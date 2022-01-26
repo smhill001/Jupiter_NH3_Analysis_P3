@@ -2,6 +2,7 @@
 """
 Created on Sun Mar 21 23:45:33 2021
 
+UPDATE 2022-01-25:  Converted to Python 3
 @author: Steven Hill
 """
 
@@ -9,7 +10,7 @@ def ComputeNetRateJupiter(scidata,header,TargetIDs,SessionID,positions,radii):
     from photutils import CircularAperture
     from photutils import aperture_photometry
     from photutils import CircularAnnulus
-    import Meta_and_Control_Data_Operations as Meta
+    import Meta_and_Control_Data_Operations_P3 as Meta
     from astropy.table import Table, hstack
     import pylab as pl
 
@@ -22,9 +23,11 @@ def ComputeNetRateJupiter(scidata,header,TargetIDs,SessionID,positions,radii):
     bkgflux_table = aperture_photometry(scidata, annulus_apertures)
     
     phot_table = hstack([rawflux_table, bkgflux_table], table_names=['raw', 'bkg'])
-    bkg_mean = phot_table['aperture_sum_bkg'] / annulus_apertures.area()
+    print("phot_table['aperture_sum_bkg']=",phot_table['aperture_sum_bkg'])
+    print("annulus_apertures.area()=",annulus_apertures.area)
+    bkg_mean = phot_table['aperture_sum_bkg'] / annulus_apertures.area
     #print "bkg_mean=",bkg_mean
-    bkg_sum = bkg_mean * apertures.area()
+    bkg_sum = bkg_mean * apertures.area
     #print "bkg_sum=",bkg_sum
     final_sum = phot_table['aperture_sum_raw'] - bkg_sum
     #print "final_sum=",final_sum

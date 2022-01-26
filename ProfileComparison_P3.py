@@ -21,32 +21,32 @@ LIBRARIES:  TBD
 """
 
 import sys
-drive='f:'
+drive='c:'
 sys.path.append(drive+'/Astronomy/Python Play')
-sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Photometry')
+sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Photometry_P3')
 sys.path.append(drive+'/Astronomy/Python Play/FITSImageStuff')
 sys.path.append(drive+'/Astronomy/Projects/SAS 2021 Project/Analysis')
 
-import scipy
+#import scipy
 import pylab as pl
-import Meta_and_Control_Data_Operations as Meta
-import SpecPhotPlot as SPP
-from astropy.io import fits
-import ComputeNetRateJupiter as CNRJ
-from astropy.io import ascii
-from astropy.table import Table, hstack, vstack
-from os import listdir
+#import Meta_and_Control_Data_Operations as Meta
+#import SpecPhotPlot as SPP
+#from astropy.io import fits
+import ComputeNetRateJupiter_P3 as CNRJ
+#from astropy.io import ascii
+#from astropy.table import Table, hstack, vstack
+#from os import listdir
 import numpy as np
 from numpy import genfromtxt
-import copy
-from scipy import interpolate
-import scipy.stats as ST
+#import copy
+#from scipy import interpolate
+#import scipy.stats as ST
 import matplotlib.image as mpimg
 
 #### SET UP INITIAL CONFIGURATION OF FILES (STILL NEED TO ADD OCTOBER)
     
-ref_path='F:/Astronomy/Projects/SAS 2021 Ammonia/'
-map_path='F:/Astronomy/Projects/Planets/Jupiter/Imaging Data/Mapping/'
+ref_path='c:/Astronomy/Projects/SAS 2021 Ammonia/'
+map_path='c:/Astronomy/Projects/Planets/Jupiter/Imaging Data/Mapping/'
 filenames=['TEXES-CIRS-blk-TEXES.txt',
            'TEXES-CIRS-red-CIRS.txt',
            #'Profile of 20200915UTJupiter-NH3-ALL-Data.csv',
@@ -141,4 +141,4 @@ pl.plot(ALLGrid[:,0],ALLGrid[:,1]*0.7-7.5,color='b',label='Jul 2020 - Jul 2021',
 pl.legend()
 #AX.plot(latgrid,AvgSignal,color='r',label='NH3/HIA')
 
-pl.savefig('F:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis/ProfileComparison.png',dpi=320)
+pl.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/ProfileComparison.png',dpi=320)

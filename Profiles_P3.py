@@ -19,16 +19,16 @@ LIBRARIES:  TBD
 """
 
 import sys
-drive='f:'
+drive='c:'
 sys.path.append(drive+'/Astronomy/Python Play')
-sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Photometry')
+sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Photometry_P3')
 sys.path.append(drive+'/Astronomy/Python Play/FITSImageStuff')
 sys.path.append(drive+'/Astronomy/Projects/SAS 2021 Project/Analysis')
 
 import scipy
 import pylab as pl
-import Meta_and_Control_Data_Operations as Meta
-import SpecPhotPlot as SPP
+import Meta_and_Control_Data_Operations_P3 as Meta
+import SpecPhotPlot_P3 as SPP
 from astropy.io import fits
 import ComputeNetRateJupiter as CNRJ
 from astropy.io import ascii
@@ -42,7 +42,7 @@ import scipy.stats as ST
 
 #### SET UP INITIAL CONFIGURATION OF FILES (STILL NEED TO ADD OCTOBER)
     
-root_path='F:/Astronomy/Projects/Planets/Jupiter/Imaging Data/'
+root_path='c:/Astronomy/Projects/Planets/Jupiter/Imaging Data/'
 observations={'20200902UT':{'pixshft':0.1,'latctr':41.8,'rp':36.1,
                             'exp647':10.0,'exp656':10.0},
               '20200903UT':{'pixshft':-0.4,'latctr':52.7,'rp':36.3,
@@ -95,8 +95,8 @@ for date in dates:
         if "csv" in fn:
             if "Aligned" in fn:
                 FNList.append(fn)
-    print len(FNList)
-    print FNList
+    print((len(FNList)))
+    print(FNList)
 
 #### READ DATA FROM EITHER CONTINUUM OR NH3
     for FN in FNList:
@@ -109,7 +109,7 @@ for date in dates:
    
     sumratio=np.sum(NH3Raw[:,1]/observations[date]['exp647'])/ \
         np.sum(CNTRaw[:,1]/observations[date]['exp656'])
-    print "sumratio=",sumratio
+    print(("sumratio=",sumratio))
 
     CNTNrm = copy.deepcopy(CNTRaw)
     CNTNrm[:,1] = CNTRaw[:,1]/np.max(CNTRaw[:,1])
@@ -211,4 +211,4 @@ MeanSpec[:,3]=sem
 
 AX.plot(latgrid,AvgSignal,color='r',label='NH3/HIA')
 
-pl.savefig('F:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis/Profiles.png',dpi=320)
+pl.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Profiles.png',dpi=320)

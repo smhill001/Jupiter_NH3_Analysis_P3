@@ -5,16 +5,16 @@ Created on Sun Nov 07 15:15:54 2021
 @author: Steven Hill
 """
 import sys
-drive='f:'
-sys.path.append(drive+'\\Astronomy\Python Play')
-sys.path.append(drive+'\\Astronomy\Python Play\Util')
-sys.path.append(drive+'\\Astronomy\Python Play\SpectroPhotometry\Spectroscopy')
+drive='x:'
+sys.path.append(drive+'/Astronomy/Python Play')
+sys.path.append(drive+'/Astronomy/Python Play/Util_P3')
+sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Spectroscopy_P3')
 
 import matplotlib.pyplot as pl
-import ConfigFiles as CF
+import ConfigFiles_P3 as CF
 import numpy as np
 
-path='F:/Astronomy/Projects/SAS 2021 Ammonia/rate_of_change_arrays/rate_of_change_arrays/'
+path='c:/Astronomy/Projects/SAS 2021 Ammonia/rate_of_change_arrays/rate_of_change_arrays/'
 
 ammonia=CF.readtextfilelines(path+"ammonia")
 arr=np.zeros([8,241])
