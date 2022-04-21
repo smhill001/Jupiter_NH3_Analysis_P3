@@ -28,6 +28,7 @@ import numpy as np
 from scipy import interpolate
 import GeneralSpecUtils_P3 as GSU
 from numpy import genfromtxt
+import NH3_Filter_Library_P3 as NFL
 
 ###### Get reference disk-integrated albedo from Karkoschka, 1994
 
@@ -37,7 +38,7 @@ Jupiter_Karkoschka1993=np.reshape(Jupiter_Karkoschka1993,[kark1993nrows,8])
 
 Jupiter_KarkRef1993=np.zeros((kark1993nrows,2))
 Jupiter_KarkRef1993[:,0]=Jupiter_Karkoschka1993[:,0]
-Jupiter_KarkRef1993[:,1]=Jupiter_Karkoschka1993[:,3]
+Jupiter_KarkRef1993[:,1]=Jupiter_Karkoschka1993[:,3] #Albedo
 
 WaveGrid,SignalonGrid=GSU.uniform_wave_grid(Jupiter_KarkRef1993[:,0],Jupiter_KarkRef1993[:,1],
                                         Extend=False,Fine=False)
@@ -47,7 +48,8 @@ JK[:,0]=WaveGrid
 JK[:,1]=SignalonGrid
 #### CODE THIS INLINE WITH THE NEW SCIPY PYTHON 3 IMPLEMENTATION OF
 #### SPLINE FITTING
-SplineWV = np.array([560.0, 580.0, 600.0, 635.0, 660.0, 675.0, 690., 714.0])
+SplineWV = np.array([560.0, 580.0, 600.0, 635.0, 660.0, 675.0, 690., 714.0,
+                     745.0, 830.0, 945.0])
 SplineMag=np.ones(SplineWV.size)
 for i in range(0,SplineWV.size):
     Start=SplineWV[i]-.0000001
@@ -74,7 +76,12 @@ Continuum_Albedo[:,1]=Temp
 
 CH4_KarkRef1993=np.zeros((kark1993nrows,2))
 CH4_KarkRef1993[:,0]=Jupiter_Karkoschka1993[:,0]
-CH4_KarkRef1993[:,1]=Jupiter_Karkoschka1993[:,2]
+CH4_KarkRef1993[:,1]=Jupiter_Karkoschka1993[:,2] #CH4 Coef
+WaveGrid,SignalonGrid=GSU.uniform_wave_grid(CH4_KarkRef1993[:,0],CH4_KarkRef1993[:,1],
+                                        Extend=False,Fine=False)
+CH4=np.zeros((WaveGrid.size,2))
+CH4[:,0]=WaveGrid
+CH4[:,1]=SignalonGrid
 
 
 ###### Get reference regional I/F reflectivities from Dahl, 2021?
@@ -87,132 +94,126 @@ Dahl_EZ="c:/Astronomy/Projects/SAS 2021 Ammonia/Dahl Spectra-EZ.txt"
 EZ = genfromtxt(Dahl_EZ, delimiter=',')
 
 ###### Plot disk-integrated reference albedo and simulated ammonia-free albedo
+fig1,axs1=pl.subplots(2,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
+                      sharex=True)
+fig1.suptitle("Ammonia Filters",x=0.5,ha='center',color='k')
 
-pl.figure(figsize=(4.0, 4.0), dpi=150, facecolor="white")
-
-pl.subplot(2,1, 1)
 #Plot Layout Configuration
 x0=600.
-x1=700.
-xtks=6
+x1=1000.
+xtks=9
 y0=0.0
-y1=1.0
-ytks=11
+y1=0.7
+ytks=8
 
 # Set x limits
-pl.xlim(x0,x1)
+axs1[0].set_xlim(x0,x1)
 # Set x ticks
-pl.xticks(np.linspace(x0,x1,xtks, endpoint=True))
+axs1[0].set_xticks(np.linspace(x0,x1,xtks, endpoint=True))
 # Set y limits
-pl.ylim(y0,y1)
-pl.yticks(np.linspace(y0,y1,ytks, endpoint=True))
+axs1[0].set_ylim(y0,y1)
+axs1[0].set_yticks(np.linspace(y0,y1,ytks, endpoint=True))
 # Set y ticks
-pl.grid(linewidth=0.2)
-pl.tick_params(axis='both', which='major', labelsize=8)
-pl.ylabel("Albedo",fontsize=8,color="black")
-pl.xlabel("Wavelength (nm)",fontsize=8)
+axs1[0].grid(linewidth=0.2)
+axs1[0].tick_params(axis='both', which='major', labelsize=8)
+axs1[0].set_ylabel("Albedo",fontsize=8,color="black")
 
-pl.plot(Continuum_Albedo[:,0],Continuum_Albedo[:,1],label='Continuum Albedo',linewidth=1,color='b')
-pl.plot(JK[:,0],JK[:,1],label='Jupiter Albedo',linewidth=0.5,color='r')
-pl.plot(CH4_KarkRef1993[:,0],CH4_KarkRef1993[:,1],label='CH4 Abs. Coef. ',linewidth=1,color='g')
-pl.legend(fontsize=7)
+axs1[0].plot(Continuum_Albedo[:,0],Continuum_Albedo[:,1],label='Continuum Albedo',linewidth=1,color='b')
+axs1[0].plot(JK[:,0],JK[:,1],label='Jupiter Albedo',linewidth=0.5,color='r')
+
+axs1b = axs1[0].twinx()  # instantiate a second axes that shares the same x-axis
+axs1b.ticklabel_format(axis='y')
+axs1b.tick_params(axis='y', which='major', labelsize=7)
+axs1b.set_yscale('log')
+axs1b.set_ylim(1e-3,1e2)
+
+
+axs1b.plot(CH4_KarkRef1993[:,0],CH4_KarkRef1993[:,1],label='CH4 Abs. Coef. ',linewidth=0.5,color='g')
+#axs1b.plot(CH4[:,0],CH4[:,1],label='CH4 Abs. Coef. ',linewidth=1,color='k')
+axs1[0].legend(fontsize=7, loc=2)
+axs1b.legend(fontsize=7, loc=1)
+
+path='c:/Astronomy/Projects/Techniques/InstrumentPerformance-P3/Filters/'
 
 
 ###### Retrieve filter transmissions and convovle with disk integrated albedoes
 
-FilterFile="c:/Astronomy/Projects/Stars/Capella/Spectral Data/1D Spectra/Capella20201125024213_1D_WVCal.txt"
-FilterOPNC = np.fromfile(file=FilterFile, dtype=float, count=-1, sep='\t')    
-FilterOPNC=np.reshape(FilterOPNC,[int(FilterOPNC.size/2),2])
 
-FilterFile="c:/Astronomy/Projects/Stars/Capella/Spectral Data/1D Spectra/Capella20201125025745_1D_WVCal.txt"
-Filter672 = np.fromfile(file=FilterFile, dtype=float, count=-1, sep='\t')    
-Filter672=np.reshape(Filter672,[int(Filter672.size/2),2])
-Transmission672=GSU.SpectrumMath(Filter672,FilterOPNC,"Divide")
+Transmission632 = np.loadtxt(path+'632OI/632OI_Transmission.txt',usecols=range(2))
+Transmission647 = np.loadtxt(path+'647CNT/647CNT_Transmission.txt',usecols=range(2))
+Transmission656 = np.loadtxt(path+'656HIA/656HIA_Transmission.txt',usecols=range(2))
+Transmission658 = np.loadtxt(path+'658NII/658NII_Transmission.txt',usecols=range(2))
+Transmission672 = np.loadtxt(path+'672SII/672SII_Transmission.txt',usecols=range(2))
+Transmission730 = np.loadtxt(path+'730OII/730OII_Transmission.txt',usecols=range(2))
+Transmission889 = np.loadtxt(path+'889CH4/889CH4_Transmission.txt',usecols=range(2))
+Transmission940 = np.loadtxt(path+'940NIR/940NIR_Transmission.txt',usecols=range(2))
 
-##########
-
-FilterFile="c:/Astronomy/Projects/Planets/Mars/Spectral Data/1D Spectra/Mars20201122014325_1D_WVCal.txt"
-FilterOPNM = np.fromfile(file=FilterFile, dtype=float, count=-1, sep='\t')    
-FilterOPNM=np.reshape(FilterOPNM,[int(FilterOPNM.size/2),2])
-
-FilterFile="c:/Astronomy/Projects/Planets/Mars/Spectral Data/1D Spectra/Mars20201122020503_1D_WVCal.txt"
-Filter658 = np.fromfile(file=FilterFile, dtype=float, count=-1, sep='\t')    
-Filter658=np.reshape(Filter658,[int(Filter658.size/2),2])
-Transmission658=GSU.SpectrumMath(Filter658,FilterOPNM,"Divide")
-
-FilterFile="c:/Astronomy/Projects/Planets/Mars/Spectral Data/1D Spectra/Mars20201122015240_1D_WVCal.txt"
-Filter656 = np.fromfile(file=FilterFile, dtype=float, count=-1, sep='\t')    
-Filter656=np.reshape(Filter656,[int(Filter656.size/2),2])
-Transmission656=GSU.SpectrumMath(Filter656,FilterOPNM,"Divide")
-
-FilterFile="c:/Astronomy/Projects/Planets/Mars/Spectral Data/1D Spectra/Mars20201122020035_1D_WVCal.txt"
-Filter647 = np.fromfile(file=FilterFile, dtype=float, count=-1, sep='\t')    
-Filter647=np.reshape(Filter647,[int(Filter647.size/2),2])
-Transmission647=GSU.SpectrumMath(Filter647,FilterOPNM,"Divide")
 
 ##########
 
-FilterFile="c:/Astronomy/Projects/Stars/Vega/Spectral Data/1D Spectra/Vega20210727051700_1D_WVCal.txt"
-FilterOPNV = np.fromfile(file=FilterFile, dtype=float, count=-1, sep='\t')    
-FilterOPNV=np.reshape(FilterOPNV,[int(FilterOPNV.size/2),2])
-
-FilterFile="c:/Astronomy/Projects/Stars/Vega/Spectral Data/1D Spectra/Vega20210727051317_1D_WVCal.txt"
-Filter632 = np.fromfile(file=FilterFile, dtype=float, count=-1, sep='\t')    
-Filter632=np.reshape(Filter632,[int(Filter632.size/2),2])
-Transmission632=GSU.SpectrumMath(Filter632,FilterOPNC,"Divide")
-
-##########
-
+ContinuumProduct940=GSU.SpectrumMath(Transmission940,Continuum_Albedo,"Multiply")
+ContinuumProduct889=GSU.SpectrumMath(Transmission889,Continuum_Albedo,"Multiply")
+ContinuumProduct730=GSU.SpectrumMath(Transmission730,Continuum_Albedo,"Multiply")
 ContinuumProduct672=GSU.SpectrumMath(Transmission672,Continuum_Albedo,"Multiply")
 ContinuumProduct658=GSU.SpectrumMath(Transmission658,Continuum_Albedo,"Multiply")
 ContinuumProduct656=GSU.SpectrumMath(Transmission656,Continuum_Albedo,"Multiply")
 ContinuumProduct647=GSU.SpectrumMath(Transmission647,Continuum_Albedo,"Multiply")
 ContinuumProduct632=GSU.SpectrumMath(Transmission632,Continuum_Albedo,"Multiply")
 
+AbsorptionProduct940=GSU.SpectrumMath(Transmission940,JK,"Multiply")
+AbsorptionProduct889=GSU.SpectrumMath(Transmission889,JK,"Multiply")
+AbsorptionProduct730=GSU.SpectrumMath(Transmission730,JK,"Multiply")
 AbsorptionProduct672=GSU.SpectrumMath(Transmission672,JK,"Multiply")
 AbsorptionProduct658=GSU.SpectrumMath(Transmission658,JK,"Multiply")
 AbsorptionProduct656=GSU.SpectrumMath(Transmission656,JK,"Multiply")
 AbsorptionProduct647=GSU.SpectrumMath(Transmission647,JK,"Multiply")
 AbsorptionProduct632=GSU.SpectrumMath(Transmission632,JK,"Multiply")
 
+keff_CH4Product=GSU.SpectrumMath(Transmission889,CH4,"Multiply")
+StartIndex889=np.where(keff_CH4Product[:,0]==877.0)
+EndIndex889=np.where(keff_CH4Product[:,0]==902.0)
+keff_CH4=sum(keff_CH4Product[StartIndex889[0][0]:EndIndex889[0][0],1])/(902.-877.)
+print("################################")
+print("Keff_CH4_889=",keff_CH4)
+
+
 ###### Plot filter transmissions convolved with disk-integrated albedos
 
-pl.subplot(2,1,2)
-x0=600.
-x1=700.
-xtks=6
-y0=0.0
-y1=0.6
-ytks=7
 
 # Set x limits
-pl.xlim(x0,x1)
+axs1[1].set_xlim(x0,x1)
 # Set x ticks
-pl.xticks(np.linspace(x0,x1,xtks, endpoint=True))
+axs1[1].set_xticks(np.linspace(x0,x1,xtks, endpoint=True))
 # Set y limits
-pl.ylim(y0,y1)
-pl.yticks(np.linspace(y0,y1,ytks, endpoint=True))
+axs1[1].set_ylim(y0,y1)
+axs1[1].set_yticks(np.linspace(y0,y1,ytks, endpoint=True))
 # Set y ticks
-pl.grid(linewidth=0.2)
-pl.tick_params(axis='both', which='major', labelsize=8)
-pl.ylabel("Albedo x Transmission",fontsize=8,color="black")
-pl.xlabel("Wavelength (nm)",fontsize=8)
-pl.plot(ContinuumProduct672[:,0],ContinuumProduct672[:,1],label='Continuum Albedo',linewidth=1,color='b')
-pl.plot(ContinuumProduct658[:,0],ContinuumProduct658[:,1],linewidth=1,color='b')
-pl.plot(ContinuumProduct656[:,0],ContinuumProduct656[:,1],linewidth=1,color='b')
-pl.plot(ContinuumProduct647[:,0],ContinuumProduct647[:,1],linewidth=1,color='b')
-pl.plot(ContinuumProduct632[:,0],ContinuumProduct632[:,1],linewidth=1,color='b')
+axs1[1].grid(linewidth=0.2)
+axs1[1].tick_params(axis='both', which='major', labelsize=8)
+axs1[1].set_ylabel("Albedo x Transmission",fontsize=8,color="black")
+axs1[1].set_xlabel("Wavelength (nm)",fontsize=8)
+axs1[1].plot(ContinuumProduct940[:,0],ContinuumProduct940[:,1],label='Continuum Albedo',linewidth=1,color='b')
+axs1[1].plot(ContinuumProduct889[:,0],ContinuumProduct889[:,1],linewidth=1,color='b')
+axs1[1].plot(ContinuumProduct730[:,0],ContinuumProduct730[:,1],linewidth=1,color='b')
+axs1[1].plot(ContinuumProduct672[:,0],ContinuumProduct672[:,1],linewidth=1,color='b')
+axs1[1].plot(ContinuumProduct658[:,0],ContinuumProduct658[:,1],linewidth=1,color='b')
+axs1[1].plot(ContinuumProduct656[:,0],ContinuumProduct656[:,1],linewidth=1,color='b')
+axs1[1].plot(ContinuumProduct647[:,0],ContinuumProduct647[:,1],linewidth=1,color='b')
+axs1[1].plot(ContinuumProduct632[:,0],ContinuumProduct632[:,1],linewidth=1,color='b')
 
-pl.plot(AbsorptionProduct672[:,0],AbsorptionProduct672[:,1],label='Jupiter Albedo',linewidth=0.5,color='r')
-pl.plot(AbsorptionProduct658[:,0],AbsorptionProduct658[:,1],linewidth=0.5,color='r')
-pl.plot(AbsorptionProduct656[:,0],AbsorptionProduct656[:,1],linewidth=0.5,color='r')
-pl.plot(AbsorptionProduct647[:,0],AbsorptionProduct647[:,1],linewidth=0.5,color='r')
-pl.plot(AbsorptionProduct632[:,0],AbsorptionProduct632[:,1],linewidth=0.5,color='r')
+axs1[1].plot(AbsorptionProduct940[:,0],AbsorptionProduct940[:,1],label='Jupiter Albedo',linewidth=0.5,color='r')
+axs1[1].plot(AbsorptionProduct889[:,0],AbsorptionProduct889[:,1],linewidth=0.5,color='r')
+axs1[1].plot(AbsorptionProduct730[:,0],AbsorptionProduct730[:,1],linewidth=0.5,color='r')
+axs1[1].plot(AbsorptionProduct672[:,0],AbsorptionProduct672[:,1],linewidth=0.5,color='r')
+axs1[1].plot(AbsorptionProduct658[:,0],AbsorptionProduct658[:,1],linewidth=0.5,color='r')
+axs1[1].plot(AbsorptionProduct656[:,0],AbsorptionProduct656[:,1],linewidth=0.5,color='r')
+axs1[1].plot(AbsorptionProduct647[:,0],AbsorptionProduct647[:,1],linewidth=0.5,color='r')
+axs1[1].plot(AbsorptionProduct632[:,0],AbsorptionProduct632[:,1],linewidth=0.5,color='r')
 
-pl.legend(fontsize=7)
+axs1[1].legend(fontsize=7,loc=2)
 
 
-pl.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/AmmoniaFilter.png',dpi=320)
+fig1.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/AmmoniaFilter.png',dpi=320)
 
 ###### Plot regional and moon reflectivities
 
@@ -370,39 +371,41 @@ pl.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Color
 
 ###############################################################################
 
-StartIndex647=np.where(ContinuumProduct647[:,0]==635.0)
-EndIndex647=np.where(ContinuumProduct647[:,0]==659.0)
-ContimIntegral647=sum(ContinuumProduct647[StartIndex647[0][0]:EndIndex647[0][0],1])
-AbsorpIntegral647=sum(AbsorptionProduct647[StartIndex647[0][0]:EndIndex647[0][0],1])
 
-print("########### Jupiter 647NH3/647Cont")
-print("index=",StartIndex647[0][0],EndIndex647[0][0])
-print("Contin, Absorp=",ContimIntegral647,AbsorpIntegral647)
-print("Ratio, 1-Ratio=",AbsorpIntegral647/ContimIntegral647,1.0-AbsorpIntegral647/ContimIntegral647)
-print("1/(1-Ratio)=",1.0/(1.0-AbsorpIntegral647/ContimIntegral647))
+ContimIntegral632,AbsorpIntegral632=NFL.cont_absorption_calcs(ContinuumProduct632,AbsorptionProduct632,622.,642.,"632OI")
+ContimIntegral647,AbsorpIntegral647=NFL.cont_absorption_calcs(ContinuumProduct647,AbsorptionProduct647,635.,659.,"647CNT")
+ContimIntegral656,AbsorpIntegral656=NFL.cont_absorption_calcs(ContinuumProduct656,AbsorptionProduct656,645.,672.,"656HIA")
+ContimIntegral658,AbsorpIntegral658=NFL.cont_absorption_calcs(ContinuumProduct658,AbsorptionProduct658,653.,663.,"658NII")
+ContimIntegral672,AbsorpIntegral672=NFL.cont_absorption_calcs(ContinuumProduct672,AbsorptionProduct672,662.,682.,"672SII")
+ContimIntegral730,AbsorpIntegral730=NFL.cont_absorption_calcs(ContinuumProduct730,AbsorptionProduct730,720.,740.,"730OII")
+ContimIntegral889,AbsorpIntegral889=NFL.cont_absorption_calcs(ContinuumProduct889,AbsorptionProduct889,877.,902.,"889CH4")
+ContimIntegral940,AbsorpIntegral940=NFL.cont_absorption_calcs(ContinuumProduct940,AbsorptionProduct940,926.,954.,"940NIR")
 
-StartIndex656=np.where(ContinuumProduct656[:,0]==645.0)
-EndIndex656=np.where(ContinuumProduct656[:,0]==672.0)
-ContimIntegral656=sum(ContinuumProduct656[StartIndex656[0][0]:EndIndex656[0][0],1])
-AbsorpIntegral656=sum(AbsorptionProduct656[StartIndex656[0][0]:EndIndex656[0][0],1])
-print()
-print("########### Jupiter 656NH3/656Cont")
-print("index=",StartIndex656[0][0],EndIndex656[0][0])
-print("Contin, Absorp=",ContimIntegral656,AbsorpIntegral656)
-print("Ratio, 1-Ratio=",AbsorpIntegral656/ContimIntegral656,1.0-AbsorpIntegral656/ContimIntegral656)
-print("1/(1-Ratio)=",1.0/(1.0-AbsorpIntegral656/ContimIntegral656))
 print()
 print("########### Jupiter 647/656 ratios")
 print("647/656 Continuum=",ContimIntegral647/ContimIntegral656)
 print("647/656 with NH3=",AbsorpIntegral647/AbsorpIntegral656)
 print("(647/656 with NH3)/(647/656 Continuum)=",(AbsorpIntegral647/AbsorpIntegral656)/(ContimIntegral647/ContimIntegral656))
+print()
+
+print()
+print("########### Jupiter 889/940 ratios")
+print("889/940 Continuum=",ContimIntegral889/ContimIntegral940)
+print("889/940 with NH3=",AbsorpIntegral889/AbsorpIntegral940)
+print("(889/940 with NH3)/(889/940 Continuum)=",(AbsorpIntegral889/AbsorpIntegral940)/(ContimIntegral889/ContimIntegral940))
+print()
 
 ###############################################################################
+StartIndex647=np.where(CallistoProduct647[:,0]==635.)
+EndIndex647=np.where(CallistoProduct647[:,0]==659.)
 
 CalIntegral647=sum(CallistoProduct647[StartIndex647[0][0]:EndIndex647[0][0],1])
 GanIntegral647=sum(GanymedeProduct647[StartIndex647[0][0]:EndIndex647[0][0],1])
 EurIntegral647=sum(EuropaProduct647[StartIndex647[0][0]:EndIndex647[0][0],1])
 IoIntegral647=sum(IoProduct647[StartIndex647[0][0]:EndIndex647[0][0],1])
+
+StartIndex656=np.where(CallistoProduct647[:,0]==645.)
+EndIndex656=np.where(CallistoProduct647[:,0]==672.)
 
 CalIntegral656=sum(CallistoProduct656[StartIndex656[0][0]:EndIndex656[0][0],1])
 GanIntegral656=sum(GanymedeProduct656[StartIndex656[0][0]:EndIndex656[0][0],1])
@@ -420,3 +423,4 @@ print("Callisto=",(ContimIntegral647/ContimIntegral656)/(CalIntegral647/CalInteg
 print("Ganymede=",(ContimIntegral647/ContimIntegral656)/(GanIntegral647/GanIntegral656))
 print("Europa=",(ContimIntegral647/ContimIntegral656)/(EurIntegral647/EurIntegral656))
 print("Io=",(ContimIntegral647/ContimIntegral656)/(IoIntegral647/IoIntegral656))
+

@@ -36,11 +36,11 @@ VERSION:    2.0 (12/31/2021) - Produces CMOS and CCD maps and given date as long
             - Poorly commented and probably has extraneous code
             - Dependency on F:\Astronomy\Python Play\PlanetMapsMapConfig.txt
             
-EXAMPLE:    AmmoniaMaps_P3(DateSelection=["2021-09-23"])
+EXAMPLE:    AmmoniaMaps(DateSelection=["2021-09-23"])
 
 """
 
-def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',orientation='Landscape'):
+def CH4_EW_Map_Test_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',orientation='Landscape'):
     ###########################################################################
     # Set up environment and paths
     #
@@ -67,6 +67,12 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
     drive="C:"
     path="/Astronomy/Projects/Planets/Jupiter/Imaging Data/Mapping/"
     
+    amagat=2.69e24 #Lodschmits number?
+    gravity=2228.0
+    mean_mol_wt=3.85e-24
+    fCH4=1.81e-3
+    STP=1.01e6
+
     observer = ephem.Observer()
     #Location from Google Maps at 483 S Oneida Way, Denver 80224
     observer.lon = ephem.degrees('-104.907985')
@@ -77,7 +83,7 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
     print("len(CM2_L360)=",len(CM2))
 
     #Set up labels for the six kinds of maps
-    PlotTypes=["NH3Abs","889CH4","380NUV","RGB","Reflectivity","ClrSlp"]
+    PlotTypes=["NH3Abs","CH4Abs","ClrSlp"]
     
     #Create empty arrays for the aggregation of NH3 absorption patch data, to
     #  be used as input to ProfileComparison.py
@@ -86,9 +92,8 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
     ###########################################################################
     #Begin looping over observing sessions
     DateCounter=0
-    for Date in DateSelection:      
-        print("Date=",Date)     
-        ##### Compute Jupiter ephemeris
+    for Date in DateSelection:
+        #Compute Ephermeris for NH3 observation CM2
         MapsforDate=[k for k in CM2 if Date in k]              
         NH3Abs_fn=[k for k in MapsforDate if "NH3Abs" in k]        
         strdate=NH3Abs_fn[0][0:15]
@@ -113,6 +118,37 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
         else:
             CM2str=str(int(CM2deg))
             
+        print("Date=",Date)     
+        ##### Compute Jupiter ephemeris
+        #MapsforDate=[k for k in CM2 if Date in k]              
+        #######################################################################
+        # Create CH4Abs patch and scale to EW(nm) for contour computations
+        CH4Abs_fn=[k for k in MapsforDate if "CH4Abs" in k]        
+        tmp=load_png(drive+path+CH4Abs_fn[0])
+        CH4Abs_map=tmp[:,:,0]
+        CH4Abs_patch=make_patch(CH4Abs_map,LatLims,LonLims,CM2deg)
+        CH4Abs_patch_EW=(1.0-0.104*(CH4Abs_patch*2.0/((2.0**16.)-1.0)+0.0))*20.2/0.896
+        
+        # Make smoothed patch for NH3Abs contours
+        kernel = Gaussian2DKernel(1)
+        print(kernel)
+        #Empirical longitudinal limb darkening correction
+        if zonecorr[:]==[0,0]:
+            ZoneLimbDarkCorr=np.ones(90)
+        else:
+            ZoneLimbDarkCorr=np.mean(CH4Abs_patch_EW[45-zonecorr[0]:45-zonecorr[1],:],axis=0) ###To flip or not to flip in long?
+        ZoneLimbDarkCorr=ZoneLimbDarkCorr/np.max(ZoneLimbDarkCorr)
+        print(ZoneLimbDarkCorr.shape,CH4Abs_patch_EW.shape)
+        CH4Abs_patch_EW_corr=CH4Abs_patch_EW/ZoneLimbDarkCorr[None,:]
+        CH4Abs_patch_EW_conv = convolve(CH4Abs_patch_EW_corr, kernel)
+        
+        CH4Abs_patch_EW_corr_WaveNum=(CH4Abs_patch_EW_corr*((1./(889.0*1e-8))/889.0))/10.
+        NCH4_lin=3.0*(CH4Abs_patch_EW_corr_WaveNum/2.2)/5753. #band strength from Hill,2015 work
+        #Random factor of 3 above to 'compensate' for band saturation.
+        NCH4_lin_conv = convolve(NCH4_lin, kernel)
+        Pcloud=NCH4_lin*amagat*gravity*mean_mol_wt/(fCH4*STP)
+        Pcloud_conv = convolve(Pcloud, kernel)
+
         #######################################################################
         # Create NH3Abs patch and scale to EW(nm) for contour computations
         tmp=load_png(drive+path+NH3Abs_fn[0])
@@ -131,22 +167,27 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
         ZoneLimbDarkCorr=ZoneLimbDarkCorr/np.max(ZoneLimbDarkCorr)
         print(ZoneLimbDarkCorr.shape,NH3Abs_patch_EW.shape)
         NH3Abs_patch_EW_corr=NH3Abs_patch_EW/ZoneLimbDarkCorr[None,:]
-
         NH3Abs_conv = convolve(NH3Abs_patch_EW_corr, kernel)
-        print("-------------------> NH3_conv.shape",NH3Abs_conv.shape)
-        
+
+        NH3Abs_patch_EW_corr_WaveNum=(NH3Abs_patch_EW_corr*((1./(646.0*1e-8))/646.0))/10.
+        NNH3_lin=(NH3Abs_patch_EW_corr_WaveNum/2.2)/630. #band strength from Lutz&Owen 1980
+        NNH3_lin_conv = convolve(NNH3_lin, kernel)
+
+
+        fNH3=NNH3_lin*amagat*gravity*mean_mol_wt/(Pcloud*STP)
+
         #######################################################################
         # Compute and plot single-session meridional and zonal profiles from 
         #   unadjusted patch. Also store the profiles for creation of average
         #   profile plots across all sessions in a give run.
-        MeridEW=np.flip(np.mean(NH3Abs_patch_EW[:,:],axis=1),axis=0)
-        MeridEWerror=np.flip(np.std(NH3Abs_patch_EW[:,:],axis=1),axis=0)
+        MeridEW=np.flip(np.mean(CH4Abs_patch_EW[:,:],axis=1),axis=0)
+        MeridEWerror=np.flip(np.std(CH4Abs_patch_EW[:,:],axis=1),axis=0)
         Lats=np.linspace(-44.5,44.5,90)
         #print DateCounter; Date
         MeridEWArray[:,DateCounter]=MeridEW[:]
         
-        ZoneEW=np.mean(NH3Abs_patch_EW[:,:],axis=0) 
-        ZoneEWerror=np.std(NH3Abs_patch_EW[:,:],axis=0)
+        ZoneEW=np.mean(CH4Abs_patch_EW[:,:],axis=0) 
+        ZoneEWerror=np.std(CH4Abs_patch_EW[:,:],axis=0)
         Lons=np.linspace(-44.5,44.5,90)
         ZoneEWArray[:,DateCounter]=ZoneEW[:]
         
@@ -164,10 +205,10 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
 
         for iprof in range(0,2):
             axsprof[iprof].grid(linewidth=0.2)
-            axsprof[iprof].set_xlim(-45.,45.)
-            axsprof[iprof].set_ylim(0.,1.5)
+            axsprof[iprof].xlim=[-45.,45.]
+            axsprof[iprof].ylim=[18.,22.]
             axsprof[iprof].set_xticks(np.linspace(-45.,45.,7), minor=False)
-            axsprof[iprof].set_yticks(np.linspace(0.,1.5,7), minor=False)
+            axsprof[iprof].set_yticks(np.linspace(18.,22.,9), minor=False)
             axsprof[iprof].tick_params(axis='both', which='major', labelsize=7)
             axsprof[iprof].set_ylabel("Equivalent Width (nm)",fontsize=8)
 
@@ -183,119 +224,78 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
         figcor,axscor=pl.subplots(2,2,figsize=(6.0,4.5), dpi=150, facecolor="white",
                             sharey=True,sharex=True)
         figcor.suptitle(Date+", CM2="+str(int(CM2deg)),x=0.5,ha='center',color='k')
-        
-        #axscor.xlim=[0.,1.]
-        #axsprof[iprof].ylim=[0.,1.5]
-        #axsprof[iprof].set_xticks(np.linspace(-45.,45.,7), minor=False)
-        #axsprof[iprof].set_yticks(np.linspace(0.,1.5,7), minor=False)
-        #axsprof[iprof].tick_params(axis='both', which='major', labelsize=7)
-        #axsprof[iprof].set_ylabel("Equivalent Width (nm)",fontsize=8)
-
-        for iPlot in range(0,len(PlotTypes)):
-            print("PlotTypes[i]=============",PlotTypes[iPlot])
-            if orientation=='Landscape':
+        for iPlot in range(0,6):
                 # Set up
-                i=int(iPlot/3)                           #Plot row
-                j=np.mod(iPlot,3)                   #Plot column
-                axs[i,j].grid(linewidth=0.2)
-                axs[i,j].ylim=[-45.,45.]
-                axs[i,j].xlim=[360-LonLims[0],360-LonLims[1]]
-                axs[i,j].set_xticks(np.linspace(450,0,31), minor=False)
-                xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
-                axs[i,j].set_xticklabels(xticklabels.astype(int))
-                axs[i,j].set_yticks(np.linspace(-45,45,7), minor=False)
-                axs[i,j].tick_params(axis='both', which='major', labelsize=7)
-                if j>0:
-                    axscor[i,j-1].grid(linewidth=0.2)
-                    axscor[i,j-1].set_xlim(0.,1.)
-                    axscor[i,j-1].set_xticks(np.linspace(0.,1.,6), minor=False)
-                    axscor[i,j-1].set_ylim(0.,float(2**16-1))
-                    axscor[i,j-1].set_yticks([0.,20000.,40000.,60000.], minor=False)
+            i=int(iPlot/3)                           #Plot row
+            j=np.mod(iPlot,3)                   #Plot column
+            axs[i,j].grid(linewidth=0.2)
+            axs[i,j].ylim=[-45.,45.]
+            axs[i,j].xlim=[360-LonLims[0],360-LonLims[1]]
+            axs[i,j].set_xticks(np.linspace(450,0,31), minor=False)
+            xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
+            axs[i,j].set_xticklabels(xticklabels.astype(int))
+            axs[i,j].set_yticks(np.linspace(-45,45,7), minor=False)
+            axs[i,j].tick_params(axis='both', which='major', labelsize=7)
 
+            axs[i,j].set_adjustable('box') 
+            
+        ###############################################################
+        # NH3 Plots
+        #
+        mapshow=axs[0,0].imshow(NH3Abs_patch_EW_corr, "gist_heat", origin='upper',  
+                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
+                           90-LatLims[0]],vmin=0,vmax=1.2,
+                           aspect="equal")
+        axs[0,0].set_title("NH3Abs EW(nm)",fontsize=8)
 
-                print("PlotTypes[iPlot]=============",PlotTypes[iPlot])
-                
-                if PlotTypes[iPlot] in ["NH3Abs"]:
-                    axs[i,j].set_title(PlotTypes[iPlot]+" EW(nm)",fontsize=8)
-                else:
-                    axs[i,j].set_title(PlotTypes[iPlot],fontsize=8)
-                    if j>0:
-                        axscor[i,j-1].set_title(PlotTypes[iPlot],fontsize=8)
-                    
-                if PlotTypes[iPlot] in ["889CH4","380NUV","Reflectivity"]:
-                    clrtbl='gist_heat'
-                    #clrtbl='bwr'
-                else:
-                    clrtbl='gist_heat_r'
-                    #clrtbl='bwr_r'
+        mapshow=axs[0,1].imshow(NNH3_lin, "gist_heat", origin='upper',  
+                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
+                           90-LatLims[0]],vmin=0.005,vmax=0.015,
+                           aspect="equal")
+        axs[0,1].set_title("NH3 (km-amagat)",fontsize=8)
 
-                axs[i,j].set_adjustable('box') 
-                
-                ###############################################################
-                # Read and plot maps patches for each data type
-                #
-                if PlotTypes[iPlot] in ["ClrSlp","889CH4","380NUV"]:
-                    fn=[k for k in MapsforDate if str(PlotTypes[iPlot]) in k]
-                    if len(fn) > 0:
-                        tmp=load_png(drive+path+fn[0])
-                        jmap=tmp[:,:,0]
-                        patch=make_patch(jmap,LatLims,LonLims,CM2deg)
-   
-                        mapshow=axs[i,j].imshow(patch, clrtbl, origin='upper',  
-                                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                                           90-LatLims[0]],vmin=0,vmax=65635,
-                                           aspect="equal")
-                        axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[0:19,:],patch[0:19,:],marker="o",s=0.5,edgecolor='C0',alpha=0.5,label="45N-35N")
-                        axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[20:35,:],patch[20:35,:],marker="o",s=0.5,edgecolor='C5',alpha=0.5,label="35N-10N (NEB)")
-                        axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[36:45,:],patch[36:45,:],marker="o",s=0.5,edgecolor='C2',alpha=0.5,label="10N-0 (NEZ)")
-                        axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[46:59,:],patch[46:59,:],marker="o",s=0.5,edgecolor='C4',alpha=0.5,label="0-15S")
-                        axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[60:74,:],patch[60:74,:],marker="o",s=0.5,edgecolor='C3',alpha=0.5,label="15S-30S (GRS)")
-                        axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[75:89,:],patch[75:89,:],marker="o",s=0.5,edgecolor='C1',alpha=0.5,label="30S-45S")
-                    else:
-                        fig.delaxes(axs[i,j])
-                        
-                elif PlotTypes[iPlot] in ["NH3Abs"]:
-                    mapshow=axs[i,j].imshow(NH3Abs_patch_EW_corr, "gist_heat", origin='upper',  
-                               extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                                       90-LatLims[0]],vmin=0,vmax=1.2,
-                                       aspect="equal")
-                        
-                elif PlotTypes[iPlot] in ["Reflectivity","RGB"]:
-                    fn=[k for k in MapsforDate if "RGB" in k]
-                    if len(fn) > 0:
-                        if PlotTypes[iPlot] in ["Reflectivity"]:
-                            tm1=imread(drive+path+fn[0])
-                            jmap=np.mean(tm1[:,:,:],axis=2)*255*255
-                            patch=make_patch(jmap,LatLims,LonLims,CM2deg)
-                        elif PlotTypes[iPlot] in ["RGB"]:
-                            jmap=imread(drive+path+fn[0])
-                            patch=make_patch(jmap,LatLims,LonLims,CM2deg)
-    
-                        mapshow=axs[i,j].imshow(patch, clrtbl,origin='upper',  
-                                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                                           90-LatLims[0]],vmin=0,vmax=65635,
-                                           aspect="equal")
-                        if PlotTypes[iPlot] in ["Reflectivity"]:
-                            axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[0:19,:],patch[0:19,:],marker="o",s=0.5,color='C0',alpha=0.5,label="45N-35N")
-                            axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[20:35,:],patch[20:35,:],marker="o",s=0.5,color='C5',alpha=0.5,label="35N-10N (NEB)")
-                            axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[36:45,:],patch[36:45,:],marker="o",s=0.5,color='C2',alpha=0.5,label="10N-0 (NEZ)")
-                            axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[46:59,:],patch[46:59,:],marker="o",s=0.5,color='C4',alpha=0.5,label="0-15S")
-                            axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[60:74,:],patch[60:74,:],marker="o",s=0.5,color='C3',alpha=0.5,label="15S-30S (GRS)")
-                            axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[75:89,:],patch[75:89,:],marker="o",s=0.5,color='C1',alpha=0.5,label="30S-45S")
-                    else:
-                        fig.delaxes(axs[i,j])
-                # Overplot contours and set axis labels
-                if cont==True:
-                    temp=make_contours(axs[i,j],NH3Abs_conv,LatLims,LonLims)
-                if i==1:
-                    axs[i,j].set_xlabel("Sys. II Longitude (deg)",fontsize=8)
-                    if j>0:
-                        axscor[i,j-1].set_xlabel("NH3 Absorption EW (nm)",fontsize=8)
+        mapshow=axs[0,2].imshow(fNH3, "gist_heat", origin='upper',  
+                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
+                           90-LatLims[0]],vmin=0.0002,vmax=0.0005,
+                           aspect="equal")
+        axs[0,2].set_title("fNH3 (vmf)",fontsize=8)
+        
+        if cont:
+            temp=make_contours_CH4(axs[0,0],NH3Abs_conv,LatLims,LonLims,
+                                   lvls=[0.4,0.5,0.6,0.7,0.8])
+            temp=make_contours_CH4(axs[0,1],NNH3_lin,LatLims,LonLims,
+                                   lvls=[0.0050,0.0075,0.0100,0.0125,0.0150])
+            temp=make_contours_CH4(axs[0,2],fNH3,LatLims,LonLims,
+                                   lvls=[0.00025,0.00030,0.00035,0.0004])
+        
+        ###############################################################
+        # CH4 Plots
+        #
+        mapshow=axs[1,0].imshow(CH4Abs_patch_EW, "gist_heat", origin='upper',  
+                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
+                           90-LatLims[0]],vmin=19.0,vmax=21.0,
+                           aspect="equal")
+        axs[1,0].set_title("CH4Abs EW(nm)",fontsize=8)
 
-                if j==0:
-                    axs[i,j].set_ylabel("Planetographic Latitude (deg)",fontsize=8)
-                axscor[1,1].legend(loc=0,ncol=2, borderaxespad=0.,prop={'size':6})
-        # Increment Date counter, adjust subplots, and save map figure            
+        mapshow=axs[1,1].imshow(NCH4_lin, "gist_heat", origin='upper',  
+                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
+                           90-LatLims[0]],vmin=0.059,vmax=0.063,
+                           aspect="equal")
+        axs[1,1].set_title("NCH4(km-amagat)",fontsize=8)
+
+        mapshow=axs[1,2].imshow(Pcloud, "gist_heat", origin='upper',  
+                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
+                           90-LatLims[0]],vmin=0.72,vmax=0.82,
+                           aspect="equal")
+        axs[1,2].set_title("Cloud Top Pressure (Pa)",fontsize=8)
+        if cont:
+            temp=make_contours_CH4(axs[1,0],CH4Abs_patch_EW_conv,LatLims,LonLims,
+                                   lvls=[19.0,19.5,20.0,20.5,21.0])
+            temp=make_contours_CH4(axs[1,1],NCH4_lin,LatLims,LonLims,
+                                   lvls=[0.059,0.060,0.061,0.062,0.063])
+            temp=make_contours_CH4(axs[1,2],Pcloud_conv,LatLims,LonLims,
+                                   lvls=[0.72,0.74,0.76,0.78,0.80])
+            
         DateCounter=DateCounter+1
         fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.90,
                     wspace=0.10, hspace=0.10)            
@@ -322,7 +322,7 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
     axsavgprof[0].fill_between(Lats, AvgMeridEW-StdMeridEW, AvgMeridEW+StdMeridEW,color='C0',alpha=.2)
     axsavgprof[0].set_xlabel("Planetographic Latitude (deg)",fontsize=8)
 
-    PTG.plot_Teifel(axsavgprof[0],clr='C0')
+    #PTG.plot_Teifel(axsavgprof[0],clr='C0')
     axsavgprof[0].legend(fontsize=7,loc=2)
 
     ax2 = axsavgprof[0].twinx()  # instantiate a second axes that shares the same x-axis
@@ -342,10 +342,10 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
     # Plot layout details and labeling
     for iavgprof in range(0,2):
         axsavgprof[iavgprof].grid(linewidth=0.2)
-        axsavgprof[iavgprof].set_xlim(-45.,45.)
-        axsavgprof[iavgprof].set_ylim(0.,1.2)
+        axsavgprof[iavgprof].xlim=[-45.,45.]
+        axsavgprof[iavgprof].ylim=[18.,22.]
         axsavgprof[iavgprof].set_xticks(np.linspace(-45.,45.,7), minor=False)
-        axsavgprof[iavgprof].set_yticks(np.linspace(0.,1.2,7), minor=False)
+        axsavgprof[iavgprof].set_yticks(np.linspace(18.,22.,9), minor=False)
         axsavgprof[iavgprof].tick_params(axis='both', which='major', labelsize=7)
         axsavgprof[iavgprof].set_ylabel("Equivalent Width (nm)",fontsize=8)
         
@@ -420,42 +420,17 @@ def make_patch(Map,LatLims,LonLims,CM2deg):
                               np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]])),axis=1)
     return patch
 
-def make_contours(ax,NH3Abs_conv,LatLims,LonLims):
+def make_contours_CH4(ax,CH4Abs_conv,LatLims,LonLims,lvls=[0.71,0.73,0.75,0.77,0.79]):
     """
     PURPOSE: Overlay countours of NH3 absorption data on Jovian maps.
              Specifically designed for equivalent widths with mean values of
              ~0.55nm
     """
-    cs=ax.contour(NH3Abs_conv,origin='upper', 
+    cs=ax.contour(CH4Abs_conv,origin='upper', 
                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],90-LatLims[0]],
-                  colors=['w','w','w','w','w'], alpha=0.5,levels=[0.4,0.5,0.6,0.7,0.8],
+                  colors=['w','w','w','w','w'], alpha=0.5,levels=lvls,
                   linewidths=[0.5,0.5,1.0,0.5,0.5],
                   linestyles=['dashed','dashed','solid','dashed','dashed'])
-    ax.clabel(cs,[0.4,0.5,0.6,0.7,0.8],inline=True,fmt='%1.1f',fontsize=8)
+    #ax.clabel(cs,[19.0,19.5,20.0,20.5,21.0],inline=True,fmt='%2.1f',fontsize=8)
+    ax.clabel(cs,lvls,inline=True,fmt='%3.1e',fontsize=8)
 
-def make_cbar():
-    """
-    PURPOSE: This is a collection of code that was once inline when I wanted
-             to plot colorbars. Since colorbars were deprecated in the plot
-             presentation, I removed the code. But I didn't want to lose it 
-             entirely, so I put it here
-    """
-    """cbar = pl.colorbar(mapshow, ticks=[0.0,0.3, 0.6,0.9,1.2], 
-                       orientation='vertical',cmap='gist_heat',
-                       ax=axs[i,j],fraction=0.046, pad=0.04)
-    
-    if PlotTypes[iPlot] in ["NH3Abs"]:
-        cbar.ax.set_yticklabels(['0.0','0.3','0.6','0.9','1.2'])  # vertical colorbar
-    else:
-        cbar.ax.set_yticklabels(['0.9', '1.0', '1.1']) 
-    cbar.ax.tick_params(labelsize=7)#if iSession >1:"""
-    
-    """cbar = pl.colorbar(mapshow, ticks=[0, 32767, 65635], 
-                       orientation="vertical",cmap='gist_heat',
-                       ax=axs[i,j],fraction=0.046, pad=0.04)
-    #ax=axs[i,j]
-    #cbar.ax.set_yticklabels(['0.9', '1.0', '1.1'],color="w")  # vertical colorbar
-    #cbar.ax.tick_params(labelsize=7,color="w")#if iSession >1:
-    cbar.set_ticks([])
-    cbar.outline.set_visible(False)
-    #cbar.remove()"""

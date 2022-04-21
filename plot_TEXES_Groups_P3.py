@@ -58,6 +58,30 @@ def plot_Teifel(ax,clr='C0'):
     Teifel = np.array(genfromtxt(pth+"Teifel2018-Fig7.txt", delimiter=','))
     ax.scatter(Teifel[4:24,0],Teifel[4:24,1]*0.1,label='Teifel etal, 2018',color=clr)
 
+def plot_Historical(ax,reference,clr='C0'):
+    """
+    PURPOSE:    This code reads and plots the zonally averaged NH3 absorption
+                EW at 645nm from data scanned from Teifel et al., 2018 
+                figure 7.
+    """
+    import matplotlib.pyplot as pl
+    import scipy
+    import numpy as np
+    data={"Vdov2021":{"Region":["SPR","STB","STrZ","SEB","EZ","NEB","NTrZ","NTB","NPR","GRS"],
+                      "Center_pgLat":[-45.00,-29.75,-23.40,-13.45,-0.15,15.60,20.80,27.8,45.00,-23.00],
+                      "645EW":[4.2,5.1,5.7,6.0,6.2,5.5,4.4,4.7,4.6,4.7]},
+          "Teif2018":{"Region":["STrZ","SEB","EZ","NEB","NTrZ"],
+                            "Center_pgLat":[-23.40,-13.45,-0.15,15.60,20.8],
+                            "645EW":[5.92,6.78,6.75,6.35,5.38]},
+          "More1991":{"Region":["SPR","STB","STrZ","SEB","EZ","NEB","NTB","NPR"],
+                            "Center_pgLat":[-45.00,-29.75,-23.40,-13.45,-0.15,20.80,27.8,45],
+                            "645EW":[5.6,5.7,7.8,9.8,7.7,4.9,5.7,7.2]},
+          "L&O1980":{"Region":["STrZ","SEB","EZ","NEB","GRS"],
+                            "Center_pgLat":[-23.40,-13.45,-0.15,15.60,-23.0],
+                            "645EW":[11.00,12.90,11.7,8.3,9.3]}}
+    ax.scatter(data[reference]["Center_pgLat"],np.array(data[reference]["645EW"])*0.1,label=reference,color=clr)
+
+
 def Centric_to_Graphic(Latc):
     #Formula used is from Simon and Beebe, 1996
     import numpy as np
