@@ -175,130 +175,143 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
                    CM2str+"-Profile.png",dpi=300)
         
         #######################################################################
-        #Begin Looping over individual patches or bands
-        fig,axs=pl.subplots(2,3,figsize=(6.0,4.5), dpi=150, facecolor="white",
-                            sharey=True,sharex=True)
+        #  Setup figure, axes, and subplots for main maps chart and for 
+        #  correlation chart
+        if orientation=='Landscape':
+            fig,axs=pl.subplots(2,3,figsize=(6.0,4.5), dpi=150, facecolor="white",
+                                sharey=True,sharex=True)          
+        elif orientation=='Portrait':
+            fig,axs=pl.subplots(3,2,figsize=(4.0,6.0), dpi=150, facecolor="white",
+                                sharey=True,sharex=True)
         fig.suptitle(Date+", CM2="+str(int(CM2deg)),x=0.5,ha='center',color='k')
 
         figcor,axscor=pl.subplots(2,2,figsize=(6.0,4.5), dpi=150, facecolor="white",
                             sharey=True,sharex=True)
         figcor.suptitle(Date+", CM2="+str(int(CM2deg)),x=0.5,ha='center',color='k')
         
-        #axscor.xlim=[0.,1.]
-        #axsprof[iprof].ylim=[0.,1.5]
-        #axsprof[iprof].set_xticks(np.linspace(-45.,45.,7), minor=False)
-        #axsprof[iprof].set_yticks(np.linspace(0.,1.5,7), minor=False)
-        #axsprof[iprof].tick_params(axis='both', which='major', labelsize=7)
-        #axsprof[iprof].set_ylabel("Equivalent Width (nm)",fontsize=8)
-
+        #######################################################################
+        #Begin Looping over individual patches or bands
         for iPlot in range(0,len(PlotTypes)):
             print("PlotTypes[i]=============",PlotTypes[iPlot])
             if orientation=='Landscape':
-                # Set up
                 i=int(iPlot/3)                           #Plot row
                 j=np.mod(iPlot,3)                   #Plot column
-                axs[i,j].grid(linewidth=0.2)
-                axs[i,j].ylim=[-45.,45.]
-                axs[i,j].xlim=[360-LonLims[0],360-LonLims[1]]
-                axs[i,j].set_xticks(np.linspace(450,0,31), minor=False)
-                xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
-                axs[i,j].set_xticklabels(xticklabels.astype(int))
-                axs[i,j].set_yticks(np.linspace(-45,45,7), minor=False)
-                axs[i,j].tick_params(axis='both', which='major', labelsize=7)
-                if j>0:
-                    axscor[i,j-1].grid(linewidth=0.2)
-                    axscor[i,j-1].set_xlim(0.,1.)
-                    axscor[i,j-1].set_xticks(np.linspace(0.,1.,6), minor=False)
-                    axscor[i,j-1].set_ylim(0.,float(2**16-1))
-                    axscor[i,j-1].set_yticks([0.,20000.,40000.,60000.], minor=False)
+                icor=i
+                jcor=j-1
+            if orientation=='Portrait':
+                j=int(iPlot/3)                           #Plot row
+                i=np.mod(iPlot,3)                   #Plot column     
+                icor=i-1
+                jcor=j
+            axs[i,j].grid(linewidth=0.2)
+            axs[i,j].ylim=[-45.,45.]
+            axs[i,j].xlim=[360-LonLims[0],360-LonLims[1]]
+            axs[i,j].set_xticks(np.linspace(450,0,31), minor=False)
+            xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
+            axs[i,j].set_xticklabels(xticklabels.astype(int))
+            axs[i,j].set_yticks(np.linspace(-45,45,7), minor=False)
+            axs[i,j].tick_params(axis='both', which='major', labelsize=7)
+            #if j>0:
+            axscor[icor,jcor].grid(linewidth=0.2)
+            axscor[icor,jcor].set_xlim(0.2,1.)
+            axscor[icor,jcor].set_xticks(np.linspace(0.2,1.,5), minor=False)
+            axscor[icor,jcor].set_ylim(0.,float(2**16-1))
+            axscor[icor,jcor].set_yticks([0.,20000.,40000.,60000.], minor=False)
+            axscor[icor,jcor].ticklabel_format(axis='y',style='sci',scilimits=(0,1))
 
 
-                print("PlotTypes[iPlot]=============",PlotTypes[iPlot])
+            print("PlotTypes[iPlot]=============",PlotTypes[iPlot])
+            
+            if PlotTypes[iPlot] in ["NH3Abs"]:
+                axs[i,j].set_title(PlotTypes[iPlot]+" EW(nm)",fontsize=8)
+            else:
+                axs[i,j].set_title(PlotTypes[iPlot],fontsize=8)
+                #if jcor>0:
+                axscor[icor,jcor].set_title(PlotTypes[iPlot],fontsize=8)
                 
-                if PlotTypes[iPlot] in ["NH3Abs"]:
-                    axs[i,j].set_title(PlotTypes[iPlot]+" EW(nm)",fontsize=8)
-                else:
-                    axs[i,j].set_title(PlotTypes[iPlot],fontsize=8)
-                    if j>0:
-                        axscor[i,j-1].set_title(PlotTypes[iPlot],fontsize=8)
-                    
-                if PlotTypes[iPlot] in ["889CH4","380NUV","Reflectivity"]:
-                    clrtbl='gist_heat'
-                    #clrtbl='bwr'
-                else:
-                    clrtbl='gist_heat_r'
-                    #clrtbl='bwr_r'
+            if PlotTypes[iPlot] in ["889CH4","380NUV","Reflectivity"]:
+                clrtbl='gist_heat'
+                #clrtbl='bwr'
+            else:
+                clrtbl='gist_heat_r'
+                #clrtbl='bwr_r'
 
-                axs[i,j].set_adjustable('box') 
-                
-                ###############################################################
-                # Read and plot maps patches for each data type
-                #
-                if PlotTypes[iPlot] in ["ClrSlp","889CH4","380NUV"]:
-                    fn=[k for k in MapsforDate if str(PlotTypes[iPlot]) in k]
-                    if len(fn) > 0:
-                        tmp=load_png(drive+path+fn[0])
-                        jmap=tmp[:,:,0]
-                        patch=make_patch(jmap,LatLims,LonLims,CM2deg)
+            axs[i,j].set_adjustable('box') 
+            
+            ###############################################################
+            # Read and plot maps patches for each data type
+            #
+            if PlotTypes[iPlot] in ["ClrSlp","889CH4","380NUV"]:
+                fn=[k for k in MapsforDate if str(PlotTypes[iPlot]) in k]
+                if len(fn) > 0:
+                    tmp=load_png(drive+path+fn[0])
+                    jmap=tmp[:,:,0]
+                    patch=make_patch(jmap,LatLims,LonLims,CM2deg)
    
-                        mapshow=axs[i,j].imshow(patch, clrtbl, origin='upper',  
-                                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                                           90-LatLims[0]],vmin=0,vmax=65635,
-                                           aspect="equal")
-                        axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[0:19,:],patch[0:19,:],marker="o",s=0.5,edgecolor='C0',alpha=0.5,label="45N-35N")
-                        axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[20:35,:],patch[20:35,:],marker="o",s=0.5,edgecolor='C5',alpha=0.5,label="35N-10N (NEB)")
-                        axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[36:45,:],patch[36:45,:],marker="o",s=0.5,edgecolor='C2',alpha=0.5,label="10N-0 (NEZ)")
-                        axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[46:59,:],patch[46:59,:],marker="o",s=0.5,edgecolor='C4',alpha=0.5,label="0-15S")
-                        axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[60:74,:],patch[60:74,:],marker="o",s=0.5,edgecolor='C3',alpha=0.5,label="15S-30S (GRS)")
-                        axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[75:89,:],patch[75:89,:],marker="o",s=0.5,edgecolor='C1',alpha=0.5,label="30S-45S")
-                    else:
-                        fig.delaxes(axs[i,j])
-                        
-                elif PlotTypes[iPlot] in ["NH3Abs"]:
-                    mapshow=axs[i,j].imshow(NH3Abs_patch_EW_corr, "gist_heat", origin='upper',  
+                    mapshow=axs[i,j].imshow(patch, clrtbl, origin='upper',  
                                extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                                       90-LatLims[0]],vmin=0,vmax=1.2,
+                                       90-LatLims[0]],vmin=0,vmax=65635,
                                        aspect="equal")
-                        
-                elif PlotTypes[iPlot] in ["Reflectivity","RGB"]:
-                    fn=[k for k in MapsforDate if "RGB" in k]
-                    if len(fn) > 0:
-                        if PlotTypes[iPlot] in ["Reflectivity"]:
-                            tm1=imread(drive+path+fn[0])
-                            jmap=np.mean(tm1[:,:,:],axis=2)*255*255
-                            patch=make_patch(jmap,LatLims,LonLims,CM2deg)
-                        elif PlotTypes[iPlot] in ["RGB"]:
-                            jmap=imread(drive+path+fn[0])
-                            patch=make_patch(jmap,LatLims,LonLims,CM2deg)
-    
-                        mapshow=axs[i,j].imshow(patch, clrtbl,origin='upper',  
-                                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                                           90-LatLims[0]],vmin=0,vmax=65635,
-                                           aspect="equal")
-                        if PlotTypes[iPlot] in ["Reflectivity"]:
-                            axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[0:19,:],patch[0:19,:],marker="o",s=0.5,color='C0',alpha=0.5,label="45N-35N")
-                            axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[20:35,:],patch[20:35,:],marker="o",s=0.5,color='C5',alpha=0.5,label="35N-10N (NEB)")
-                            axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[36:45,:],patch[36:45,:],marker="o",s=0.5,color='C2',alpha=0.5,label="10N-0 (NEZ)")
-                            axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[46:59,:],patch[46:59,:],marker="o",s=0.5,color='C4',alpha=0.5,label="0-15S")
-                            axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[60:74,:],patch[60:74,:],marker="o",s=0.5,color='C3',alpha=0.5,label="15S-30S (GRS)")
-                            axscor[i,j-1].scatter(NH3Abs_patch_EW_corr[75:89,:],patch[75:89,:],marker="o",s=0.5,color='C1',alpha=0.5,label="30S-45S")
-                    else:
-                        fig.delaxes(axs[i,j])
-                # Overplot contours and set axis labels
-                if cont==True:
-                    temp=make_contours(axs[i,j],NH3Abs_conv,LatLims,LonLims)
-                if i==1:
-                    axs[i,j].set_xlabel("Sys. II Longitude (deg)",fontsize=8)
-                    if j>0:
-                        axscor[i,j-1].set_xlabel("NH3 Absorption EW (nm)",fontsize=8)
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[0:19,:],patch[0:19,:],marker="o",s=0.5,edgecolor='C0',alpha=0.5,label="45N-35N")
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[20:35,:],patch[20:35,:],marker="o",s=0.5,edgecolor='C5',alpha=0.5,label="35N-10N (NEB)")
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[36:45,:],patch[36:45,:],marker="o",s=0.5,edgecolor='C2',alpha=0.5,label="10N-0 (NEZ)")
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[46:59,:],patch[46:59,:],marker="o",s=0.5,edgecolor='C4',alpha=0.5,label="0-15S")
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[60:74,:],patch[60:74,:],marker="o",s=0.5,edgecolor='C3',alpha=0.5,label="15S-30S (GRS)")
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[75:89,:],patch[75:89,:],marker="o",s=0.5,edgecolor='C1',alpha=0.5,label="30S-45S")
+                else:
+                    fig.delaxes(axs[i,j])
+                    
+            elif PlotTypes[iPlot] in ["NH3Abs"]:
+                mapshow=axs[i,j].imshow(NH3Abs_patch_EW_corr, "gist_heat", origin='upper',  
+                           extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
+                                   90-LatLims[0]],vmin=0,vmax=1.2,
+                                   aspect="equal")
+                    
+            elif PlotTypes[iPlot] in ["Reflectivity","RGB"]:
+                fn=[k for k in MapsforDate if "RGB" in k]
+                if len(fn) > 0:
+                    if PlotTypes[iPlot] in ["Reflectivity"]:
+                        tm1=imread(drive+path+fn[0])
+                        jmap=np.mean(tm1[:,:,:],axis=2)*255*255
+                        patch=make_patch(jmap,LatLims,LonLims,CM2deg)
+                    elif PlotTypes[iPlot] in ["RGB"]:
+                        jmap=imread(drive+path+fn[0])
+                        patch=make_patch(jmap,LatLims,LonLims,CM2deg)
 
-                if j==0:
-                    axs[i,j].set_ylabel("Planetographic Latitude (deg)",fontsize=8)
-                axscor[1,1].legend(loc=0,ncol=2, borderaxespad=0.,prop={'size':6})
+                    mapshow=axs[i,j].imshow(patch, clrtbl,origin='upper',  
+                               extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
+                                       90-LatLims[0]],vmin=0,vmax=65635,
+                                       aspect="equal")
+                    if PlotTypes[iPlot] in ["Reflectivity"]:
+                        axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[0:19,:],patch[0:19,:],marker="o",s=0.5,color='C0',alpha=0.5,label="45N-35N")
+                        axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[20:35,:],patch[20:35,:],marker="o",s=0.5,color='C5',alpha=0.5,label="35N-10N (NEB)")
+                        axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[36:45,:],patch[36:45,:],marker="o",s=0.5,color='C2',alpha=0.5,label="10N-0 (NEZ)")
+                        axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[46:59,:],patch[46:59,:],marker="o",s=0.5,color='C4',alpha=0.5,label="0-15S")
+                        axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[60:74,:],patch[60:74,:],marker="o",s=0.5,color='C3',alpha=0.5,label="15S-30S (GRS)")
+                        axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[75:89,:],patch[75:89,:],marker="o",s=0.5,color='C1',alpha=0.5,label="30S-45S")
+                else:
+                    fig.delaxes(axs[i,j])
+            # Overplot contours and set axis labels
+            if cont==True:
+                temp=make_contours(axs[i,j],NH3Abs_conv,LatLims,LonLims)
+            if orientation=='Landscape' and i==1:
+                axs[i,j].set_xlabel("Sys. II Longitude (deg)",fontsize=8)
+                #if jcor>0:
+                #axscor[1,jcor].set_xlabel("NH3 Absorption EW (nm)",fontsize=8)
+            if orientation=='Portrait' and i==2:
+                axs[i,j].set_xlabel("Sys. II Longitude (deg)",fontsize=8)
+                #if jcor>0:
+
+            if j==0:
+                axs[i,j].set_ylabel("Planetographic Latitude (deg)",fontsize=8)
+
+            axscor[1,jcor].set_xlabel("NH3 Absorption EW (nm)",fontsize=8)
+            axscor[icor,0].set_ylabel("Relative Signal (Counts)",fontsize=8)
+            axscor[0,0].legend(loc=0,ncol=1, borderaxespad=0.,prop={'size':5})
         # Increment Date counter, adjust subplots, and save map figure            
         DateCounter=DateCounter+1
         fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.90,
-                    wspace=0.10, hspace=0.10)            
+                    wspace=0.10, hspace=0.20)            
         fig.savefig(drive+path+"NH3 Map Plots/"+Date+"-Jupiter-NH3"+"_CMII_"+
                    CM2str+"-Map.png",dpi=300)
         

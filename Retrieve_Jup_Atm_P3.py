@@ -36,11 +36,11 @@ VERSION:    2.0 (12/31/2021) - Produces CMOS and CCD maps and given date as long
             - Poorly commented and probably has extraneous code
             - Dependency on F:\Astronomy\Python Play\PlanetMapsMapConfig.txt
             
-EXAMPLE:    AmmoniaMaps(DateSelection=["2021-09-23"])
+EXAMPLE:    Retrieve_Jup_Atm_P3(DateSelection=["2021-09-05"])
 
 """
 
-def Retrieve_Jup_Atm_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',orientation='Landscape'):
+def Retrieve_Jup_Atm_P3(coords='map',cont=False,zonecorr=[0,0],DateSelection='All',orientation='Landscape'):
     ###########################################################################
     # Set up environment and paths
     #
@@ -143,8 +143,8 @@ def Retrieve_Jup_Atm_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All
         CH4Abs_patch_EW_conv = convolve(CH4Abs_patch_EW_corr, kernel)
         
         CH4Abs_patch_EW_corr_WaveNum=(CH4Abs_patch_EW_corr*((1./(889.0*1e-8))/889.0))/10.
-        NCH4_lin=3.0*(CH4Abs_patch_EW_corr_WaveNum/2.2)/5753. #band strength from Hill,2015 work
-        #Random factor of 3 above to 'compensate' for band saturation.
+        NCH4_lin=1.0*(CH4Abs_patch_EW_corr_WaveNum/2.2)/5753. #band strength from Hill,2015 work
+        #Random factor of 3 (in place of 1.0) above to 'compensate' for band saturation???
         NCH4_lin_conv = convolve(NCH4_lin, kernel)
         Pcloud=NCH4_lin*amagat*gravity*mean_mol_wt/(fCH4*STP)
         Pcloud_conv = convolve(Pcloud, kernel)
@@ -256,7 +256,7 @@ def Retrieve_Jup_Atm_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All
 
         mapshow=axs[0,2].imshow(fNH3, "gist_heat", origin='upper',  
                    extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                           90-LatLims[0]],vmin=0.0002,vmax=0.0005,
+                           90-LatLims[0]],vmin=0.0000,vmax=0.0015,
                            aspect="equal")
         axs[0,2].set_title("fNH3 (vmf)",fontsize=8)
         
@@ -266,7 +266,7 @@ def Retrieve_Jup_Atm_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All
             temp=make_contours_CH4(axs[0,1],NNH3_lin,LatLims,LonLims,
                                    lvls=[0.0050,0.0075,0.0100,0.0125,0.0150])
             temp=make_contours_CH4(axs[0,2],fNH3,LatLims,LonLims,
-                                   lvls=[0.00025,0.00030,0.00035,0.0004])
+                                   lvls=[0.00050,0.00075,0.00100,0.00125,0.00150])
         
         ###############################################################
         # CH4 Plots
@@ -279,22 +279,22 @@ def Retrieve_Jup_Atm_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All
 
         mapshow=axs[1,1].imshow(NCH4_lin, "gist_heat", origin='upper',  
                    extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                           90-LatLims[0]],vmin=0.059,vmax=0.063,
+                           90-LatLims[0]],vmin=0.018,vmax=0.022,
                            aspect="equal")
         axs[1,1].set_title("NCH4(km-amagat)",fontsize=8)
 
         mapshow=axs[1,2].imshow(Pcloud, "gist_heat", origin='upper',  
                    extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                           90-LatLims[0]],vmin=0.72,vmax=0.82,
+                           90-LatLims[0]],vmin=0.23,vmax=0.275,
                            aspect="equal")
         axs[1,2].set_title("Cloud Top Pressure (Pa)",fontsize=8)
         if cont:
             temp=make_contours_CH4(axs[1,0],CH4Abs_patch_EW_conv,LatLims,LonLims,
                                    lvls=[19.0,19.5,20.0,20.5,21.0])
             temp=make_contours_CH4(axs[1,1],NCH4_lin,LatLims,LonLims,
-                                   lvls=[0.059,0.060,0.061,0.062,0.063])
+                                   lvls=[0.019,0.020,0.021])
             temp=make_contours_CH4(axs[1,2],Pcloud_conv,LatLims,LonLims,
-                                   lvls=[0.72,0.74,0.76,0.78,0.80])
+                                   lvls=[0.24,0.25,0.26,0.27])
             
         DateCounter=DateCounter+1
         fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.90,
