@@ -99,12 +99,8 @@ fig1,axs1=pl.subplots(2,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
 fig1.suptitle("Ammonia Filters",x=0.5,ha='center',color='k')
 
 #Plot Layout Configuration
-x0=600.
-x1=1000.
-xtks=9
-y0=0.0
-y1=0.7
-ytks=8
+x0,x1,xtks=600.,1000.,9
+y0,y1,ytks=0.0,0.7,8
 
 # Set x limits
 axs1[0].set_xlim(x0,x1)
@@ -139,6 +135,7 @@ path='c:/Astronomy/Projects/Techniques/InstrumentPerformance-P3/Filters/'
 ###### Retrieve filter transmissions and convovle with disk integrated albedoes
 
 
+Transmission620 = np.loadtxt(path+'620CH4/620_TransmissionMock.txt',usecols=range(2))
 Transmission632 = np.loadtxt(path+'632OI/632OI_Transmission.txt',usecols=range(2))
 Transmission647 = np.loadtxt(path+'647CNT/647CNT_Transmission.txt',usecols=range(2))
 Transmission656 = np.loadtxt(path+'656HIA/656HIA_Transmission.txt',usecols=range(2))
@@ -159,6 +156,7 @@ ContinuumProduct658=GSU.SpectrumMath(Transmission658,Continuum_Albedo,"Multiply"
 ContinuumProduct656=GSU.SpectrumMath(Transmission656,Continuum_Albedo,"Multiply")
 ContinuumProduct647=GSU.SpectrumMath(Transmission647,Continuum_Albedo,"Multiply")
 ContinuumProduct632=GSU.SpectrumMath(Transmission632,Continuum_Albedo,"Multiply")
+ContinuumProduct620=GSU.SpectrumMath(Transmission620,Continuum_Albedo,"Multiply")
 
 AbsorptionProduct940=GSU.SpectrumMath(Transmission940,JK,"Multiply")
 AbsorptionProduct889=GSU.SpectrumMath(Transmission889,JK,"Multiply")
@@ -168,13 +166,17 @@ AbsorptionProduct658=GSU.SpectrumMath(Transmission658,JK,"Multiply")
 AbsorptionProduct656=GSU.SpectrumMath(Transmission656,JK,"Multiply")
 AbsorptionProduct647=GSU.SpectrumMath(Transmission647,JK,"Multiply")
 AbsorptionProduct632=GSU.SpectrumMath(Transmission632,JK,"Multiply")
+AbsorptionProduct620=GSU.SpectrumMath(Transmission620,JK,"Multiply")
 
-keff_CH4Product=GSU.SpectrumMath(Transmission889,CH4,"Multiply")
-StartIndex889=np.where(keff_CH4Product[:,0]==877.0)
-EndIndex889=np.where(keff_CH4Product[:,0]==902.0)
-keff_CH4=sum(keff_CH4Product[StartIndex889[0][0]:EndIndex889[0][0],1])/(902.-877.)
-print("################################")
-print("Keff_CH4_889=",keff_CH4)
+tmp=NFL.K_eff(Transmission940,CH4,930.,950.,"940NIR")
+tmp=NFL.K_eff(Transmission889,CH4,879.,899.,"889CH4")
+tmp=NFL.K_eff(Transmission730,CH4,720.,740.,"730OII")
+tmp=NFL.K_eff(Transmission672,CH4,662.,682.,"672SII")
+tmp=NFL.K_eff(Transmission658,CH4,653.,663.,"658NII")
+tmp=NFL.K_eff(Transmission656,CH4,646.,666.,"656HIA")
+tmp=NFL.K_eff(Transmission647,CH4,637.,657.,"647CNT")
+tmp=NFL.K_eff(Transmission632,CH4,622.,642.,"632OI")
+tmp=NFL.K_eff(Transmission620,CH4,610.,630.,"620CH4")
 
 
 ###### Plot filter transmissions convolved with disk-integrated albedos
@@ -200,6 +202,7 @@ axs1[1].plot(ContinuumProduct658[:,0],ContinuumProduct658[:,1],linewidth=1,color
 axs1[1].plot(ContinuumProduct656[:,0],ContinuumProduct656[:,1],linewidth=1,color='b')
 axs1[1].plot(ContinuumProduct647[:,0],ContinuumProduct647[:,1],linewidth=1,color='b')
 axs1[1].plot(ContinuumProduct632[:,0],ContinuumProduct632[:,1],linewidth=1,color='b')
+axs1[1].plot(ContinuumProduct620[:,0],ContinuumProduct620[:,1],linewidth=1,color='b')
 
 axs1[1].plot(AbsorptionProduct940[:,0],AbsorptionProduct940[:,1],label='Jupiter Albedo',linewidth=0.5,color='r')
 axs1[1].plot(AbsorptionProduct889[:,0],AbsorptionProduct889[:,1],linewidth=0.5,color='r')
@@ -209,6 +212,7 @@ axs1[1].plot(AbsorptionProduct658[:,0],AbsorptionProduct658[:,1],linewidth=0.5,c
 axs1[1].plot(AbsorptionProduct656[:,0],AbsorptionProduct656[:,1],linewidth=0.5,color='r')
 axs1[1].plot(AbsorptionProduct647[:,0],AbsorptionProduct647[:,1],linewidth=0.5,color='r')
 axs1[1].plot(AbsorptionProduct632[:,0],AbsorptionProduct632[:,1],linewidth=0.5,color='r')
+axs1[1].plot(AbsorptionProduct620[:,0],AbsorptionProduct620[:,1],linewidth=0.5,color='r')
 
 axs1[1].legend(fontsize=7,loc=2)
 

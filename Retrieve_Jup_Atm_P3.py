@@ -40,7 +40,7 @@ EXAMPLE:    Retrieve_Jup_Atm_P3(DateSelection=["2021-09-05"])
 
 """
 
-def Retrieve_Jup_Atm_P3(coords='map',cont=False,zonecorr=[0,0],DateSelection='All',orientation='Landscape'):
+def Retrieve_Jup_Atm_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',orientation='Landscape'):
     ###########################################################################
     # Set up environment and paths
     #
