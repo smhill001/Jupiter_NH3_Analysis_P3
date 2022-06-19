@@ -15,6 +15,7 @@ This code creates two plots, each with two subplots
         Subplot 2:  Plots Galilean moon reflectivites from Clark & McCord, 1980
 
 UPDATE 2022-01-25:  Converted the code to Python 3 on the new Astronomy laptop
+UPDATE 2022-06-19:  
 
 @author: Steven Hill
 """
@@ -96,7 +97,7 @@ EZ = genfromtxt(Dahl_EZ, delimiter=',')
 ###### Plot disk-integrated reference albedo and simulated ammonia-free albedo
 fig1,axs1=pl.subplots(2,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
                       sharex=True)
-fig1.suptitle("Ammonia Filters",x=0.5,ha='center',color='k')
+#fig1.suptitle("Ammonia Filters",x=0.5,ha='center',color='k')
 
 #Plot Layout Configuration
 x0,x1,xtks=600.,1000.,9
@@ -112,22 +113,24 @@ axs1[0].set_yticks(np.linspace(y0,y1,ytks, endpoint=True))
 # Set y ticks
 axs1[0].grid(linewidth=0.2)
 axs1[0].tick_params(axis='both', which='major', labelsize=8)
-axs1[0].set_ylabel("Albedo",fontsize=8,color="black")
+axs1[0].set_ylabel("Albedo",color="black")
 
 axs1[0].plot(Continuum_Albedo[:,0],Continuum_Albedo[:,1],label='Continuum Albedo',linewidth=1,color='b')
 axs1[0].plot(JK[:,0],JK[:,1],label='Jupiter Albedo',linewidth=0.5,color='r')
+axs1[0].set_title("Jovian Albedo and Methane Absorption")
 
 axs1b = axs1[0].twinx()  # instantiate a second axes that shares the same x-axis
 axs1b.ticklabel_format(axis='y')
-axs1b.tick_params(axis='y', which='major', labelsize=7)
+axs1b.tick_params(axis='y', which='major', labelsize=8)
 axs1b.set_yscale('log')
-axs1b.set_ylim(1e-3,1e2)
+axs1b.set_ylim(1e-4,1e3)
+axs1b.set_ylabel("Methane Absorption (km-atm)",color="green")
 
 
 axs1b.plot(CH4_KarkRef1993[:,0],CH4_KarkRef1993[:,1],label='CH4 Abs. Coef. ',linewidth=0.5,color='g')
 #axs1b.plot(CH4[:,0],CH4[:,1],label='CH4 Abs. Coef. ',linewidth=1,color='k')
-axs1[0].legend(fontsize=7, loc=2)
-axs1b.legend(fontsize=7, loc=1)
+axs1[0].legend(fontsize=8, loc=2)
+axs1b.legend(fontsize=8, loc=1)
 
 path='c:/Astronomy/Projects/Techniques/InstrumentPerformance-P3/Filters/'
 
@@ -135,7 +138,7 @@ path='c:/Astronomy/Projects/Techniques/InstrumentPerformance-P3/Filters/'
 ###### Retrieve filter transmissions and convovle with disk integrated albedoes
 
 
-Transmission620 = np.loadtxt(path+'620CH4/620_TransmissionMock.txt',usecols=range(2))
+Transmission620 = np.loadtxt(path+'620CH4/620CH4_Transmission.txt',usecols=range(2))
 Transmission632 = np.loadtxt(path+'632OI/632OI_Transmission.txt',usecols=range(2))
 Transmission647 = np.loadtxt(path+'647CNT/647CNT_Transmission.txt',usecols=range(2))
 Transmission656 = np.loadtxt(path+'656HIA/656HIA_Transmission.txt',usecols=range(2))
@@ -168,19 +171,7 @@ AbsorptionProduct647=GSU.SpectrumMath(Transmission647,JK,"Multiply")
 AbsorptionProduct632=GSU.SpectrumMath(Transmission632,JK,"Multiply")
 AbsorptionProduct620=GSU.SpectrumMath(Transmission620,JK,"Multiply")
 
-tmp=NFL.K_eff(Transmission940,CH4,930.,950.,"940NIR")
-tmp=NFL.K_eff(Transmission889,CH4,879.,899.,"889CH4")
-tmp=NFL.K_eff(Transmission730,CH4,720.,740.,"730OII")
-tmp=NFL.K_eff(Transmission672,CH4,662.,682.,"672SII")
-tmp=NFL.K_eff(Transmission658,CH4,653.,663.,"658NII")
-tmp=NFL.K_eff(Transmission656,CH4,646.,666.,"656HIA")
-tmp=NFL.K_eff(Transmission647,CH4,637.,657.,"647CNT")
-tmp=NFL.K_eff(Transmission632,CH4,622.,642.,"632OI")
-tmp=NFL.K_eff(Transmission620,CH4,610.,630.,"620CH4")
-
-
 ###### Plot filter transmissions convolved with disk-integrated albedos
-
 
 # Set x limits
 axs1[1].set_xlim(x0,x1)
@@ -192,8 +183,8 @@ axs1[1].set_yticks(np.linspace(y0,y1,ytks, endpoint=True))
 # Set y ticks
 axs1[1].grid(linewidth=0.2)
 axs1[1].tick_params(axis='both', which='major', labelsize=8)
-axs1[1].set_ylabel("Albedo x Transmission",fontsize=8,color="black")
-axs1[1].set_xlabel("Wavelength (nm)",fontsize=8)
+axs1[1].set_ylabel("Albedo x Transmission",color="black")
+axs1[1].set_xlabel("Wavelength (nm)")
 axs1[1].plot(ContinuumProduct940[:,0],ContinuumProduct940[:,1],label='Continuum Albedo',linewidth=1,color='b')
 axs1[1].plot(ContinuumProduct889[:,0],ContinuumProduct889[:,1],linewidth=1,color='b')
 axs1[1].plot(ContinuumProduct730[:,0],ContinuumProduct730[:,1],linewidth=1,color='b')
@@ -214,44 +205,115 @@ axs1[1].plot(AbsorptionProduct647[:,0],AbsorptionProduct647[:,1],linewidth=0.5,c
 axs1[1].plot(AbsorptionProduct632[:,0],AbsorptionProduct632[:,1],linewidth=0.5,color='r')
 axs1[1].plot(AbsorptionProduct620[:,0],AbsorptionProduct620[:,1],linewidth=0.5,color='r')
 
-axs1[1].legend(fontsize=7,loc=2)
+axs1[1].legend(fontsize=8,loc=2)
+axs1[1].set_title("Convolution with Filters")
 
+fig1.subplots_adjust(left=0.10, right=0.90, top=0.94, bottom=0.09)
 
 fig1.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/AmmoniaFilter.png',dpi=320)
 
+###############################################################################
+# Begin K_eff and weighting function calculations
+fig_trans,axs_trans=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
+                              sharex=True)
+axs_trans.set_title("Transmission (2-way)")
+axs_trans.set_ylim(100.,5000000.)
+axs_trans.set_yscale('log')
+axs_trans.set_ylim(axs_trans.get_ylim()[::-1]) #reverse y-axis
+axs_trans.set_xlim(0.,1.) #reverse y-axis
+axs_trans.set_xscale('linear')
+axs_trans.grid(which='both')
+axs_trans.set_xlabel("Transmission Functions (2-way)")
+axs_trans.set_ylabel("Pressue (Pa)")
+
+fig_Keff,axs_Keff=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
+                              sharex=True)
+axs_Keff.set_title("Contribution Functions (2-way)")
+P=np.geomspace(10.,1.0e7,num=70,endpoint=True,dtype=float) #in Pascals
+
+#axs_Keff = pl.gca() 
+axs_Keff.set_ylim(100.,5000000.)
+axs_Keff.set_yscale('log')
+axs_Keff.set_ylim(axs_Keff.get_ylim()[::-1]) #reverse y-axis
+axs_Keff.set_xlim(0.,1.) #reverse y-axis
+axs_Keff.set_xscale('linear')
+axs_Keff.grid(which='both')
+axs_Keff.set_xlabel("Normalized Contribution")
+axs_Keff.set_ylabel("Pressue (Pa)")
+
+
+keff_CH4,leff_CH4=NFL.K_eff(P,Transmission940,CH4,930.,950.,"940NIR",axs_Keff)
+tau_CH4=NFL.Weighting_Function(P,keff_CH4,"940NIR",axs_Keff)
+tau_R=NFL.Rayleigh_Function(P,leff_CH4,"940NIR",axs_Keff)
+tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"940NIR",axs_trans,axs_Keff)
+
+keff_CH4,leff_CH4=NFL.K_eff(P,Transmission889,CH4,879.,899.,"889CH4",axs_Keff)
+tau_CH4=NFL.Weighting_Function(P,keff_CH4,"889CH4",axs_Keff)
+tau_R=NFL.Rayleigh_Function(P,leff_CH4,"889CH4",axs_Keff)
+tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"889CH4",axs_trans,axs_Keff)
+
+keff_CH4,leff_CH4=NFL.K_eff(P,Transmission730,CH4,720.,740.,"730OII",axs_Keff)
+tau_CH4=NFL.Weighting_Function(P,keff_CH4,"730OII",axs_Keff)
+tau_R=NFL.Rayleigh_Function(P,leff_CH4,"730OII",axs_Keff)
+tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"730OII",axs_trans,axs_Keff)
+
+keff_CH4,leff_CH4=NFL.K_eff(P,Transmission672,CH4,662.,682.,"672SII",axs_Keff)
+tau_CH4=NFL.Weighting_Function(P,keff_CH4,"672SII",axs_Keff)
+tau_R=NFL.Rayleigh_Function(P,leff_CH4,"672SII",axs_Keff)
+tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"672SII",axs_trans,axs_Keff)
+
+keff_CH4,leff_CH4=NFL.K_eff(P,Transmission658,CH4,653.,663.,"658NII",axs_Keff)
+tau_CH4=NFL.Weighting_Function(P,keff_CH4,"658NII",axs_Keff)
+tau_R=NFL.Rayleigh_Function(P,leff_CH4,"658NII",axs_Keff)
+tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"658NII",axs_trans,axs_Keff)
+
+keff_CH4,leff_CH4=NFL.K_eff(P,Transmission656,CH4,646.,666.,"656HIA",axs_Keff)
+tau_CH4=NFL.Weighting_Function(P,keff_CH4,"656HIA",axs_Keff)
+tau_R=NFL.Rayleigh_Function(P,leff_CH4,"656HIA",axs_Keff)
+tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"656HIA",axs_trans,axs_Keff)
+
+keff_CH4,leff_CH4=NFL.K_eff(P,Transmission647,CH4,637.,657.,"647CNT",axs_Keff)
+tau_CH4=NFL.Weighting_Function(P,keff_CH4,"647CNT",axs_Keff)
+tau_R=NFL.Rayleigh_Function(P,leff_CH4,"647CNT",axs_Keff)
+tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"647CNT",axs_trans,axs_Keff)
+
+keff_CH4,leff_CH4=NFL.K_eff(P,Transmission632,CH4,622.,642.,"632OI",axs_Keff)
+tau_CH4=NFL.Weighting_Function(P,keff_CH4,"632OI",axs_Keff)
+tau_R=NFL.Rayleigh_Function(P,leff_CH4,"632OI",axs_Keff)
+tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"632OI",axs_trans,axs_Keff)
+
+keff_CH4,leff_CH4=NFL.K_eff(P,Transmission620,CH4,610.,630.,"620CH4",axs_Keff)
+tau_CH4=NFL.Weighting_Function(P,keff_CH4,"620CH4",axs_Keff)
+tau_R=NFL.Rayleigh_Function(P,leff_CH4,"620CH4",axs_Keff)
+tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"620CH4",axs_trans,axs_Keff)
+
+axs_Keff.legend(loc=1,ncol=4, borderaxespad=0.,prop={'size':7})
+fig_Keff.subplots_adjust(left=0.12, right=0.96, top=0.94, bottom=0.09)
+axs_trans.legend(loc=1,ncol=4, borderaxespad=0.,prop={'size':7})
+fig_trans.subplots_adjust(left=0.12, right=0.96, top=0.94, bottom=0.09)
+
+fig_trans.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/TransmissionFunctions.png',dpi=320)
+fig_Keff.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/ContributionFunctions.png',dpi=320)
+
 ###### Plot regional and moon reflectivities
-
-pl.figure(figsize=(4.0, 4.0), dpi=150, facecolor="white")
-
-pl.subplot(2,1, 1)
+fig_moons,axs_moons=pl.subplots(2,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
+                      sharex=True)
 #Plot Layout Configuration
-x0=600.
-x1=700.
-xtks=6
-y0=0.0
-y1=1.2
-ytks=7
-
-# Set x limits
-pl.xlim(x0,x1)
+x0,x1,xtks=600.,700.,11
+y0,y1,ytks=0.0,1.2,7
+#fig1.suptitle("Ammonia Filters",x=0.5,ha='center',color='k')
+axs_moons[0].set_xlim(x0,x1)
 # Set x ticks
-pl.xticks(np.linspace(x0,x1,xtks, endpoint=True))
+axs_moons[0].set_xticks(np.linspace(x0,x1,xtks, endpoint=True))
 # Set y limits
-pl.ylim(y0,y1)
-pl.yticks(np.linspace(y0,y1,ytks, endpoint=True))
+axs_moons[0].set_ylim(y0,y1)
+axs_moons[0].set_yticks(np.linspace(y0,y1,ytks, endpoint=True))
 # Set y ticks
-pl.grid(linewidth=0.2)
-pl.tick_params(axis='both', which='major', labelsize=8)
-pl.ylabel("Albedo",fontsize=8,color="black")
-pl.xlabel("Wavelength (nm)",fontsize=8)
-"""
-pl.plot(NEB[:,0],NEB[:,1],label='Dahl - NEB',linewidth=1,color='r')
-pl.plot(SEB[:,0],SEB[:,1]*0.820,label='Dahl - SEB',linewidth=1,color='g')
-pl.plot(EZ[:,0],EZ[:,1]*0.715,label='Dahl - EZ',linewidth=1,color='b')
+axs_moons[0].grid(linewidth=0.2)
+axs_moons[0].tick_params(axis='both', which='major', labelsize=8)
+axs_moons[0].set_ylabel("Albedo",color="black")
 
-pl.plot(JK[:,0],JK[:,1],label='Kark - regrid',linewidth=1,color='0.3')
-pl.plot(Continuum_Albedo[:,0],Continuum_Albedo[:,1],label='Continuum',linewidth=1,color='0.7')
-"""
+axs_moons[0].set_title("Moons Albedo")
 
 Callisto1980 = np.fromfile(file="c:/Astronomy/Projects/Planets/JovianMoons/References/callisto_no_header.txt", dtype=float, count=-1, sep=" ")    
 Callisto1980=np.reshape(Callisto1980,[int(Callisto1980.size/3),3])
@@ -317,61 +379,54 @@ IoProduct656=GSU.SpectrumMath(Transmission656,Io_Grid,"Multiply")
 IoProduct647=GSU.SpectrumMath(Transmission647,Io_Grid,"Multiply")
 IoProduct632=GSU.SpectrumMath(Transmission632,Io_Grid,"Multiply")
 
-pl.plot(Callisto1980[:,0]*1000.,Callisto1980[:,1],label='Callisto',linewidth=1,color='b')
-pl.plot(Ganymede1980[:,0]*1000.,Ganymede1980[:,1],label='Ganymede',linewidth=1,color='g')
-pl.plot(Europa1980[:,0]*1000.,Europa1980[:,1],label='Europa',linewidth=1,color='r')
-pl.plot(Io_leading1980[:,0]*1000.,Io_leading1980[:,1],label='Io Leading',linewidth=1,linestyle='dashed',color='k')
-pl.plot(Io_trailing1980[:,0]*1000.,Io_trailing1980[:,1],label='Io Trailing',linewidth=1,color='k')
-pl.legend(fontsize=7)
+axs_moons[0].plot(Callisto1980[:,0]*1000.,Callisto1980[:,1],label='Callisto',linewidth=1,color='b')
+axs_moons[0].plot(Ganymede1980[:,0]*1000.,Ganymede1980[:,1],label='Ganymede',linewidth=1,color='g')
+axs_moons[0].plot(Europa1980[:,0]*1000.,Europa1980[:,1],label='Europa',linewidth=1,color='r')
+axs_moons[0].plot(Io_leading1980[:,0]*1000.,Io_leading1980[:,1],label='Io Leading',linewidth=1,linestyle='dashed',color='k')
+axs_moons[0].plot(Io_trailing1980[:,0]*1000.,Io_trailing1980[:,1],label='Io Trailing',linewidth=1,color='k')
+axs_moons[0].legend(fontsize=7)
 
-pl.subplot(2,1,2)
-x0=600.
-x1=700.
-xtks=6
-y0=0.0
-y1=1.2
-ytks=7
-
-# Set x limits
-pl.xlim(x0,x1)
+axs_moons[1].set_xlim(x0,x1)
 # Set x ticks
-pl.xticks(np.linspace(x0,x1,xtks, endpoint=True))
+axs_moons[1].set_xticks(np.linspace(x0,x1,xtks, endpoint=True))
 # Set y limits
-pl.ylim(y0,y1)
-pl.yticks(np.linspace(y0,y1,ytks, endpoint=True))
+axs_moons[1].set_ylim(y0,y1)
+axs_moons[1].set_yticks(np.linspace(y0,y1,ytks, endpoint=True))
 # Set y ticks
-pl.grid(linewidth=0.2)
-pl.tick_params(axis='both', which='major', labelsize=8)
-pl.ylabel("Albedo x Transmission",fontsize=8,color="black")
-pl.xlabel("Wavelength (nm)",fontsize=8)
+axs_moons[1].grid(linewidth=0.2)
+axs_moons[1].tick_params(axis='both', which='major', labelsize=8)
+axs_moons[1].set_ylabel("Albedo x Transmission",color="black")
+axs_moons[1].set_xlabel("Wavelength (nm)")
+axs_moons[1].set_title("Convolution with Filters")
 
-pl.plot(CallistoProduct672[:,0],CallistoProduct672[:,1],label='Callisto',linewidth=0.5,color='b')
-pl.plot(CallistoProduct658[:,0],CallistoProduct658[:,1],linewidth=0.5,color='b')
-pl.plot(CallistoProduct656[:,0],CallistoProduct656[:,1],linewidth=0.5,color='b')
-pl.plot(CallistoProduct647[:,0],CallistoProduct647[:,1],linewidth=0.5,color='b')
-pl.plot(CallistoProduct632[:,0],CallistoProduct632[:,1],linewidth=0.5,color='b')
+axs_moons[1].plot(CallistoProduct672[:,0],CallistoProduct672[:,1],label='Callisto',linewidth=0.5,color='b')
+axs_moons[1].plot(CallistoProduct658[:,0],CallistoProduct658[:,1],linewidth=0.5,color='b')
+axs_moons[1].plot(CallistoProduct656[:,0],CallistoProduct656[:,1],linewidth=0.5,color='b')
+axs_moons[1].plot(CallistoProduct647[:,0],CallistoProduct647[:,1],linewidth=0.5,color='b')
+axs_moons[1].plot(CallistoProduct632[:,0],CallistoProduct632[:,1],linewidth=0.5,color='b')
 
-pl.plot(GanymedeProduct672[:,0],GanymedeProduct672[:,1],label='Ganymede',linewidth=0.5,color='g')
-pl.plot(GanymedeProduct658[:,0],GanymedeProduct658[:,1],linewidth=0.5,color='g')
-pl.plot(GanymedeProduct656[:,0],GanymedeProduct656[:,1],linewidth=0.5,color='g')
-pl.plot(GanymedeProduct647[:,0],GanymedeProduct647[:,1],linewidth=0.5,color='g')
-pl.plot(GanymedeProduct632[:,0],GanymedeProduct632[:,1],linewidth=0.5,color='g')
+axs_moons[1].plot(GanymedeProduct672[:,0],GanymedeProduct672[:,1],label='Ganymede',linewidth=0.5,color='g')
+axs_moons[1].plot(GanymedeProduct658[:,0],GanymedeProduct658[:,1],linewidth=0.5,color='g')
+axs_moons[1].plot(GanymedeProduct656[:,0],GanymedeProduct656[:,1],linewidth=0.5,color='g')
+axs_moons[1].plot(GanymedeProduct647[:,0],GanymedeProduct647[:,1],linewidth=0.5,color='g')
+axs_moons[1].plot(GanymedeProduct632[:,0],GanymedeProduct632[:,1],linewidth=0.5,color='g')
 
-pl.plot(EuropaProduct672[:,0],EuropaProduct672[:,1],label='Europa',linewidth=0.5,color='r')
-pl.plot(EuropaProduct658[:,0],EuropaProduct658[:,1],linewidth=0.5,color='r')
-pl.plot(EuropaProduct656[:,0],EuropaProduct656[:,1],linewidth=0.5,color='r')
-pl.plot(EuropaProduct647[:,0],EuropaProduct647[:,1],linewidth=0.5,color='r')
-pl.plot(EuropaProduct632[:,0],EuropaProduct632[:,1],linewidth=0.5,color='r')
+axs_moons[1].plot(EuropaProduct672[:,0],EuropaProduct672[:,1],label='Europa',linewidth=0.5,color='r')
+axs_moons[1].plot(EuropaProduct658[:,0],EuropaProduct658[:,1],linewidth=0.5,color='r')
+axs_moons[1].plot(EuropaProduct656[:,0],EuropaProduct656[:,1],linewidth=0.5,color='r')
+axs_moons[1].plot(EuropaProduct647[:,0],EuropaProduct647[:,1],linewidth=0.5,color='r')
+axs_moons[1].plot(EuropaProduct632[:,0],EuropaProduct632[:,1],linewidth=0.5,color='r')
 
-pl.plot(IoProduct672[:,0],IoProduct672[:,1],label='Io Trailing',linewidth=0.5,color='k')
-pl.plot(IoProduct658[:,0],IoProduct658[:,1],linewidth=0.5,color='k')
-pl.plot(IoProduct656[:,0],IoProduct656[:,1],linewidth=0.5,color='k')
-pl.plot(IoProduct647[:,0],IoProduct647[:,1],linewidth=0.5,color='k')
-pl.plot(IoProduct632[:,0],IoProduct632[:,1],linewidth=0.5,color='k')
+axs_moons[1].plot(IoProduct672[:,0],IoProduct672[:,1],label='Io Trailing',linewidth=0.5,color='k')
+axs_moons[1].plot(IoProduct658[:,0],IoProduct658[:,1],linewidth=0.5,color='k')
+axs_moons[1].plot(IoProduct656[:,0],IoProduct656[:,1],linewidth=0.5,color='k')
+axs_moons[1].plot(IoProduct647[:,0],IoProduct647[:,1],linewidth=0.5,color='k')
+axs_moons[1].plot(IoProduct632[:,0],IoProduct632[:,1],linewidth=0.5,color='k')
 
-pl.legend(fontsize=7)
+axs_moons[1].legend(fontsize=8)
+fig_moons.subplots_adjust(left=0.10, right=0.90, top=0.94, bottom=0.09)
 
-pl.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/ColorSlopes.png',dpi=320)
+fig_moons.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/ColorSlopes.png',dpi=320)
 
 ###############################################################################
 
