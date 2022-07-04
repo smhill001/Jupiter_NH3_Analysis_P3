@@ -329,6 +329,7 @@ CallistoProduct658=GSU.SpectrumMath(Transmission658,CalGrid,"Multiply")
 CallistoProduct656=GSU.SpectrumMath(Transmission656,CalGrid,"Multiply")
 CallistoProduct647=GSU.SpectrumMath(Transmission647,CalGrid,"Multiply")
 CallistoProduct632=GSU.SpectrumMath(Transmission632,CalGrid,"Multiply")
+CallistoProduct620=GSU.SpectrumMath(Transmission620,CalGrid,"Multiply")
 
 
 Ganymede1980 = np.fromfile(file="c:/Astronomy/Projects/Planets/JovianMoons/References/ganymede_no_header.txt", dtype=float, count=-1, sep=" ")    
@@ -345,6 +346,7 @@ GanymedeProduct658=GSU.SpectrumMath(Transmission658,GanGrid,"Multiply")
 GanymedeProduct656=GSU.SpectrumMath(Transmission656,GanGrid,"Multiply")
 GanymedeProduct647=GSU.SpectrumMath(Transmission647,GanGrid,"Multiply")
 GanymedeProduct632=GSU.SpectrumMath(Transmission632,GanGrid,"Multiply")
+GanymedeProduct620=GSU.SpectrumMath(Transmission620,GanGrid,"Multiply")
 
 Europa1980 = np.fromfile(file="c:/Astronomy/Projects/Planets/JovianMoons/References/europa_no_header.txt", dtype=float, count=-1, sep=" ")    
 Europa1980=np.reshape(Europa1980,[int(Europa1980.size/3),3])
@@ -360,6 +362,7 @@ EuropaProduct658=GSU.SpectrumMath(Transmission658,EurGrid,"Multiply")
 EuropaProduct656=GSU.SpectrumMath(Transmission656,EurGrid,"Multiply")
 EuropaProduct647=GSU.SpectrumMath(Transmission647,EurGrid,"Multiply")
 EuropaProduct632=GSU.SpectrumMath(Transmission632,EurGrid,"Multiply")
+EuropaProduct620=GSU.SpectrumMath(Transmission620,EurGrid,"Multiply")
 
 Io_leading1980 = np.fromfile(file="c:/Astronomy/Projects/Planets/JovianMoons/References/io.leading_no_header.txt", dtype=float, count=-1, sep=" ")    
 Io_leading1980=np.reshape(Io_leading1980,[int(Io_leading1980.size/3),3])
@@ -378,6 +381,7 @@ IoProduct658=GSU.SpectrumMath(Transmission658,Io_Grid,"Multiply")
 IoProduct656=GSU.SpectrumMath(Transmission656,Io_Grid,"Multiply")
 IoProduct647=GSU.SpectrumMath(Transmission647,Io_Grid,"Multiply")
 IoProduct632=GSU.SpectrumMath(Transmission632,Io_Grid,"Multiply")
+IoProduct620=GSU.SpectrumMath(Transmission620,Io_Grid,"Multiply")
 
 axs_moons[0].plot(Callisto1980[:,0]*1000.,Callisto1980[:,1],label='Callisto',linewidth=1,color='b')
 axs_moons[0].plot(Ganymede1980[:,0]*1000.,Ganymede1980[:,1],label='Ganymede',linewidth=1,color='g')
@@ -404,24 +408,28 @@ axs_moons[1].plot(CallistoProduct658[:,0],CallistoProduct658[:,1],linewidth=0.5,
 axs_moons[1].plot(CallistoProduct656[:,0],CallistoProduct656[:,1],linewidth=0.5,color='b')
 axs_moons[1].plot(CallistoProduct647[:,0],CallistoProduct647[:,1],linewidth=0.5,color='b')
 axs_moons[1].plot(CallistoProduct632[:,0],CallistoProduct632[:,1],linewidth=0.5,color='b')
+axs_moons[1].plot(CallistoProduct620[:,0],CallistoProduct620[:,1],linewidth=0.5,color='b')
 
 axs_moons[1].plot(GanymedeProduct672[:,0],GanymedeProduct672[:,1],label='Ganymede',linewidth=0.5,color='g')
 axs_moons[1].plot(GanymedeProduct658[:,0],GanymedeProduct658[:,1],linewidth=0.5,color='g')
 axs_moons[1].plot(GanymedeProduct656[:,0],GanymedeProduct656[:,1],linewidth=0.5,color='g')
 axs_moons[1].plot(GanymedeProduct647[:,0],GanymedeProduct647[:,1],linewidth=0.5,color='g')
 axs_moons[1].plot(GanymedeProduct632[:,0],GanymedeProduct632[:,1],linewidth=0.5,color='g')
+axs_moons[1].plot(GanymedeProduct620[:,0],GanymedeProduct620[:,1],linewidth=0.5,color='g')
 
 axs_moons[1].plot(EuropaProduct672[:,0],EuropaProduct672[:,1],label='Europa',linewidth=0.5,color='r')
 axs_moons[1].plot(EuropaProduct658[:,0],EuropaProduct658[:,1],linewidth=0.5,color='r')
 axs_moons[1].plot(EuropaProduct656[:,0],EuropaProduct656[:,1],linewidth=0.5,color='r')
 axs_moons[1].plot(EuropaProduct647[:,0],EuropaProduct647[:,1],linewidth=0.5,color='r')
 axs_moons[1].plot(EuropaProduct632[:,0],EuropaProduct632[:,1],linewidth=0.5,color='r')
+axs_moons[1].plot(EuropaProduct620[:,0],EuropaProduct620[:,1],linewidth=0.5,color='r')
 
 axs_moons[1].plot(IoProduct672[:,0],IoProduct672[:,1],label='Io Trailing',linewidth=0.5,color='k')
 axs_moons[1].plot(IoProduct658[:,0],IoProduct658[:,1],linewidth=0.5,color='k')
 axs_moons[1].plot(IoProduct656[:,0],IoProduct656[:,1],linewidth=0.5,color='k')
 axs_moons[1].plot(IoProduct647[:,0],IoProduct647[:,1],linewidth=0.5,color='k')
 axs_moons[1].plot(IoProduct632[:,0],IoProduct632[:,1],linewidth=0.5,color='k')
+axs_moons[1].plot(IoProduct620[:,0],IoProduct620[:,1],linewidth=0.5,color='k')
 
 axs_moons[1].legend(fontsize=8)
 fig_moons.subplots_adjust(left=0.10, right=0.90, top=0.94, bottom=0.09)
@@ -431,6 +439,7 @@ fig_moons.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P
 ###############################################################################
 
 
+ContimIntegral620,AbsorpIntegral620=NFL.cont_absorption_calcs(ContinuumProduct620,AbsorptionProduct620,615.,635.,"620CH4")
 ContimIntegral632,AbsorpIntegral632=NFL.cont_absorption_calcs(ContinuumProduct632,AbsorptionProduct632,622.,642.,"632OI")
 ContimIntegral647,AbsorpIntegral647=NFL.cont_absorption_calcs(ContinuumProduct647,AbsorptionProduct647,635.,659.,"647CNT")
 ContimIntegral656,AbsorpIntegral656=NFL.cont_absorption_calcs(ContinuumProduct656,AbsorptionProduct656,645.,672.,"656HIA")
