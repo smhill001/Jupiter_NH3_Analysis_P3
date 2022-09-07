@@ -7,13 +7,11 @@ Created on Wed Oct 06 14:36:01 2021
 PURPOSE:    Read a white balanced RGB (656,647,632) image and compute the
             color slope and NH3 absorption images.
 
-EXAMPLE:    filename="2021-09-05-0409_0-Jupiter-R656G647B632-ReAligned-WhtBal.png"
-            filename2="2021-09-05-0432_8-Jupiter_NoWV-R940(G)B889-R(G)B-WhtBal.png"
+EXAMPLE:    Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20210905UT")
+            
 """
 
-def Jupiter_NH3_CH4_Images_Arrays_P3(filename="2021-09-05-0409_0-Jupiter-R656G647B632-ReAligned-WhtBal.png",
-                           filename2="2021-09-05-0432_8-Jupiter_NoWV-R940(G)B889-R(G)B-WhtBal.png",
-                           obsdate="20210905UT"):
+def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20210905UT",target="Jupiter"):
     import sys
     drive='c:'
     sys.path.append(drive+'/Astronomy/Python Play')
@@ -24,99 +22,375 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(filename="2021-09-05-0409_0-Jupiter-R656G64
     from matplotlib.pyplot import imread
     import pylab as pl
     import numpy as np
-    
-    ###########################################################################
-    # Here's where we filter and select the images to plot. Probably want
-    # more than one option, e.g.:
-    #   - For posting to ALPO Japan or other public sites
-    #   - For basic array of monchromatic derotated images, both with and 
-    #     without wavelets processing
-    #   - RGB array, e.g., RGB, 889-G-NUV, 656-647-632
-    #   - Array corresponding to Maps presented for NH3 analysis
-    ###########################################################################
+    from imageio import imwrite
+    from numpy import inf
+ 
+    sourcefiles={'20210622UT':{'NH3file':'2021-06-22-1050_1-Jupiter_NoWV-R656G647B656-RGB-WhtBal.png',
+                               'CH4file':'2021-06-22-1054_6-Jupiter_NoWV-R656(G)B889-R(G)B-WhtBal.png',
+                               'Context':{'NUVfile':'2021-06-22-1035_3-Jupiter_380NUV-Derot-Stack.png',
+                                          'RGBfile':'2021-06-22-1043_2-Jupiter-(685)GB-RGB-WhtBal-Wavelets.png'}},
+                 
+                 '20210708UT':{'NH3file':'2021-07-08-1044_4-Jupiter-NoWV-DR-ST-R656G647B632-WhtBal.png',
+                               'CH4file':'2021-07-08-1049_5-Jupiter_NoWV-R656(G)B889-R(G)B-WhtBal.png',
+                               'Context':{'NUVfile':'2021-07-08-1041_5-Jupiter_380NUV_-Derot-Stack-Wavelets4x10+5x20.png',
+                                          'RGBfile':'2021-07-08-1037_5-Jupiter-AllREDGB-RGB-WhtBal-ClrSmth-Smth-Wavelets.png'}},
+                 
+                 '20210719UT':{'NH3file':'2021-07-19-1053_0-Jupiter_NoWV-R656G647B630-RGB-WhtBal.png',
+                               'CH4file':'2021-07-19-1055_4-Jupiter_NoWV-R656(G)B889-R(G)B-WhtBal.png',
+                               'Context':{'NUVfile':'2021-07-19-1043_7-Jupiter_380NUV-Derot-Stack.png',
+                                          'RGBfile':'2021-07-19-1056_7-Jupiter-Wavelets-RGB-WhtBal-ClrSmth-Smth-Wavelets.png'}},
+                 
+                 '20210720UT':{'NH3file':'2021-07-20-1108_1-Jupiter-DR-ST-R656G647B632-WhtBal.png',
+                               'CH4file':'2021-07-20-1110_2-Jupiter_NoWV-R656(G)B889-R(G)B-WhtBal.png',
+                               'Context':{'NUVfile':'2021-07-20-1056_7-Jupiter_380NUV-Derot-Stack.png',
+                                          'RGBfile':'2021-07-20-1053_5-Jupiter-Wavelets-RGB-WhtBal-ClrSmth-Smth-Wavelets.png'}},
+                 
+                 '20210905UT':{'NH3file':'2021-09-05-0409_0-Jupiter-R656G647B632-ReAligned-WhtBal.png',
+                               'CH4file':'2021-09-05-0432_8-Jupiter_NoWV-R940(G)B889-R(G)B-WhtBal.png',
+                               'Context':{'NUVfile':'2021-09-05-0431_9-Jupiter-380NUV-Boudreau.png',
+                                          'RGBfile':'2021-09-05-0423_5-Jupiter-RGB-Boudreau.png'}},
+                 
+                 '20210910UT':{'NH3file':'2021-09-10-0414_7-Jupiter-NoWV-DR-ST-R656G647B632-WhtBal.png',
+                               'CH4file':'2021-09-10-0429_4-Jupiter_NoWV-R656(G)B889-R(G)B-WhtBal.png',
+                               'Context':{'NUVfile':'2021-09-10-0430_6-Jupiter_380NUV-Wavelets-Derot-Stack.png',
+                                          'RGBfile':'2021-09-10-0421_0-Jupiter-Wavelets-R(AllRED)GB-RGB-WhtBal-ClrSmth-Smth-Wavelets.png'}},
+                 
+                 '20210913UT':{'NH3file':'2021-09-13-0443_3-Jupiter_NoWV-R656G647B630-RGB-WhtBal.png',
+                               'CH4file':'2021-09-13-0458_3-Jupiter_NoWV-R656(G)B889-R(G)B-WhtBal.png',
+                               'Context':{'NUVfile':'2021-09-13-0504_6-Jupiter_380NUV-Wavelets-Derot-Stack.png',
+                                          'RGBfile':'2021-09-13-0450_4-Jupiter-Wavelets-R(AllRED)GB-RGB-WhtBal-ClrSmth-Smth-Wavelets.png'}},
+                 
+                 '20210915UT':{'NH3file':'2021-09-15-0349_0-Jupiter-NoWV-DR-ST-R656G647B632-WhtBal.png',
+                               'CH4file':'2021-09-15-0401_4-Jupiter_NoWV-R656(G)B889-R(G)B-WhtBal.png',
+                               'Context':{'NUVfile':'2021-09-15-0404_9-Jupiter_380NUV-Wavelets-Derot-Stack.png',
+                                          'RGBfile':'2021-09-15-0355_8-Jupiter-Wavelets-R(AllRED)GB-RGB-WhtBal-ClrSmth-Smth-Wavelets.png'}},
+ 
+                 '20210919UT':{'NH3file':'2021-09-19-0508_9-Jupiter-Wavelets-R(656)G(647)B(632)-RGB-WhtBal.png',
+                               'CH4file':'NA',
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2021-09-19-0505_4-Jupiter-Wavelets-R(AllRed)GB-RGB-WhtBal-ClrSmth-Smth-Wavelets.png'}},
 
-    path='c:/Astronomy/Projects/Planets/Jupiter/Imaging Data/'+obsdate+'/'
-    print(path)
-    fn=path+filename
-    print(fn)
-    imageRGB=imread(fn)
-    print(path)
-    fn2=path+filename2
-    print(fn2)
-    imageRGB2=imread(fn2)
+                 '20210923UT':{'NH3file':'2021-09-23-0434_5-Jupiter_NoWV-R656G647B630-RGB-WhtBal.png',
+                               'CH4file':'2021-09-23-0452_1-Jupiter_NoWV-R656(G)B889-R(G)B-WhtBal.png',
+                               'Context':{'NUVfile':'2021-09-23-0453_6-Jupiter_380NUV-Wavelets-Derot-Stack.png',
+                                          'RGBfile':'2021-09-23-0442_4-Jupiter-Wavelets-RGB-RAllGB-WhtBal-ClrSmth-Smth-Wavelets.png'}},
+ 
+                 '20210927UT':{'NH3file':'2021-09-27-0312_1-Jupiter-DR-ST-R656G647B632-WhtBal.png',
+                               'CH4file':'2021-09-27-0326_7-Jupiter_NoWV-R656(G)B889-R(G)B-WhtBal.png',
+                               'Context':{'NUVfile':'2021-09-27-0329_0-Jupiter_380NUV-WV-DR-ST.png',
+                                          'RGBfile':'2021-09-27-0319_8-Jupiter-Wavelets-R(ALL)GB-WV-RGB-WhtBal-ClrSmth-Smth-Wavelets.png'}},
+ 
+                 '20211019UT':{'NH3file':'2021-10-19-0405_6-Jupiter-NoWV-R656G647B632-WhtBal.png',
+                               'CH4file':'2021-10-19-0423_8-Jupiter_NoWV-R656(G)B889-R(G)B-WhtBal.png',
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2021-10-19-0414_7-Jupiter-Wavelets-R685GB-WV-RGB-WhtBal-ClrSmth-Smth-Wavelets.png'}},
+ 
+                 '20211202UT':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'X/10','Transparency':'X/10'},
+                               'NH3file':'2021-12-02-0029_4-Jupiter-noWV-R656G647B632-WhtBal.png',
+                               'CH4file':'2021-12-02-0031_0-Jupiter_NoWV-R656G730B632-RGB-WhtBal.png',
+                               #'CH4file':'2021-12-02-0031_8-Jupiter_NoWV-R656(G)B730-R(G)B-WhtBal.png',
+                               'CH4labels':['Synth. Continuum @ 730nm','730nm (CH4)','730/Cont. (CH4)'],
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2021-12-02-0037_8-Jupiter-WV-R685GB-RGB-WhtBal-ClrSmth-Smth-Wavelets.png'}},
+ 
+                 '20211203UT':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'X/10','Transparency':'X/10'},
+                               'NH3file':'2021-12-03-0030_9-Jupiter-NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4file':'2021-12-03-0032_8-Jupiter_NoWV-R656G730B632-RGB-WhtBal.png',
+                               #'CH4file':'2021-12-03-0035_1-Jupiter_NoWV-R656(G)B730-R(G)B-WhtBal.png',
+                               'CH4labels':['Synth. Continuum @ 730nm','730nm (CH4)','730/Cont. (CH4)'],
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2021-12-03-0040_5-Jupiter-WV-R685GB-RGB-WhtBal-ClrSmth-Smth-Wavelets.png'}},
+
+                  '20220810UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                             'Seeing':'7/10','Transparency':'7/10'},
+                               'NH3file':'2022-08-10-1013_0-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4file':'2022-08-10-1031_8-Jupiter_NoWV-R656(G)B889-R(G)B-WhtBal.png',
+                               'CH4labels':['656nm (Cont.)','889nm (CH4)','889/Cont. (CH4)'],
+                               'Context':{'NUVfile':'2022-08-10-1052_4-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'2022-08-10-1030_0-Jupiter_WV-R(AllRED)GB-RGB-WhtBal-Wavelets-Str.png'},
+                               'Contextlabels':['889nm','RGB']},
+
+                 '20220810UTb':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'7/10'},
+                               'NH3file':'2022-08-10-1013_0-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4file':'2022-08-10-1014_8-Jupiter_NoWV-R656G620B632-RGB-WhtBal.png',
+                               'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4)'],
+                               'Context':{'NUVfile':'2022-08-10-1052_4-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'2022-08-10-1030_0-Jupiter_WV-R(AllRED)GB-RGB-WhtBal-Wavelets-Str.png'},
+                               'Contextlabels':['889nm','RGB']},
+
+                  '20220812UT':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'3/10'}, 
+                               'CH4file':'2022-08-12-1025_5-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'NH3file':'2022-08-12-1025_5-Jupiter_NoWV-R656G620B632-RGB-WhtBalHP.png',
+                               'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-08-12-1046_3-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'2022-08-12-1033_8-Jupiter_WV-R(AllRed)GB-RGB-WhtBal-Wavelets.png'},
+                               'Contextlabels':['889nm','RGB']},
+
+                  '20220818UT':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-08-18-0734_3-Jupiter_NoWV-R656G620B632-RGB-WhtBal.png',
+                               'NH3file':'2022-08-18-0733_4-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-08-18-0801_5-Jupiter_889CH4-WV-ST-DR.png',
+                                          'RGBfile':'2022-08-18-0745_4-Jupiter_AllRED-WV-RGB-WhtBal-Wavelets.png'},
+                               'Contextlabels':['889nm','RGB']},
+
+                  '20220828UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'6/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-08-28-0608_2-Jupiter_NoWV-R656G620B632-RGB-WhtBal.png',
+                               'NH3file':'2022-08-28-0608_2-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-08-28-0611_6-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'2022-08-28-0601_3-Jupiter-RGB-JamesWillinghan-j220828a1-HalfSize.jpg'},
+                               'Contextlabels':['889nm','']},
+
+                  '20220828UTb':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'6/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-08-28-0608_0-Jupiter_NoWV-R656G730B632-RGB-WhtBal.png',
+                               'NH3file':'2022-08-28-0608_2-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Synth. Continuum @ 730nm','730nm (CH4)','730/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-08-28-0611_6-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'2022-08-28-0601_3-Jupiter-RGB-JamesWillinghan-j220828a1-HalfSize.jpg'},
+                               'Contextlabels':['889nm','']},
+                  
+                  '20220828UTc':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'6/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-08-28-0615_6-Jupiter_NoWV-R940G889B940-RGB-WhtBal.png',
+                               'NH3file':'2022-08-28-0608_2-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Continuum @ 940nm','889nm (CH4)b','889/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-08-28-0611_6-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'2022-08-28-0601_3-Jupiter-RGB-JamesWillinghan-j220828a1-HalfSize.jpg'},
+                               'Contextlabels':['889nm','']},
+
+                  '20220830UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-08-30-0559_2-Jupiter_NoWV-R656G620B632-RGB-WhtBal.png',
+                               'NH3file':'2022-08-30-0559_1-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-08-30-0604_2-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'2022-08-28-1429_7-Jupiter-RGB-Arakawa-j220828e1.bmp'},
+                               'Contextlabels':['889nm','']},
+
+                  '20220830UTb':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-08-30-0559_1-Jupiter_NoWV-R656G730B632-RGB-WhtBal.png',
+                               'NH3file':'2022-08-30-0559_1-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Synth. Continuum @ 730nm','730nm (CH4)','730/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-08-30-0604_2-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'2022-08-28-1429_7-Jupiter-RGB-Arakawa-j220828e1.bmp'},
+                               'Contextlabels':['889nm','']},
+
+                  '20220830UTc':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-08-30-0605_6-Jupiter_NoWV-R940G889B940-RGB-WhtBal.png',
+                               'NH3file':'2022-08-30-0559_1-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Continuum @ 940nm','889nm (CH4)b','889/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-08-30-0604_2-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'2022-08-28-1429_7-Jupiter-RGB-Arakawa-j220828e1.bmp'},
+                               'Contextlabels':['889nm','']}, 
+                  
+                  '20220830UTd':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-08-30-0605_6-Jupiter_NoWV-R940G889B940-RGB-WhtBal.png',
+                               'NH3file':'2022-08-30-0559_1-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Continuum @ 940nm','889nm (CH4)b','889/Cont. (CH4))'],
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'NA'},
+                               'Contextlabels':['889nm','']},
+                  
+                  '20220901UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'6/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-09-01-0604_9-Jupiter_NoWV-R656G620B632-RGB-WhtBal.png',
+                               'NH3file':'2022-09-01-0604_9-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-09-01-0603_5-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'NA'},
+                               'Contextlabels':['889nm','']},
+
+                  '20220901UTb':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'6/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-09-01-0604_8-Jupiter_NoWV-R656G730B632-RGB-WhtBal.png',
+                               'NH3file':'2022-09-01-0604_9-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Synth. Continuum @ 730nm','730nm (CH4)','730/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-09-01-0603_5-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'NA'},
+                               'Contextlabels':['889nm','']},
+
+                  '20220901UTc':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'6/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-09-01-0601_7-Jupiter_NoWV-R940G889B940-RGB-WhtBal.png',
+                               'NH3file':'2022-09-01-0604_9-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Continuum @ 940nm','889nm (CH4)b','889/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-09-01-0603_5-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'NA'},
+                               'Contextlabels':['889nm','']},
+
+                  '20220904UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-09-04-0638_9-Jupiter_NoWV-R656G620B632-RGB-WhtBal.png',
+                               'NH3file':'2022-09-04-0638_2-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-09-04-0639_1-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'NA'},
+                               'Contextlabels':['889nm','']},
+                  
+                  '20220904UTb':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-09-04-0638_6-Jupiter_NoWV-R656G730B632-RGB-WhtBal.png',
+                               'NH3file':'2022-09-04-0638_2-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Synth. Continuum @ 730nm','730nm (CH4)','730/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-09-04-0639_1-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'NA'},
+                               'Contextlabels':['889nm','']},
+                  
+                  '20220904UTc':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-09-04-0638_6-Jupiter_NoWV-R940G889B940-RGB-WhtBal.png',
+                               'NH3file':'2022-09-04-0638_2-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Continuum @ 940nm','889nm (CH4)b','889/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-09-04-0639_1-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'NA'},
+                               'Contextlabels':['889nm','']},
+
+                  '20220905UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-09-05-0559_2-Jupiter_NoWV-R656G620B632-RGB-WhtBal.png',
+                               'NH3file':'2022-09-05-0559_1-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-09-05-0558_9-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'NA'},
+                               'Contextlabels':['889nm','']},
+                  
+                  '20220905UTb':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-09-05-0559_2-Jupiter_NoWV-R656G730B632-RGB-WhtBal.png',
+                               'NH3file':'2022-09-05-0559_1-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Synth. Continuum @ 730nm','730nm (CH4)','730/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-09-05-0558_9-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'NA'},
+                               'Contextlabels':['889nm','']},
+                  
+                  '20220905UTc':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-09-05-0559_0-Jupiter_NoWV-R940G889B940-RGB-WhtBal.png',
+                               'NH3file':'2022-09-05-0559_1-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Continuum @ 940nm','889nm (CH4)b','889/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-09-05-0558_9-Jupiter_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'NA'},
+                               'Contextlabels':['889nm','']},
+
+                  '20220905UTSa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-09-05-0454_5-Saturn_R656G620B632-RGB-WhtBal.png',
+                               'NH3file':'2022-09-05-0454_5-Saturn_R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-09-05-0453_6-Saturn_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'NA'},
+                               'Contextlabels':['889nm','']},
+                  
+                  '20220905UTSb':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-09-05-0454_4-Saturn_R656G730B632-RGB-WhtBal.png',
+                               'NH3file':'2022-09-05-0454_5-Saturn_R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Synth. Continuum @ 730nm','730nm (CH4)','730/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-09-05-0453_6-Saturn_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'NA'},
+                               'Contextlabels':['889nm','']},
+                  
+                  '20220905UTSc':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'7/10'}, 
+                               'CH4file':'2022-09-05-0453_7-Saturn_R940G889B940-RGB-WhtBal.png',
+                               'NH3file':'2022-09-05-0454_5-Saturn_R656G647B632-RGB-WhtBal.png',
+                               'CH4labels':['Continuum @ 940nm','889nm (CH4)b','889/Cont. (CH4))'],
+                               'Context':{'NUVfile':'2022-09-05-0453_6-Saturn_889CH4-WV-DR-ST.png',
+                                          'RGBfile':'NA'},
+                               'Contextlabels':['889nm','']}}
+
+    path='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+obsdate[0:10]+'/'
+    NH3file=sourcefiles[obsdate]['NH3file']
+    CH4file=sourcefiles[obsdate]['CH4file']
+    NUVfile=sourcefiles[obsdate]['Context']['NUVfile']
+    RGBfile=sourcefiles[obsdate]['Context']['RGBfile']
+
+    print(NUVfile,RGBfile)
+
+    if NH3file != 'NA':
+        NH3_RGB=load_png(path+NH3file)
+    if CH4file != 'NA':
+        CH4_RGB=load_png(path+CH4file)
+    if NUVfile != 'NA':
+        NUV_RGB=load_png(path+NUVfile)
+    else:
+        NUV_RGB=[]
+    if RGBfile != 'NA':
+        RGB_RGB=imread(path+RGBfile)
+    else:
+        RGB_RGB=[]
     
-    indices=(imageRGB>0.1)
-    mask=np.zeros(imageRGB.shape)
-    print(mask.shape)
-    print(indices)
+    indices=(NH3_RGB>0.2*NH3_RGB.max())
+    mask=np.zeros(NH3_RGB.shape)
     mask[indices]=1.
     
-    fig,ax=pl.subplots(3,3,figsize=(6.0,6.0), dpi=150, facecolor="black",
-                          sharex=True)
-    fig.suptitle("Jovian Methane and Ammonia "+filename[0:10],
-                 x=0.05,ha='left',color='w')
-    ax[0,0].annotate("C11, FL=2800mm, ST2000XM, Denver, CO; Copyright Steven Hill",[0.10,1.1],
-                 ha='left',xycoords='axes fraction',color='w',fontsize=10)
+    if NUVfile !='NA' or RGBfile != 'NA':
+        ny,nx,dx,dy=4,3,5.0,10.0
+    else:
+        ny,nx,dx,dy=3,3,6.0,6.0
+        
+    fig,ax=pl.subplots(ny,nx,figsize=(dx,dy), dpi=150, facecolor="black",
+                          sharey=True,sharex=True)
+    fig.suptitle(NH3file[0:10],x=0.5,ha='center',color='w',fontsize=10)
+    #fig.suptitle("Methane and Ammonia Experiment "+NH3file[0:10],
+    #             x=0.5,ha='center',color='w',fontsize=12)
+    ax[0,1].annotate("Steven Hill",[0.5,1.2],ha='center',xycoords='axes fraction',color='w',fontsize=8)
+    ax[0,1].annotate("Denver, Colorado",[0.5,1.1],ha='center',xycoords='axes fraction',color='w',fontsize=8)
+    
+    ax[0,0].annotate("0.28m Celestron",[0.07,1.3],
+                 ha='left',xycoords='axes fraction',color='w',fontsize=8)
+    ax[0,0].annotate("5.60m FL",[0.07,1.2],
+                 ha='left',xycoords='axes fraction',color='w',fontsize=8)
+    ax[0,0].annotate("ASI120MM",[0.07,1.1],
+                 ha='left',xycoords='axes fraction',color='w',fontsize=8)
+    ax[0,2].annotate("Seeing="+sourcefiles[obsdate]['Metadata']['Seeing'],[0.95,1.3],
+                 ha='right',xycoords='axes fraction',color='w',fontsize=8)
+    ax[0,2].annotate("Transparency="+sourcefiles[obsdate]['Metadata']['Transparency'],[0.95,1.2],
+                 ha='right',xycoords='axes fraction',color='w',fontsize=8)
     
     # AMMONIA PANELS (6)
     
-    eph=get_WINJupos_ephem('2021-09-05_04:09:00')
-    AmmoniaHeader="AMMONIA "+filename[11:15]+"UT; CM1"+eph[0]+"; CM2"+eph[1]+"; CM3"+eph[2]+"; Alt"+eph[3]
+    clrslp,nh3abs=Ammonia_Panels(NH3file,NH3_RGB,mask,ax)
+    nh3abs16bit = np.nan_to_num(((5*65535*(nh3abs - 0.9))*mask[:,:,0]).astype(np.uint16))
+    imwrite(path+'/'+NH3file[0:26]+'NH3AbsPython.png', nh3abs16bit.astype(np.uint16))
+    clrslp16bit = np.nan_to_num((32000+500*(clrslp)).astype(np.uint16))
+    imwrite(path+'/'+NH3file[0:26]+'ClrSlpPython.png', clrslp16bit.astype(np.uint16))
 
-    ax[0,0].imshow(imageRGB[:,:,0],'gist_gray')
-    ax[0,0].annotate('656nm (Red cont.)',[0.5,0.03],color='white',ha='center',
-                    xycoords='axes fraction',fontsize=8)
-    ax[0,1].imshow(imageRGB[:,:,1],'gist_gray')
-    ax[0,1].annotate('647nm (NH3)',[0.5,0.03],color='white',ha='center',
-                    xycoords='axes fraction',fontsize=8)
-    ax[0,2].imshow(imageRGB[:,:,2],'gist_gray')
-    ax[0,2].annotate('632nm (Blue cont.)',[0.5,0.03],color='white',ha='center',
-                    xycoords='axes fraction',fontsize=8)
-    clrslp=np.array(imageRGB[:,:,0])/np.array(imageRGB[:,:,2]) #This is a ratio, not a slope
-    ax[1,0].imshow(clrslp*mask[:,:,1],'gist_gray',vmin=0.9,vmax=1.1)
-    ax[1,0].annotate('656/632 (Color Slope)',[0.5,0.03],color='white',ha='center',
-                    xycoords='axes fraction',fontsize=8)
-    ax[1,0].annotate('Scale: 0.9 -> 1.1',[0.5,-0.04],color='white',ha='center',
-                    xycoords='axes fraction',fontsize=8)
-    CNT647=(15./24.)*np.array(imageRGB[:,:,2])+(9./24.)*np.array(imageRGB[:,:,0])
-    CNT647a=(12./24.)*np.array(imageRGB[:,:,2])+(12./24.)*np.array(imageRGB[:,:,0])
-    ax[1,1].imshow(CNT647,'gist_gray')
-    ax[1,1].annotate('Synth. Continuum @ 647nm',[0.5,0.03],color='white',ha='center',
-                    xycoords='axes fraction',fontsize=8)
-    nh3abs=np.array(imageRGB[:,:,1])/CNT647
-    ax[1,2].imshow(nh3abs*mask[:,:,1],'gist_gray',vmin=0.9,vmax=1.1)
-    ax[1,2].annotate('647/Synth. Continuum',[0.51,0.03],color='white',ha='center',
-                    xycoords='axes fraction',fontsize=8)
-    ax[1,2].annotate('Scale: 0.9 -> 1.1',[0.5,-0.04],color='white',ha='center',
-                    xycoords='axes fraction',fontsize=8)
-    
-    ax[0,1].annotate(AmmoniaHeader,[0.5,0.93],color='white',ha='center',
-                    xycoords='axes fraction',fontsize=9)
-    ax[0,1].set_zorder(1) #required so not blocked by the ax[0,2] image
-    #see https://stackoverflow.com/questions/29735743/getting-text-to-display-in-front-of-subplot-images
 
     # METHANE PANELS (3)
+    if CH4file != 'NA':
+        try:
+            CH4labels = sourcefiles[obsdate]['CH4labels']
+        except KeyError:
+            CH4labels=['656nm (Cont.)','889nm (CH4)','889/Cont. (CH4))']
 
-    eph=get_WINJupos_ephem('2021-09-05_04:33:00')
-    MethaneHeader="METHANE "+filename2[11:15]+"UT; CM1"+eph[0]+"; CM2"+eph[1]+"; CM3"+eph[2]+"; Alt"+eph[3]
+        ch4abs=Methane_Panels(CH4file,CH4_RGB,mask,ax,CH4labels=CH4labels)
+        ch4abs[ch4abs == inf] = 0
+        ch4abs[ch4abs == -inf] = 0
+        #nh3abs16bit = np.nan_to_num(((0.6667*65535*(ch4abs-0.5))*mask[:,:,0]).astype(np.uint16))
+        nh3abs16bit = np.nan_to_num(((0.4*65535*(ch4abs))*mask[:,:,0]).astype(np.uint16))
+        imwrite(path+'/'+CH4file[0:26]+'CH4AbsPython.png', nh3abs16bit.astype(np.uint16))
 
-    ax[2,0].imshow(imageRGB2[:,:,0],'gist_gray')
-    ax[2,0].annotate('940nm (Continuum)',[0.51,0.03],color='white',ha='center',
-                    xycoords='axes fraction',fontsize=8)
-    ax[2,1].imshow(imageRGB2[:,:,2],'gist_gray')
-    ax[2,1].annotate('889nm (CH4)',[0.5,0.03],color='white',ha='center',
-                    xycoords='axes fraction',fontsize=8)
-    ch4abs=np.array(imageRGB2[:,:,2])/np.array(imageRGB2[:,:,0])
-    ax[2,2].imshow(ch4abs*mask[:,:,1],'gist_gray',vmin=0.5,vmax=2.0)
-    ax[2,2].annotate('889/940 Continuum',[0.5,0.03],color='white',ha='center',
-                    xycoords='axes fraction',fontsize=8)
-    ax[2,2].annotate('Scale: 0.5 -> 2.0',[0.5,-0.04],color='white',ha='center',
-                    xycoords='axes fraction',fontsize=8)
-    
-    ax[2,1].annotate(MethaneHeader,[0.5,0.93],color='white',ha='center',
-                    xycoords='axes fraction',fontsize=9)
-    ax[2,1].set_zorder(1) #required so not blocked by the ax[2,2] image
-    #see https://stackoverflow.com/questions/29735743/getting-text-to-display-in-front-of-subplot-images
+    # CONTEXT PANELS (3)
+    if NUVfile != 'NA' or RGBfile != 'NA':
+        try:
+            Contextlabels = sourcefiles[obsdate]['Contextlabels']
+        except KeyError:
+            Contextlabels=['380nm','RGB']
+
+        tmp=Context_Panels(ax,NUVFile=NUVfile,NUV_RGB=NUV_RGB,RGBFile=RGBfile,RGB_RGB=RGB_RGB,mask=[],
+                           Contextlabels=Contextlabels)
 
 
     for i in range(0,3):
@@ -124,10 +398,191 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(filename="2021-09-05-0409_0-Jupiter-R656G64
             print(i,j)
             ax[i,j].axis('off')
 
-    fig.subplots_adjust(left=0.00, bottom=0.03, right=1.0, top=0.90,
-                wspace=0.001, hspace=0.05)
+    fig.subplots_adjust(left=0.00, bottom=0.05, right=1.0, top=0.90,
+                wspace=0.001, hspace=0.10)
 
-    fig.savefig(path+"PublicImageArray"+obsdate+".png",dpi=150)
+    fig.savefig(path+obsdate+"Jupiter_SMHill.png",dpi=150)
+    fig.savefig(path+obsdate+"Jupiter_SMHill.jpg",dpi=150)
+    #imageio.imwrite(path+"PublicImageArray16bit"+obsdate+".png",fig.astype(np.uint16))
+    
+    #figx,axx=pl.subplots(1,1,figsize=(4,4), dpi=150, facecolor="black",
+    #                      sharex=False)
+    #ch4abs_scaled=(np.array(ch4abs)-1.0)/10.0+1.0
+    #axx.imshow((np.array(nh3abs)/np.array(ch4abs_scaled))*np.array(mask[:,:,0]),'gist_gray')
+
+    
+def Ammonia_Panels(NH3file,NH3_RGB,mask,ax,NH3labels=['656nm (Red Cont.)','647nm (NH3)','632nm (Blue Cont.)']):
+    import numpy as np
+    from astropy.io import fits
+    import pylab as pl
+    #import sharpen as sharp
+
+    sec=str(int(str(NH3file[16:17]))*6)
+    NH3time=(NH3file[0:10]+"_"+NH3file[11:13]+":"+NH3file[13:15]+":"+sec.zfill(2))
+    eph=get_WINJupos_ephem(NH3time)
+    AmmoniaHeader=NH3time[11:19]+" UT; CM1"+eph[0]+"; CM2"+eph[1]+"; CM3"+eph[2]+"; Alt"+eph[3]
+    
+    #clrslp=np.array(NH3_RGB[:,:,0]).astype(float)/np.array(NH3_RGB[:,:,2]).astype(float) #This is a ratio, not a slope
+    clrslp=(np.array(NH3_RGB[:,:,0]).astype(float)-np.array(NH3_RGB[:,:,2]).astype(float))/24.0 
+    CNT647=15.0*clrslp+np.array(NH3_RGB[:,:,2])
+    #CNT647=(15./24.)*np.array(NH3_RGB[:,:,2])+(9./24.)*np.array(NH3_RGB[:,:,0])
+    #CNT647a=(12./24.)*np.array(NH3_RGB[:,:,2])+(12./24.)*np.array(NH3_RGB[:,:,0])
+    nh3abs=np.array(NH3_RGB[:,:,1])/CNT647
+
+    ax[0,0].imshow(sharpen(NH3_RGB[:,:,0]),'gist_gray',vmin=0.0,vmax=np.nanmax(NH3_RGB[:,:,0])*1.4)
+    ax[0,0].annotate(NH3labels[0],[0.5,0.03],color='white',ha='center',
+                    xycoords='axes fraction',fontsize=8)
+    ax[0,1].imshow(sharpen(NH3_RGB[:,:,2])*mask[:,:,1],'gist_gray',vmin=0.0,vmax=np.nanmax(NH3_RGB[:,:,0])*1.4)
+    ax[0,1].annotate(NH3labels[2],[0.5,0.03],color='white',ha='center',
+                    xycoords='axes fraction',fontsize=8)
+    ax[0,2].imshow(clrslp*mask[:,:,1]+50*(mask[:,:,1]-1.0),'gist_gray',vmin=-50.,vmax=50.)
+    ax[0,2].annotate('656/632 (Color Slope)',[0.5,0.03],color='white',ha='center',
+                    xycoords='axes fraction',fontsize=8)
+        
+    ax[1,0].imshow(sharpen(CNT647)*mask[:,:,1],'gist_gray',vmin=0.0,vmax=np.nanmax(NH3_RGB[:,:,0])*1.4)
+    ax[1,0].annotate('Synth. Continuum @ 647nm',[0.5,0.03],color='white',ha='center',
+                    xycoords='axes fraction',fontsize=8)
+    ax[1,1].imshow(sharpen(NH3_RGB[:,:,1]),'gist_gray',vmin=0.0,vmax=np.nanmax(NH3_RGB[:,:,0])*1.4)
+    ax[1,1].annotate(NH3labels[1],[0.5,0.03],color='white',ha='center',
+                    xycoords='axes fraction',fontsize=8)
+    ax[1,2].imshow(nh3abs*mask[:,:,1],'gist_gray',vmin=0.9,vmax=1.1)
+    ax[1,2].annotate('647/Cont. (NH3)',[0.51,0.03],color='white',ha='center',
+                    xycoords='axes fraction',fontsize=8)
+    #ax[1,2].annotate('Scale: 0.9 -> 1.1',[0.5,-0.04],color='white',ha='center',
+    #                xycoords='axes fraction',fontsize=8)
+
+    ax[0,1].annotate("CONTINUUM",[-1.2,0.93],color='white',ha='left',
+                    xycoords='axes fraction',fontsize=9)
+    ax[0,1].annotate(AmmoniaHeader,[2.2,0.93],color='white',ha='right',
+                    xycoords='axes fraction',fontsize=8)
+    ax[1,1].annotate(r"AMMONIA (NH$_3$)",[-1.2,0.93],color='white',ha='left',
+                    xycoords='axes fraction',fontsize=9)
+    ax[1,1].annotate(AmmoniaHeader,[2.2,0.93],color='white',ha='right',
+                    xycoords='axes fraction',fontsize=8)
+    ax[0,1].set_zorder(1) #required so not blocked by the ax[0,2] image
+    ax[1,1].set_zorder(1) #required so not blocked by the ax[0,2] image
+    #see https://stackoverflow.com/questions/29735743/getting-text-to-display-in-front-of-subplot-images
+    
+    #hdu = fits.PrimaryHDU(clrslp*mask[:,:,1])
+    #hdu.writeto('C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/new2.fits')
+    return clrslp,nh3abs
+    
+def Methane_Panels(CH4file,CH4_RGB,mask,ax,CH4labels=['656nm (Cont.)','889nm (CH4)','889/Cont. (CH4))']):
+    import numpy as np
+    #import sharpen as sharp
+    sec=str(int(str(CH4file[16:17]))*6)
+    CH4time=(CH4file[0:10]+"_"+CH4file[11:13]+":"+CH4file[13:15]+":"+sec.zfill(2))
+    eph=get_WINJupos_ephem(CH4time)
+    MethaneHeader=CH4time[11:19]+" UT; CM1"+eph[0]+"; CM2"+eph[1]+"; CM3"+eph[2]+"; Alt"+eph[3]
+
+    print("*********CH4file=",CH4file)
+    if CH4labels[1]=='889nm (CH4)':
+        ax[2,0].imshow(sharpen(CH4_RGB[:,:,0]),'gist_gray',vmin=0.0,vmax=np.nanmax(CH4_RGB[:,:,0])*1.4)
+        ax[2,0].annotate(CH4labels[0],[0.5,0.03],color='white',ha='center',
+                        xycoords='axes fraction',fontsize=8)
+        ax[2,1].imshow(CH4_RGB[:,:,2],'gist_gray',vmin=0.0,vmax=np.nanmax(CH4_RGB[:,:,0])*2.4)
+        ax[2,1].annotate(CH4labels[1],[0.5,0.03],color='white',ha='center',
+                    xycoords='axes fraction',fontsize=8)
+        ch4abs=np.array(CH4_RGB[:,:,2])/np.array(CH4_RGB[:,:,0])
+        maxmin=[0.0,2.0]
+    elif CH4labels[1]=='730nm (CH4)':
+        clrslp=(np.array(CH4_RGB[:,:,0]).astype(float)-np.array(CH4_RGB[:,:,2]).astype(float))/24.0 
+        CNT730=98.*clrslp+np.array(CH4_RGB[:,:,2])
+        ch4abs=np.array(CH4_RGB[:,:,1])/CNT730
+        ax[2,0].imshow(sharpen(CNT730)*mask[:,:,1],'gist_gray',vmin=0.0,vmax=np.nanmax(CNT730)*1.2)
+        ax[2,0].annotate(CH4labels[0],[0.5,0.03],color='white',ha='center',
+                        xycoords='axes fraction',fontsize=8)
+        ax[2,1].imshow(sharpen(CH4_RGB[:,:,1])*mask[:,:,1],'gist_gray',vmin=0.0,vmax=np.nanmax(CH4_RGB[:,:,0])*1.2)
+        ax[2,1].annotate(CH4labels[1],[0.5,0.03],color='white',ha='center',
+                    xycoords='axes fraction',fontsize=8)
+        maxmin=[0.8,1.2]
+    elif CH4labels[1]=='620nm (CH4)':
+        clrslp=(np.array(CH4_RGB[:,:,0]).astype(float)-np.array(CH4_RGB[:,:,2]).astype(float))/24.0 
+        CNT620=-12.0*clrslp+np.array(CH4_RGB[:,:,2])
+        ch4abs=np.array(CH4_RGB[:,:,1])/CNT620
+        ax[2,0].imshow(sharpen(CNT620)*mask[:,:,1],'gist_gray',vmin=0.0,vmax=np.nanmax(CNT620)*1.2)
+        ax[2,0].annotate(CH4labels[0],[0.5,0.03],color='white',ha='center',
+                        xycoords='axes fraction',fontsize=8)
+        ax[2,1].imshow(sharpen(CH4_RGB[:,:,1])*mask[:,:,1],'gist_gray',vmin=0.0,vmax=np.nanmax(CH4_RGB[:,:,0])*1.2)
+        ax[2,1].annotate(CH4labels[1],[0.5,0.03],color='white',ha='center',
+                    xycoords='axes fraction',fontsize=8)
+        maxmin=[0.9,1.1]
+    elif CH4labels[1]=='889nm (CH4)b':
+        #clrslp=(np.array(CH4_RGB[:,:,0]).astype(float)-np.array(CH4_RGB[:,:,2]).astype(float))/24.0 
+        #CNT620=-12.0*clrslp+np.array(CH4_RGB[:,:,2])
+        ch4abs=np.array(CH4_RGB[:,:,1])/np.array(CH4_RGB[:,:,0])
+        ax[2,0].imshow(sharpen(CH4_RGB[:,:,0])*mask[:,:,1],'gist_gray',vmin=0.0,vmax=np.nanmax(CH4_RGB[:,:,0])*1.2)
+        ax[2,0].annotate(CH4labels[0],[0.5,0.03],color='white',ha='center',
+                        xycoords='axes fraction',fontsize=8)
+        ax[2,1].imshow(sharpen(CH4_RGB[:,:,1])*mask[:,:,1],'gist_gray',vmin=0.0,vmax=np.nanmax(CH4_RGB[:,:,1])*1.2)
+        ax[2,1].annotate(CH4labels[1],[0.5,0.03],color='white',ha='center',
+                    xycoords='axes fraction',fontsize=8)
+        maxmin=[0.5,2.0]
+
+
+    ax[2,2].imshow(ch4abs*mask[:,:,1],'gist_gray',vmin=maxmin[0],vmax=maxmin[1])
+    ax[2,2].annotate(CH4labels[2],[0.5,0.03],color='white',ha='center',
+                    xycoords='axes fraction',fontsize=8)
+    #ax[2,2].annotate('Scale: 0.5 -> 2.0',[0.5,-0.04],color='white',ha='center',
+    #                xycoords='axes fraction',fontsize=8)
+    
+    ax[2,1].annotate(r"METHANE (CH$_4$)",[-1.2,0.93],color='white',ha='left',
+                    xycoords='axes fraction',fontsize=9)
+    ax[2,1].annotate(MethaneHeader,[2.2,0.93],color='white',ha='right',
+                    xycoords='axes fraction',fontsize=8)
+    ax[2,1].set_zorder(1) #required so not blocked by the ax[2,2] image
+    #see https://stackoverflow.com/questions/29735743/getting-text-to-display-in-front-of-subplot-images
+    return ch4abs
+
+def Context_Panels(ax,NUVFile='NA',NUV_RGB=[],RGBFile='NA',RGB_RGB=[],mask=[],
+                   Contextlabels=['380nm','RGB']):
+    import numpy as np
+    
+    if NUVFile != 'NA': 
+        sec=str(int(str(NUVFile[16:17]))*6)
+        NUVtime=(NUVFile[0:10]+"_"+NUVFile[11:13]+":"+NUVFile[13:15]+":"+sec.zfill(2))
+        eph=get_WINJupos_ephem(NUVtime)
+        if np.array(mask).size != 0:
+            ax[3,0].imshow(np.array(NUV_RGB[:,:,0])*np.array(mask[:,:,0]),'gist_gray')
+        else:
+            ax[3,0].imshow(NUV_RGB[:,:,0],'gist_gray')
+        ax[3,0].annotate(Contextlabels[0]+'; '+NUVtime[11:19]+" UT; Alt"+eph[3],[0.5,0.03],color='white',ha='center',
+                        xycoords='axes fraction',fontsize=8)
+        ax[3,0].annotate("CM1"+eph[0]+"; CM2"+eph[1]+"; CM3"+eph[2],
+                         [0.5,-0.05],color='white',ha='center',
+                        xycoords='axes fraction',fontsize=7)
+    print("RGBFile=",RGBFile)
+    if RGBFile != 'NA': 
+        sec=str(int(str(RGBFile[16:17]))*6)
+        RGBtime=(RGBFile[0:10]+"_"+RGBFile[11:13]+":"+RGBFile[13:15]+":"+sec.zfill(2))
+        eph=get_WINJupos_ephem(RGBtime)
+        ax[3,1].imshow(RGB_RGB)
+        ax[3,1].annotate(Contextlabels[1]+'; '+RGBtime[11:19]+" UT; Alt"+eph[3],[0.5,0.03],color='white',ha='center',
+                        xycoords='axes fraction',fontsize=8)
+        ax[3,1].annotate("CM1"+eph[0]+"; CM2"+eph[1]+"; CM3"+eph[2],
+                         [0.5,-0.05],color='white',ha='center',
+                        xycoords='axes fraction',fontsize=7)
+    
+        ax[3,2].imshow(np.zeros(RGB_RGB.shape))
+    
+    ContextHeader="CONTEXT"
+    ax[3,1].annotate(ContextHeader,[-1.2,0.93],color='white',ha='left',
+                    xycoords='axes fraction',fontsize=9)
+
+    ax[3,2].annotate("NOTES",[0.5,0.93],color='white',ha='center',
+                     xycoords='axes fraction',fontsize=8)
+    ax[3,2].annotate("Ammonia and methane \n"+
+                     "absorption are explored \n"+
+                     "using in-band images \n"+
+                     "divided by continuum \n"+
+                     "images. Computed ratio \n"
+                     "images are not sharpened \n"
+                     "to minimize artifacts.",
+                     [0.0,0.85],color='white',ha='left',va='top',
+                     xycoords='axes fraction',fontsize=7)
+
+    ax[3,1].set_zorder(1) #required so not blocked by the ax[2,2] image
+    #see https://stackoverflow.com/questions/29735743/getting-text-to-display-in-front-of-subplot-images 
     
 def load_png(file_path):
     """
@@ -162,7 +617,7 @@ def get_WINJupos_ephem(dateobs):
     import time
     #shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+commands) #run as admin
     batfile=open("WINJupos_CM.bat",'w')
-    Line1='cd "\Program Files\WinJUPOS 12.0.11"\r\n'
+    Line1='cd "\Program Files\WinJUPOS 12.1.1"\r\n'
     #Line2='WinJUPOS.x64.exe Jupiter /GetCM:2021-09-05_04:09:00 /GeoLong:-104.9 /GeoLat:39.7 /GetAlt >"c:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\cm.txt"\r\n'
     Line2='WinJUPOS.x64.exe Jupiter /GetCM:'+dateobs+' /GeoLong:-104.9 /GeoLat:39.7 /GetAlt >"c:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\cm.txt"\r\n'
     #batfile.writelines(["Line1\r\n","Line2\r\n"])
@@ -189,6 +644,14 @@ def get_WINJupos_ephem(dateobs):
     print("Alt =  "+temp)
     eph.extend([temp])        
     return eph
-    
+
+def sharpen(image):
+    from astropy.convolution import Gaussian2DKernel
+    from astropy.convolution import convolve
+    kernel = Gaussian2DKernel(x_stddev=5)
+    blurred=convolve(image,kernel)
+    tst=image+0.99*(image-blurred)
+    return tst
+
 
     

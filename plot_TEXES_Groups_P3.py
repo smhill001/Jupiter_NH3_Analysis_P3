@@ -46,14 +46,11 @@ def plot_Teifel(ax,clr='C0'):
                 EW at 645nm from data scanned from Teifel et al., 2018 
                 figure 7.
     """
-    import matplotlib.pyplot as pl
-    import scipy
     import numpy as np
     from numpy import genfromtxt
     Lats=[-24.0,-12.5,0.0,12.5,24.0]
     EWs=np.array([5.92,6.78,6.75,6.35,5.38])*0.1
     #ax.scatter(Lats,EWs)
-    import scipy
     pth="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
     Teifel = np.array(genfromtxt(pth+"Teifel2018-Fig7.txt", delimiter=','))
     ax.scatter(Teifel[4:24,0],Teifel[4:24,1]*0.1,label='Teifel etal, 2018',color=clr)
@@ -65,7 +62,6 @@ def plot_Historical(ax,reference,clr='C0'):
                 figure 7.
     """
     import matplotlib.pyplot as pl
-    import scipy
     import numpy as np
     data={"Vdov2021":{"Region":["SPR","STB","STrZ","SEB","EZ","NEB","NTrZ","NTB","NPR","GRS"],
                       "Center_pgLat":[-45.00,-29.75,-23.40,-13.45,-0.15,15.60,20.80,27.8,45.00,-23.00],

@@ -49,8 +49,11 @@ JK[:,0]=WaveGrid
 JK[:,1]=SignalonGrid
 #### CODE THIS INLINE WITH THE NEW SCIPY PYTHON 3 IMPLEMENTATION OF
 #### SPLINE FITTING
-SplineWV = np.array([560.0, 580.0, 600.0, 635.0, 660.0, 675.0, 690., 714.0,
+SplineWV1= np.array([560.0, 580.0, 600.0, 635.0, 660.0, 675.0, 690., 714.0,
                      745.0, 830.0, 945.0])
+SplineWV2 = np.array([560.0, 580.0, 600.0, 677.0, 690., 
+                     745.0, 830.0, 945.0,1050.0])
+SplineWV=SplineWV2
 SplineMag=np.ones(SplineWV.size)
 for i in range(0,SplineWV.size):
     Start=SplineWV[i]-.0000001
@@ -60,6 +63,8 @@ for i in range(0,SplineWV.size):
     print("i= ",i,SplineWVIndices)
     SplineMag[i]=np.log10(JK[SplineWVIndices[0],1])
 
+print(SplineMag)
+SplineMag[SplineMag.size-1]=np.log10(0.42)
 x = np.arange(0, 2*np.pi+np.pi/4, 2*np.pi/8)
 y = np.sin(x)
 tck = interpolate.splrep(SplineWV, SplineMag, s=0)
@@ -83,6 +88,12 @@ WaveGrid,SignalonGrid=GSU.uniform_wave_grid(CH4_KarkRef1993[:,0],CH4_KarkRef1993
 CH4=np.zeros((WaveGrid.size,2))
 CH4[:,0]=WaveGrid
 CH4[:,1]=SignalonGrid
+
+fn='foo.csv'
+pth="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
+NH3 = np.array(genfromtxt(pth+fn, delimiter=','))
+
+
 
 
 ###### Get reference regional I/F reflectivities from Dahl, 2021?
@@ -115,19 +126,21 @@ axs1[0].grid(linewidth=0.2)
 axs1[0].tick_params(axis='both', which='major', labelsize=8)
 axs1[0].set_ylabel("Albedo",color="black")
 
-axs1[0].plot(Continuum_Albedo[:,0],Continuum_Albedo[:,1],label='Continuum Albedo',linewidth=1,color='b')
-axs1[0].plot(JK[:,0],JK[:,1],label='Jupiter Albedo',linewidth=0.5,color='r')
-axs1[0].set_title("Jovian Albedo and Methane Absorption")
+axs1[0].plot(Continuum_Albedo[:,0],Continuum_Albedo[:,1],label='Continuum Albedo',
+             linewidth=1,linestyle='--',color='C0')
+axs1[0].plot(JK[:,0],JK[:,1],label='Jupiter Albedo',linewidth=1.0,color='C0')
+axs1[0].set_title("Jovian Albedo and Methane and Ammonia Absorption")
 
 axs1b = axs1[0].twinx()  # instantiate a second axes that shares the same x-axis
 axs1b.ticklabel_format(axis='y')
 axs1b.tick_params(axis='y', which='major', labelsize=8)
 axs1b.set_yscale('log')
 axs1b.set_ylim(1e-4,1e3)
-axs1b.set_ylabel("Methane Absorption (km-atm)",color="green")
+axs1b.set_ylabel("Absorption Coefficient (km-atm)")#,color="green")
 
 
-axs1b.plot(CH4_KarkRef1993[:,0],CH4_KarkRef1993[:,1],label='CH4 Abs. Coef. ',linewidth=0.5,color='g')
+axs1b.plot(CH4_KarkRef1993[:,0],CH4_KarkRef1993[:,1],label='CH4 Abs. Coef. ',linewidth=0.5,color='C2')
+axs1b.plot(NH3[:,0],NH3[:,1],label='NH3 Abs. Coef. ',linewidth=1.0,color='C3')
 #axs1b.plot(CH4[:,0],CH4[:,1],label='CH4 Abs. Coef. ',linewidth=1,color='k')
 axs1[0].legend(fontsize=8, loc=2)
 axs1b.legend(fontsize=8, loc=1)
@@ -272,10 +285,17 @@ tau_CH4=NFL.Weighting_Function(P,keff_CH4,"656HIA",axs_Keff)
 tau_R=NFL.Rayleigh_Function(P,leff_CH4,"656HIA",axs_Keff)
 tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"656HIA",axs_trans,axs_Keff)
 
+
 keff_CH4,leff_CH4=NFL.K_eff(P,Transmission647,CH4,637.,657.,"647CNT",axs_Keff)
 tau_CH4=NFL.Weighting_Function(P,keff_CH4,"647CNT",axs_Keff)
 tau_R=NFL.Rayleigh_Function(P,leff_CH4,"647CNT",axs_Keff)
 tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"647CNT",axs_trans,axs_Keff)
+
+keff_NH3,leff_NH3=NFL.K_eff(P,Transmission647,NH3,637.,657.,"647CNT",axs_Keff)
+tau_NH3=NFL.Weighting_Function(P,keff_NH3,"647CNT",axs_Keff)
+tau_R=NFL.Rayleigh_Function(P,leff_NH3,"647CNT",axs_Keff)
+tmp=NFL.Compute_Transmission(P,tau_R,tau_NH3,"647CNT",axs_trans,axs_Keff)
+
 
 keff_CH4,leff_CH4=NFL.K_eff(P,Transmission632,CH4,622.,642.,"632OI",axs_Keff)
 tau_CH4=NFL.Weighting_Function(P,keff_CH4,"632OI",axs_Keff)

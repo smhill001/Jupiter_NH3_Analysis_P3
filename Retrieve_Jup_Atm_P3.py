@@ -143,7 +143,7 @@ def Retrieve_Jup_Atm_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All
         CH4Abs_patch_EW_conv = convolve(CH4Abs_patch_EW_corr, kernel)
         
         CH4Abs_patch_EW_corr_WaveNum=(CH4Abs_patch_EW_corr*((1./(889.0*1e-8))/889.0))/10.
-        NCH4_lin=1.0*(CH4Abs_patch_EW_corr_WaveNum/2.2)/5753. #band strength from Hill,2015 work
+        NCH4_lin=3.0*(CH4Abs_patch_EW_corr_WaveNum/2.2)/5753. #band strength from Hill,2015 work
         #Random factor of 3 (in place of 1.0) above to 'compensate' for band saturation???
         NCH4_lin_conv = convolve(NCH4_lin, kernel)
         Pcloud=NCH4_lin*amagat*gravity*mean_mol_wt/(fCH4*STP)
@@ -244,57 +244,57 @@ def Retrieve_Jup_Atm_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All
         #
         mapshow=axs[0,0].imshow(NH3Abs_patch_EW_corr, "gist_heat", origin='upper',  
                    extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                           90-LatLims[0]],vmin=0,vmax=1.2,
+                           90-LatLims[0]],#vmin=0,vmax=1.2,
                            aspect="equal")
         axs[0,0].set_title("NH3Abs EW(nm)",fontsize=8)
 
         mapshow=axs[0,1].imshow(NNH3_lin, "gist_heat", origin='upper',  
                    extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                           90-LatLims[0]],vmin=0.005,vmax=0.015,
+                           90-LatLims[0]],#vmin=0.005,vmax=0.015,
                            aspect="equal")
         axs[0,1].set_title("NH3 (km-amagat)",fontsize=8)
 
         mapshow=axs[0,2].imshow(fNH3, "gist_heat", origin='upper',  
                    extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                           90-LatLims[0]],vmin=0.0000,vmax=0.0015,
+                           90-LatLims[0]],#vmin=0.0000,vmax=0.0015,
                            aspect="equal")
         axs[0,2].set_title("fNH3 (vmf)",fontsize=8)
         
+        print("******",np.linspace(fNH3.min(),fNH3.max(),num=5,endpoint=True))
         if cont:
             temp=make_contours_CH4(axs[0,0],NH3Abs_conv,LatLims,LonLims,
-                                   lvls=[0.4,0.5,0.6,0.7,0.8])
+                                   lvls=np.linspace(NH3Abs_conv.min(),NH3Abs_conv.max(),num=5,endpoint=True))
             temp=make_contours_CH4(axs[0,1],NNH3_lin,LatLims,LonLims,
-                                   lvls=[0.0050,0.0075,0.0100,0.0125,0.0150])
+                                   lvls=np.linspace(NNH3_lin.min(),NNH3_lin.max(),num=5,endpoint=True))
             temp=make_contours_CH4(axs[0,2],fNH3,LatLims,LonLims,
-                                   lvls=[0.00050,0.00075,0.00100,0.00125,0.00150])
-        
+                                   lvls=np.linspace(fNH3.min(),fNH3.max(),num=5,endpoint=True))
         ###############################################################
         # CH4 Plots
         #
         mapshow=axs[1,0].imshow(CH4Abs_patch_EW, "gist_heat", origin='upper',  
                    extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                           90-LatLims[0]],vmin=19.0,vmax=21.0,
+                           90-LatLims[0]],#vmin=19.0,vmax=21.0,
                            aspect="equal")
         axs[1,0].set_title("CH4Abs EW(nm)",fontsize=8)
 
         mapshow=axs[1,1].imshow(NCH4_lin, "gist_heat", origin='upper',  
                    extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                           90-LatLims[0]],vmin=0.018,vmax=0.022,
+                           90-LatLims[0]],#vmin=0.018,vmax=0.022,
                            aspect="equal")
         axs[1,1].set_title("NCH4(km-amagat)",fontsize=8)
 
         mapshow=axs[1,2].imshow(Pcloud, "gist_heat", origin='upper',  
                    extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                           90-LatLims[0]],vmin=0.23,vmax=0.275,
+                           90-LatLims[0]],#vmin=0.23,vmax=0.275,
                            aspect="equal")
         axs[1,2].set_title("Cloud Top Pressure (Pa)",fontsize=8)
         if cont:
             temp=make_contours_CH4(axs[1,0],CH4Abs_patch_EW_conv,LatLims,LonLims,
-                                   lvls=[19.0,19.5,20.0,20.5,21.0])
+                                   lvls=np.linspace(CH4Abs_patch_EW_conv.min(),CH4Abs_patch_EW_conv.max(),num=50,endpoint=True))
             temp=make_contours_CH4(axs[1,1],NCH4_lin,LatLims,LonLims,
-                                   lvls=[0.019,0.020,0.021])
+                                   lvls=np.linspace(NCH4_lin.min(),NCH4_lin.max(),num=5,endpoint=True))
             temp=make_contours_CH4(axs[1,2],Pcloud_conv,LatLims,LonLims,
-                                   lvls=[0.24,0.25,0.26,0.27])
+                                   lvls=np.linspace(Pcloud_conv.min(),Pcloud_conv.max(),num=50,endpoint=True))
             
         DateCounter=DateCounter+1
         fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.90,

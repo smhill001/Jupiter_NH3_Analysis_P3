@@ -89,7 +89,8 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
     for Date in DateSelection:      
         print("Date=",Date)     
         ##### Compute Jupiter ephemeris
-        MapsforDate=[k for k in CM2 if Date in k]              
+        MapsforDate=[k for k in CM2 if Date in k]
+        print(MapsforDate)              
         NH3Abs_fn=[k for k in MapsforDate if "NH3Abs" in k]        
         strdate=NH3Abs_fn[0][0:15]
         print(strdate)
