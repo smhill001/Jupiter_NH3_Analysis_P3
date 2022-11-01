@@ -253,12 +253,21 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
                                extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
                                        90-LatLims[0]],vmin=0,vmax=65635,
                                        aspect="equal")
+                    """
                     axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[0:19,:],patch[0:19,:],marker="o",s=0.5,edgecolor='C0',alpha=0.5,label="45N-35N")
                     axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[20:35,:],patch[20:35,:],marker="o",s=0.5,edgecolor='C5',alpha=0.5,label="35N-10N (NEB)")
                     axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[36:45,:],patch[36:45,:],marker="o",s=0.5,edgecolor='C2',alpha=0.5,label="10N-0 (NEZ)")
                     axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[46:59,:],patch[46:59,:],marker="o",s=0.5,edgecolor='C4',alpha=0.5,label="0-15S")
                     axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[60:74,:],patch[60:74,:],marker="o",s=0.5,edgecolor='C3',alpha=0.5,label="15S-30S (GRS)")
                     axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[75:89,:],patch[75:89,:],marker="o",s=0.5,edgecolor='C1',alpha=0.5,label="30S-45S")
+                    """
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr,patch,marker="o",s=0.5,edgecolor='C7',alpha=0.2,label="Other")
+
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[20:26,:],patch[20:26,:],marker="o",s=0.5,edgecolor='C0',alpha=0.5,label="25N-19N (NTropZ")
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[27:37,:],patch[27:37,:],marker="o",s=0.5,edgecolor='C5',alpha=0.5,label="18N-9N (NEB)")
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[38:45,:],patch[38:45,:],marker="o",s=0.5,edgecolor='C2',alpha=0.5,label="8N-0 (NEZ)")
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[46:54,:],patch[46:54,:],marker="o",s=0.5,edgecolor='C4',alpha=0.5,label="0-8S (SEZ)")
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[63:71,32:46],patch[63:71,32:46],marker="o",s=0.5,edgecolor='C3',alpha=0.5,label="18S-26S (GRS)")
                 else:
                     fig.delaxes(axs[i,j])
                     
@@ -308,7 +317,7 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
 
             axscor[1,jcor].set_xlabel("NH3 Absorption EW (nm)",fontsize=8)
             axscor[icor,0].set_ylabel("Relative Signal (Counts)",fontsize=8)
-            axscor[0,0].legend(loc=0,ncol=1, borderaxespad=0.,prop={'size':5})
+            axscor[0,0].legend(loc=8,ncol=3, borderaxespad=0.,prop={'size':5})
         # Increment Date counter, adjust subplots, and save map figure            
         DateCounter=DateCounter+1
         fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.90,

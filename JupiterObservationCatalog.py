@@ -27,7 +27,7 @@ def JupiterObservationCatalog():
     map_list=[]
     cam_list=[]
     Filter_List=['380NUV','450BLU','467HeII','501OIII','550GRN','550OPN',
-                 '620CH4','632OI', '647CNT', '650RED', '656HIA','658NII',
+                 '620CH4','632OI', '647', '650RED', '656HIA','658NII',
                  '672SII','685NIR','730OII', '742NIR', '807NIR','889CH4',
                  '940NIR','1000NIR']
     path='c:/Astronomy/Projects/Planets/Jupiter/Imaging Data/'
@@ -41,7 +41,7 @@ def JupiterObservationCatalog():
     pathout='/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/'
     t = Table(names=('Date', 'Camera','Map',
                      '380NUV','450BLU','467HeII','501OIII','550GRN','550OPN',
-                     '620CH4','632OI', '647CNT', '650RED', '656HIA','658NII',
+                     '620CH4','632OI', '647', '650RED', '656HIA','658NII',
                      '672SII','685NIR','730OII', '742NIR', '807NIR','889CH4',
                      '940NIR','1000NIR'),
               dtype=('S10', 'S4','S30',

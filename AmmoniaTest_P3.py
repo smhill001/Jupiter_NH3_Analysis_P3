@@ -83,18 +83,27 @@ Continuum_Albedo[:,1]=Temp
 CH4_KarkRef1993=np.zeros((kark1993nrows,2))
 CH4_KarkRef1993[:,0]=Jupiter_Karkoschka1993[:,0]
 CH4_KarkRef1993[:,1]=Jupiter_Karkoschka1993[:,2] #CH4 Coef
+print("***",CH4_KarkRef1993.shape)
 WaveGrid,SignalonGrid=GSU.uniform_wave_grid(CH4_KarkRef1993[:,0],CH4_KarkRef1993[:,1],
                                         Extend=False,Fine=False)
 CH4=np.zeros((WaveGrid.size,2))
 CH4[:,0]=WaveGrid
 CH4[:,1]=SignalonGrid
 
-fn='foo.csv'
+fn='Lutz&Owen1980_Figure5_AmmoniaCrossSection.csv'
 pth="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
-NH3 = np.array(genfromtxt(pth+fn, delimiter=','))
+NH3_Lutz_Owen_1980 = np.array(genfromtxt(pth+fn, delimiter=','))
 
 
+fn='Exomol_NH3.csv'
+pth="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
+NH3_Exomol = np.array(genfromtxt(pth+fn, delimiter=','))
+print("***",NH3_Exomol.shape)
+wv,csec=GSU.uniform_wave_grid(NH3_Exomol[:,0]*1000.,NH3_Exomol[:,1],Extend=False,Fine=False)
+NH3_Exomol_regrid=np.transpose(np.array([wv,csec]))
 
+NH3=NH3_Exomol_regrid
+print("***",NH3_Exomol_regrid.shape,NH3_Exomol_regrid.max(1))
 
 ###### Get reference regional I/F reflectivities from Dahl, 2021?
 
@@ -141,6 +150,8 @@ axs1b.set_ylabel("Absorption Coefficient (km-atm)")#,color="green")
 
 axs1b.plot(CH4_KarkRef1993[:,0],CH4_KarkRef1993[:,1],label='CH4 Abs. Coef. ',linewidth=0.5,color='C2')
 axs1b.plot(NH3[:,0],NH3[:,1],label='NH3 Abs. Coef. ',linewidth=1.0,color='C3')
+axs1b.plot(NH3_Lutz_Owen_1980[:,0],NH3_Lutz_Owen_1980[:,1],label='NH3 Abs. Coef. L&O ',linewidth=0.5,color='C3')
+
 #axs1b.plot(CH4[:,0],CH4[:,1],label='CH4 Abs. Coef. ',linewidth=1,color='k')
 axs1[0].legend(fontsize=8, loc=2)
 axs1b.legend(fontsize=8, loc=1)
@@ -239,27 +250,27 @@ axs_trans.grid(which='both')
 axs_trans.set_xlabel("Transmission Functions (2-way)")
 axs_trans.set_ylabel("Pressue (Pa)")
 
-fig_Keff,axs_Keff=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
+fig_Keff,axs_Keff=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white",
                               sharex=True)
-axs_Keff.set_title("Contribution Functions (2-way)")
+axs_Keff.set_title("Weighting Functions (2-way)", fontsize=18)
 P=np.geomspace(10.,1.0e7,num=70,endpoint=True,dtype=float) #in Pascals
 
 #axs_Keff = pl.gca() 
-axs_Keff.set_ylim(100.,5000000.)
+axs_Keff.set_ylim(1000.,1000000.)
 axs_Keff.set_yscale('log')
 axs_Keff.set_ylim(axs_Keff.get_ylim()[::-1]) #reverse y-axis
 axs_Keff.set_xlim(0.,1.) #reverse y-axis
 axs_Keff.set_xscale('linear')
 axs_Keff.grid(which='both')
-axs_Keff.set_xlabel("Normalized Contribution")
-axs_Keff.set_ylabel("Pressue (Pa)")
+axs_Keff.set_xlabel("Normalized Weight",fontsize=14)
+axs_Keff.set_ylabel("Pressue (Pa)",fontsize=14)
 
-
+"""
 keff_CH4,leff_CH4=NFL.K_eff(P,Transmission940,CH4,930.,950.,"940NIR",axs_Keff)
 tau_CH4=NFL.Weighting_Function(P,keff_CH4,"940NIR",axs_Keff)
 tau_R=NFL.Rayleigh_Function(P,leff_CH4,"940NIR",axs_Keff)
 tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"940NIR",axs_trans,axs_Keff)
-
+"""
 keff_CH4,leff_CH4=NFL.K_eff(P,Transmission889,CH4,879.,899.,"889CH4",axs_Keff)
 tau_CH4=NFL.Weighting_Function(P,keff_CH4,"889CH4",axs_Keff)
 tau_R=NFL.Rayleigh_Function(P,leff_CH4,"889CH4",axs_Keff)
@@ -269,7 +280,7 @@ keff_CH4,leff_CH4=NFL.K_eff(P,Transmission730,CH4,720.,740.,"730OII",axs_Keff)
 tau_CH4=NFL.Weighting_Function(P,keff_CH4,"730OII",axs_Keff)
 tau_R=NFL.Rayleigh_Function(P,leff_CH4,"730OII",axs_Keff)
 tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"730OII",axs_trans,axs_Keff)
-
+"""
 keff_CH4,leff_CH4=NFL.K_eff(P,Transmission672,CH4,662.,682.,"672SII",axs_Keff)
 tau_CH4=NFL.Weighting_Function(P,keff_CH4,"672SII",axs_Keff)
 tau_R=NFL.Rayleigh_Function(P,leff_CH4,"672SII",axs_Keff)
@@ -279,18 +290,18 @@ keff_CH4,leff_CH4=NFL.K_eff(P,Transmission658,CH4,653.,663.,"658NII",axs_Keff)
 tau_CH4=NFL.Weighting_Function(P,keff_CH4,"658NII",axs_Keff)
 tau_R=NFL.Rayleigh_Function(P,leff_CH4,"658NII",axs_Keff)
 tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"658NII",axs_trans,axs_Keff)
-
+"""
 keff_CH4,leff_CH4=NFL.K_eff(P,Transmission656,CH4,646.,666.,"656HIA",axs_Keff)
 tau_CH4=NFL.Weighting_Function(P,keff_CH4,"656HIA",axs_Keff)
 tau_R=NFL.Rayleigh_Function(P,leff_CH4,"656HIA",axs_Keff)
 tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"656HIA",axs_trans,axs_Keff)
 
-
+"""
 keff_CH4,leff_CH4=NFL.K_eff(P,Transmission647,CH4,637.,657.,"647CNT",axs_Keff)
 tau_CH4=NFL.Weighting_Function(P,keff_CH4,"647CNT",axs_Keff)
 tau_R=NFL.Rayleigh_Function(P,leff_CH4,"647CNT",axs_Keff)
 tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"647CNT",axs_trans,axs_Keff)
-
+"""
 keff_NH3,leff_NH3=NFL.K_eff(P,Transmission647,NH3,637.,657.,"647CNT",axs_Keff)
 tau_NH3=NFL.Weighting_Function(P,keff_NH3,"647CNT",axs_Keff)
 tau_R=NFL.Rayleigh_Function(P,leff_NH3,"647CNT",axs_Keff)
@@ -307,13 +318,13 @@ tau_CH4=NFL.Weighting_Function(P,keff_CH4,"620CH4",axs_Keff)
 tau_R=NFL.Rayleigh_Function(P,leff_CH4,"620CH4",axs_Keff)
 tmp=NFL.Compute_Transmission(P,tau_R,tau_CH4,"620CH4",axs_trans,axs_Keff)
 
-axs_Keff.legend(loc=1,ncol=4, borderaxespad=0.,prop={'size':7})
+axs_Keff.legend(loc=1,ncol=3, borderaxespad=0.,prop={'size':10})
 fig_Keff.subplots_adjust(left=0.12, right=0.96, top=0.94, bottom=0.09)
 axs_trans.legend(loc=1,ncol=4, borderaxespad=0.,prop={'size':7})
 fig_trans.subplots_adjust(left=0.12, right=0.96, top=0.94, bottom=0.09)
 
-fig_trans.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/TransmissionFunctions.png',dpi=320)
-fig_Keff.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/ContributionFunctions.png',dpi=320)
+fig_trans.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/TransmissionFunctions.png',dpi=320,bbox_inches = 'tight')
+fig_Keff.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/ContributionFunctions.png',dpi=320,bbox_inches = 'tight')
 
 ###### Plot regional and moon reflectivities
 fig_moons,axs_moons=pl.subplots(2,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
