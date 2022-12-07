@@ -23,6 +23,7 @@ ax1.imshow(mat['mu'])
 
 Latpgtemp=mat['lat']
 Latpg=Latpgtemp.flatten()
+print(Latpg)
 longtemp=mat['lon']
 long=longtemp.flatten()
 mu_arr=np.zeros((161,161),dtype=float)

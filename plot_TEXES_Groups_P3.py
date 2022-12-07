@@ -5,7 +5,7 @@ Created on Sun Dec 05 08:48:16 2021
 @author: Steven Hill
 """
 
-def plot_TEXES_Groups(ax,clr="C2"):
+def plot_TEXES_Groups(ax,clr="C2",prs=0.43798,mult=1.0):
     """
     PURPOSE:    This code reads and plots the NH3 mole fraction data from
                 Fletcher et al., 2016 at 440mb pressure. It loops over the
@@ -16,12 +16,18 @@ def plot_TEXES_Groups(ax,clr="C2"):
     import scipy
     import numpy as np
     import matplotlib.pyplot as pl
+    print('***************** mult=',mult)
     pth="c:/Astronomy/Projects/SAS 2021 Ammonia/GeminiTEXES2017/ZonalResults/"
     latc = scipy.fromfile(file=pth+"zmean_g1_retnh3_lat.txt", dtype=float, count=-1, sep=" ")
     pressure = scipy.fromfile(file=pth+"zmean_g1_retnh3_pressure.txt", dtype=float, count=-1, sep=" ")
     data=np.zeros((7,61))
     print("data=",data.shape)
-    PL=23
+
+    ind=np.where(np.abs(pressure-prs)/pressure<0.01)
+    print('&&&&&&&&&&&&&&&&&&&&&&&&',ind)
+    print('&&&',np.ndarray.flatten(np.array(ind))[0])
+    
+    PL=np.ndarray.flatten(np.array(ind))[0]
     Start=61*PL
     End=61*(PL+1)
     for i in range(1,7):
@@ -32,9 +38,9 @@ def plot_TEXES_Groups(ax,clr="C2"):
         data[i-1,:]=dat
     print(Start,End,pressure[PL])
     latg=Centric_to_Graphic(latc)
-    scaled_data_mean=np.mean(data,axis=0)#*8.0e4
-    scaled_data_std=np.std(data,axis=0)#*8.0e4
-    ax.plot(latg,scaled_data_mean,label='Fletcher etal, 2016',color=clr)
+    scaled_data_mean=np.mean(data,axis=0)*mult#*8.0e4
+    scaled_data_std=np.std(data,axis=0)*mult#*8.0e4
+    ax.plot(latg,scaled_data_mean,label='Fletcher etal, 2020 ('+str(int(prs*1000.))+'mb)',color=clr)
     ax.fill_between(latg, scaled_data_mean-scaled_data_std, scaled_data_mean+scaled_data_std,
                     color=clr,alpha=0.1)
     print(data[Start:End])

@@ -132,7 +132,27 @@ def Campaign(dates):
                               'moons':[[842.0,645.0],[859.0,633.0],[908.0,508.0]],
                               'JIDs':['0_Jupiter'],
                               'Jupiter':[[794.0,801.0]],
-                              'Filters':['647CNT','632OI','656HIA','730OII']}}
+                              'Filters':['647CNT','632OI','656HIA','730OII']},
+                  '20221031UT':{'mIDs':['4_Callisto','1_Io','2_Europa','3_Ganymede'],
+                              'moons':[[250.333,277.918],[674.035,488.655],[1134.514,765.890],[1282.841,889.552]],
+                              'JIDs':['0_Jupiter'],
+                              'Jupiter':[[986.0,683.0]],
+                              'Filters':['647NH3','632OI','656HIA','620CH4']},
+                  '20221101UT':{'mIDs':['4_Callisto','3_Ganymede'],
+                              'moons':[[382.,467.],[1344,997]],
+                              'JIDs':['0_Jupiter'],
+                              'Jupiter':[[807.0,674.0]],
+                              'Filters':['647NH3','632OI','656HIA','620CH4']},
+                  '20221109UT':{'mIDs':['2_Europa','3_Ganymede','4_Callisto'], #IO TRANSITING
+                              'moons':[[970.,785.],[1044.,810.],[1165.,856.]],
+                              'JIDs':['0_Jupiter'],
+                              'Jupiter':[[641.,586.]],
+                              'Filters':['647NH3','632OI','656HIA','620CH4']},
+                  '20221121UT':{'mIDs':['2_Europa','3_Ganymede','1_Io'], #CALLISTO OUT OF FIELD OF VIEW
+                              'moons':[[569.,430.],[879.,657.],[970.,685.]],
+                              'JIDs':['0_Jupiter'],
+                              'Jupiter':[[768.,564.]],
+                              'Filters':['647NH3','632OI','656HIA','620CH4']}}
     
     return root_path,pathout,observations
 
@@ -294,12 +314,14 @@ def SummaryTablePlot(AllTable,dates,MeasFilt,RefFilt,pathout):
     from astropy.table import Table#, vstack
     import numpy as np
     from astropy.io import ascii
+    import matplotlib.dates as mdates
+    from datetime import datetime, timedelta
 
     ###############################################################################
     # Set column names for summary table and initialize booleans, counters, and
     #    datetimearray. NOTE THAT DATETIMEARRAY IS SET TO 1-DAY GRANULARITY.
     RowNames=['0_Jupiter','1_Io','2_Europa','3_Ganymede','4_Callisto',
-              'Moons Ratio','Moons StdP','95% Conf','Trans647','NH3 Abs','Trans Conf']
+              '  Moons Avg.','Moons StdP','95% Conf','Observed Transmission','NH3 Abs','Trans Conf']
     First2=True   
     counter=0
     datetimearray=np.empty([len(dates)],dtype=datetime)
@@ -312,16 +334,28 @@ def SummaryTablePlot(AllTable,dates,MeasFilt,RefFilt,pathout):
     #   
 
     #Set Ratio y limits based on filter pair
-    YL={"647CNT":{"656HIA":[1.2,1.45],
+    YL={"620CH4":{"656HIA":[1.2,1.45],
                   "672SII":[1.2,1.45],
                   "658NII":[3.5,4.0],
                   "632OI":[0.85,1.0]},
+        "647CNT":{"656HIA":[1.2,1.45],
+                  "672SII":[1.2,1.45],
+                  "658NII":[3.5,4.0],
+                  "632OI":[0.85,1.0]},
+        "647NH3":{"656HIA":[1.2,1.45],
+                  "672SII":[1.2,1.45],
+                  "658NII":[3.5,4.0],
+                  "632OI":[0.85,1.0]},
+        "620CH4":{"656HIA":[1.4,1.7],
+                  "672SII":[1.2,1.45],
+                  "658NII":[3.5,4.0],
+                  "632OI":[1.0,1.2]},
         "889CH4":{"940NIR":[0.0,6.0]},
         "656HIA":{"672SII":[0.8,1.2],
                   "658NII":[2.5,3.0],
                   "632OI":[0.0,2.0]}}
-    ExpectedLevel={"647CNT":0.961,"889CH4":0.1,"656HIA":1.0}
-    YLR={"647CNT":[0.9,1.05],"889CH4":[0.,0.2],"656HIA":[0.9,1.1]}                                
+    ExpectedLevel={"620CH4":0.90,"647CNT":0.961,"647NH3":0.961,"889CH4":0.1,"656HIA":1.0}
+    YLR={"620CH4":[0.85,1.05],"647CNT":[0.9,1.05],"647NH3":[0.9,1.05],"889CH4":[0.,0.2],"656HIA":[0.9,1.1]}                                
     print("RefFilt,dates=",RefFilt,dates)
     for date in dates:
         print("DATE=",date)
@@ -387,7 +421,7 @@ def SummaryTablePlot(AllTable,dates,MeasFilt,RefFilt,pathout):
     YY['StdP Ratio']=0.0
     YY['Conf 95%']=0.0
     
-    figloc,ax=pl.subplots(2,1,figsize=(6,4), dpi=150, facecolor="white")
+    figloc,ax=pl.subplots(2,1,figsize=(6,6), dpi=150, sharex=True, facecolor="white")
     mkrsize=5.0
     #pl.figure(figsize=(6,4), dpi=150, facecolor="white")
     #pl.subplot(2,1,1)
@@ -416,22 +450,26 @@ def SummaryTablePlot(AllTable,dates,MeasFilt,RefFilt,pathout):
         elif date[0:4]=='2021':
             starttime=datetime(2021,8,1,0,0,0)
             endtime=datetime(2021,11,30,0,0,0)
+        elif date[0:4]=='2022':
+            starttime=datetime(2022,10,1,0,0,0)
+            endtime=datetime(2022,11,30,0,0,0)
     
         ax[0].set_xlim(starttime,endtime)
         ax[0].set_ylim(YL[MeasFilt][RefFilt][0],YL[MeasFilt][RefFilt][1])
         #pl.ylim(0.9,1.1)
         #pl.ylim(3.5,4.0)
-        if RowNames[i]=='0_Jupiter' or RowNames[i]=='Moons Ratio':
+        if RowNames[i]=='0_Jupiter' or RowNames[i]=='  Moons Avg.':
             mkrsize=5.0
         else:
             mkrsize=2.0
-        plotshows=ax[0].plot_date(datetimearray,tmparr,label=RowNames[i],xdate=True,fmt='o',markersize=mkrsize)
-        ax[0].legend(fontsize=6,ncol=3)
+        plotshows=ax[0].plot_date(datetimearray,tmparr,label=str(RowNames[i])[2:],xdate=True,fmt='o',markersize=mkrsize)
+        ax[0].legend(fontsize=8,ncol=3)
         locs,labls=pl.xticks()
         labls=[]
         ax[0].xticks=[locs,labls]
         ax[0].grid('both', linewidth=0.5)
-    ax[0].set_title(MeasFilt+' over '+RefFilt)
+    ax[0].set_title(MeasFilt+'/'+RefFilt+' Ratio for each Body')
+    ax[0].set_ylabel("Signal Ratio",fontsize=12)
         
     tmperr=np.zeros(len(dates))
       
@@ -445,26 +483,36 @@ def SummaryTablePlot(AllTable,dates,MeasFilt,RefFilt,pathout):
     #pl.subplot(2,1,2)
     ax[1].set_xlim(starttime,endtime)
     ax[1].set_ylim(YLR[MeasFilt][0],YLR[MeasFilt][1])
-    mkrsize=2.0
+    mkrsize=4.0
     ax[1].plot_date(datetimearray,tmparr,label=RowNames[8],xdate=True,fmt='o',
                  markersize=mkrsize,color='k')
     ax[1].errorbar(datetimearray,tmparr,yerr=tmperr,linewidth=0.0,ecolor='k',elinewidth=1.0)
 
-    ax[1].plot_date([starttime,endtime],ExpectedLevel[MeasFilt]*np.ones(2),xdate=True,
-                 linestyle='dashed',markersize=0.0,color='r',linewidth=0.5)
     ax[1].plot_date([starttime,endtime],np.mean(tmparr)*np.ones(2),xdate=True,
-                 linestyle='dashed',markersize=0.0,color='k',linewidth=0.5)
-    ax[1].text(starttime, ExpectedLevel[MeasFilt],str(ExpectedLevel[MeasFilt])[0:5],
-             horizontalalignment='left', verticalalignment='bottom',color='r',fontsize=8)
-    ax[1].text(starttime, np.mean(tmparr),str(np.mean(tmparr))[0:5],
-             horizontalalignment='left', verticalalignment='bottom',color='k',fontsize=8)
+                 linestyle='dashed',markersize=0.0,color='k',linewidth=1.0,label="Avg. Obs.="+str(np.mean(tmparr))[0:5])
+    ax[1].plot_date([starttime,endtime],ExpectedLevel[MeasFilt]*np.ones(2),xdate=True,
+                 linestyle='dashed',markersize=0.0,color='r',linewidth=1.0,label="Predicted="+str(ExpectedLevel[MeasFilt]))
+    #ax[1].text(starttime, ExpectedLevel[MeasFilt],str(ExpectedLevel[MeasFilt])[0:5],
+    #         horizontalalignment='left', verticalalignment='bottom',color='r',fontsize=8)
+    #ax[1].text(starttime, np.mean(tmparr),str(np.mean(tmparr))[0:5],
+    #         horizontalalignment='left', verticalalignment='bottom',color='k',fontsize=8)
     
+    xtks = np.arange(starttime, endtime, timedelta(days=7)).astype(datetime)    
+    ax[1].set(xlim=(starttime, endtime))
+    ax[1].set_xticks(xtks)
+    ax[1].xaxis.set_major_formatter(mdates.DateFormatter('%b-%d'))
+
     
-    ax[1].legend(fontsize=6)
+    ax[1].legend(fontsize=8)
     ax[1].grid('both', linewidth=0.5)
+    ax[1].set_xlabel(date[0:4],fontsize=12)
+    ax[1].set_ylabel("Relative Transmission",fontsize=12)
+    ax[1].set_title("Jovian Atmospheric Transmission: "+MeasFilt+" vs "+RefFilt)
     ascii.write(YY,pathout+'Transmission_'+MeasFilt+'_over_'+RefFilt+'.csv',format='csv',
                 overwrite=True,delimiter=',')
     #print pathout
+    figloc.subplots_adjust(left=0.12, bottom=0.10, right=0.98, top=0.92)
+
     figloc.savefig(pathout+'Jupiter-Photometry_'+dates[0][0:4]+'_'+MeasFilt+'_over_'+RefFilt+'.png',dpi=300)
 
         

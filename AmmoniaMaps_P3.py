@@ -61,6 +61,7 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
     import ephem
     import EWLibV006_P3 as EWL
     import plot_TEXES_Groups_P3 as PTG
+    import NH3_Filter_Library_P3 as NH3
 
     ###########################################################################
     #Initialization section
@@ -184,7 +185,10 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
         elif orientation=='Portrait':
             fig,axs=pl.subplots(3,2,figsize=(4.0,6.0), dpi=150, facecolor="white",
                                 sharey=True,sharex=True)
+        print("&&&&&&&&&& date_list_datetime= ",date_list_datetime)
+        print("&&&&&&&&&& dates= ",dates)
         fig.suptitle(Date+", CM2="+str(int(CM2deg)),x=0.5,ha='center',color='k')
+        #fig.suptitle(date_list_datetime[0]+", CM2="+str(int(CM2deg)),x=0.5,ha='center',color='k')
 
         figcor,axscor=pl.subplots(2,2,figsize=(6.0,4.5), dpi=150, facecolor="white",
                             sharey=True,sharex=True)
@@ -228,7 +232,7 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
             else:
                 axs[i,j].set_title(PlotTypes[iPlot],fontsize=8)
                 #if jcor>0:
-                axscor[icor,jcor].set_title(PlotTypes[iPlot],fontsize=8)
+                axscor[icor,jcor].set_title(PlotTypes[iPlot]+' vs NH3 EW (nm)',fontsize=8)
                 
             if PlotTypes[iPlot] in ["889CH4","380NUV","Reflectivity"]:
                 clrtbl='gist_heat'
@@ -263,11 +267,11 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
                     """
                     axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr,patch,marker="o",s=0.5,edgecolor='C7',alpha=0.2,label="Other")
 
-                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[20:26,:],patch[20:26,:],marker="o",s=0.5,edgecolor='C0',alpha=0.5,label="25N-19N (NTropZ")
-                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[27:37,:],patch[27:37,:],marker="o",s=0.5,edgecolor='C5',alpha=0.5,label="18N-9N (NEB)")
-                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[38:45,:],patch[38:45,:],marker="o",s=0.5,edgecolor='C2',alpha=0.5,label="8N-0 (NEZ)")
-                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[46:54,:],patch[46:54,:],marker="o",s=0.5,edgecolor='C4',alpha=0.5,label="0-8S (SEZ)")
-                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[63:71,32:46],patch[63:71,32:46],marker="o",s=0.5,edgecolor='C3',alpha=0.5,label="18S-26S (GRS)")
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[20:26,:],patch[20:26,:],marker="o",s=0.5,edgecolor='C0',alpha=0.5,label="NTropZ: 25N-19N")
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[27:37,:],patch[27:37,:],marker="o",s=0.5,edgecolor='C5',alpha=0.5,label="NEB: 18N-9N")
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[38:45,:],patch[38:45,:],marker="o",s=0.5,edgecolor='C2',alpha=0.5,label="NEZ: 8N-0")
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[46:54,:],patch[46:54,:],marker="o",s=0.5,edgecolor='C4',alpha=0.5,label="SEZ: 0-8S")
+                    axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[63:71,32:46],patch[63:71,32:46],marker="o",s=0.5,edgecolor='C3',alpha=0.5,label="GRS")
                 else:
                     fig.delaxes(axs[i,j])
                     
@@ -293,12 +297,21 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
                                        90-LatLims[0]],vmin=0,vmax=65635,
                                        aspect="equal")
                     if PlotTypes[iPlot] in ["Reflectivity"]:
+                        axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr,patch,marker="o",s=0.5,edgecolor='C7',alpha=0.2,label="Other")
+    
+                        axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[20:26,:],patch[20:26,:],marker="o",s=0.5,edgecolor='C0',alpha=0.5,label="NTropZ: 25N-19N")
+                        axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[27:37,:],patch[27:37,:],marker="o",s=0.5,edgecolor='C5',alpha=0.5,label="NEB: 18N-9N")
+                        axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[38:45,:],patch[38:45,:],marker="o",s=0.5,edgecolor='C2',alpha=0.5,label="NEZ: 8N-0")
+                        axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[46:54,:],patch[46:54,:],marker="o",s=0.5,edgecolor='C4',alpha=0.5,label="SEZ: 0-8S")
+                        axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[63:71,32:46],patch[63:71,32:46],marker="o",s=0.5,edgecolor='C3',alpha=0.5,label="GRS")
+                        """
                         axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[0:19,:],patch[0:19,:],marker="o",s=0.5,color='C0',alpha=0.5,label="45N-35N")
                         axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[20:35,:],patch[20:35,:],marker="o",s=0.5,color='C5',alpha=0.5,label="35N-10N (NEB)")
                         axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[36:45,:],patch[36:45,:],marker="o",s=0.5,color='C2',alpha=0.5,label="10N-0 (NEZ)")
                         axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[46:59,:],patch[46:59,:],marker="o",s=0.5,color='C4',alpha=0.5,label="0-15S")
                         axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[60:74,:],patch[60:74,:],marker="o",s=0.5,color='C3',alpha=0.5,label="15S-30S (GRS)")
                         axscor[icor,jcor].scatter(NH3Abs_patch_EW_corr[75:89,:],patch[75:89,:],marker="o",s=0.5,color='C1',alpha=0.5,label="30S-45S")
+                        """
                 else:
                     fig.delaxes(axs[i,j])
             # Overplot contours and set axis labels
@@ -347,16 +360,17 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
 
     PTG.plot_Teifel(axsavgprof[0],clr='C0')
     axsavgprof[0].legend(fontsize=7,loc=2)
-
+    
     ax2 = axsavgprof[0].twinx()  # instantiate a second axes that shares the same x-axis
     ax2.ticklabel_format(axis='y',style='sci',scilimits=(0,1))
     ax2.tick_params(axis='y', which='major', labelsize=7)
-    PTG.plot_TEXES_Groups(ax2,clr='C2')
+    plevel=0.437980
+    PTG.plot_TEXES_Groups(ax2,clr='C2',prs=plevel)
 
-    ax2.set_ylabel("NH3 Mole Fraction at 440mb",fontsize=8)
+    ax2.set_ylabel("NH3 Mole Fraction at "+str(int(plevel*1000))+"mb",fontsize=8)
     ax2.yaxis.label.set_color('C2')
     ax2.legend(fontsize=7,loc=1)
-
+    
     # Zonal Profile
     axsavgprof[1].plot(Lons,AvgZoneEW)
     axsavgprof[1].fill_between(Lons, AvgZoneEW-StdZoneEW, AvgZoneEW+StdZoneEW,alpha=.2)
@@ -366,9 +380,9 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
     for iavgprof in range(0,2):
         axsavgprof[iavgprof].grid(linewidth=0.2)
         axsavgprof[iavgprof].set_xlim(-45.,45.)
-        axsavgprof[iavgprof].set_ylim(0.,1.2)
+        axsavgprof[iavgprof].set_ylim(0.0,1.2)
         axsavgprof[iavgprof].set_xticks(np.linspace(-45.,45.,7), minor=False)
-        axsavgprof[iavgprof].set_yticks(np.linspace(0.,1.2,7), minor=False)
+        axsavgprof[iavgprof].set_yticks(np.linspace(0.0,1.2,7), minor=False)
         axsavgprof[iavgprof].tick_params(axis='both', which='major', labelsize=7)
         axsavgprof[iavgprof].set_ylabel("Equivalent Width (nm)",fontsize=8)
         

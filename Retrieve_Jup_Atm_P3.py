@@ -71,7 +71,7 @@ def Retrieve_Jup_Atm_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All
     gravity=2228.0
     mean_mol_wt=3.85e-24
     fCH4=1.81e-3
-    STP=1.01e6
+    STP=1.01e6  #####!!!! Shouldn't this be 1.01e5???? Maybe cgs?
 
     observer = ephem.Observer()
     #Location from Google Maps at 483 S Oneida Way, Denver 80224

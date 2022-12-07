@@ -122,23 +122,29 @@ def JupiterObservationCatalog():
 
 
 ###############################################################################
-def PlotJupiterObservations():
+def PlotJupiterObservations(CM=1):
     import matplotlib.pyplot as pl
     from datetime import datetime
-    fig,ax=pl.subplots(nrows=2,ncols=1,figsize=(6.0,6.0), dpi=150, 
+    fig,ax=pl.subplots(nrows=3,ncols=1,figsize=(6.0,6.0), dpi=150, 
                        sharex=True,facecolor="white")
     fig.suptitle("Jupiter NH3 Observations",x=0.5,ha='center',color='k',
                  fontsize=16)
+
+    startdate=datetime.strptime("2022-07-19","%Y-%m-%d")
+    enddate=datetime.strptime("2023-01-04","%Y-%m-%d")
+    subPlotJupiterObservations(ax[0],startdate,enddate,CM=CM)
+    
     startdate=datetime.strptime("2021-06-21","%Y-%m-%d")
     enddate=datetime.strptime("2021-12-07","%Y-%m-%d")
-    subPlotJupiterObservations(ax[0],startdate,enddate)
+    subPlotJupiterObservations(ax[1],startdate,enddate,CM=CM)
+    
     startdate=datetime.strptime("2020-06-21","%Y-%m-%d")
     enddate=datetime.strptime("2020-12-07","%Y-%m-%d")
-    subPlotJupiterObservations(ax[1],startdate,enddate,xtitle=True)
+    subPlotJupiterObservations(ax[2],startdate,enddate,CM=CM,xtitle=True)
     pl.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/JupiterObservations.png',dpi=320)
 
 
-def subPlotJupiterObservations(ax,startdate,enddate,xtitle=False):
+def subPlotJupiterObservations(ax,startdate,enddate,CM=1,xtitle=False):
     import sys
     drive='c:'
     sys.path.append(drive+'/Astronomy/Python Play')
@@ -152,8 +158,7 @@ def subPlotJupiterObservations(ax,startdate,enddate,xtitle=False):
     from datetime import datetime, timedelta
     import EWLibV006_P3 as EWL
     import matplotlib.pyplot as pl
-
-
+    import matplotlib.dates as mdates
 
     observer = ephem.Observer()
     #Location from Google Maps at 483 S Oneida Way, Denver 80224
@@ -202,14 +207,20 @@ def subPlotJupiterObservations(ax,startdate,enddate,xtitle=False):
     print(cam_list)
     CMOS_indices = [k for k, x in enumerate(cam_list) if x == 'CMOS']
     CCD_indices = [k for k, x in enumerate(cam_list) if x == 'CCD']
+    if CM==1:
+        ax.scatter(np.array(CMI_list)[CMOS_indices]*180./np.pi,np.array(date_list_datetime)[CMOS_indices],
+                   s=2.0,color='C0',label="CMOS Obs")                            
+        ax.scatter(np.array(CMI_list)[CCD_indices]*180./np.pi,np.array(date_list_datetime)[CCD_indices],
+                   s=2.0,color='C1',label="CCD Obs")      
+    elif CM==2:                      
+        ax.scatter(np.array(CMII_list)[CMOS_indices]*180./np.pi,np.array(date_list_datetime)[CMOS_indices],
+                   s=2.0,color='C0',label="CMOS Obs")                            
+        ax.scatter(np.array(CMII_list)[CCD_indices]*180./np.pi,np.array(date_list_datetime)[CCD_indices],
+                   s=2.0,color='C1',label="CCD Obs")      
 
-    ax.scatter(np.array(CMI_list)[CMOS_indices]*180./np.pi,np.array(date_list_datetime)[CMOS_indices],
-               s=2.0,color='C0',label="CMOS Obs")                            
-    ax.scatter(np.array(CMI_list)[CCD_indices]*180./np.pi,np.array(date_list_datetime)[CCD_indices],
-               s=2.0,color='C1',label="CCD Obs")                            
-
-    perijoveTime=['2020-07-25-0625','2020-09-16-0220','2021-07-21-0814','2021-09-02-2242',
-                  '2021-10-16-1713']
+    perijoveTime=['2020-07-25-0625','2020-09-16-0220',
+                  '2021-07-21-0814','2021-09-02-2242','2021-10-16-1713',
+                  '2022-08-17-1446','2022-09-29-1711','2022-11-06-2138','2022-12-15-0323']
     periJdatetimelist=[]
     for pjt in  range (0,len(perijoveTime)):
         periJdatetimelist.append(datetime.strptime(perijoveTime[pjt],"%Y-%m-%d-%H%M"))
@@ -218,7 +229,9 @@ def subPlotJupiterObservations(ax,startdate,enddate,xtitle=False):
         Juno_Ganymede_vis_list,Juno_Callisto_vis_list= \
         EWL.JupiterEphemLists(periJdatetimelist,observer)
 
-    JunoCMIEqX=[277.3,216.4,107.,225.,132.]
+    JunoCMIEqX=[277.3,216.4,
+                107.,225.,132.,
+                319.,357.,37.,130.]
 
     for k in range(0,metadata.nrecords-1):
         #print metadata.VideoFile[k]
@@ -227,22 +240,33 @@ def subPlotJupiterObservations(ax,startdate,enddate,xtitle=False):
         date=datetime.strptime(strdate,"%Y-%m-%d-%H%M")
 
 
-    ax.scatter(JunoCMIEqX,periJdatetimelist,color='k',s=10,
-               label="PJXX Sys 1 Long")      
-    ax.scatter(np.array(Juno_CMI_list)*180./np.pi,juno_list_datetime,color='r',
-               s=10,label="PJXX CMI")      
+    if CM==1:    
+        ax.scatter(JunoCMIEqX,periJdatetimelist,color='k',s=10,
+                   label="PJXX Sys 1 EqX")      
+        ax.scatter(np.array(Juno_CMI_list)*180./np.pi,juno_list_datetime,color='r',
+                   s=10,label="PJXX CMI")      
+    elif CM==2:
+        delta=np.array(Juno_CMII_list)-np.array(Juno_CMI_list)
+        ax.scatter(JunoCMIEqX+delta,periJdatetimelist,color='k',s=10,
+                   label="PJXX Sys 2 EqX")      
+        ax.scatter(np.array(Juno_CMII_list)*180./np.pi,juno_list_datetime,color='r',
+                   s=10,label="PJXX CMII")      
+        
     ax.autoscale(enable=False)
     ax.yaxis_date()
     ax.set_adjustable('box')
-    ax.tick_params(axis='both',labelsize=10)
+    ax.tick_params(axis='both',labelsize=8)
     ax.set_xticks(np.linspace(0.,360.,13, endpoint=True))
     print([startdate,enddate])
 
     ytks = np.arange(startdate, enddate, timedelta(days=28)).astype(datetime)    
     ax.set(xlim=(0.0, 360.0), ylim=(startdate, enddate))
     ax.set_yticks(ytks)
+    ax.yaxis.set_major_formatter(mdates.DateFormatter('%b-%d'))
+    ax.set_ylabel(str(startdate)[0:4],fontsize=12)
+
     if xtitle:
-        ax.set_xlabel("CM I Longitude (deg)",fontsize=12)
+        ax.set_xlabel("Sys "+str(CM)+" Longitude (deg)",fontsize=12)
         ax.legend(ncol=2,fontsize="small")
     ax.grid(linewidth=0.2)
     pl.subplots_adjust(left=0.15, bottom=0.12, right=0.95, top=0.92)
