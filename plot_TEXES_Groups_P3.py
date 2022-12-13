@@ -16,34 +16,54 @@ def plot_TEXES_Groups(ax,clr="C2",prs=0.43798,mult=1.0):
     import scipy
     import numpy as np
     import matplotlib.pyplot as pl
+    import ComputeNetRateJupiter_P3 as CNRJ
+
     print('***************** mult=',mult)
     pth="c:/Astronomy/Projects/SAS 2021 Ammonia/GeminiTEXES2017/ZonalResults/"
-    latc = scipy.fromfile(file=pth+"zmean_g1_retnh3_lat.txt", dtype=float, count=-1, sep=" ")
     pressure = scipy.fromfile(file=pth+"zmean_g1_retnh3_pressure.txt", dtype=float, count=-1, sep=" ")
-    data=np.zeros((7,61))
+    data=np.zeros((7,181))
     print("data=",data.shape)
 
     ind=np.where(np.abs(pressure-prs)/pressure<0.01)
-    print('&&&&&&&&&&&&&&&&&&&&&&&&',ind)
-    print('&&&',np.ndarray.flatten(np.array(ind))[0])
+    PL=np.ndarray.flatten(np.array(ind))[0]
+    #print('&&&&&&&&&&&&&&&&&&&&&&&&',ind)
+    #print('&&&',np.ndarray.flatten(np.array(ind))[0],'***PL=',PL)
     
     PL=np.ndarray.flatten(np.array(ind))[0]
-    Start=61*PL
-    End=61*(PL+1)
-    for i in range(1,7):
+    for i in range(1,8):
+        latc = scipy.fromfile(file=pth+"zmean_g"+str(i)+"_retnh3_lat.txt", dtype=float, count=-1, sep=" ")
+        latg=Centric_to_Graphic(latc)
+        latsize=len(latg)
+        #print("latsize=========",latsize)
+        Start=latsize*PL
+        End=latsize*(PL+1)
+        """if i==4:
+            Start=59*PL
+            End=59*(PL+1)
+            latc = scipy.fromfile(file=pth+"zmean_g4_retnh3_lat.txt", dtype=float, count=-1, sep=" ")
+            latg=Centric_to_Graphic(latc)
+        else:
+            Start=61*PL
+            End=61*(PL+1)
+            latc = scipy.fromfile(file=pth+"zmean_g1_retnh3_lat.txt", dtype=float, count=-1, sep=" ")
+            latg=Centric_to_Graphic(latc)"""
+        #print("Start,End=",Start,End)
         print(i)
         tmp = scipy.fromfile(file=pth+"zmean_g"+str(i)+"_retnh3_data.txt", dtype=float, count=-1, sep=" ")
         dat=tmp[Start:End]
-        print("dat=",dat.shape, dat)
-        data[i-1,:]=dat
-    print(Start,End,pressure[PL])
-    latg=Centric_to_Graphic(latc)
+        latgrid,tmpsig=CNRJ.uniform_lat_grid(latg,dat,Fine=True)
+
+        #print("dat=",tmpsig.shape, tmpsig)
+        data[i-1,:]=tmpsig
+    #print(Start,End,pressure[PL])
     scaled_data_mean=np.mean(data,axis=0)*mult#*8.0e4
     scaled_data_std=np.std(data,axis=0)*mult#*8.0e4
-    ax.plot(latg,scaled_data_mean,label='Fletcher etal, 2020 ('+str(int(prs*1000.))+'mb)',color=clr)
-    ax.fill_between(latg, scaled_data_mean-scaled_data_std, scaled_data_mean+scaled_data_std,
+    ax.plot(latgrid,scaled_data_mean,label='Fletcher etal, 2020 ('+str(int(prs*1000.))+'mb)',color=clr)
+    ax.fill_between(latgrid, scaled_data_mean-scaled_data_std, scaled_data_mean+scaled_data_std,
                     color=clr,alpha=0.1)
-    print(data[Start:End])
+    #ax.plot(latgrid,data[3,:]*mult)
+    #for i in range(1,8):
+    #    ax.plot(latgrid,data[i-1,:]*mult)
 
     
 def plot_Teifel(ax,clr='C0'):
@@ -92,5 +112,5 @@ def Centric_to_Graphic(Latc):
     Latg=Latc
     for i in range(len(Latc)):
         Latg[i]=np.arctan(((Req/Rp)**2)*np.tan(Latc[i]*np.pi/180.))*180.0/np.pi
-    print(Latg)
+    #print(Latg)
     return Latg

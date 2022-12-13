@@ -170,10 +170,15 @@ def subPlotJupiterObservations(ax,startdate,enddate,CM=1,xtitle=False):
     path='c:/Astronomy/Projects/Planets/Jupiter/Imaging Data/'
     dateUTarray=os.listdir(path)
     for i in dateUTarray:
-        if os.path.isdir(path+i):
-            #print(i)
-            sessionlist=os.listdir(path+i)
+        Video=False
+        if os.path.isdir(path+i) and str(i)[0:2]=="20":  #Only look in date directories
+            print(i)
+            sessionlist=os.listdir(path+i)  #List of files for a given date
             for j in sessionlist:
+                if "Jupiter_VideoMetaData" in j and "csv" in j:
+                    Video=True
+            for j in sessionlist:
+                print(j)
                 if "csv" in j:
                     if "Jupiter_VideoMetaData" in j:
                         #print j
@@ -187,13 +192,14 @@ def subPlotJupiterObservations(ax,startdate,enddate,CM=1,xtitle=False):
                             #print date
                             date_list.append(date)
                             cam_list.append('CMOS')
-                elif "fit" in j:
+                elif ("fit" in j or "FIT"  in j) and \
+                     ("2020" or "2021" or "2022" in i[0:4]) and not(Video):
                     if "Aligned" in j:
-                        #print j
+                        print("* ",j)
                         strdate=j[0:15]
-                        #print strdate
+                        print("** ",strdate)
                         date=datetime.strptime(strdate,"%Y-%m-%d-%H%M")
-                        #print date
+                        print("*** ",date)
                         date_list.append(date)
                         cam_list.append('CCD')
                         

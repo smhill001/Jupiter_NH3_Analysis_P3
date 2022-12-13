@@ -58,6 +58,8 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
     clrmap='jet'
     
     MeridEWArray=np.zeros((LatLims[1]-LatLims[0],len(Dates)))
+    MeridEWArrayStd=np.zeros((LatLims[1]-LatLims[0],len(Dates)))
+    statsarray=np.zeros((7,4))
 
     first=True
     firstRGB=True
@@ -87,6 +89,10 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
         fNH3hdulist.close()
         
         fNH3_patch=make_patch(fNH3data,LatLims,LonLims,CM2,LonRng)*1.0e6
+        
+        stats=patchstats(fNH3_patch)
+        statsarray[j,:]=stats
+        
         fNH3_patch_smooth=make_patch(convolve(fNH3data,kernel,boundary='extend'),LatLims,LonLims,CM2,LonRng)*1.0e6
         if first:
             fNH3_patch_avg=np.zeros(fNH3_patch_smooth.shape)
@@ -106,11 +112,14 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
             ObsCM2=float(eph[1].strip())
 
 
-            MeridEW=np.flip(np.mean(fNH3_patch_smooth[:,:],axis=1),axis=0)
-            MeridEWerror=np.flip(np.std(fNH3_patch_smooth[:,:],axis=1),axis=0)
+            #MeridEW=np.flip(np.mean(fNH3_patch_smooth[:,:],axis=1),axis=0)
+            #MeridEWerror=np.flip(np.std(fNH3_patch_smooth[:,:],axis=1),axis=0)
+            MeridEW=np.flip(np.mean(fNH3_patch[:,:],axis=1),axis=0)
+            MeridEWerror=np.flip(np.std(fNH3_patch[:,:],axis=1),axis=0)
             Lats=np.linspace(-44.5,44.5,90)
             #print DateCounter; Date
             MeridEWArray[:,j]=MeridEW[:]
+            MeridEWArrayStd[:,j]=MeridEWerror[:]
 
             axs[1,j].set_title("CM2 = "+str(ObsCM2),fontsize=9)
             fNH3_patch_avg=fNH3_patch_avg+fNH3_patch_smooth/7.
@@ -141,7 +150,8 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
     pathout='c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/'
 
     fig.savefig(pathout+"GRS_NH3_Comparison_2022.png",dpi=300)
-
+    for j in range(0,7):
+        print(statsarray[j,:],(statsarray[j,3]-statsarray[j,2])/(2.*statsarray[j,1]))
     ###########################################################################
     figavg,axsavg=pl.subplots(2,2,figsize=(6.0,6.0), dpi=150, facecolor="white",
                         sharey='all',sharex='col')
@@ -209,6 +219,12 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
     cbar.ax.tick_params(labelsize=8,color='k')#if iSession >1:
     cbar.ax.set_yticklabels(['5', '10', '15','20'],color="k")
 
+    statsavg=patchstats(fNH3_patch_avg)
+    print()
+    print(statsavg,(statsavg[3]-statsavg[2])/(2.*statsavg[1]))
+    print()
+    print(np.nanmean(statsarray[:,0]),np.nanstd(statsarray[:,0]))
+
     #####Fletcher########
         
     show=axsavg[1,1].imshow(FletcherNH3,  
@@ -250,7 +266,7 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
     ###########################################################################
     #print DateCounter; Date
     figprof,axsprof=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white")
-    figprof.suptitle("Ammonia Abundance Profile",x=0.5,ha='center',color='k')
+    figprof.suptitle("Ammonia Abundance Meridional Profile",x=0.5,ha='center',color='k')
 
     AvgMeridEW=np.mean(MeridEWArray[:,:],axis=1)
     StdMeridEW=np.std(MeridEWArray[:,:],axis=1)
@@ -258,11 +274,11 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
     MeridEW=np.flip(np.mean(fNH3_patch_avg[:,:],axis=1),axis=0)
     MeridEWerror=np.flip(np.std(fNH3_patch_avg[:,:],axis=1),axis=0)
     #Lats=np.linspace(-44.5,44.5,90)
-    Lats=np.linspace(89.5-LatLims[1],LatLims[0],LatLims[1]-LatLims[0]) #!!!! Problem! doesn't work for 
+    Lats=np.linspace(90.0-LatLims[1],90.0-LatLims[0],LatLims[1]-LatLims[0]) #!!!! Problem! doesn't work for 
     #!!!! anything other than 45-> -45 (45,135)
 
-    print('^^^^^^^^^',Lats)
-    print('^^^^^^^^^',MeridEW)
+    #print('^^^^^^^^^',Lats)
+    #print('^^^^^^^^^',MeridEW)
     axsprof.plot(Lats,AvgMeridEW,label='This Work, Ammonia Abundance Index') 
     axsprof.fill_between(Lats, AvgMeridEW-StdMeridEW, AvgMeridEW+StdMeridEW,color='C0',alpha=.2)
 
@@ -270,8 +286,12 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
     PTG.plot_TEXES_Groups(axsprof,clr='C2',prs=plevel,mult=1000000.)
     plevel=0.657540
     PTG.plot_TEXES_Groups(axsprof,clr='C3',prs=plevel,mult=1000000.)
+    #for j in range(0,7):
+    #    axsprof.plot(Lats,MeridEWArray[:,j])
+    #    axsprof.fill_between(Lats, MeridEWArray[:,j]-MeridEWArrayStd[:,j],MeridEWArray[:,j]+MeridEWArrayStd[:,j],alpha=.2)
     axsprof.set_xlim(-30.,30.)
     axsprof.set_xlabel("Planetographic Latitude (deg)",fontsize=10)
+    axsprof.set_ylim(50.,300.)
     axsprof.set_ylabel("Ammonia Abundance (ppm)",fontsize=10)
     axsprof.legend(loc=1,ncol=2, borderaxespad=0.,prop={'size':7})
     axsprof.grid(linewidth=0.2)
@@ -343,7 +363,7 @@ def get_WINJupos_ephem(dateobs):
     Lines=ephemfile.readlines()
     ephemfile.close()
     LineString=str(Lines[0])
-    print(LineString)
+    ###print(LineString)
     ###########################################################################
     # PARSE OUTPUT FILE AND CREATE STRING ARRAY EPH FOR CM1, CM2, CM3, AND ALT
     ###########################################################################
@@ -367,3 +387,14 @@ def sharpen(image):
     blurred=convolve(image,kernel)
     tst=image+0.99*(image-blurred) #Need to revalidate that this is correct
     return tst
+
+def patchstats(patch):
+    import numpy as np
+    from numpy import nanmean,nanstd,nanmin,nanmax
+
+    mean=np.nanmean(patch)
+    stdev=np.nanstd(patch)
+    minimum=np.nanmin(patch)
+    maximum=np.nanmax(patch)
+    
+    return [mean,stdev,minimum,maximum]

@@ -24,4 +24,4 @@ ALLValidated=["2020-07-20","2020-07-29","2021-07-08","2021-07-20",
               "2021-09-27"]
 
 Late2021Validated=["2021-11-30","2021-12-02","2021-12-03"]
-AMP3.AmmoniaMaps_P3(DateSelection=CMOSDates,cont=True)
+AMP3.AmmoniaMaps_P3(DateSelection=CMOSDates+Late2021Validated,cont=True)

@@ -110,6 +110,11 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
                                             'CH4file':'2022-09-19-0453_4-Jupiter_620CH4AbsMap.fits',
                                             'NH3file':'2022-09-19-0453_4-Jupiter_647NH3AbsMap.fits',
                                             'RGBfile':'2022-09-19-0518_7-Jupiter_WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
+                 '20220925UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                                         'Seeing':'6/10','Transparency':'7/10'}, 
+                                            'CH4file':'2022-09-25-0615_4-Jupiter_620CH4AbsMap.fits',
+                                            'NH3file':'2022-09-25-0615_6-Jupiter_647NH3AbsMap.fits',
+                                            'RGBfile':'2022-09-25-0546_6-Jupiter_WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
                  '20221009UTa_Img':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                                          'Seeing':'6/10','Transparency':'7/10'}, 
                                             'CH4file':'2022-10-09-0401_5-Jupiter_620CH4AbsImg.fits',
@@ -168,10 +173,10 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
     eph=get_WINJupos_ephem(NH3time)
     CM2=float(eph[1].strip())
     print("********** CM2=",CM2)
-    #LatLims=[45,135]
-    #LonLims=[360-int(CM2+45),360-int(CM2-45)]
-    LatLims=[30,150]
-    LonLims=[360-int(CM2+60),360-int(CM2-60)]
+    LatLims=[45,135]
+    LonLims=[360-int(CM2+45),360-int(CM2-45)]
+    #LatLims=[30,150]
+    #LonLims=[360-int(CM2+60),360-int(CM2-60)]
 
 
 
@@ -453,7 +458,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
                 wspace=0.25, hspace=0.05)     
     axs1[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
 
-    fig.savefig(path+"/"+obsdate+"-Jupiter-Retrieval-NH3-RGB-only"+"_CMII_"+
+    fig1.savefig(path+"/"+obsdate+"-Jupiter-Retrieval-NH3-RGB-only"+"_CMII_"+
               str(CM2)+"-Map.png",dpi=300)
 
     return()
