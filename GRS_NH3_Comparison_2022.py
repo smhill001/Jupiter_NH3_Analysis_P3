@@ -5,7 +5,7 @@ Created on Wed Nov 23 09:07:27 2022
 @author: smhil
 """
 
-def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
+def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
     import sys
     drive='c:'
     sys.path.append(drive+'/Astronomy/Python Play')
@@ -24,6 +24,7 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
     from astropy.convolution import convolve
     from astropy.io import fits
     import plot_TEXES_Groups_P3 as PTG
+    import RetrievalLibrary as RL
 
 
     ###########################################################################
@@ -32,7 +33,9 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
     #    !!!!DOUBLE CHECK THAT FITS FILE TIME TAGS ARE ACCURATE BETWEEN CH4 AND NH3
     ###########################################################################
 #    sourcedata=obsdate+"_"+imagetype
-    sourcefiles={'20220810UT':{'fNH3file':'2022-08-10-1013_0-Jupiter_fNH3Abs647.fits',
+    GRSDates=['20220810UT','20220818UT','20220828UT','20220904UT','20220919UT',
+              '20221013UT','20221020UT','20230113UT']
+    GRSFilesSys2={'20220810UT':{'fNH3file':'2022-08-10-1013_0-Jupiter_fNH3Abs647.fits',
                                'RGBfile':'2022-08-10-1030_0-Jupiter_WV-R(AllRED)GB-RGB-WhtBal-Wavelets-Str_CM2_L360_MAP-BARE.png'},
                  '20220818UT':{'fNH3file':'2022-08-18-0733_4-Jupiter_fNH3Abs647.fits',
                                'RGBfile':'2022-08-18-0745_4-Jupiter_AllRED-WV-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
@@ -45,28 +48,73 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
                  '20221013UT':{'fNH3file':'2022-10-13-0345_5-Jupiter-fNH3Abs647.fits',
                                'RGBfile':'2022-10-13-0402_0-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
                  '20221020UT':{'fNH3file':'2022-10-20-0440_4-Jupiter-fNH3Abs647.fits',
-                               'RGBfile':'2022-10-20-0422_6-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'}}
-        
-    fig,axs=pl.subplots(2,7,figsize=(12.0,4.0), dpi=150, facecolor="white",
+                               'RGBfile':'2022-10-20-0422_6-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
+                 '20230113UT':{'fNH3file':'2023-01-13-0046_2-Jupiter-fNH3Abs647.fits',
+                               'RGBfile':'2023-01-13-0046_0-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'}}
+
+    OvalBADates=['20220812UT','20220901UT','20220925UT']
+    OvalBAFilesSys2={'20220812UT':{'fNH3file':'2022-08-12-1025_5-Jupiter_fNH3Abs647.fits',
+                               'RGBfile':'2022-08-12-1033_8-Jupiter_WV-R(AllRed)GB-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
+                 '20220901UT':{'fNH3file':'2022-09-01-0604_9-Jupiter_fNH3Abs647.fits',
+                               'RGBfile':'2022-09-01-0618_0-Jupiter-Rivera-j220901l1_CM2_L360_MAP-BARE.png'},
+                 '20220925UT':{'fNH3file':'2022-09-25-0615_6-Jupiter_fNH3Abs647.fits',
+                               'RGBfile':'2022-09-25-0546_6-Jupiter_WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'}}
+
+    WS6Dates=['20220901UT','20220913UT','20221009UTb','20221019UT']
+    WS6FilesSys2={'20220901UT':{'fNH3file':'2022-09-01-0604_9-Jupiter_fNH3Abs647.fits',
+                               'RGBfile':'2022-09-01-0618_0-Jupiter-Rivera-j220901l1_CM2_L360_MAP-BARE.png'},
+                 '20220913UT':{'fNH3file':'2022-09-13-0457_4-Jupiter_fNH3Abs647.fits',
+                               'RGBfile':'2022-09-13-0455_6-Jupiter_WV-R685G550B450-RGB-WhtBal-ClrSmth-Wavelets_CM2_L360_MAP-BARE.png'},
+                 '20221009UTb':{'fNH3file':'2022-10-09-0524_5-Jupiter_fNH3Abs647.fits',
+                               'RGBfile':'2022-10-09-0542_8-Jupiter_NoWV-R685G550B450-RGB-WhtBal-Str0to160-Wavelets_CM2_L360_MAP-BARE.png'},
+                 '20221019UT':{'fNH3file':'2022-10-19-0342_4-Jupiter-fNH3Abs647.fits',
+                               'RGBfile':'2022-10-19-0358_2-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'}}
+ 
+    SysII_147Dates=['20220905UT','20221009UTa','20221021UT']
+    SysII_147FilesSys2={'20220905UT':{'fNH3file':'2022-09-05-0559_1-Jupiter_fNH3Abs647.fits',
+                               'RGBfile':'2022-09-05-1559_0-Jupiter_j220905l1_Michael_Wong_CM2_L360_MAP-BARE.png'},
+                 '20221009UTa':{'fNH3file':'2022-10-09-0401_5-Jupiter_fNH3Abs647.fits',
+                               'RGBfile':'2022-10-09-0339_0-Jupiter_WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
+                 '20221021UT':{'fNH3file':'2022-10-21-0358_6-Jupiter-fNH3Abs647.fits',
+                               'RGBfile':'2022-10-21-0342_1-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'}}
+
+    DarkFeatDates=['20220810UT','20220905UT','20220912UT','20220919UT','20221019UT','20221021UT']
+    
+    if target=='GRS':
+        Dates=GRSDates
+        sourcefiles=GRSFilesSys2
+    elif target=="OvalBA":
+        Dates=OvalBADates
+        sourcefiles=OvalBAFilesSys2
+    elif target=="WS6":
+        Dates=WS6Dates
+        sourcefiles=WS6FilesSys2
+    elif target=="SysII_147":
+        Dates=SysII_147Dates
+        sourcefiles=SysII_147FilesSys2
+    
+    
+    NDates=len(Dates)
+
+    fig,axs=pl.subplots(2,NDates,figsize=(12.0,4.0), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
     fig.suptitle('2022 GRS NH3',x=0.5,ha='center',color='k')
     LonLims=[360-int(CM2+LonRng),360-int(CM2-LonRng)]
     target='Jupiter'
-    Dates=['20220810UT','20220818UT','20220828UT','20220904UT','20220919UT','20221013UT','20221020UT']
     kernel = Gaussian2DKernel(1)
     #clrmap='gist_heat'
     clrmap='jet'
     
     MeridEWArray=np.zeros((LatLims[1]-LatLims[0],len(Dates)))
     MeridEWArrayStd=np.zeros((LatLims[1]-LatLims[0],len(Dates)))
-    statsarray=np.zeros((7,4))
+    statsarray=np.zeros((NDates,4))
 
     first=True
     firstRGB=True
-    for iPlot in range(0,14):
+    for iPlot in range(0,2*NDates):
             # Set up
-        i=int(iPlot/7)                           #Plot row
-        j=np.mod(iPlot,7)                   #Plot column
+        i=int(iPlot/NDates)                           #Plot row
+        j=np.mod(iPlot,NDates)                   #Plot column
         axs[i,j].grid(linewidth=0.2)
         axs[i,j].ylim=[-45.,45.]
         axs[i,j].xlim=[360-LonLims[0],360-LonLims[1]]
@@ -88,27 +136,35 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
         fNH3data=fNH3hdulist[0].data
         fNH3hdulist.close()
         
-        fNH3_patch=make_patch(fNH3data,LatLims,LonLims,CM2,LonRng)*1.0e6
+        fNH3_patch=RL.make_patch(fNH3data,LatLims,LonLims,CM2,LonRng)*1.0e6
+        vn=np.mean(fNH3_patch)-3.0*np.std(fNH3_patch)
+        vx=np.mean(fNH3_patch)+3.0*np.std(fNH3_patch)
+        n=6
+        tx=np.linspace(vn,vx,n,endpoint=True)
+        print('$$$$$$$$$$ tx=',tx,vn,vx,n)
         
-        stats=patchstats(fNH3_patch)
+        stats=RL.patchstats(fNH3_patch)
         statsarray[j,:]=stats
         
-        fNH3_patch_smooth=make_patch(convolve(fNH3data,kernel,boundary='extend'),LatLims,LonLims,CM2,LonRng)*1.0e6
+        fNH3_patch_smooth=RL.make_patch(convolve(fNH3data,kernel,boundary='extend'),LatLims,LonLims,CM2,LonRng)*1.0e6
         if first:
             fNH3_patch_avg=np.zeros(fNH3_patch_smooth.shape)
         if i>>0:
-            show=axs[1,j].imshow(fNH3_patch_smooth, clrmap, origin='upper',vmin=100,vmax=160,  
+            print()
+            print(vn,vx)
+
+            show=axs[1,j].imshow(fNH3_patch_smooth, clrmap, origin='upper',vmin=vn,vmax=vx,  
                        extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
                                90-LatLims[0]],#vmin=0,vmax=1.2,
                                aspect="equal")
-            temp=make_contours_CH4_patch(axs[1,j],fNH3_patch_smooth,LatLims,LonLims,
-                                   lvls=np.linspace(100,160,num=13,endpoint=True),frmt='%3.0f')
+            temp=RL.make_contours_CH4_patch(axs[1,j],fNH3_patch_smooth,LatLims,LonLims,
+                                   lvls=tx,frmt='%3.0f',clr='k')
             axs[1,j].set_xlabel("Sys. 2 Longitude (deg)",fontsize=9)
             
             sfile=sourcefiles[Dates[j]]['fNH3file']
             sec=str(int(str(sfile[16:17]))*6)
             sfiletime=(sfile[0:10]+"_"+sfile[11:13]+":"+sfile[13:15]+":"+sec.zfill(2))
-            eph=get_WINJupos_ephem(sfiletime)
+            eph=RL.get_WINJupos_ephem(sfiletime)
             ObsCM2=float(eph[1].strip())
 
 
@@ -122,11 +178,11 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
             MeridEWArrayStd[:,j]=MeridEWerror[:]
 
             axs[1,j].set_title("CM2 = "+str(ObsCM2),fontsize=9)
-            fNH3_patch_avg=fNH3_patch_avg+fNH3_patch_smooth/7.
+            fNH3_patch_avg=fNH3_patch_avg+fNH3_patch_smooth/NDates
             first=False
             
         RGB=imread(path+sourcefiles[Dates[j]]['RGBfile'])
-        RGB_patch=make_patch(RGB,LatLims,LonLims,CM2,LonRng)
+        RGB_patch=RL.make_patch(RGB,LatLims,LonLims,CM2,LonRng)
         if firstRGB:
             RGB_patch_avg=np.zeros(RGB_patch.shape)
         if i==0:
@@ -134,9 +190,9 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
                        extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
                                90-LatLims[0]],
                                aspect="equal")
-            temp=make_contours_CH4_patch(axs[0,j],fNH3_patch_smooth,LatLims,LonLims,
-                                   lvls=np.linspace(100,160,num=13,endpoint=True),frmt='%3.0f')
-            RGB_patch_avg=RGB_patch_avg+RGB_patch/7.
+            temp=RL.make_contours_CH4_patch(axs[0,j],fNH3_patch_smooth,LatLims,LonLims,
+                                   lvls=tx,frmt='%3.0f',clr='k')
+            RGB_patch_avg=RGB_patch_avg+RGB_patch/NDates
             firstRGB=False
             axs[0,j].set_title(Dates[j],fontsize=9)
 
@@ -150,118 +206,150 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
     pathout='c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/'
 
     fig.savefig(pathout+"GRS_NH3_Comparison_2022.png",dpi=300)
-    for j in range(0,7):
+    for j in range(0,NDates):
         print(statsarray[j,:],(statsarray[j,3]-statsarray[j,2])/(2.*statsarray[j,1]))
+
     ###########################################################################
-    figavg,axsavg=pl.subplots(2,2,figsize=(6.0,6.0), dpi=150, facecolor="white",
-                        sharey='all',sharex='col')
+    # Make GRS 2022 average plot 
+    ###########################################################################
+
+
+    figavg,axsavg=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
+                        sharey=True,sharex=True)
+    #fig1.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2)),x=0.5,ha='center',color='k')
     figavg.suptitle('Average 2022 GRS NH3',x=0.5,ha='center',color='k')
+
+    for ix in range(0,1):
+        axsavg[ix].grid(linewidth=0.2)
+        axsavg[ix].ylim=[-45.,45.]
+        axsavg[ix].xlim=[360-LonLims[0],360-LonLims[1]]
+        axsavg[ix].set_xticks(np.linspace(450,0,31), minor=False)
+        xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
+        axsavg[ix].set_xticklabels(xticklabels.astype(int))
+        axsavg[ix].set_yticks(np.linspace(-45,45,7), minor=False)
+        axsavg[ix].tick_params(axis='both', which='major', labelsize=10)
+
+        axsavg[ix].set_adjustable('box') 
+
+    vn=np.mean(fNH3_patch_avg)-3.0*np.std(fNH3_patch_avg)
+    vx=np.mean(fNH3_patch_avg)+3.0*np.std(fNH3_patch_avg)
+    n=6
+    tx=np.linspace(vn,vx,n,endpoint=True)
+
+
+    show=axsavg[0].imshow(fNH3_patch_avg, "jet", origin='upper',vmin=vn,vmax=vx,  
+               extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
+                       90-LatLims[0]],#vmin=0,vmax=1.
+                       aspect="equal")
+    temp=RL.make_contours_CH4_patch(axsavg[0],fNH3_patch_avg,LatLims,LonLims,
+                           lvls=tx,frmt='%3.0f',clr='k')
+    
+    cbar = pl.colorbar(show, ticks=tx, 
+                       orientation='vertical',cmap='gist_heat',
+                       ax=axsavg[0],fraction=0.046, pad=0.04)
+    cbar.ax.set_yticklabels(np.around(tx,1))
+
+    cbar.ax.tick_params(labelsize=8,color='k')#if iSession >1:
+    axsavg[0].set_title("Ammonia Abundance Index (ppm)",fontsize=10)
+
+    gamma=1.3
+    RGB4Display_avg=np.power(np.array(RGB_patch_avg).astype(float),gamma)
+    RGB4Display_avg=RGB4Display_avg/RGB4Display_avg.max()
+
+    show=axsavg[1].imshow(RGB4Display_avg,   
+               extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
+                       90-LatLims[0]],#vmin=0,vmax=1.2,
+                       aspect="equal")
+    temp=RL.make_contours_CH4_patch(axsavg[1],fNH3_patch_avg,LatLims,LonLims,
+                           tx,frmt='%3.0f',clr='k')
+    box = axsavg[1].get_position()
+    
+    
+    #axsavg[1].tick_params(axis='both', which='major', labelsize=9)
+    axsavg[1].set_title("RGB Context Image",fontsize=10)
+
+    axsavg[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
+    axsavg[0].set_xlabel("Sys. 2 Longitude (deg)",fontsize=10)
+    axsavg[1].set_xlabel("Sys. 2 Longitude (deg)",fontsize=10)
+
+    figavg.subplots_adjust(left=0.10, bottom=0.03, right=0.98, top=0.95,
+                wspace=0.25, hspace=0.05)     
+    axsavg[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
+
+    #figavg.savefig(path+"/"+obsdate+"-Jupiter-Retrieval-NH3_RGB_only"+"-CMII_"+
+    #          str(CM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
+    figavg.savefig(pathout+"GRS_NH3_Comparison_AVG_2022.png",dpi=300)
+    
+    ###########################################################################
+    # Make Fletcher Plot
+    ###########################################################################
+    
+    figfletch,axsfletch=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
+                        sharey=True,sharex=True)
+    figfletch.suptitle('Fletcher NH3',x=0.5,ha='center',color='k')
+
     print(fNH3_patch_avg.shape,RGB_patch_avg.shape)
     print(RGB_patch_avg.min(),RGB_patch_avg.max())
-    for i in range(0,1):
-        for j in range(0,1):
-            axsavg[i,j].grid(linewidth=0.2)
-            #axsavg[i,j].ylim=[-45.,45.]
-            #axsavg[i,j].xlim=[360-LonLims[0],360-LonLims[1]]
-            print(360-LonLims[0],360-LonLims[1])
-            print(LatLims)
-            axsavg[i,j].set_xticks(np.linspace(450,0,31), minor=False)
-            xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
-            axsavg[i,j].set_xticklabels(xticklabels.astype(int))
+    for ix in range(0,1):
+        axsfletch[ix].grid(linewidth=0.2)
+        #axsavg[i,j].ylim=[-45.,45.]
+        #axsavg[i,j].xlim=[360-LonLims[0],360-LonLims[1]]
+        print(360-LonLims[0],360-LonLims[1])
+        print(LatLims)
+        axsfletch[ix].set_xticks(np.linspace(450,0,31), minor=False)
+        xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
+        axsfletch[ix].set_xticklabels(xticklabels.astype(int))
 
-            axsavg[i,j].set_yticks(np.linspace(-45,45,7), minor=False)
-            axsavg[i,j].tick_params(axis='both', which='major', labelsize=7)
+        axsfletch[ix].set_yticks(np.linspace(-45,45,7), minor=False)
+        axsfletch[ix].tick_params(axis='both', which='major', labelsize=10)
 
-    RGB_patch_avg_sharp=RGB_patch_avg
-    RGB_patch_avg_sharp[:,:,0]=sharpen(RGB_patch_avg_sharp[:,:,0])
-    RGB_patch_avg_sharp[:,:,1]=sharpen(RGB_patch_avg_sharp[:,:,1])
-    RGB_patch_avg_sharp[:,:,2]=sharpen(RGB_patch_avg_sharp[:,:,2])
-    show=axsavg[0,0].imshow(RGB_patch_avg_sharp,vmin=0,vmax=512,  
-               extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                       90-LatLims[0]],#vmin=0,vmax=1.2,
-                       aspect="equal")
-    temp=make_contours_CH4_patch(axsavg[0,0],fNH3_patch_avg,LatLims,LonLims,
-                           lvls=np.linspace(100,160,num=13,endpoint=True),frmt='%3.0f')
-    axsavg[0,0].set_title('RGB Context',fontsize=9)
-
-    clrmap='jet'
-    show=axsavg[1,0].imshow(fNH3_patch_avg, clrmap, origin='upper',vmin=120,vmax=150,  
-               extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                       90-LatLims[0]],#vmin=0,vmax=1.2,
-                       aspect="equal")
-    temp=make_contours_CH4_patch(axsavg[1,0],fNH3_patch_avg,LatLims,LonLims,
-                           lvls=np.linspace(120,150,num=7,endpoint=True),frmt='%3.0f')
-
-    cbar = pl.colorbar(show, ticks=[120,130,140,150], 
-                       orientation='vertical',cmap='jet',
-                       ax=axsavg[1,0],fraction=0.046, pad=0.04)
-    cbar.ax.tick_params(labelsize=8,color='k')#if iSession >1:
-    axsavg[1,0].set_title('Ammonia Abundance Index (ppm)',fontsize=9)
-
-    #####Fletcher########
     FletcherRGBfile='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Fletcher-2016-RGB-Screenshot 2022-11-26 232747.jpeg'
     FletcherRGB=imread(FletcherRGBfile)
     FletcherNH3file='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Fletcher-2016-AmmoniaVMR-Screenshot 2022-11-26 232643.jpeg'
     FletcherNH3=imread(FletcherNH3file)
-    show=axsavg[0,1].imshow(FletcherRGB,  
+    show=axsfletch[1].imshow(FletcherRGB,  
                extent=[148,88,90-LatLims[1],
                        90-LatLims[0]],#vmin=0,vmax=1.2,
                        aspect="equal")
-    axsavg[0,1].set_title("RGB Context  \n[Fletcher et al., 2016] (adapted)",fontsize=9,wrap=True)
+    axsfletch[1].set_title("RGB Context  \n[Fletcher et al., 2016] (adapted)",fontsize=9,wrap=True)
 
-    show=axsavg[1,1].imshow(fNH3_patch_avg, clrmap, origin='upper',vmin=120,vmax=150,  
+    show=axsfletch[0].imshow(fNH3_patch_avg, clrmap, origin='upper',vmin=120,vmax=150,  
                extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
                        90-LatLims[0]],#vmin=0,vmax=1.2,
                        aspect="equal")
     cbar = pl.colorbar(show, ticks=[122,130.5,139.5,148], 
                        orientation='vertical',cmap='jet',
-                       ax=axsavg[1,1],fraction=0.046, pad=0.04)
+                       ax=axsfletch[0],fraction=0.046, pad=0.04)
     cbar.ax.tick_params(labelsize=8,color='k')#if iSession >1:
     cbar.ax.set_yticklabels(['5', '10', '15','20'],color="k")
+    box = axsfletch[1].get_position()
 
-    statsavg=patchstats(fNH3_patch_avg)
+    statsavg=RL.patchstats(fNH3_patch_avg)
     print()
     print(statsavg,(statsavg[3]-statsavg[2])/(2.*statsavg[1]))
     print()
     print(np.nanmean(statsarray[:,0]),np.nanstd(statsarray[:,0]))
-
+    
     #####Fletcher########
-        
-    show=axsavg[1,1].imshow(FletcherNH3,  
+    
+    show=axsfletch[0].imshow(FletcherNH3,  
                extent=[148,88,90-LatLims[1],
                        90-LatLims[0]],#vmin=0,vmax=1.2,
                        aspect="equal")
-    
-    axsavg[1,1].set_title("Ammonia Abundance at 500mb (ppm) \n[Fletcher et al., 2016] (adapted)",fontsize=9,wrap=True)
 
-    #axsavg[1,1].set_xticks(np.linspace(450,0,31), minor=False)
-    #xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
-    #axsavg[1,1].set_xticklabels(xticklabels.astype(int))
-    xticklabels=np.array(np.linspace(135,90,4))
-    axsavg[1,1].set_xticks(np.linspace(135,90,4), minor=False)
-    axsavg[1,1].set_xticklabels(xticklabels.astype(int))             
+    axsfletch[0].set_title("Ammonia Abundance at 500mb (ppm) \n[Fletcher et al., 2016] (adapted)",fontsize=9,wrap=True)
 
-
-    for i in range(0,2):
-        for j in range(0,2):
-            axsavg[i,j].tick_params(axis='both', which='major', labelsize=9)
-
-    axsavg[0,0].set_ylabel("Planetographic Latitude (deg)",fontsize=9)
-    axsavg[1,0].set_ylabel("Planetographic Latitude (deg)",fontsize=9)
-    axsavg[1,0].set_xlabel("Sys. 2 Longitude (deg)",fontsize=9)
-    axsavg[1,1].set_xlabel("Sys. 3 Longitude (deg)",fontsize=9)
+    axsfletch[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
+    axsfletch[0].set_xlabel("Sys. 3 Longitude (deg)",fontsize=10)
+    axsfletch[1].set_xlabel("Sys. 3 Longitude (deg)",fontsize=10)
     
 
-    figavg.subplots_adjust(left=0.08, bottom=0.1, right=0.95, top=0.90,
-                wspace=0.10, hspace=0.30)  
-    
-    
-    box = axsavg[0,0].get_position()
-    axsavg[0,0].set_position([box.x0+0.0, box.y0-0., box.width * 1., box.height * 1.])
-    box = axsavg[0,1].get_position()
-    axsavg[0,1].set_position([box.x0+0.0, box.y0-0., box.width * 1., box.height * 1.])
+    figfletch.subplots_adjust(left=0.10, bottom=0.03, right=0.98, top=0.95,
+                wspace=0.25, hspace=0.05)     
+    #axsfletch[1].set_position([box.x0+0.0, box.y0-0., box.width * 1., box.height * 1.])
+    axsfletch[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
 
-    figavg.savefig(pathout+"GRS_NH3_Comparison_AVG_2022.png",dpi=300)
+    figfletch.savefig(pathout+"GRS_NH3_Comparison_Fletcher.png",dpi=300)
     
     ###########################################################################
     #print DateCounter; Date
@@ -305,96 +393,3 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30):
     #axsprof[0].set_xlabel("Planetographic Latitude (deg)",fontsize=8)
 
 
-def make_patch(Map,LatLims,LonLims,CM2deg,LonRng):
-    """
-    Purpose: Make a map patch and handle the case where the data overlap
-             the map edges. This is designed for a map with Jovian longitude
-             conventions that with the left boundary at 360 ascending from
-             the right boundary at 0. In WinJUPOS, the actual map setting
-             shows the left boundary at zero, which is of course, also 360.
-    """
-    import numpy as np
-    patch=np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]:LonLims[1]])
-    if CM2deg<LonRng:
-        patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]-1:360]),
-                              np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]-360])),axis=1)
-    if CM2deg>360-LonRng:
-        patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],360+LonLims[0]:360]),
-                              np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]])),axis=1)
-    patch_pad=np.pad(patch,5,mode='reflect')
-    return patch
-
-def make_contours_CH4_patch(ax,CH4Abs_conv,LatLims,LonLims,lvls=[0.71,0.73,0.75,0.77,0.79],frmt='%3.1e'):
-    """
-    PURPOSE: Overlay countours of NH3 absorption data on Jovian maps.
-             Specifically designed for equivalent widths with mean values of
-             ~0.55nm
-    """
-    cs=ax.contour(CH4Abs_conv,origin='upper', 
-                  extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],90-LatLims[0]],
-                  colors=['w','w','w','w','w'], alpha=0.5,levels=lvls,
-                  linewidths=[0.5,0.5,1.0,0.5,0.5],
-                  linestyles=['dashed','dashed','solid','dashed','dashed'])
-    #ax.clabel(cs,[19.0,19.5,20.0,20.5,21.0],inline=True,fmt='%2.1f',fontsize=8)
-    ax.clabel(cs,lvls,inline=True,fmt=frmt,fontsize=8)
-
-def get_WINJupos_ephem(dateobs):
-    # Example call: get_WINJupos_ephem('2021-09-05_04:09:00')
-    import win32com.shell.shell as shell
-    import time
-    #shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+commands) #run as admin
-    ###########################################################################
-    # WRITE *.BAT FILE WITH COMMAND SCRIPT FOR WINJUPOS
-    ###########################################################################   
-    batfile=open("WINJupos_CM.bat",'w')
-    Line1='cd "\Program Files\WinJUPOS 12.1.1"\r\n'
-    #Line2='WinJUPOS.x64.exe Jupiter /GetCM:2021-09-05_04:09:00 /GeoLong:-104.9 /GeoLat:39.7 /GetAlt >"c:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\cm.txt"\r\n'
-    Line2='WinJUPOS.x64.exe Jupiter /GetCM:'+dateobs+' /GeoLong:-104.9 /GeoLat:39.7 /GetAlt >"c:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\cm.txt"\r\n'
-    #batfile.writelines(["Line1\r\n","Line2\r\n"])
-    batfile.writelines([Line1,Line2])
-    batfile.close()
-    ###########################################################################
-    # EXECUTE *.BAT COMMAND FILE FOR WINJUPOS AND WAIT TO READ RESULT FILE
-    ###########################################################################
-    commands = "WINJupos_CM.bat"  
-    shell.ShellExecuteEx(lpFile='cmd.exe', lpParameters='/c '+commands)
-    time.sleep(1)
-    ephemfile=open("C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/cm.txt",'r')
-    Lines=ephemfile.readlines()
-    ephemfile.close()
-    LineString=str(Lines[0])
-    ###print(LineString)
-    ###########################################################################
-    # PARSE OUTPUT FILE AND CREATE STRING ARRAY EPH FOR CM1, CM2, CM3, AND ALT
-    ###########################################################################
-    start=[i for i, letter in enumerate(LineString) if letter == "="]
-    end=[i for i, letter in enumerate(LineString) if letter == "°"]
-    eph=[]
-    for i in range(0,3):
-        temp=LineString[int(start[i])+1:int(end[i])]
-        #print("CM"+str(i+1)+" = "+LineString[int(start[i])+1:int(end[i])])#,Linestring[start[1]:end[1]],Linestring[start[2]:end[2]])
-        print("CM"+str(i+1)+" = "+temp)#,Linestring[start[1]:end[1]],Linestring[start[2]:end[2]])
-        eph.extend([temp])        
-    temp=LineString[int(start[3])+1:int(end[3])]
-    print("Alt =  "+temp)
-    eph.extend([temp])        
-    return eph
-
-def sharpen(image):
-    from astropy.convolution import Gaussian2DKernel
-    from astropy.convolution import convolve
-    kernel = Gaussian2DKernel(x_stddev=5)
-    blurred=convolve(image,kernel)
-    tst=image+0.99*(image-blurred) #Need to revalidate that this is correct
-    return tst
-
-def patchstats(patch):
-    import numpy as np
-    from numpy import nanmean,nanstd,nanmin,nanmax
-
-    mean=np.nanmean(patch)
-    stdev=np.nanstd(patch)
-    minimum=np.nanmin(patch)
-    maximum=np.nanmax(patch)
-    
-    return [mean,stdev,minimum,maximum]

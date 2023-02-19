@@ -8,9 +8,9 @@ Created on Tue Jul 13 16:36:08 2021
 def Campaign(dates):
     """
     ###############################################################################
-    NAME:       Campaign - Jupiter NH3 2020 Campaign
+    NAME:       Campaign - Jupiter NH3 CCD Photometry Campaigns
     
-    PURPOSE:    To store campaign and session data in Python dictionary format
+    PURPOSE:    Store campaign and session data in Python dictionary format
                 for Jupiter NH3 photometry observations.
                 
     INPUTS:     dates        = A list of observing sessions (dates)
@@ -35,6 +35,7 @@ def Campaign(dates):
     root_path='c:/Astronomy/Projects/Planets/Jupiter/Imaging Data/'
     pathout='/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/'
     
+    # 2020
     observations={'20200902UT':{'mIDs':['1_Io','2_Europa'],
                               'moons':[[1062.392,327.706],[1242.608,333.763]],
                               'JIDs':['0_Jupiter'],
@@ -98,6 +99,7 @@ def Campaign(dates):
                               'JIDs':['0_Jupiter'],
                               'Jupiter':[[1098.101,607.210]],
                               'Filters':['647CNT','656HIA','672SII','889CH4','940NIR']},
+      #2021
                   '20210812UT':{'mIDs':['4_Callisto'],
                               'moons':[[221.0,975.0]],
                               'JIDs':['0_Jupiter'],
@@ -133,6 +135,7 @@ def Campaign(dates):
                               'JIDs':['0_Jupiter'],
                               'Jupiter':[[794.0,801.0]],
                               'Filters':['647CNT','632OI','656HIA','730OII']},
+      #2022
                   '20221031UT':{'mIDs':['4_Callisto','1_Io','2_Europa','3_Ganymede'],
                               'moons':[[250.333,277.918],[674.035,488.655],[1134.514,765.890],[1282.841,889.552]],
                               'JIDs':['0_Jupiter'],
@@ -156,7 +159,7 @@ def Campaign(dates):
     
     return root_path,pathout,observations
 
-def CreatePhotTable(root_path,pathout,observations,dates):
+def CreatePhotTable(root_path,pathout,observations,dates,Diagnostics):
     """
     ###############################################################################
     NAME:       CreatePhotTable - Special Jupiter Version!
@@ -199,6 +202,8 @@ def CreatePhotTable(root_path,pathout,observations,dates):
     from astropy.io import fits, ascii
     from astropy.table import vstack
     from os import listdir
+    import pylab as pl
+
     
     First1=True
     ###########################################################################
@@ -233,10 +238,16 @@ def CreatePhotTable(root_path,pathout,observations,dates):
         # Loop over files of available observations and compute net rates for 
         # the current observing session (date). Then add the result row for 
         # each FITS file to a summary table.
+        
+        if Diagnostics:
+            fig,ax=pl.subplots(2,len(FNList),figsize=(12,4), dpi=150, sharex=True, sharey=True, facecolor="white")
+            fig.suptitle(date,x=0.5,ha='center',color='k')
+   
         First=True    
-        for FN in FNList:
+        for i in range(0,len(FNList)):
             # Read FITS file and set HARDCODED radii for aperture photometry
             #print path+FN
+            FN=FNList[i]
             hdulist=fits.open(path+FN)
             header=hdulist[0].header
             scidata=hdulist[0].data
@@ -248,8 +259,18 @@ def CreatePhotTable(root_path,pathout,observations,dates):
             # (vertical stack) into a single table. The table contains just
             # the data for that date (ARE MULTIPLE SESSIONS FOR A SINGLE
             # A VALID USE CASE?)
-            moonsrate,WVCenter,mtable=CNRJ.ComputeNetRateJupiter(scidata,header,mIDs,date,moons,moonsradii)
-            Jupiterrate,WVCenter,jtable=CNRJ.ComputeNetRateJupiter(scidata,header,JIDs,date,Jupiter,Jupiterradii)
+            #fig,ax=pl.subplots(2,1,figsize=(6,6), dpi=150, sharex=True, facecolor="white")
+            if Diagnostics:
+                fig2plot=fig
+                axmoons=ax[1,i]
+                axJupiter=ax[0,i]
+            elif not(Diagnostics):
+                fig2plot="None"
+                axmoons="None"
+                axJupiter="None"
+                
+            moonsrate,WVCenter,mtable=CNRJ.ComputeNetRateJupiter(scidata,header,mIDs,date,moons,moonsradii,fig2plot,axmoons)
+            Jupiterrate,WVCenter,jtable=CNRJ.ComputeNetRateJupiter(scidata,header,JIDs,date,Jupiter,Jupiterradii,fig2plot,axJupiter)
             outtable = vstack([jtable, mtable])
                    
             # Create and load summary table. Adds a row for each (filter) observation for 
@@ -265,7 +286,10 @@ def CreatePhotTable(root_path,pathout,observations,dates):
             else:
                 AllTable=vstack([AllTable,outtable])
                    
-    ascii.write(AllTable,pathout+'AllTable.csv',format='basic',overwrite=True,delimiter=',')
+    ascii.write(AllTable,pathout+'AllTable_'+dates[0][0:4]+'.csv',format='basic',overwrite=True,delimiter=',')
+    if Diagnostics:
+        fig.subplots_adjust(left=0.05, bottom=0.08, right=0.99, top=0.92)  
+
     return AllTable
 
 def SummaryTablePlot(AllTable,dates,MeasFilt,RefFilt,pathout):
@@ -338,11 +362,11 @@ def SummaryTablePlot(AllTable,dates,MeasFilt,RefFilt,pathout):
                   "672SII":[1.2,1.45],
                   "658NII":[3.5,4.0],
                   "632OI":[0.85,1.0]},
-        "647CNT":{"656HIA":[1.2,1.45],
+        "647CNT":{"656HIA":[1.0,1.6],
                   "672SII":[1.2,1.45],
                   "658NII":[3.5,4.0],
                   "632OI":[0.85,1.0]},
-        "647NH3":{"656HIA":[1.2,1.45],
+        "647NH3":{"656HIA":[1.0,1.6],
                   "672SII":[1.2,1.45],
                   "658NII":[3.5,4.0],
                   "632OI":[0.85,1.0]},
@@ -421,6 +445,7 @@ def SummaryTablePlot(AllTable,dates,MeasFilt,RefFilt,pathout):
     YY['StdP Ratio']=0.0
     YY['Conf 95%']=0.0
     
+    
     figloc,ax=pl.subplots(2,1,figsize=(6,6), dpi=150, sharex=True, facecolor="white")
     mkrsize=5.0
     #pl.figure(figsize=(6,4), dpi=150, facecolor="white")
@@ -488,8 +513,13 @@ def SummaryTablePlot(AllTable,dates,MeasFilt,RefFilt,pathout):
                  markersize=mkrsize,color='k')
     ax[1].errorbar(datetimearray,tmparr,yerr=tmperr,linewidth=0.0,ecolor='k',elinewidth=1.0)
 
+    Mean=np.mean(tmparr)
+    STD=np.std(tmparr)
+    SEM=STD/np.sqrt(tmparr.size)
     ax[1].plot_date([starttime,endtime],np.mean(tmparr)*np.ones(2),xdate=True,
-                 linestyle='dashed',markersize=0.0,color='k',linewidth=1.0,label="Avg. Obs.="+str(np.mean(tmparr))[0:5])
+                 linestyle='dashed',markersize=0.0,color='k',linewidth=1.0,label="Avg. Obs.="+str(Mean)[0:5]+r"$\pm$"+str(SEM)[0:6])
+    ax[1].fill_between([starttime,endtime],Mean+STD,Mean-STD,color='C0',alpha=0.2)
+    ax[1].fill_between([starttime,endtime],Mean+SEM,Mean-SEM,color='C0',alpha=0.3)
     ax[1].plot_date([starttime,endtime],ExpectedLevel[MeasFilt]*np.ones(2),xdate=True,
                  linestyle='dashed',markersize=0.0,color='r',linewidth=1.0,label="Predicted="+str(ExpectedLevel[MeasFilt]))
     #ax[1].text(starttime, ExpectedLevel[MeasFilt],str(ExpectedLevel[MeasFilt])[0:5],

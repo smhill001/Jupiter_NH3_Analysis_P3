@@ -2,11 +2,16 @@
 """
 Created on Sun Mar 21 23:45:33 2021
 
+PURPOSE:    Compute count rates for multiple targets in an image. This version
+            is particularly focused on Jupiter and it's moons and so only
+            has two fixed/configurable apertures, one for 'moons' and 
+            one for 'Jupiter'
+
 UPDATE 2022-01-25:  Converted to Python 3
 @author: Steven Hill
 """
 
-def ComputeNetRateJupiter(scidata,header,TargetIDs,SessionID,positions,radii):
+def ComputeNetRateJupiter(scidata,header,TargetIDs,SessionID,positions,radii,figure,axis):
     from photutils import CircularAperture
     from photutils import aperture_photometry
     from photutils import CircularAnnulus
@@ -46,18 +51,37 @@ def ComputeNetRateJupiter(scidata,header,TargetIDs,SessionID,positions,radii):
     Filter=Meta.FilterParameters(header['FILTER'])
     WVCenter=Filter.CenterWV###Testing Area
     
-    """
-    #Code to display diagnostic plots (not yet finished):
     
-    pl.figure(figsize=(6,4), dpi=150, facecolor="white")
-    pl.imshow(scidata)
-    ap_patches = apertures.plot(color='white', lw=0.5,
-                           label='Photometry aperture')
-    ann_patches = annulus_apertures.plot(color='red', lw=0.5,
-                                    label='Background annulus')
+    #Code to display diagnostic image plots with photometric annuli overlaid
+    
+    if axis!='None':
+            
+        if TargetIDs[0]=='0_Jupiter':
+            vmx=5.0e5
+        elif TargetIDs[0]!='0_Jupiter':
+            vmx=5.0e4
+            
+        axis.imshow(scidata,vmin=0,vmax=vmx)
+    
+        pl.axes(axis)
+        ap_patches = apertures.plot(color='white', lw=0.5,
+                               label='Photometry aperture')
+        ann_patches = annulus_apertures.plot(color='red', lw=0.5,
+                                        label='Background annulus')
+        
+        title=header['FILTER']
+        axis.set_title(title,fontsize=7)
+        xlbl=TargetIDs[0][2:]
+        for ixlbl in range(1,len(TargetIDs)):
+            xlbl=xlbl+" "+TargetIDs[ixlbl][2:]
+        axis.set_xlabel(xlbl,fontsize=7)
+        axis.tick_params(axis='both', which='major', labelsize=7)
+    
+        axis.set_adjustable('box') 
+
     #labels = (ap_patches[0], ann_patches[0])
     #pl.legend(font=10)
-    """
+    
     return rate,WVCenter,phot_table
 
 def uniform_lat_grid(Latitude,Signal,Fine=False):

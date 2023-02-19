@@ -5,7 +5,8 @@ Created on Sun Nov  6 16:47:21 2022
 @author: smhil
 """
 
-def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='Map'):
+def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
+                             imagetype='Map',CalModel='AGU 2022',Smoothing=True):
     import sys
     drive='c:'
     sys.path.append(drive+'/Astronomy/Python Play')
@@ -23,6 +24,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
     from astropy.convolution import Gaussian2DKernel
     from astropy.convolution import convolve
     from astropy.io import fits
+    import RetrievalLibrary as RL
 
     # Retrieve_Jup_Atm_2022_P3(obsdate="20221019UT",target="Jupiter")   
     
@@ -39,6 +41,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
     #  DATA FILES AND METADATA DICTIONARY
     #    !!!!SHOULD MAKE THIS A DATA OBJECT!!!!
     #    !!!!DOUBLE CHECK THAT FITS FILE TIME TAGS ARE ACCURATE BETWEEN CH4 AND NH3
+    #    !!!!Make sure that variable map boundaries can be input!!!!
     ###########################################################################
     sourcedata=obsdate+"_"+imagetype
     sourcefiles={'20220810UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
@@ -46,6 +49,11 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
                                'CH4file':'2022-08-10-1013_0-Jupiter_620CH4AbsMap.fits',
                                'NH3file':'2022-08-10-1013_0-Jupiter_647NH3AbsMap.fits',
                                'RGBfile':'2022-08-10-1030_0-Jupiter_WV-R(AllRED)GB-RGB-WhtBal-Wavelets-Str_CM2_L360_MAP-BARE.png'},
+                 '20220812UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                                         'Seeing':'6/10','Transparency':'7/10'}, 
+                                            'CH4file':'2022-08-12-1025_5-Jupiter_620CH4AbsMap.fits',
+                                            'NH3file':'2022-08-12-1025_5-Jupiter_647NH3AbsMap.fits',
+                                            'RGBfile':'2022-08-12-1033_8-Jupiter_WV-R(AllRed)GB-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
                  '20220818UT':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'6/10','Transparency':'7/10'}, 
                                'CH4file':'2022-08-18-0733_4-Jupiter_CH4Abs620.fits',
@@ -66,15 +74,25 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
                                             'CH4file':'2022-08-28-0608_2-Jupiter_620CH4AbsMap.fits',
                                             'NH3file':'2022-08-28-0608_2-Jupiter_647NH3AbsMap.fits',
                                             'RGBfile':'2022-08-28-0601_3-Jupiter-RGB-JamesWillinghan-j220828a1_CM2_L360_MAP-BARE.png'},
-                 '20220830UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                 '20220830UT_Img':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                                          'Seeing':'6/10','Transparency':'7/10'}, 
                                             'CH4file':'2022-08-30-0559_1-Jupiter_CH4Abs620.fits',
                                             'NH3file':'2022-08-30-0559_1-Jupiter_NH3Abs647.fits'},
-                 '20220901UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                 '20220830UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                                         'Seeing':'6/10','Transparency':'7/10'}, 
+                                            'CH4file':'2022-08-30-0559_2-Jupiter_620CH4AbsMap.fits',
+                                            'NH3file':'2022-08-30-0559_1-Jupiter_647NH3AbsMap.fits',
+                                            'RGBfile':'2022-08-28-1429_7-Jupiter-RGB-Arakawa-j220828e1_CM2_L360_MAP-BARE.png'},
+                 '20220901UT_Img':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                                          'Seeing':'6/10','Transparency':'7/10'}, 
                                             'CH4file':'2022-09-01-0604_9-Jupiter_CH4Abs620.fits',
                                             'NH3file':'2022-09-01-0604_9-Jupiter_NH3Abs647.fits',
                                             'RGBfile':'NA'},
+                 '20220901UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                                         'Seeing':'6/10','Transparency':'7/10'}, 
+                                            'CH4file':'2022-09-01-0604_9-Jupiter_620CH4AbsMap.fits',
+                                            'NH3file':'2022-09-01-0604_9-Jupiter_647NH3AbsMap.fits',
+                                            'RGBfile':'2022-09-01-0618_0-Jupiter-Rivera-j220901l1_CM2_L360_MAP-BARE.png'},
                  '20220904UTa_Img':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                                          'Seeing':'6/10','Transparency':'7/10'}, 
                                             'CH4file':'2022-09-04-0638_9-Jupiter_620CH4AbsImg.fits',
@@ -90,6 +108,11 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
                                             'CH4file':'2022-09-05-0559_1-Jupiter_620CH4AbsMap.fits',
                                             'NH3file':'2022-09-05-0559_1-Jupiter_647NH3AbsMap.fits',
                                             'RGBfile':'2022-09-05-1559_0-Jupiter_j220905l1_Michael_Wong_CM2_L360_MAP-BARE.png'},
+                 '20220905UTaSmth_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                                         'Seeing':'6/10','Transparency':'7/10'}, 
+                                            'CH4file':'2022-09-05-0559_2-Jupiter_620CH4AbsMap.fits',
+                                            'NH3file':'2022-09-05-0559_1-Jupiter_647NH3AbsMap.fits',
+                                            'RGBfile':'2022-09-05-1559_0-Jupiter_j220905l1_Michael_Wong_CM2_L360_MAP-BARE.png'},
                  '20220912UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                                          'Seeing':'6/10','Transparency':'7/10'}, 
                                             'CH4file':'2022-09-12-0533_4-Jupiter_CH4Abs620.fits',
@@ -100,12 +123,22 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
                                             'CH4file':'2022-09-12-0533_4-Jupiter_620CH4AbsMap.fits',
                                             'NH3file':'2022-09-12-0533_4-Jupiter_647NH3AbsMap.fits',
                                             'RGBfile':'2022-09-12-0532_3-Jupiter_WV-R685G550B450-RGB-WhtBal-ClrSmth-Wavelets_CM2_L360_MAP-BARE.png'},
+                 '20220913UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                                         'Seeing':'6/10','Transparency':'7/10'}, 
+                                            'CH4file':'2022-09-13-0457_4-Jupiter_620CH4AbsMap.fits',
+                                            'NH3file':'2022-09-13-0457_4-Jupiter_647NH3AbsMap.fits',
+                                            'RGBfile':'2022-09-13-0455_6-Jupiter_WV-R685G550B450-RGB-WhtBal-ClrSmth-Wavelets_CM2_L360_MAP-BARE.png'},
                  '20220919UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                                          'Seeing':'6/10','Transparency':'7/10'}, 
                                             'CH4file':'2022-09-19-0453_4-Jupiter_CH4Abs620.fits',
                                             'NH3file':'2022-09-19-0453_4-Jupiter_NH3Abs647.fits',
                                             'RGBfile':'2022-09-19-0518_7-Jupiter_WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20220919UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                 '20220919UTa_Map':{'Metadata':{'Telescope':'VLT','FL':'5600mm','Camera':'ASI120MM',
+                                                         'Seeing':'6/10','Transparency':'7/10'}, 
+                                            'CH4file':'2022-09-19-0352_3-Jupiter-620CH4AbsMap.fits',
+                                            'NH3file':'2022-09-19-0352_3-Jupiter-647NH3AbsMap.fits',
+                                            'RGBfile':'2022-09-19-0352_3-Jupiter-MUSE-R650G550B450-RGB-WhtBal-Filtered-Wavelets_CM2_L360_MAP-BARE.png'},
+                 '20220919UTb_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                                          'Seeing':'6/10','Transparency':'7/10'}, 
                                             'CH4file':'2022-09-19-0453_4-Jupiter_620CH4AbsMap.fits',
                                             'NH3file':'2022-09-19-0453_4-Jupiter_647NH3AbsMap.fits',
@@ -157,30 +190,30 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
                                             'RGBfile':'2022-10-20-0422_6-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
                  '20221021UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                                          'Seeing':'6/10','Transparency':'7/10'}, 
+#                                            'CH4file':'2022-10-21-0358_6-Jupiter-620CH4AbsMap-Sharp.fits',
+#                                            'NH3file':'2022-10-21-0358_6-Jupiter-647NH3AbsMap-Gauss2.fits',
                                             'CH4file':'2022-10-21-0358_6-Jupiter-620CH4AbsMap.fits',
                                             'NH3file':'2022-10-21-0358_6-Jupiter-647NH3AbsMap.fits',
-                                            'RGBfile':'2022-10-21-0342_1-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'}}
+                                            'RGBfile':'2022-10-21-0342_1-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
+                 '20230113UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                                         'Seeing':'8/10','Transparency':'7/10'}, 
+                                            'CH4file':'2023-01-13-0046_2-Jupiter-620CH4AbsMap.fits',
+                                            'NH3file':'2023-01-13-0046_2-Jupiter-647NH3AbsMap.fits',
+                                            'RGBfile':'2023-01-13-0046_0-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'}}
+
+    calibration={'AGU 2022':{'CH4GlobalTrans':0.858,'NH3GlobalTrans':0.928},
+                 'Model 1':{'CH4GlobalTrans':0.880,'NH3GlobalTrans':0.960},
+                 'Model 2':{'CH4GlobalTrans':0.878,'NH3GlobalTrans':0.940},
+                 'Observed':{'CH4GlobalTrans':0.909,'NH3GlobalTrans':0.974}}
+
     ###########################################################################
-    # OBTAIN IMAGES TO DISPLAY AND DETERMINE IMAGE ARRAY SIZE
+    # OPEN AND READ DATA FILES (FITS MAPS of NH3 and CH4 Absorption (Transmission?))
     ###########################################################################             
     path='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+obsdate[0:10]+'/'
     CH4file=sourcefiles[sourcedata]['CH4file']
     NH3file=sourcefiles[sourcedata]['NH3file']
     RGBfile=sourcefiles[sourcedata]['RGBfile']
 
-    sec=str(int(str(NH3file[16:17]))*6)
-    NH3time=(NH3file[0:10]+"_"+NH3file[11:13]+":"+NH3file[13:15]+":"+sec.zfill(2))
-    eph=get_WINJupos_ephem(NH3time)
-    CM2=float(eph[1].strip())
-    print("********** CM2=",CM2)
-    LatLims=[45,135]
-    LonLims=[360-int(CM2+45),360-int(CM2-45)]
-    #LatLims=[30,150]
-    #LonLims=[360-int(CM2+60),360-int(CM2-60)]
-
-
-
-    print("CH4file=",CH4file)
     CH4hdulist=fits.open(path+CH4file)
     CH4hdulist.info()
     CH4hdr=CH4hdulist[0].header
@@ -196,20 +229,53 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
     if RGBfile != 'NA':
         RGB=imread(path+RGBfile)
 
-    CH4GlobalTrans=0.858 #just a test number for now
-    NH3GlobalTrans=0.928
-    #CH4GlobalTrans=0.858 #just a test number for now
-    #NH3GlobalTrans=0.961
+    ###########################################################################
+    # Get ephemeris data from file name date-time string and set lat and lon lims
+    ###########################################################################             
+    sec=str(int(str(NH3file[16:17]))*6)
+    NH3time=(NH3file[0:10]+"_"+NH3file[11:13]+":"+NH3file[13:15]+":"+sec.zfill(2))
+    eph=RL.get_WINJupos_ephem(NH3time)
+    CM2=float(eph[1].strip())
+    LatLims=[45,135]
+    LonLims=[360-int(CM2+45),360-int(CM2-45)]
+    #LatLims=[30,150]
+    #LonLims=[360-int(CM2+60),360-int(CM2-60)]
+    #LatLims=[70,130]
+    #LonLims=[360-int(25+30),360-int(25-30)]
+
+    ###########################################################################
+    # Set calibration and compute physical parameters
+    ###########################################################################             
+    CH4GlobalTrans=calibration[CalModel]['CH4GlobalTrans']
+    NH3GlobalTrans=calibration[CalModel]['NH3GlobalTrans']
+    
+    kernel = Gaussian2DKernel(1)
+    if Smoothing:
+        CH4_tau=-np.log(convolve((CH4data*CH4GlobalTrans),kernel,boundary='extend'))
+        NH3_tau=-np.log(convolve((NH3data*NH3GlobalTrans),kernel,boundary='extend'))
+        smthtitle="Smoothed"
+    else: 
+        CH4_tau=-np.log(CH4data*CH4GlobalTrans)
+        NH3_tau=-np.log(NH3data*NH3GlobalTrans)
+        smthtitle="Unsmoothed"
+
+    CH4_Ncol=1000*CH4_tau/K_eff_CH4620
+    NH3_Ncol=1000*NH3_tau/K_eff_NH3647
+
+    CH4_Cloud_Press=(CH4_Ncol/1000.)*amagat*gravity*mean_mol_wt/(fCH4*STP)
+    fNH3=(NH3_Ncol/1000.)*amagat*gravity*mean_mol_wt/(CH4_Cloud_Press*STP)
+    ##!!!! WOW!!! I need to calculate fNH3 the EASY way also and compare!!!
+    ###########################################################################
+    # Set up figure and axes for plots
+    ###########################################################################             
 
     fig,axs=pl.subplots(2,3,figsize=(7.0,4.5), dpi=150, facecolor="white",
-                        sharey=True,sharex=True)
-    #fig.suptitle(obsdate+", CM2="+str(int(CM2)),x=0.5,ha='center',color='k')
-    fig.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2)),x=0.5,ha='center',color='k')
+                        sharey=True,sharex=True)      
+    fig.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
 
     if imagetype=='Map':
         for iPlot in range(0,6):
-                # Set up
-            i=int(iPlot/3)                           #Plot row
+            i=int(iPlot/3)                      #Plot row
             j=np.mod(iPlot,3)                   #Plot column
             axs[i,j].grid(linewidth=0.2)
             axs[i,j].ylim=[-45.,45.]
@@ -219,63 +285,41 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
             axs[i,j].set_xticklabels(xticklabels.astype(int))
             axs[i,j].set_yticks(np.linspace(-45,45,7), minor=False)
             axs[i,j].tick_params(axis='both', which='major', labelsize=7)
-
             axs[i,j].set_adjustable('box') 
 
-    kernel = Gaussian2DKernel(1)
-    CH4_tau=-np.log(CH4data*CH4GlobalTrans)
+    ###########################################################################
+    # Plot CH4 Optical Depth
+    ###########################################################################
     if imagetype=='Map':
-        CH4_tau_patch=make_patch(CH4_tau,LatLims,LonLims,CM2)
-        show=axs[0,0].imshow(CH4_tau_patch, "gist_heat", origin='upper',vmin=0.10,vmax=0.20,  
-                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                           90-LatLims[0]],#vmin=0,vmax=1.2,
-                           aspect="equal")
-        temp=make_contours_CH4_patch(axs[0,0],convolve(CH4_tau_patch,kernel),LatLims,LonLims,
-                               lvls=np.linspace(0.15,0.2,num=5,endpoint=True),frmt='%3.2f')
-
-        cbar = pl.colorbar(show, ticks=[0.10,0.12,0.14,0.16,0.18,0.20], 
-                   orientation='vertical',cmap='gist_heat',
-                   ax=axs[0,0],fraction=0.046, pad=0.04)
-        cbar.ax.tick_params(labelsize=6,color="k")#if iSession >1:
-
-        
+        plot_patch(CH4_tau,LatLims,LonLims,CM2,"gist_heat",axs[0,0],'%3.3f')
     else:
         show=axs[0,0].imshow(CH4_tau, "gist_heat", origin='upper',vmin=0.10,vmax=0.20,
                            aspect="equal")
-        temp=make_contours_CH4(axs[0,0],np.flip(convolve(CH4_tau,kernel),axis=0),
+        temp=RL.make_contours_CH4(axs[0,0],np.flip(convolve(CH4_tau,kernel),axis=0),
                                lvls=np.linspace(0.15,0.20,num=5,endpoint=True))
     
     axs[0,0].set_title("CH4 620nm Optical Depth",fontsize=8)
 
-    CH4_Ncol=CH4_tau/K_eff_CH4620
+    ###########################################################################
+    # Plot CH4 Column Density (m-atm)
+    ###########################################################################
     if imagetype=='Map':
-        CH4_Ncol_patch=make_patch(CH4_Ncol,LatLims,LonLims,CM2)
-        show=axs[0,1].imshow(CH4_Ncol_patch*1000., "gist_heat", origin='upper',vmin=200,vmax=500,  
-                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                           90-LatLims[0]],#vmin=0,vmax=1.2,
-                           aspect="equal")
-        temp=make_contours_CH4_patch(axs[0,1],convolve(CH4_Ncol_patch,kernel)*1000.,LatLims,LonLims,
-                               lvls=np.linspace(200.,500.,num=5,endpoint=True),frmt='%3.0f')
-        
-        cbar = pl.colorbar(show, ticks=[200,300,400,500], 
-                   orientation='vertical',cmap='gist_heat',
-                   ax=axs[0,1],fraction=0.046, pad=0.04)
-        cbar.ax.tick_params(labelsize=6,color="k")#if iSession >1:
-
+        plot_patch(CH4_Ncol,LatLims,LonLims,CM2,"gist_heat",axs[0,1],'%3.0f')
     else:
         show=axs[0,1].imshow(CH4_Ncol*1000., "gist_heat", origin='upper',vmin=200,vmax=500,
                            aspect="equal")
-        temp=make_contours_CH4(axs[0,1],np.flip(convolve(CH4_Ncol,kernel)*1000.,axis=0),
+        temp=RL.make_contours_CH4(axs[0,1],np.flip(convolve(CH4_Ncol,kernel)*1000.,axis=0),
                                lvls=np.linspace(200.,500.,num=5,endpoint=True),frmt='%3.0f')
         
     axs[0,1].set_title("N[CH4] (m-atm)",fontsize=8)
 
-    CH4_Cloud_Press=CH4_Ncol*amagat*gravity*mean_mol_wt/(fCH4*STP)
-    
+    ###########################################################################
+    # Plot CH4 Cloud Top Pressure (mb?) OR RGB Image
+    ###########################################################################    
     if RGBfile == 'NA':
         show=axs[0,2].imshow(CH4_Cloud_Press, "gist_heat", origin='upper',vmin=2.0,vmax=6.0,
                            aspect="equal")
-        temp=make_contours_CH4(axs[0,2],CH4_Cloud_Press,
+        temp=RL.make_contours_CH4(axs[0,2],CH4_Cloud_Press,
                                lvls=np.linspace(2.0,6.0,num=5,endpoint=True))
         axs[0,2].set_title("Scattering Pressure (Pa)",fontsize=8)
     else:
@@ -290,87 +334,52 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
             show=axs[0,2].imshow(RGB, aspect="equal",vmin=0,vmax=2^16)
             axs[0,2].set_title("Scattering Pressure (Pa)",fontsize=8)
 
-
-
-    NH3_tau=-np.log(NH3data*NH3GlobalTrans)
+    ###########################################################################
+    # Plot NH3 Optical Depth
+    ###########################################################################
     if imagetype=='Map':
-        NH3_tau_patch=make_patch(NH3_tau,LatLims,LonLims,CM2)
-        show=axs[1,0].imshow(NH3_tau_patch, "gist_heat", origin='upper',vmin=0.02,vmax=0.12,  
-                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                           90-LatLims[0]],#vmin=0,vmax=1.2,
-                           aspect="equal")
-        temp=make_contours_CH4_patch(axs[1,0],convolve(NH3_tau_patch,kernel),LatLims,LonLims,
-                               lvls=np.linspace(0.02,0.12,num=5,endpoint=True),frmt='%3.0f')
-        
-        cbar = pl.colorbar(show, ticks=[0.02,0.04,0.06,0.08,0.10,0.12], 
-                   orientation='vertical',cmap='gist_heat',
-                   ax=axs[1,0],fraction=0.046, pad=0.04)
-        cbar.ax.tick_params(labelsize=6,color="k")#if iSession >1:
-
+        plot_patch(NH3_tau,LatLims,LonLims,CM2,"gist_heat",axs[1,0],'%3.3f')
     else:
         show=axs[1,0].imshow(NH3_tau, "gist_heat", origin='upper',vmin=0.02,vmax=0.12,  
                            aspect="equal")
-        temp=make_contours_CH4(axs[1,0],np.flip(convolve(NH3_tau,kernel),axis=0),
+        temp=RL.make_contours_CH4(axs[1,0],np.flip(convolve(NH3_tau,kernel),axis=0),
                                lvls=np.linspace(0.02,0.12,num=5,endpoint=True))
         
     axs[1,0].set_title("NH3 647nm Optical Depth",fontsize=8)
 
-    NH3_Ncol=NH3_tau/K_eff_NH3647
+    ###########################################################################
+    # Plot NH3 Column Density (km-atm)
+    ###########################################################################
     if imagetype=='Map':
-        NH3_Ncol_patch=make_patch(NH3_Ncol,LatLims,LonLims,CM2)
-        show=axs[1,1].imshow(NH3_Ncol_patch*1000., "gist_heat", origin='upper',vmin=10,vmax=40,  
-                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                           90-LatLims[0]],#vmin=0,vmax=1.2,
-                           aspect="equal")
-        temp=make_contours_CH4_patch(axs[1,1],convolve(NH3_Ncol_patch,kernel)*1000.,LatLims,LonLims,
-                              lvls=np.linspace(20.,40.,num=5,endpoint=True),frmt='%3.0f')
-        
-        cbar = pl.colorbar(show, ticks=[10,20,30,40], 
-                           orientation='vertical',cmap='gist_heat',
-                           ax=axs[1,1],fraction=0.046, pad=0.04)
-        cbar.ax.tick_params(labelsize=6,color="k")#if iSession >1:
-        
+        plot_patch(NH3_Ncol,LatLims,LonLims,CM2,"gist_heat",axs[1,1],'%3.1f')
     else:    
         show=axs[1,1].imshow(NH3_Ncol*1000., "gist_heat", origin='upper',vmin=10,vmax=40,
                            aspect="equal")
-        temp=make_contours_CH4(axs[1,1],np.flip(convolve(NH3_Ncol,kernel)*1000.,axis=0),
+        temp=RL.make_contours_CH4(axs[1,1],np.flip(convolve(NH3_Ncol,kernel)*1000.,axis=0),
                                lvls=np.linspace(20.,40.,num=5,endpoint=True),frmt='%3.0f')
     
     axs[1,1].set_title("N[NH3] (m-atm)",fontsize=8)
     
-
-    fNH3=NH3_Ncol*amagat*gravity*mean_mol_wt/(CH4_Cloud_Press*STP)
+    ###########################################################################
+    # Plot NH3 Mole Fraction - Ammonia Absorption Index
+    ###########################################################################
     if imagetype=='Map':
-        fNH3_patch=make_patch(fNH3,LatLims,LonLims,CM2)
-        show=axs[1,2].imshow(fNH3_patch*1e6, "jet", origin='upper',vmin=100,vmax=160,  
-                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                           90-LatLims[0]],#vmin=0,vmax=1.
-                           aspect="equal")
-        temp=make_contours_CH4_patch(axs[1,2],convolve(fNH3_patch,kernel)*1.0e6,LatLims,LonLims,
-                               lvls=np.linspace(0.00010*1.0e6,0.00015*1.0e6,num=5,endpoint=True),frmt='%3.0f')
-        
-        cbar = pl.colorbar(show, ticks=[100,120,140,160], 
-                           orientation='vertical',cmap='gist_heat',
-                           ax=axs[1,2],fraction=0.046, pad=0.04)
-        cbar.ax.tick_params(labelsize=6,color='C7')#if iSession >1:
-
+        fNH3_patch_mb,vn_fNH3,vx_fNH3,tx_fNH3=plot_patch(fNH3*1e6,LatLims,LonLims,CM2,"jet",axs[1,2],'%3.0f')
 
     else:    
         show=axs[1,2].imshow(fNH3*1e6, "jet", origin='upper',vmin=100,vmax=160,
                            aspect="equal")
-        temp=make_contours_CH4(axs[1,2],np.flip(convolve(fNH3*1.0e6,kernel),axis=0),
+        temp=RL.make_contours_CH4(axs[1,2],np.flip(convolve(fNH3*1.0e6,kernel),axis=0),
                                lvls=np.linspace(0.00010*1e6,0.00015*1e6,num=5,endpoint=True),frmt='%3.0f')
     
     axs[1,2].set_title("Ammonia Abundance Index (ppm)",fontsize=8)
 
-
     if RGBfile != 'NA':
         if imagetype=='Map':
-            
-            temp=make_contours_CH4_patch(axs[0,2],convolve(fNH3_patch,kernel)*1.0e6,LatLims,LonLims,
-                                   lvls=np.linspace(0.00010*1.0e6,0.00015*1.0e6,num=5,endpoint=True),frmt='%3.0f')
+            temp=RL.make_contours_CH4_patch(axs[0,2],fNH3_patch_mb,LatLims,LonLims,
+                                   lvls=tx_fNH3,frmt='%3.0f',clr='k')
         else:
-            temp=make_contours_CH4(axs[0,2],np.flip(convolve(fNH3,kernel),axis=0),
+            temp=RL.make_contours_CH4(axs[0,2],np.flip(convolve(fNH3,kernel),axis=0),
                                    lvls=np.linspace(0.00010,0.00015,num=5,endpoint=True))
 
     axs[0,0].set_ylabel("Planetographic Latitude (deg)",fontsize=8)
@@ -382,9 +391,8 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
     fig.subplots_adjust(left=0.10, bottom=0.08, right=0.94, top=0.90,
                 wspace=0.25, hspace=0.05)     
 
-  
-    fig.savefig(path+"/"+obsdate+"-Jupiter-Retrieval"+"_CMII_"+
-               str(CM2)+"-Map.png",dpi=300)
+    fig.savefig(path+"/"+obsdate+"-Jupiter-Retrieval"+"-CMII_"+
+              str(CM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
 
     hdu = fits.PrimaryHDU(fNH3.astype(np.float32))
     hdul = fits.HDUList([hdu])
@@ -409,7 +417,8 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
     
     fig1,axs1=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
-    fig1.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2)),x=0.5,ha='center',color='k')
+    #fig1.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2)),x=0.5,ha='center',color='k')
+    fig1.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
 
     for ix in range(0,1):
         axs1[ix].grid(linewidth=0.2)
@@ -424,26 +433,30 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
         axs1[ix].set_adjustable('box') 
 
 
-    show=axs1[0].imshow(fNH3_patch*1e6, "jet", origin='upper',vmin=100,vmax=160,  
+    show=axs1[0].imshow(fNH3_patch_mb, "jet", origin='upper',vmin=vn_fNH3,vmax=vx_fNH3,  
                extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
                        90-LatLims[0]],#vmin=0,vmax=1.
                        aspect="equal")
-    temp=make_contours_CH4_patch(axs1[0],convolve(fNH3_patch,kernel)*1.0e6,LatLims,LonLims,
-                           lvls=np.linspace(0.00010*1.0e6,0.00015*1.0e6,num=5,endpoint=True),frmt='%3.0f')
+    temp=RL.make_contours_CH4_patch(axs1[0],fNH3_patch_mb,LatLims,LonLims,
+                           lvls=tx_fNH3,frmt='%3.0f',clr='k')
     
-    cbar = pl.colorbar(show, ticks=[100,120,140,160], 
+    cbar = pl.colorbar(show, ticks=tx_fNH3, 
                        orientation='vertical',cmap='gist_heat',
                        ax=axs1[0],fraction=0.046, pad=0.04)
+    cbar.ax.set_yticklabels(np.around(tx_fNH3,1))
     cbar.ax.tick_params(labelsize=8,color='k')#if iSession >1:
-    axs1[0].set_title("Ammonia Abundance Index (ppm)",fontsize=10)
+        
+    axs1[0].set_title("f_c(NH3) (ppm)",fontsize=10)
 
     gamma=1.3
-    show=axs1[1].imshow(np.power(np.array(RGB_patch).astype(float),1.3),   
+    RGB4Display=np.power(np.array(RGB_patch).astype(float),gamma)
+    RGB4Display=RGB4Display/RGB4Display.max()
+    show=axs1[1].imshow(RGB4Display,
                extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                       90-LatLims[0]],#vmin=0,vmax=1.2,
+                       90-LatLims[0]],
                        aspect="equal")
-    temp=make_contours_CH4_patch(axs1[1],convolve(fNH3_patch,kernel)*1.0e6,LatLims,LonLims,
-                           lvls=np.linspace(0.00010*1.0e6,0.00015*1.0e6,num=5,endpoint=True),frmt='%3.0f')
+    temp=RL.make_contours_CH4_patch(axs1[1],fNH3_patch_mb,LatLims,LonLims,
+                           tx_fNH3,frmt='%3.0f',clr='k')
     box = axs1[1].get_position()
     
     
@@ -458,37 +471,68 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",imagetype='M
                 wspace=0.25, hspace=0.05)     
     axs1[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
 
-    fig1.savefig(path+"/"+obsdate+"-Jupiter-Retrieval-NH3-RGB-only"+"_CMII_"+
-              str(CM2)+"-Map.png",dpi=300)
+    fig1.savefig(path+"/"+obsdate+"-Jupiter-Retrieval-NH3_RGB_only"+"-CMII_"+
+              str(CM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
+    
+    ###########################################################################
+    ## Just RGB and Cloud Pressure
+    ###########################################################################
+    #!!!!!!!!!! FIX THIS !!!!!!!!!!!!!
+    fig2,axs2=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
+                        sharey=True,sharex=True)
+    #fig1.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2)),x=0.5,ha='center',color='k')
+    fig2.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+
+    for ix in range(0,1):
+        axs2[ix].grid(linewidth=0.2)
+        axs2[ix].ylim=[-45.,45.]
+        axs2[ix].xlim=[360-LonLims[0],360-LonLims[1]]
+        axs2[ix].set_xticks(np.linspace(450,0,31), minor=False)
+        xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
+        axs2[ix].set_xticklabels(xticklabels.astype(int))
+        axs2[ix].set_yticks(np.linspace(-45,45,7), minor=False)
+        axs2[ix].tick_params(axis='both', which='major', labelsize=9)
+
+        axs2[ix].set_adjustable('box') 
+
+    Pcloud_patch,vn,vx,tx=plot_patch(CH4_Cloud_Press,LatLims,LonLims,CM2,"jet",
+                                     axs2[0],'%3.2f',cont=False)
+
+    temp=RL.make_contours_CH4_patch(axs2[0],fNH3_patch_mb,LatLims,LonLims,
+                           lvls=tx_fNH3,frmt='%3.0f',clr='r')
+    
+    axs2[0].set_title("Cloud Top Pressure (bar)s",fontsize=10)
+
+    gamma=1.3
+    RGB4Display=np.power(np.array(RGB_patch).astype(float),gamma)
+    RGB4Display=RGB4Display/RGB4Display.max()
+    show=axs2[1].imshow(RGB4Display,
+               extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
+                       90-LatLims[0]],
+                       aspect="equal")
+    temp=RL.make_contours_CH4_patch(axs2[1],Pcloud_patch,LatLims,LonLims,
+                           tx,frmt='%3.2f',clr='k')
+    temp=RL.make_contours_CH4_patch(axs2[1],fNH3_patch_mb,LatLims,LonLims,
+                           lvls=tx_fNH3,frmt='%3.0f',clr='r')
+    box = axs2[1].get_position()
+    
+    
+    axs2[1].tick_params(axis='both', which='major', labelsize=9)
+    axs2[1].set_title("RGB Context Image",fontsize=10)
+
+    axs2[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
+    axs2[0].set_xlabel("Sys. 2 Longitude (deg)",fontsize=10)
+    axs2[1].set_xlabel("Sys. 2 Longitude (deg)",fontsize=10)
+
+    fig2.subplots_adjust(left=0.10, bottom=0.03, right=0.98, top=0.95,
+                wspace=0.25, hspace=0.05)     
+    axs2[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
+
+    fig2.savefig(path+"/"+obsdate+"-Jupiter-Retrieval-Pcloud_only"+"-CMII_"+
+              str(CM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
 
     return()
 
-def make_contours_CH4(ax,CH4Abs_conv,lvls=[0.71,0.73,0.75,0.77,0.79],frmt='%3.1e'):
-    """
-    PURPOSE: Overlay countours of NH3 absorption data on Jovian maps.
-             Specifically designed for equivalent widths with mean values of
-             ~0.55nm
-    """
-    cs=ax.contour(CH4Abs_conv,origin='upper', 
-                  colors=['w','w','w','w','w'], alpha=0.5,levels=lvls,
-                  linewidths=[0.5,0.5,1.0,0.5,0.5],
-                  linestyles=['dashed','dashed','solid','dashed','dashed'])
-    #ax.clabel(cs,[19.0,19.5,20.0,20.5,21.0],inline=True,fmt='%2.1f',fontsize=8)
-    ax.clabel(cs,lvls,inline=True,fmt=frmt,fontsize=8)
-    
-def make_contours_CH4_patch(ax,CH4Abs_conv,LatLims,LonLims,lvls=[0.71,0.73,0.75,0.77,0.79],frmt='%3.1e'):
-    """
-    PURPOSE: Overlay countours of NH3 absorption data on Jovian maps.
-             Specifically designed for equivalent widths with mean values of
-             ~0.55nm
-    """
-    cs=ax.contour(CH4Abs_conv,origin='upper', 
-                  extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],90-LatLims[0]],
-                  colors=['w','w','w','w','w'], alpha=0.5,levels=lvls,
-                  linewidths=[0.5,0.5,1.0,0.5,0.5],
-                  linestyles=['dashed','dashed','solid','dashed','dashed'])
-    #ax.clabel(cs,[19.0,19.5,20.0,20.5,21.0],inline=True,fmt='%2.1f',fontsize=8)
-    ax.clabel(cs,lvls,inline=True,fmt=frmt,fontsize=8)
 
 def load_png(file_path):
     """
@@ -517,47 +561,6 @@ def load_png(file_path):
 
     return flow.astype(np.uint16) 
     
-def get_WINJupos_ephem(dateobs):
-    # Example call: get_WINJupos_ephem('2021-09-05_04:09:00')
-    import win32com.shell.shell as shell
-    import time
-    #shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+commands) #run as admin
-    ###########################################################################
-    # WRITE *.BAT FILE WITH COMMAND SCRIPT FOR WINJUPOS
-    ###########################################################################   
-    batfile=open("WINJupos_CM.bat",'w')
-    Line1='cd "\Program Files\WinJUPOS 12.1.1"\r\n'
-    #Line2='WinJUPOS.x64.exe Jupiter /GetCM:2021-09-05_04:09:00 /GeoLong:-104.9 /GeoLat:39.7 /GetAlt >"c:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\cm.txt"\r\n'
-    Line2='WinJUPOS.x64.exe Jupiter /GetCM:'+dateobs+' /GeoLong:-104.9 /GeoLat:39.7 /GetAlt >"c:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\cm.txt"\r\n'
-    #batfile.writelines(["Line1\r\n","Line2\r\n"])
-    batfile.writelines([Line1,Line2])
-    batfile.close()
-    ###########################################################################
-    # EXECUTE *.BAT COMMAND FILE FOR WINJUPOS AND WAIT TO READ RESULT FILE
-    ###########################################################################
-    commands = "WINJupos_CM.bat"  
-    shell.ShellExecuteEx(lpFile='cmd.exe', lpParameters='/c '+commands)
-    time.sleep(1)
-    ephemfile=open("C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/cm.txt",'r')
-    Lines=ephemfile.readlines()
-    ephemfile.close()
-    LineString=str(Lines[0])
-    print(LineString)
-    ###########################################################################
-    # PARSE OUTPUT FILE AND CREATE STRING ARRAY EPH FOR CM1, CM2, CM3, AND ALT
-    ###########################################################################
-    start=[i for i, letter in enumerate(LineString) if letter == "="]
-    end=[i for i, letter in enumerate(LineString) if letter == "°"]
-    eph=[]
-    for i in range(0,3):
-        temp=LineString[int(start[i])+1:int(end[i])]
-        #print("CM"+str(i+1)+" = "+LineString[int(start[i])+1:int(end[i])])#,Linestring[start[1]:end[1]],Linestring[start[2]:end[2]])
-        print("CM"+str(i+1)+" = "+temp)#,Linestring[start[1]:end[1]],Linestring[start[2]:end[2]])
-        eph.extend([temp])        
-    temp=LineString[int(start[3])+1:int(end[3])]
-    print("Alt =  "+temp)
-    eph.extend([temp])        
-    return eph
 
 def make_patch(Map,LatLims,LonLims,CM2deg):
     """
@@ -576,3 +579,33 @@ def make_patch(Map,LatLims,LonLims,CM2deg):
         patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],360+LonLims[0]:360]),
                               np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]])),axis=1)
     return patch
+
+def plot_patch(fullmap,LatLims,LonLims,CM2,colorscale,axis,frmt,cont=True):
+    import numpy as np
+    import pylab as pl
+    import RetrievalLibrary as RL
+
+    patch=make_patch(fullmap,LatLims,LonLims,CM2)
+    vn,vx,n=0.10,0.20,6
+    #vn=np.min(patch)
+    #vx=np.max(patch)
+    
+    vn=np.mean(patch)-3.0*np.std(patch)
+    vx=np.mean(patch)+3.0*np.std(patch)
+    
+    tx=np.linspace(vn,vx,n,endpoint=True)
+    show=axis.imshow(patch, colorscale, origin='upper',vmin=vn,vmax=vx,  
+               extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
+                       90-LatLims[0]],
+                       aspect="equal")
+    if cont:
+        temp=RL.make_contours_CH4_patch(axis,patch,LatLims,LonLims,
+                           lvls=tx,frmt=frmt,clr='k')
+
+    cbar = pl.colorbar(show, ticks=tx, 
+               orientation='vertical',cmap='gist_heat',
+               ax=axis,fraction=0.046, pad=0.04)
+    cbar.ax.set_yticklabels(np.around(tx,3))
+    cbar.ax.tick_params(labelsize=6,color="k")#if iSession >1:
+
+    return patch,vn,vx,tx
