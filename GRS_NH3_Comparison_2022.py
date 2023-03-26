@@ -80,16 +80,16 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
 
     DarkFeatDates=['20220810UT','20220905UT','20220912UT','20220919UT','20221019UT','20221021UT']
     
-    if target=='GRS':
+    if target=='GRS':  #CM2~22
         Dates=GRSDates
         sourcefiles=GRSFilesSys2
-    elif target=="OvalBA":
+    elif target=="OvalBA":  #CM2~270
         Dates=OvalBADates
         sourcefiles=OvalBAFilesSys2
     elif target=="WS6":
         Dates=WS6Dates
         sourcefiles=WS6FilesSys2
-    elif target=="SysII_147":
+    elif target=="SysII_147":  #CM2=147
         Dates=SysII_147Dates
         sourcefiles=SysII_147FilesSys2
     
@@ -250,7 +250,7 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
     cbar.ax.set_yticklabels(np.around(tx,1))
 
     cbar.ax.tick_params(labelsize=8,color='k')#if iSession >1:
-    axsavg[0].set_title("Ammonia Abundance Index (ppm)",fontsize=10)
+    axsavg[0].set_title(r'$\bar{f_c} (NH_3)$ (ppm)',fontsize=10)
 
     gamma=1.3
     RGB4Display_avg=np.power(np.array(RGB_patch_avg).astype(float),gamma)
@@ -352,9 +352,11 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
     figfletch.savefig(pathout+"GRS_NH3_Comparison_Fletcher.png",dpi=300)
     
     ###########################################################################
-    #print DateCounter; Date
+    # MAKE PROFILE AVERAGE PLOT
+    ###########################################################################
+
     figprof,axsprof=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white")
-    figprof.suptitle("Ammonia Abundance Meridional Profile",x=0.5,ha='center',color='k')
+    figprof.suptitle('Ammonia Abundance Meridional Profile',x=0.5,ha='center',color='k')
 
     AvgMeridEW=np.mean(MeridEWArray[:,:],axis=1)
     StdMeridEW=np.std(MeridEWArray[:,:],axis=1)
@@ -367,21 +369,53 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
 
     #print('^^^^^^^^^',Lats)
     #print('^^^^^^^^^',MeridEW)
-    axsprof.plot(Lats,AvgMeridEW,label='This Work, Ammonia Abundance Index') 
-    axsprof.fill_between(Lats, AvgMeridEW-StdMeridEW, AvgMeridEW+StdMeridEW,color='C0',alpha=.2)
+    axsprof.plot(Lats,AvgMeridEW,color='k',
+                 label=r'This Work, Celestron 11 Seasonal Avg., $\bar{f_c} (NH_3)$') 
+    axsprof.fill_between(Lats, AvgMeridEW-StdMeridEW, AvgMeridEW+StdMeridEW,color='k',alpha=.1)
 
     plevel=0.752910
-    PTG.plot_TEXES_Groups(axsprof,clr='C2',prs=plevel,mult=1000000.)
+    #PTG.plot_TEXES_Groups(axsprof,clr='C2',prs=plevel,mult=1000000.)
     plevel=0.657540
-    PTG.plot_TEXES_Groups(axsprof,clr='C3',prs=plevel,mult=1000000.)
+    PTG.plot_TEXES_Groups(axsprof,clr='r',prs=plevel,mult=1000000.)
+    plevel=0.574240
+    #PTG.plot_TEXES_Groups(axsprof,clr='C4',prs=plevel,mult=1000000.)
+    
+    path20220919='C:/Astronomy/Projects/Planets/Jupiter/Imaging Data/20220919UT/'
+    VLTMUSEProfile=np.loadtxt(path20220919+
+                              'Profile of 2022-09-19-0352_3-Jupiter-fNH3Abs647-VLTMUSE.csv',
+                              usecols=range(2),delimiter=",")
+    axsprof.plot(VLTMUSEProfile[:,0]-45.,VLTMUSEProfile[:,1]*1e6*69./79.,color='k',
+                 linestyle="dashed",label=r'This Work, VLT-MUSE, $\bar{f_c} (NH_3)$') 
+      
+    belt={"SSTB":[-39.6,-36.2],
+          "STB":[-32.4,-27.1],
+          "SEB":[-19.7,-7.2],
+          "NEB":[6.9,17.4],
+          "NTB":[24.2,31.4],
+          "NNTB":[35.4,39.6]}
+    
+    zone={"STZ":[-36.2,-32.4],
+          "STrZ":[-27.1,-19.7],
+          "EZ":[-7.2,6.9],
+          "NTrZ":[17.4,24.2],
+          "NTZ":[31.4,35.4]}
+
+    for zb in belt:
+        print(zb,belt[zb])
+        axsprof.fill_between([belt[zb][0],belt[zb][1]],np.array([0.,0.]),np.array([1000.,1000.]),
+                                color="0.5",alpha=0.2)
+        axsprof.annotate(zb,xy=[np.mean(belt[zb]),51],ha="center")
+    for zb in zone:
+        axsprof.annotate(zb,xy=[np.mean(zone[zb]),51],ha="center")
+
     #for j in range(0,7):
     #    axsprof.plot(Lats,MeridEWArray[:,j])
     #    axsprof.fill_between(Lats, MeridEWArray[:,j]-MeridEWArrayStd[:,j],MeridEWArray[:,j]+MeridEWArrayStd[:,j],alpha=.2)
     axsprof.set_xlim(-30.,30.)
     axsprof.set_xlabel("Planetographic Latitude (deg)",fontsize=10)
-    axsprof.set_ylim(50.,300.)
+    axsprof.set_ylim(50.,150.)
     axsprof.set_ylabel("Ammonia Abundance (ppm)",fontsize=10)
-    axsprof.legend(loc=1,ncol=2, borderaxespad=0.,prop={'size':7})
+    axsprof.legend(loc=1,ncol=2, borderaxespad=0.,prop={'size':8})
     axsprof.grid(linewidth=0.2)
     axsprof.tick_params(axis='both', which='major', labelsize=8)
 

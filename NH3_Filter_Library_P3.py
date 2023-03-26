@@ -14,7 +14,12 @@ Created on Fri Feb 18 09:27:30 2022
                   returned)
                      
      K_eff
+        PURPOSE: Compute K_eff and l_eff for CH4 or NH3 by convolving the 
+                 absorption corss section and filter transmission.
+                 
      tau_gas_versus_P
+        PURPOSE: Compute two-way optical depth, tau, due to gas absorption
+                 as a function of pressure.
      tau_rayleigh_versus_P
      Compute_Transmission
      Get_Albedo_and_Absorption
@@ -47,6 +52,7 @@ def K_eff(P,FilterTransmission,Abs_Crossection,wv1,wv2,filtername,axis):
     # COMPUTE K_eff AND l_eff FOR AN ABSORBING GAS, CH4 OR NH3, GIVEN THE 
     #   CROSSECTION AND FILTER TRANSMISSION
     #   !!!! AGAIN, NEED TO HAVE TELESCOPE PERFORMANCE HERE ALSO
+    #   !!!! Is pressure, P, actually used? Remove from passed parameters.
     ###########################################################################
     import numpy as np
     import GeneralSpecUtils_P3 as GSU

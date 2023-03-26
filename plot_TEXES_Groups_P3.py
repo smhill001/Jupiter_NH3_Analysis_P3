@@ -58,15 +58,16 @@ def plot_TEXES_Groups(ax,clr="C2",prs=0.43798,mult=1.0):
     #print(Start,End,pressure[PL])
     scaled_data_mean=np.mean(data,axis=0)*mult#*8.0e4
     scaled_data_std=np.std(data,axis=0)*mult#*8.0e4
-    ax.plot(latgrid,scaled_data_mean,label='Fletcher etal, 2020 ('+str(int(prs*1000.))+'mb)',color=clr)
+    ax.plot(latgrid,scaled_data_mean,linewidth=1.0,
+            label='Fletcher etal, 2020 ('+str(int(prs*1000.))+'mb)',color=clr)
     ax.fill_between(latgrid, scaled_data_mean-scaled_data_std, scaled_data_mean+scaled_data_std,
-                    color=clr,alpha=0.1)
+                    color=clr,alpha=0.08)
     #ax.plot(latgrid,data[3,:]*mult)
     #for i in range(1,8):
     #    ax.plot(latgrid,data[i-1,:]*mult)
 
     
-def plot_Teifel(ax,clr='C0'):
+def plot_Teifel(ax,clr='C0',width=1.5):
     """
     PURPOSE:    This code reads and plots the zonally averaged NH3 absorption
                 EW at 645nm from data scanned from Teifel et al., 2018 
@@ -79,7 +80,8 @@ def plot_Teifel(ax,clr='C0'):
     #ax.scatter(Lats,EWs)
     pth="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
     Teifel = np.array(genfromtxt(pth+"Teifel2018-Fig7.txt", delimiter=','))
-    ax.scatter(Teifel[4:24,0],Teifel[4:24,1]*0.1,label='Teifel etal, 2018',color=clr)
+    ax.plot(Teifel[4:24,0],Teifel[4:24,1]*0.1,label='Teifel etal, 2018',
+            linewidth=width,color=clr)
 
 def plot_Historical(ax,reference,clr='C0'):
     """
@@ -102,6 +104,25 @@ def plot_Historical(ax,reference,clr='C0'):
                             "Center_pgLat":[-23.40,-13.45,-0.15,15.60,-23.0],
                             "645EW":[11.00,12.90,11.7,8.3,9.3]}}
     ax.scatter(data[reference]["Center_pgLat"],np.array(data[reference]["645EW"])*0.1,label=reference,color=clr)
+
+def plot_VLTMUSEandC11_EW_profiles(ax,reference,clr='C0'):
+    import numpy as np
+    
+    data={"C11 2022":{"path":"/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/",
+                              "fn":"Profile of Jupiter GRS AVG NH3 Transmission 8 files-Celestron11.csv",
+                              "Disk_Int_Trans":0.972},
+          "VLTMUSE 2022":{"path":"C:/Astronomy/Projects/Planets/Jupiter/Imaging Data/20220919UT/",
+                              "fn":"Profile of 2022-09-19-0352_3-Jupiter-647NH3AbsMap-VLTMUSE.csv",
+                              "Disk_Int_Trans":0.961}}
+                             
+    EW_slope=-12.82831873
+    EW_const=12.82685019                         
+    Profile=np.loadtxt(data[reference]["path"]+data[reference]["fn"],usecols=range(2),delimiter=",")
+    print("Profile.shape=",Profile.shape)
+    Transmission=(Profile[:,1])*data[reference]["Disk_Int_Trans"]
+    EW=EW_slope*Transmission+EW_const
+    print("EW.shape=",EW.shape)
+    ax.plot(Profile[:,0]-45.,EW,color=clr,label=reference)
 
 
 def Centric_to_Graphic(Latc):

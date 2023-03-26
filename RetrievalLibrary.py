@@ -5,7 +5,7 @@ Created on Fri Jan  6 14:43:04 2023
 @author: smhil
 """
 
-def make_patch(Map,LatLims,LonLims,CM2deg,LonRng):
+def make_patch(Map,LatLims,LonLims,CM2deg,LonRng,pad=True):
     """
     Purpose: Make a map patch and handle the case where the data overlap
              the map edges. This is designed for a map with Jovian longitude
@@ -21,7 +21,8 @@ def make_patch(Map,LatLims,LonLims,CM2deg,LonRng):
     if CM2deg>360-LonRng:
         patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],360+LonLims[0]:360]),
                               np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]])),axis=1)
-    patch_pad=np.pad(patch,5,mode='reflect')
+    if pad:
+        patch_pad=np.pad(patch,5,mode='reflect')
     return patch
 
 def make_contours_CH4_patch(ax,CH4Abs_conv,LatLims,LonLims,lvls=[0.71,0.73,0.75,0.77,0.79],frmt='%3.1e',clr='w'):

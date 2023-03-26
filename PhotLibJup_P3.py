@@ -253,7 +253,8 @@ def CreatePhotTable(root_path,pathout,observations,dates,Diagnostics):
             scidata=hdulist[0].data
             moonsradii=[12,20,28]       # Should have a default value that
             #moonsradii=[12,50,56]       # Should have a default value that
-            Jupiterradii=[50,85,100]    # can be overwritten for these!
+            #Jupiterradii=[50,85,100]    # can be overwritten for these!
+            Jupiterradii=[60,95,110]    # can be overwritten for these!
             
             # Compute Jupiter and Moons count rates and concatenate 
             # (vertical stack) into a single table. The table contains just
@@ -414,11 +415,11 @@ def SummaryTablePlot(AllTable,dates,MeasFilt,RefFilt,pathout):
             print(r647A)
             rmean_moonsA=np.mean(r647A[1:5])
             rstd_moonsA=np.std(r647A[1:5])
-            Conf_moonsA=rstd_moonsA/np.sqrt(np.count_nonzero(r647A[1:5]))
+            Conf_moonsA=rstd_moonsA/np.sqrt(np.count_nonzero(r647A[1:5])) #Standard Error
             
-            trans647A=r647A[0]/rmean_moonsA
+            trans647A=r647A[0]/rmean_moonsA      #Mean Transmission
             NH3_absA=1.0-r647A[0]/rmean_moonsA
-            Trans_ConfA=Conf_moonsA/rmean_moonsA
+            Trans_ConfA=Conf_moonsA/rmean_moonsA #Standard Error
             
             testA=Table({'RowNames':np.array(targetsA),date:np.array(r647A)},names=('RowNames',date))
         

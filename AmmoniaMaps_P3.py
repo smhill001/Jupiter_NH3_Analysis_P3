@@ -120,8 +120,11 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
         tmp=load_png(drive+path+NH3Abs_fn[0])
         NH3Abs_map=tmp[:,:,0]
         NH3Abs_patch=make_patch(NH3Abs_map,LatLims,LonLims,CM2deg)
-        NH3Abs_patch_EW=(1.0-0.961*(NH3Abs_patch*0.2/((2.0**16.)-1.0)+0.9))*0.55/0.039
-        
+        #NH3Abs_patch_EW=(1.0-0.961*(NH3Abs_patch*0.2/((2.0**16.)-1.0)+0.9))*0.55/0.039
+        EW_slope=-12.82831873
+        EW_const=12.82685019                         
+        NH3Abs_patch_EW=(EW_slope*((NH3Abs_patch*0.2/((2.0**16.)-1.0)+0.9)*0.972)+EW_const)
+
         # Make smoothed patch for NH3Abs contours
         kernel = Gaussian2DKernel(1)
         print(kernel)
@@ -358,9 +361,12 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
     axsavgprof[0].fill_between(Lats, AvgMeridEW-StdMeridEW, AvgMeridEW+StdMeridEW,color='C0',alpha=.2)
     axsavgprof[0].set_xlabel("Planetographic Latitude (deg)",fontsize=8)
 
-    PTG.plot_Teifel(axsavgprof[0],clr='C0')
+    PTG.plot_Teifel(axsavgprof[0],clr='C0')   
+    PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof[0],"VLTMUSE 2022",clr='C1')
+    PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof[0],"C11 2022",clr='C2')
     axsavgprof[0].legend(fontsize=7,loc=2)
-    
+
+    """
     ax2 = axsavgprof[0].twinx()  # instantiate a second axes that shares the same x-axis
     ax2.ticklabel_format(axis='y',style='sci',scilimits=(0,1))
     ax2.tick_params(axis='y', which='major', labelsize=7)
@@ -370,10 +376,10 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
     ax2.set_ylabel("NH3 Mole Fraction at "+str(int(plevel*1000))+"mb",fontsize=8)
     ax2.yaxis.label.set_color('C2')
     ax2.legend(fontsize=7,loc=1)
-    
+    """
     # Zonal Profile
     axsavgprof[1].plot(Lons,AvgZoneEW)
-    axsavgprof[1].fill_between(Lons, AvgZoneEW-StdZoneEW, AvgZoneEW+StdZoneEW,alpha=.2)
+    axsavgprof[1].fill_between(Lons, AvgZoneEW-StdZoneEW, AvgZoneEW+StdZoneEW,alpha=.1)
     axsavgprof[1].set_xlabel("Longitude (deg)",fontsize=8)
     
     # Plot layout details and labeling
@@ -387,7 +393,12 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
         axsavgprof[iavgprof].set_ylabel("Equivalent Width (nm)",fontsize=8)
         
     figavgprof.savefig(drive+path+"NH3 Map Plots/Jupiter-NH3_CMII_AvgProfile.png",dpi=300)
-    return 0
+    
+    #filtereffectivedata = open('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/filtereffectivedata.csv', 'w')
+    #tmp="Wavelength (nm),Filter Name,k_eff (NH3),l_eff (NH3),k_eff (CH4),l_eff (CH4),Trans,Tau,NH3 (m-atm),CH4 (m-atm)\n"
+    #filtereffectivedata.write(tmp)
+    
+    return Lats,AvgMeridEW,StdZoneEW
 
 
 def NewGetMaps():

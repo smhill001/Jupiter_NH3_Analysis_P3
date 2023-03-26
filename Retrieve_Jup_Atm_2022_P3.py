@@ -6,7 +6,8 @@ Created on Sun Nov  6 16:47:21 2022
 """
 
 def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
-                             imagetype='Map',CalModel='AGU 2022',Smoothing=True):
+                             imagetype='Map',CalModel='Observed',Smoothing=True,
+                             LatLims=[45,135],LonRng=45,delta_CM2=0):
     import sys
     drive='c:'
     sys.path.append(drive+'/Astronomy/Python Play')
@@ -204,7 +205,8 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     calibration={'AGU 2022':{'CH4GlobalTrans':0.858,'NH3GlobalTrans':0.928},
                  'Model 1':{'CH4GlobalTrans':0.880,'NH3GlobalTrans':0.960},
                  'Model 2':{'CH4GlobalTrans':0.878,'NH3GlobalTrans':0.940},
-                 'Observed':{'CH4GlobalTrans':0.909,'NH3GlobalTrans':0.974}}
+                 'Observed':{'CH4GlobalTrans':0.910,'NH3GlobalTrans':0.972},
+                 'VLT-MUSE':{'CH4GlobalTrans':0.861,'NH3GlobalTrans':0.961}}
 
     ###########################################################################
     # OPEN AND READ DATA FILES (FITS MAPS of NH3 and CH4 Absorption (Transmission?))
@@ -235,9 +237,12 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     sec=str(int(str(NH3file[16:17]))*6)
     NH3time=(NH3file[0:10]+"_"+NH3file[11:13]+":"+NH3file[13:15]+":"+sec.zfill(2))
     eph=RL.get_WINJupos_ephem(NH3time)
-    CM2=float(eph[1].strip())
-    LatLims=[45,135]
-    LonLims=[360-int(CM2+45),360-int(CM2-45)]
+    Real_CM2=float(eph[1].strip())
+    CM2=Real_CM2+delta_CM2
+    LonLims=[360-int(CM2+LonRng),360-int(CM2-LonRng)]
+
+    ###LatLims=[45,135]
+    ###LonLims=[360-int(CM2+45),360-int(CM2-45)]
     #LatLims=[30,150]
     #LonLims=[360-int(CM2+60),360-int(CM2-60)]
     #LatLims=[70,130]
@@ -446,7 +451,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     cbar.ax.set_yticklabels(np.around(tx_fNH3,1))
     cbar.ax.tick_params(labelsize=8,color='k')#if iSession >1:
         
-    axs1[0].set_title("f_c(NH3) (ppm)",fontsize=10)
+    axs1[0].set_title(r'$\bar{f_c}(NH3) (ppm)$',fontsize=10)
 
     gamma=1.3
     RGB4Display=np.power(np.array(RGB_patch).astype(float),gamma)
@@ -459,7 +464,29 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
                            tx_fNH3,frmt='%3.0f',clr='k')
     box = axs1[1].get_position()
     
+    belt={"SSTB":[-39.6,-36.2],
+          "STB":[-32.4,-27.1],
+          "SEB":[-19.7,-7.2],
+          "NEB":[6.9,17.4],
+          "NTB":[24.2,31.4],
+          "NNTB":[35.4,39.6]}
     
+    zone={"STZ":[-36.2,-32.4],
+          "STrZ":[-27.1,-19.7],
+          "EZ":[-7.2,6.9],
+          "NTrZ":[17.4,24.2],
+          "NTZ":[31.4,35.4]}
+
+    for zb in belt:
+        print(zb,belt[zb])
+        axs1[0].fill_between([360-LonLims[0],360-LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+                                color="0.5",alpha=0.4)
+        axs1[1].fill_between([360-LonLims[0],360-LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+                                color="0.5",alpha=0.4)
+        #axs1[1].annotate(zb,xy=[np.mean(belt[zb]),51],ha="center")
+    #for zb in zone:
+        #axs1[1].annotate(zb,xy=[np.mean(zone[zb]),51],ha="center")
+
     axs1[1].tick_params(axis='both', which='major', labelsize=9)
     axs1[1].set_title("RGB Context Image",fontsize=10)
 
@@ -495,13 +522,15 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
 
         axs2[ix].set_adjustable('box') 
 
-    Pcloud_patch,vn,vx,tx=plot_patch(CH4_Cloud_Press,LatLims,LonLims,CM2,"jet",
-                                     axs2[0],'%3.2f',cont=False)
+    Pcloud_patch,vn,vx,tx=plot_patch(CH4_Cloud_Press/4.0,LatLims,LonLims,CM2,"jet",
+                                     axs2[0],'%3.2f',cont=False,cbar_reverse=True)
 
-    temp=RL.make_contours_CH4_patch(axs2[0],fNH3_patch_mb,LatLims,LonLims,
-                           lvls=tx_fNH3,frmt='%3.0f',clr='r')
+    temp=RL.make_contours_CH4_patch(axs2[0],Pcloud_patch,LatLims,LonLims,
+                           lvls=tx,frmt='%3.2f',clr='k')
+    #temp=RL.make_contours_CH4_patch(axs2[0],fNH3_patch_mb,LatLims,LonLims,
+    #                       lvls=tx_fNH3,frmt='%3.0f',clr='r')
     
-    axs2[0].set_title("Cloud Top Pressure (bar)s",fontsize=10)
+    axs2[0].set_title("Cloud Top Pressure (bars)",fontsize=10)
 
     gamma=1.3
     RGB4Display=np.power(np.array(RGB_patch).astype(float),gamma)
@@ -512,11 +541,33 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
                        aspect="equal")
     temp=RL.make_contours_CH4_patch(axs2[1],Pcloud_patch,LatLims,LonLims,
                            tx,frmt='%3.2f',clr='k')
-    temp=RL.make_contours_CH4_patch(axs2[1],fNH3_patch_mb,LatLims,LonLims,
-                           lvls=tx_fNH3,frmt='%3.0f',clr='r')
+    #temp=RL.make_contours_CH4_patch(axs2[1],fNH3_patch_mb,LatLims,LonLims,
+    #                       lvls=tx_fNH3,frmt='%3.0f',clr='r')
     box = axs2[1].get_position()
     
+    belt={"SSTB":[-39.6,-36.2],
+          "STB":[-32.4,-27.1],
+          "SEB":[-19.7,-7.2],
+          "NEB":[6.9,17.4],
+          "NTB":[24.2,31.4],
+          "NNTB":[35.4,39.6]}
     
+    zone={"STZ":[-36.2,-32.4],
+          "STrZ":[-27.1,-19.7],
+          "EZ":[-7.2,6.9],
+          "NTrZ":[17.4,24.2],
+          "NTZ":[31.4,35.4]}
+
+    for zb in belt:
+        print(zb,belt[zb])
+        axs2[0].fill_between([360-LonLims[0],360-LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+                                color="0.5",alpha=0.4)
+        axs2[1].fill_between([360-LonLims[0],360-LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+                                color="0.5",alpha=0.4)
+        #axs1[1].annotate(zb,xy=[np.mean(belt[zb]),51],ha="center")
+    #for zb in zone:
+        #axs1[1].annotate(zb,xy=[np.mean(zone[zb]),51],ha="center")
+
     axs2[1].tick_params(axis='both', which='major', labelsize=9)
     axs2[1].set_title("RGB Context Image",fontsize=10)
 
@@ -580,7 +631,7 @@ def make_patch(Map,LatLims,LonLims,CM2deg):
                               np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]])),axis=1)
     return patch
 
-def plot_patch(fullmap,LatLims,LonLims,CM2,colorscale,axis,frmt,cont=True):
+def plot_patch(fullmap,LatLims,LonLims,CM2,colorscale,axis,frmt,cont=True,cbar_reverse=False):
     import numpy as np
     import pylab as pl
     import RetrievalLibrary as RL
@@ -607,5 +658,7 @@ def plot_patch(fullmap,LatLims,LonLims,CM2,colorscale,axis,frmt,cont=True):
                ax=axis,fraction=0.046, pad=0.04)
     cbar.ax.set_yticklabels(np.around(tx,3))
     cbar.ax.tick_params(labelsize=6,color="k")#if iSession >1:
+    if cbar_reverse:
+        cbar.ax.invert_yaxis()
 
     return patch,vn,vx,tx

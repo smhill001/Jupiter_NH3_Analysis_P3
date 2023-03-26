@@ -34,7 +34,7 @@ import NH3_Filter_Library_P3 as NFL
 # LOAD JOVIAN DISK-INTEGRATEDALBEDO DATA FROM KARKOSCHKA, 1994 (DATA FROM 1993)
 ###############################################################################
 #Plot Layout Configuration
-ContinuumModel='1'
+ContinuumModel='Both'
 x0,x1,xtks=600.,1000.,9
 y0,y1,ytks=0.0,0.7,8
 Albedo,Continuum_Albedo,CH4,NH3=NFL.Get_Albedo_and_Absorption(x0,x1,xtks,y0,y1,ytks,
@@ -70,6 +70,7 @@ Iodata = deepcopy(filterdata)
 Europadata = deepcopy(filterdata)
 Ganymededata = deepcopy(filterdata)
 Callistodata = deepcopy(filterdata)
+MoonsAvgdata = deepcopy(filterdata)
 
 path='c:/Astronomy/Projects/Techniques/InstrumentPerformance-P3/Filters/'
 
@@ -391,8 +392,7 @@ fig_moons.subplots_adjust(left=0.10, right=0.90, top=0.94, bottom=0.09)
 
 fig_moons.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/ColorSlopes.png',dpi=320)
 
-filterloop=['620','632','647','656']
-for filt in filterloop:
+for filt in filterlistshort:
     print('^^^^^^^^^^^^^'+filt)
 
     Iodata[filt]['Cont_Int'],Iodata[filt]['Absr_Int'],Iodata[filt]['TransInt']= \
@@ -415,6 +415,7 @@ for filt in filterloop:
                                   float(filt)-Jupiterdata[filt]['filtwdth'],\
                                   float(filt)+Jupiterdata[filt]['filtwdth'], \
                                       Jupiterdata[filt]['filtname'],prn=False)
+
 
     print(Iodata[filt]['Cont_Int'],Iodata[filt]['Absr_Int'],Iodata[filt]['TransInt'])
     print(Europadata[filt]['Cont_Int'],Europadata[filt]['Absr_Int'],Europadata[filt]['TransInt'])
@@ -452,3 +453,26 @@ CalCH4Abs=Callistodata['620']['TransInt']/Cal620Slope
 print("************ Cal Trans",CalNH3Abs)
 print("************ Cal Trans",CalCH4Abs)
 
+MoonsAvgdata['647']['TransInt'] = np.mean([IoNH3Abs,EurNH3Abs,GanNH3Abs,CalNH3Abs])
+MoonsAvgdata['647']['Tau_Albedo']=-np.log(MoonsAvgdata['647']['TransInt'])
+MoonsAvgdata['647']['NH3ColDens']=1000.*MoonsAvgdata['647']['Tau_Albedo']/Jupiterdata['647']['keff_NH3']
+MoonsAvgdata['647']['CH4ColDens']=1000.*MoonsAvgdata['647']['Tau_Albedo']/Jupiterdata['647']['keff_CH4']
+
+MoonsAvgdata['620']['TransInt'] = np.mean([IoCH4Abs,EurCH4Abs,GanCH4Abs,CalCH4Abs])
+MoonsAvgdata['620']['Tau_Albedo']=-np.log(MoonsAvgdata['620']['TransInt'])
+MoonsAvgdata['620']['NH3ColDens']=1000.*MoonsAvgdata['620']['Tau_Albedo']/Jupiterdata['620']['keff_NH3']
+MoonsAvgdata['620']['CH4ColDens']=1000.*MoonsAvgdata['620']['Tau_Albedo']/Jupiterdata['620']['keff_CH4']
+
+filtereffectivedata = open('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/filtereffectivedataMod3.csv', 'w')
+tmp="Wavelength (nm),Filter Name,k_eff (NH3),l_eff (NH3),k_eff (CH4),l_eff (CH4),Trans,Tau,NH3 (m-atm),CH4 (m-atm)\n"
+filtereffectivedata.write(tmp)
+
+for filtr in ['620','647']:
+    print(filtr)
+    tmp=filtr+","+Jupiterdata[filtr]['filtname']+","+str(Jupiterdata[filtr]['keff_NH3'])+","\
+            +str(Jupiterdata[filtr]['leff_NH3'])+","+str(Jupiterdata[filtr]['keff_CH4'])+","\
+            +str(Jupiterdata[filtr]['leff_CH4'])+","+str(MoonsAvgdata[filtr]['TransInt'])+","\
+            +str(MoonsAvgdata[filtr]['Tau_Albedo'])+","+str(MoonsAvgdata[filtr]['NH3ColDens'])+","\
+            +str(MoonsAvgdata[filtr]['CH4ColDens'])+"\n"
+    filtereffectivedata.write(tmp)
+filtereffectivedata.close()
