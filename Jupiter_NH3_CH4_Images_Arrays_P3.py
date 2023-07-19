@@ -11,7 +11,7 @@ EXAMPLE:    Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20210905UT")
             
 """
 
-def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220904UT",target="Jupiter",imagetype='Map'):
+def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imagetype='Map'):
     import sys
     drive='c:'
     sys.path.append(drive+'/Astronomy/Python Play')
@@ -361,8 +361,8 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220904UT",target="Jupiter",image
                   
                   '20220919UTb_Map':{'Metadata':{'Telescope':'VLT','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'6/10','Transparency':'7/10'}, 
-                               'CH4file':['2022-09-19-0352_3-Jupiter-MUSE-R656G620B632-RGB-WhtBal-Filtered_CM2_L360_MAP-BARE.png'],
-                               'NH3file':'2022-09-19-0352_3-Jupiter-MUSE-R656G647B632-RGB-WhtBal-Filtered_CM2_L360_MAP-BARE.png',
+                               'CH4file':['2022-09-19-0352_3-Jupiter-VLT-R656G620B632-RGB-WhtBal-MedFilt_CM2_L360_MAP-BARE.png'],
+                               'NH3file':'2022-09-19-0352_3-Jupiter-VLT-R656G647B632-RGB-WhtBal-MedFilt_CM2_L360_MAP-BARE.png',
                                #'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
                                'Context':{'NUVfile':'NA',
                                           'RGBfile':'2022-09-19-0352_3-Jupiter-MUSE-R650G550B450-RGB-WhtBal-Filtered_CM2_L360_MAP-BARE.png'},
@@ -578,7 +578,7 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220904UT",target="Jupiter",image
     ax[0,1].annotate("Steven Hill",[0.5,1.2],ha='center',xycoords='axes fraction',color='w',fontsize=8)
     ax[0,1].annotate("Denver, Colorado",[0.5,1.1],ha='center',xycoords='axes fraction',color='w',fontsize=8)
     
-    ax[0,0].annotate("0.28m Celestron",[0.07,1.3],
+    ax[0,0].annotate(sourcefiles[sourcedata]['Metadata']['Telescope'],[0.07,1.3],
                  ha='left',xycoords='axes fraction',color='w',fontsize=8)
     ax[0,0].annotate("5.60m FL",[0.07,1.2],
                  ha='left',xycoords='axes fraction',color='w',fontsize=8)
@@ -837,11 +837,19 @@ def Methane_Panels(CH4file,CH4_RGB,mask,ax,ifile,CH4labels=['656nm (Cont.)','889
         ax[2+ifile,0].imshow(sharpen(CH4_RGB[:,:,0]),'gist_gray',vmin=0.0,vmax=np.nanmax(CH4_RGB[:,:,0])*1.2)
         ax[2+ifile,1].imshow(CH4_RGB[:,:,1],'gist_gray',vmin=0.0,vmax=np.nanmax(CH4_RGB[:,:,0])*1.2)
         maxmin=[0.5,2.0]
-    elif CH4labels[1]=='730nm (CH4)' or CH4labels[1]=='620nm (CH4)':
+    elif CH4labels[1]=='730nm (CH4)':# or CH4labels[1]=='620nm (CH4)':
         clrslp=(np.array(CH4_RGB[:,:,0]).astype(float)-np.array(CH4_RGB[:,:,2]).astype(float))/24.0 
         meta={'620nm (CH4)':{'dwave':-12,'maxmin':[0.9,1.1]},
               '730nm (CH4)':{'dwave':98,'maxmin':[0.8,1.2]}}
         CNTSynth=meta[CH4labels[1]]['dwave']*clrslp+np.array(CH4_RGB[:,:,2])
+        ch4abs=(np.array(CH4_RGB[:,:,1])+0.0001)/(CNTSynth+0.0001)
+        ax[2+ifile,0].imshow(sharpen(CNTSynth)*mask[:,:,1],'gist_gray',vmin=0.0,vmax=np.nanmax(CNTSynth)*1.2)
+        ax[2+ifile,1].imshow(sharpen(CH4_RGB[:,:,1])*mask[:,:,1],'gist_gray',vmin=0.0,vmax=np.nanmax(CH4_RGB[:,:,0])*1.2)
+        maxmin=meta[CH4labels[1]]['maxmin']
+    elif CH4labels[1]=='620nm (CH4)': ###ADDITION FOR PIECEWISE CONTINUOUS RATHER THAN EXTRAPOLATED
+        meta={'620nm (CH4)':{'dwave':-12,'maxmin':[0.9,1.1]},
+              '730nm (CH4)':{'dwave':98,'maxmin':[0.8,1.2]}}
+        CNTSynth=np.array(CH4_RGB[:,:,2])
         ch4abs=(np.array(CH4_RGB[:,:,1])+0.0001)/(CNTSynth+0.0001)
         ax[2+ifile,0].imshow(sharpen(CNTSynth)*mask[:,:,1],'gist_gray',vmin=0.0,vmax=np.nanmax(CNTSynth)*1.2)
         ax[2+ifile,1].imshow(sharpen(CH4_RGB[:,:,1])*mask[:,:,1],'gist_gray',vmin=0.0,vmax=np.nanmax(CH4_RGB[:,:,0])*1.2)

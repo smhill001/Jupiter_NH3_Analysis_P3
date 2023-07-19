@@ -40,7 +40,8 @@ EXAMPLE:    AmmoniaMaps_P3(DateSelection=["2021-09-23"])
 
 """
 
-def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',orientation='Landscape'):
+def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',
+                   orientation='Landscape'):
     ###########################################################################
     # Set up environment and paths
     #
@@ -122,7 +123,8 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
         NH3Abs_patch=make_patch(NH3Abs_map,LatLims,LonLims,CM2deg)
         #NH3Abs_patch_EW=(1.0-0.961*(NH3Abs_patch*0.2/((2.0**16.)-1.0)+0.9))*0.55/0.039
         EW_slope=-12.82831873
-        EW_const=12.82685019                         
+        EW_const=12.82685019 
+        #!!! YIKES Hardcoding above and below!
         NH3Abs_patch_EW=(EW_slope*((NH3Abs_patch*0.2/((2.0**16.)-1.0)+0.9)*0.972)+EW_const)
 
         # Make smoothed patch for NH3Abs contours
@@ -144,8 +146,17 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
         # Compute and plot single-session meridional and zonal profiles from 
         #   unadjusted patch. Also store the profiles for creation of average
         #   profile plots across all sessions in a give run.
-        MeridEW=np.flip(np.mean(NH3Abs_patch_EW[:,:],axis=1),axis=0)
-        MeridEWerror=np.flip(np.std(NH3Abs_patch_EW[:,:],axis=1),axis=0)
+        #
+        #!!!! 7/14/2023 MODIFICATION MADE TO ONLY CONSIDER +/-10 DEG FROM
+        #     THE CM FOR MERIDIONAL PROFILES. THIS IS CONSISTENT WITH 2023
+        #     PLOTS THAT ONLY LOOK AT THE CENTRAL +/-10 DEG
+        #
+        #MeridEW=np.flip(np.mean(NH3Abs_patch_EW[:,:],axis=1),axis=0)
+        #MeridEWerror=np.flip(np.std(NH3Abs_patch_EW[:,:],axis=1),axis=0)
+        #
+        MeridEW=np.flip(np.mean(NH3Abs_patch_EW[:,45:65],axis=1),axis=0)
+        MeridEWerror=np.flip(np.std(NH3Abs_patch_EW[:,45:65],axis=1),axis=0)
+        
         Lats=np.linspace(-44.5,44.5,90)
         #print DateCounter; Date
         MeridEWArray[:,DateCounter]=MeridEW[:]
@@ -392,7 +403,7 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',ori
         axsavgprof[iavgprof].tick_params(axis='both', which='major', labelsize=7)
         axsavgprof[iavgprof].set_ylabel("Equivalent Width (nm)",fontsize=8)
         
-    figavgprof.savefig(drive+path+"NH3 Map Plots/Jupiter-NH3_CMII_AvgProfile.png",dpi=300)
+    figavgprof.savefig(drive+path+"NH3 Map Plots/"+DateSelection[0][0:4]+"-Jupiter-NH3_CMII_AvgProfile.png",dpi=300)
     
     #filtereffectivedata = open('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/filtereffectivedata.csv', 'w')
     #tmp="Wavelength (nm),Filter Name,k_eff (NH3),l_eff (NH3),k_eff (CH4),l_eff (CH4),Trans,Tau,NH3 (m-atm),CH4 (m-atm)\n"

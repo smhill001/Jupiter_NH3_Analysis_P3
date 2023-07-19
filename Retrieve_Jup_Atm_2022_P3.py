@@ -6,8 +6,8 @@ Created on Sun Nov  6 16:47:21 2022
 """
 
 def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
-                             imagetype='Map',CalModel='Observed',Smoothing=True,
-                             LatLims=[45,135],LonRng=45,delta_CM2=0):
+                             imagetype='Map',CalModel='SCT-Obs-Final',Smoothing=True,
+                             LatLims=[45,135],LonRng=45,delta_CM2=0,showbands=False):
     import sys
     drive='c:'
     sys.path.append(drive+'/Astronomy/Python Play')
@@ -33,11 +33,8 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     gravity=2228.0 #cm/s^2
     mean_mol_wt=3.85e-24 #cgs or SI !!!!WHY IS THIS 2.2 FOR MENDIKOA!!!!!
     fCH4=1.81e-3
-    STP=1.01e6  #dyne/cm^2 [(g-cm/s^2)/cm^2]
+    STP=1.01e6  #dyne/cm^2 [(g-cm/s^2)/cm^2]`
     
-    K_eff_CH4620=0.428
-    K_eff_NH3647=2.964
-
     ###########################################################################
     #  DATA FILES AND METADATA DICTIONARY
     #    !!!!SHOULD MAKE THIS A DATA OBJECT!!!!
@@ -84,6 +81,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
                                             'CH4file':'2022-08-30-0559_2-Jupiter_620CH4AbsMap.fits',
                                             'NH3file':'2022-08-30-0559_1-Jupiter_647NH3AbsMap.fits',
                                             'RGBfile':'2022-08-28-1429_7-Jupiter-RGB-Arakawa-j220828e1_CM2_L360_MAP-BARE.png'},
+                 #!!! 7/16/2023: SOME SORT OF PROBLEM WITH CONTOUR LEVELS PREVENTS THIS FROM RUNNING; NEED TO RERUN
                  '20220901UT_Img':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                                          'Seeing':'6/10','Transparency':'7/10'}, 
                                             'CH4file':'2022-09-01-0604_9-Jupiter_CH4Abs620.fits',
@@ -206,11 +204,18 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
                  'Model 1':{'CH4GlobalTrans':0.880,'NH3GlobalTrans':0.960},
                  'Model 2':{'CH4GlobalTrans':0.878,'NH3GlobalTrans':0.940},
                  'Observed':{'CH4GlobalTrans':0.910,'NH3GlobalTrans':0.972},
-                 'VLT-MUSE':{'CH4GlobalTrans':0.861,'NH3GlobalTrans':0.961}}
+                 'VLT-MUSE':{'CH4GlobalTrans':0.861,'NH3GlobalTrans':0.961},
+                 'SCT-Obs-Final':{'CH4GlobalTrans':0.920,'NH3GlobalTrans':0.972},
+                 'VLT-Obs-Final':{'CH4GlobalTrans':0.893,'NH3GlobalTrans':0.962}}
 
+    K_eff={'CH4_620':{'C11':0.427,'VLT':0.454},
+           'NH3_647':{'C11':2.955,'VLT':3.129}}
     ###########################################################################
     # OPEN AND READ DATA FILES (FITS MAPS of NH3 and CH4 Absorption (Transmission?))
     ###########################################################################             
+    K_eff_CH4620=K_eff['CH4_620'][sourcefiles[sourcedata]['Metadata']['Telescope']]#0.428
+    K_eff_NH3647=K_eff['NH3_647'][sourcefiles[sourcedata]['Metadata']['Telescope']]#2.964
+
     path='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+obsdate[0:10]+'/'
     CH4file=sourcefiles[sourcedata]['CH4file']
     NH3file=sourcefiles[sourcedata]['NH3file']
@@ -270,13 +275,14 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     CH4_Cloud_Press=(CH4_Ncol/1000.)*amagat*gravity*mean_mol_wt/(fCH4*STP)
     fNH3=(NH3_Ncol/1000.)*amagat*gravity*mean_mol_wt/(CH4_Cloud_Press*STP)
     ##!!!! WOW!!! I need to calculate fNH3 the EASY way also and compare!!!
+    #fNH3=NH3_Ncol/CH4_Ncol
     ###########################################################################
     # Set up figure and axes for plots
     ###########################################################################             
 
     fig,axs=pl.subplots(2,3,figsize=(7.0,4.5), dpi=150, facecolor="white",
                         sharey=True,sharex=True)      
-    fig.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+    fig.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(Real_CM2))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
 
     if imagetype=='Map':
         for iPlot in range(0,6):
@@ -296,7 +302,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     # Plot CH4 Optical Depth
     ###########################################################################
     if imagetype=='Map':
-        plot_patch(CH4_tau,LatLims,LonLims,CM2,"gist_heat",axs[0,0],'%3.3f')
+        plot_patch(CH4_tau,LatLims,LonLims,CM2,LonRng,"gist_heat",axs[0,0],'%3.3f')
     else:
         show=axs[0,0].imshow(CH4_tau, "gist_heat", origin='upper',vmin=0.10,vmax=0.20,
                            aspect="equal")
@@ -309,7 +315,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     # Plot CH4 Column Density (m-atm)
     ###########################################################################
     if imagetype=='Map':
-        plot_patch(CH4_Ncol,LatLims,LonLims,CM2,"gist_heat",axs[0,1],'%3.0f')
+        plot_patch(CH4_Ncol,LatLims,LonLims,CM2,LonRng,"gist_heat",axs[0,1],'%3.0f')
     else:
         show=axs[0,1].imshow(CH4_Ncol*1000., "gist_heat", origin='upper',vmin=200,vmax=500,
                            aspect="equal")
@@ -329,7 +335,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
         axs[0,2].set_title("Scattering Pressure (Pa)",fontsize=8)
     else:
         if imagetype=='Map':
-            RGB_patch=make_patch(RGB,LatLims,LonLims,CM2)
+            RGB_patch=make_patch_RGB(RGB,LatLims,LonLims,CM2,LonRng)
             print("@@@@@@@ RGB_patch.shape()=",RGB_patch.shape)
             show=axs[0,2].imshow(RGB_patch, vmin=0,vmax=2^16,  
                        extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
@@ -343,7 +349,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     # Plot NH3 Optical Depth
     ###########################################################################
     if imagetype=='Map':
-        plot_patch(NH3_tau,LatLims,LonLims,CM2,"gist_heat",axs[1,0],'%3.3f')
+        plot_patch(NH3_tau,LatLims,LonLims,CM2,LonRng,"gist_heat",axs[1,0],'%3.3f')
     else:
         show=axs[1,0].imshow(NH3_tau, "gist_heat", origin='upper',vmin=0.02,vmax=0.12,  
                            aspect="equal")
@@ -356,7 +362,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     # Plot NH3 Column Density (km-atm)
     ###########################################################################
     if imagetype=='Map':
-        plot_patch(NH3_Ncol,LatLims,LonLims,CM2,"gist_heat",axs[1,1],'%3.1f')
+        plot_patch(NH3_Ncol,LatLims,LonLims,CM2,LonRng,"gist_heat",axs[1,1],'%3.1f')
     else:    
         show=axs[1,1].imshow(NH3_Ncol*1000., "gist_heat", origin='upper',vmin=10,vmax=40,
                            aspect="equal")
@@ -369,7 +375,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     # Plot NH3 Mole Fraction - Ammonia Absorption Index
     ###########################################################################
     if imagetype=='Map':
-        fNH3_patch_mb,vn_fNH3,vx_fNH3,tx_fNH3=plot_patch(fNH3*1e6,LatLims,LonLims,CM2,"jet",axs[1,2],'%3.0f')
+        fNH3_patch_mb,vn_fNH3,vx_fNH3,tx_fNH3=plot_patch(fNH3*1e6,LatLims,LonLims,CM2,LonRng,"jet",axs[1,2],'%3.0f')
 
     else:    
         show=axs[1,2].imshow(fNH3*1e6, "jet", origin='upper',vmin=100,vmax=160,
@@ -397,7 +403,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
                 wspace=0.25, hspace=0.05)     
 
     fig.savefig(path+"/"+obsdate+"-Jupiter-Retrieval"+"-CMII_"+
-              str(CM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
+              str(Real_CM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
 
     hdu = fits.PrimaryHDU(fNH3.astype(np.float32))
     hdul = fits.HDUList([hdu])
@@ -423,7 +429,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     fig1,axs1=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
     #fig1.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2)),x=0.5,ha='center',color='k')
-    fig1.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+    fig1.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(Real_CM2))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
 
     for ix in range(0,1):
         axs1[ix].grid(linewidth=0.2)
@@ -477,12 +483,13 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
           "NTrZ":[17.4,24.2],
           "NTZ":[31.4,35.4]}
 
-    for zb in belt:
-        print(zb,belt[zb])
-        axs1[0].fill_between([360-LonLims[0],360-LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
-                                color="0.5",alpha=0.4)
-        axs1[1].fill_between([360-LonLims[0],360-LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
-                                color="0.5",alpha=0.4)
+    if showbands:
+        for zb in belt:
+            print(zb,belt[zb])
+            axs1[0].fill_between([360-LonLims[0],360-LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+                                    color="0.5",alpha=0.4)
+            axs1[1].fill_between([360-LonLims[0],360-LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+                                    color="0.5",alpha=0.4)
         #axs1[1].annotate(zb,xy=[np.mean(belt[zb]),51],ha="center")
     #for zb in zone:
         #axs1[1].annotate(zb,xy=[np.mean(zone[zb]),51],ha="center")
@@ -499,7 +506,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     axs1[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
 
     fig1.savefig(path+"/"+obsdate+"-Jupiter-Retrieval-NH3_RGB_only"+"-CMII_"+
-              str(CM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
+              str(Real_CM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
     
     ###########################################################################
     ## Just RGB and Cloud Pressure
@@ -508,7 +515,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     fig2,axs2=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
     #fig1.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2)),x=0.5,ha='center',color='k')
-    fig2.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+    fig2.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(Real_CM2))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
 
     for ix in range(0,1):
         axs2[ix].grid(linewidth=0.2)
@@ -522,7 +529,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
 
         axs2[ix].set_adjustable('box') 
 
-    Pcloud_patch,vn,vx,tx=plot_patch(CH4_Cloud_Press/4.0,LatLims,LonLims,CM2,"jet",
+    Pcloud_patch,vn,vx,tx=plot_patch(CH4_Cloud_Press/4.0,LatLims,LonLims,CM2,LonRng,"jet",
                                      axs2[0],'%3.2f',cont=False,cbar_reverse=True)
 
     temp=RL.make_contours_CH4_patch(axs2[0],Pcloud_patch,LatLims,LonLims,
@@ -558,12 +565,13 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
           "NTrZ":[17.4,24.2],
           "NTZ":[31.4,35.4]}
 
-    for zb in belt:
-        print(zb,belt[zb])
-        axs2[0].fill_between([360-LonLims[0],360-LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
-                                color="0.5",alpha=0.4)
-        axs2[1].fill_between([360-LonLims[0],360-LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
-                                color="0.5",alpha=0.4)
+    if showbands:
+        for zb in belt:
+            print(zb,belt[zb])
+            axs2[0].fill_between([360-LonLims[0],360-LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+                                    color="0.5",alpha=0.4)
+            axs2[1].fill_between([360-LonLims[0],360-LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+                                    color="0.5",alpha=0.4)
         #axs1[1].annotate(zb,xy=[np.mean(belt[zb]),51],ha="center")
     #for zb in zone:
         #axs1[1].annotate(zb,xy=[np.mean(zone[zb]),51],ha="center")
@@ -580,7 +588,12 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     axs2[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
 
     fig2.savefig(path+"/"+obsdate+"-Jupiter-Retrieval-Pcloud_only"+"-CMII_"+
-              str(CM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
+              str(Real_CM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
+
+
+
+    plot_scatter(Pcloud_patch,fNH3_patch_mb,path,obsdate,Real_CM2,LatLims)
+
 
     return()
 
@@ -613,7 +626,7 @@ def load_png(file_path):
     return flow.astype(np.uint16) 
     
 
-def make_patch(Map,LatLims,LonLims,CM2deg):
+def make_patch_RGB(Map,LatLims,LonLims,CM2deg,LonRng,pad=True):
     """
     Purpose: Make a map patch and handle the case where the data overlap
              the map edges. This is designed for a map with Jovian longitude
@@ -622,21 +635,26 @@ def make_patch(Map,LatLims,LonLims,CM2deg):
              shows the left boundary at zero, which is of course, also 360.
     """
     import numpy as np
-    patch=np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]:LonLims[1]])
-    if CM2deg<45:
-        patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]-1:360]),
-                              np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]-360])),axis=1)
-    if CM2deg>315:
-        patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],360+LonLims[0]:360]),
-                              np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]])),axis=1)
+    patch=np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]:LonLims[1],:])
+    print("####################### Patch RGB shape",patch.shape)
+    if CM2deg<LonRng:
+        patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]-1:360,:]),
+                              np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]-360,:])),axis=1)
+    if CM2deg>360.-LonRng:
+        patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],360+LonLims[0]:360,:]),
+                              np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1],:])),axis=1)
+    print("####################### Patch RGB shape",patch.shape)
+    #if pad:
+    #    patch_pad=np.pad(patch,5,mode='reflect')
+
     return patch
 
-def plot_patch(fullmap,LatLims,LonLims,CM2,colorscale,axis,frmt,cont=True,cbar_reverse=False):
+def plot_patch(fullmap,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,cont=True,cbar_reverse=False):
     import numpy as np
     import pylab as pl
     import RetrievalLibrary as RL
 
-    patch=make_patch(fullmap,LatLims,LonLims,CM2)
+    patch=RL.make_patch(fullmap,LatLims,LonLims,CM2,LonRng)
     vn,vx,n=0.10,0.20,6
     #vn=np.min(patch)
     #vx=np.max(patch)
@@ -644,6 +662,7 @@ def plot_patch(fullmap,LatLims,LonLims,CM2,colorscale,axis,frmt,cont=True,cbar_r
     vn=np.mean(patch)-3.0*np.std(patch)
     vx=np.mean(patch)+3.0*np.std(patch)
     
+    print(np.mean(patch),vn,vx)
     tx=np.linspace(vn,vx,n,endpoint=True)
     show=axis.imshow(patch, colorscale, origin='upper',vmin=vn,vmax=vx,  
                extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
@@ -662,3 +681,75 @@ def plot_patch(fullmap,LatLims,LonLims,CM2,colorscale,axis,frmt,cont=True,cbar_r
         cbar.ax.invert_yaxis()
 
     return patch,vn,vx,tx
+
+def plot_scatter(patch1,patch2,filepath,obsdate,Real_CM2,LatLims):
+    import pylab as pl
+    import numpy as np
+    import copy
+    
+    BZ={"SSTB":[-39.6,-36.2],
+          "STZ":[-36.2,-32.4],
+          "STB":[-32.4,-27.1],
+          "STrZ":[-27.1,-19.7],
+          "SEB":[-19.7,-7.2],
+          "SEZ":[-7.2,0.0],
+          "NEZ":[0.0,6.9],
+          "NEB":[6.9,17.4],
+          "NTrZ":[17.4,24.2],
+          "NTB":[24.2,31.4],
+          "NTZ":[31.4,35.4],
+          "NNTB":[35.4,39.6]}
+
+    BZind=copy.deepcopy(BZ)   
+    BZkeys=BZ.keys()
+    patch1=patch1*1000.
+
+    figcor,axscor=pl.subplots(1,1,figsize=(6.0,4.5), dpi=150, facecolor="white",
+                        sharey=True,sharex=True)          
+
+    for key in BZ.keys():
+        print(key,BZ[key],[90,90]-np.array(BZ[key]),LatLims)
+        BZind[key][0]=int(90-BZ[key][0])-LatLims[0]
+        BZind[key][1]=int(90-BZ[key][1])-LatLims[0]
+        
+        if BZind[key][0]<0:
+            BZind[key][0]=0
+        if BZind[key][1]<0:
+            BZind[key][1]=0
+        if BZind[key][0]>(LatLims[1]-LatLims[0]):
+            BZind[key][0]=LatLims[1]-LatLims[0]
+        if BZind[key][1]>(LatLims[1]-LatLims[0]):
+            BZind[key][1]=LatLims[1]-LatLims[0]
+        
+        if BZind[key][0]==BZind[key][1]:
+            print("do nothing")
+        else:
+            axscor.scatter(patch1[BZind[key][1]:BZind[key][0],:],
+                           patch2[BZind[key][1]:BZind[key][0],:],
+                           marker="o",s=5.0,
+                           alpha=0.8,label=key)
+
+    #print(patch1.shape,patch2.shape)
+    #axscor.scatter(patch1,patch2,marker="o",s=0.5,edgecolor='C0',alpha=0.7,label="Other")
+    """axscor.scatter(patch1[0:6,:],patch2[0:6,:],marker="o",s=5.0,color='C1',alpha=0.8,label="NTB")
+    axscor.scatter(patch1[7:13,:],patch2[7:13,:],marker="o",s=5.0,color='C2',alpha=0.8,label="NTrZ")
+    axscor.scatter(patch1[14:22,:],patch2[14:22,:],marker="o",s=5.0,color='C3',alpha=0.8,label="NEB")
+    axscor.scatter(patch1[23:29,:],patch2[23:29,:],marker="o",s=5.0,color='C4',alpha=0.8,label="NEZ")
+    axscor.scatter(patch1[30:36,:],patch2[30:36,:],marker="o",s=5.0,color='C5',alpha=0.8,label="SEZ")
+    axscor.scatter(patch1[37:45,:],patch2[37:45,:],marker="o",s=5.0,color='C6',alpha=0.8,label="SEB")"""
+    #axscor.set_title("Scatter Plot")
+     
+    axscor.grid(linewidth=0.2)
+    axscor.set_xlim(500.,900.)
+    axscor.set_ylim(50.,140)
+    #axscor.set_xticks(np.linspace(-45.,45.,7), minor=False)
+    #axscor.set_yticks(np.linspace(0.0,1.0,6), minor=False)
+    #axscor.tick_params(axis='both', which='major', labelsize=8)
+    axscor.set_xlabel("Effective Cloud-top Pressure (mb)",fontsize=10)
+    axscor.set_ylabel("Ammonia Mole Fraction (ppm)",fontsize=10)
+    axscor.legend(fontsize=9,loc=1)
+    
+    figcor.subplots_adjust(left=0.12, right=0.97, top=0.93, bottom=0.11)
+    figcor.savefig(filepath+"/"+obsdate+"-Jupiter-Retrieval-Scatter"+"-CMII_"+str(Real_CM2)+".png",dpi=300)
+  
+

@@ -56,21 +56,10 @@ CMOS2021EW=np.loadtxt(path+
                           usecols=range(3),delimiter=",")
 axsavgprof.plot(CMOS2021EW[:,0],CMOS2021EW[:,1],color="b",linewidth=1.0,label="2021 Celestron 11")
 
-GRSAvgProfile=np.loadtxt(path+
-                          'Profile of Jupiter GRS AVG NH3 Transmission 8 files-Celestron11.csv',
-                          usecols=range(2),delimiter=",")
-GRSAvgTransmission=(GRSAvgProfile[:,1])*0.972
-GRSAvg_EW=-12.82831873*GRSAvgTransmission+12.82685019
-axsavgprof.plot(GRSAvgProfile[:,0]-45.,GRSAvg_EW,color="k",label="2022 Celestron 11")
+PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof,"C11 2022",clr='k',width=1.5)
+PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof,"VLTMUSE 2022",clr='k',width=1.5,style='dashed')
+#PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof,"VLTMUSE 2022",clr='k',width=1.5,style='dashed',smooth=True)
 
-path20220919='C:/Astronomy/Projects/Planets/Jupiter/Imaging Data/20220919UT/'
-
-VLTMUSEProfile=np.loadtxt(path20220919+
-                          'Profile of 2022-09-19-0352_3-Jupiter-647NH3AbsMap-VLTMUSE.csv',
-                          usecols=range(2),delimiter=",")
-MUSETransmission=(VLTMUSEProfile[:,1])*0.961
-MUSE_EW=-12.82831873*MUSETransmission+12.82685019
-axsavgprof.plot(VLTMUSEProfile[:,0]-45.,MUSE_EW,color="k",linestyle="dashed",label="2022 VLT/MUSE")
 
 for zb in belt:
     print(zb,belt[zb])

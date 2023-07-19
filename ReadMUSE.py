@@ -2,6 +2,14 @@
 """
 Created on Thu Jan 12 14:21:05 2023
 
+PROGRAM: ReadMUSE
+PURPOSE: Read MUSE fits file for Jupiter observation on 9/19/2022 and
+            1) Create synthetic images for Ammonia abundance analysis
+                (620, 632, 647, and 656 nm)
+            2) Create synthetic RGB images
+            3) Create full disk radiance spectrum
+            4) Create estimated albedo spectrum for comparison to Karkoschka
+            5) Write filter files for synthetic filter bands
 @author: smhil
 """
 
@@ -9,7 +17,7 @@ import sys
 drive='c:'
 sys.path.append(drive+'/Astronomy/Python Play')
 sys.path.append(drive+'/Astronomy/Python Play/Util_P3')
-sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Spectroscopy')
+sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Spectroscopy_P3')
 
 import os
 from matplotlib.pyplot import imread
@@ -41,7 +49,10 @@ fn=dateobs[0:10]+'-'+dateobs[11:13]+dateobs[14:16]+'_'+str(float(dateobs[17:19])
 print(dateobs)
 print(fn)
 #print(MUSEhdr)
-wavelength=np.linspace(470.,935.13,3722)
+#Create MUSE wavelength grid
+#wavelength=np.linspace(470.,935.13,3722)
+delta=-0.2
+wavelength=np.linspace(470.+delta,935.13+delta,3722)
 
 filterwavelength=['620','632','647','656','658','672','730','889','940']
 filterdata={'620':{'transfile':'620CH4/620CH4_Transmission.txt',
@@ -63,8 +74,8 @@ filterdata={'620':{'transfile':'620CH4/620CH4_Transmission.txt',
              '940':{'transfile':'940NIR/940NIR_Transmission.txt',
                     'filtname':'940NIR','filtwdth':10.}}
 
-filtpath='C:/Astronomy/Projects/Techniques/InstrumentPerformance-P3/Filters/'
-filterdata['620']['FiltTrans']=np.loadtxt(filtpath+filterdata['620']['transfile'],usecols=range(2))
+#filtpath='C:/Astronomy/Projects/Techniques/InstrumentPerformance-P3/Filters/'
+#filterdata['620']['FiltTrans']=np.loadtxt(filtpath+filterdata['620']['transfile'],usecols=range(2))
 
 #F620_wvs=[617.5,622.5]
 F620_wvs=[615.,625.]
@@ -110,13 +121,16 @@ imwrite(path+fn+'MUSE656-6nmSplit.png', MUSE656abs16bit)
 
 fig,axs=pl.subplots(2,2,figsize=(7.0,4.5), dpi=150, facecolor="white",
                     sharey=True,sharex=True)      
-#fig.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
-
+fig.suptitle("MUSE Ammonia Analysis Synthetic Band Images",ha='center')
 
 axs[0,0].imshow(MUSE620,"gray",origin='lower')
+axs[0,0].set_title("615-625 nm")
 axs[0,1].imshow(MUSE632,"gray",origin='lower')
+axs[0,1].set_title("627-637 nm")
 axs[1,0].imshow(MUSE647,"gray",origin='lower')
+axs[1,0].set_title("642-652 nm")
 axs[1,1].imshow(MUSE656,"gray",origin='lower')
+axs[1,1].set_title("651-654, 658-661 nm")
 
 F450_wvs=[471.,480.]
 F450_idx=[np.argmin(abs(F450_wvs[0]-wavelength)),np.argmin(abs(F450_wvs[1]-wavelength))]
@@ -144,20 +158,39 @@ imwrite(path+fn+'MUSE650.png', MUSE650abs16bit)
 
 fig1,axs1=pl.subplots(2,2,figsize=(7.0,4.5), dpi=150, facecolor="white",
                     sharey=True,sharex=True)      
-#fig.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+fig1.suptitle("MUSE RGB Synthetic Band Images",ha='center')
 axs1[0,0].imshow(MUSE450,"gray",origin='lower')
+axs1[0,0].set_title("471-480 nm")
 axs1[0,1].imshow(MUSE550,"gray",origin='lower')
+axs1[0,1].set_title("530-580 nm")
 axs1[1,0].imshow(MUSE650,"gray",origin='lower')
+axs1[1,0].set_title("630-680 nm")
+
+###############################################################################
+# Compute spectrum, smoothed spectrum, albedo spectrum, and write filter files
+###############################################################################
 
 MUSESpec=np.nanmean(MUSEdata[:,:,:],axis=(1,2))
 print("MUSESpec.shape=",MUSESpec.shape,MUSESpec)
-WaveGrid,SignalonGrid=GSU.uniform_wave_grid(wavelength,MUSESpec,Extend=False,Fine=False)
+kernel_size = 4
+kernel = np.ones(kernel_size) / kernel_size
+data_convolved = np.convolve(MUSESpec, kernel, mode='same')
+WaveGrid,SignalonGrid=GSU.uniform_wave_grid(wavelength,data_convolved,Extend=False,Fine=False)
 MuseSpecGrid=np.column_stack((WaveGrid,SignalonGrid))
 print("MuseSpecGrid.shape=",MuseSpecGrid.shape)
 RefPath="c:/Astronomy/Python Play/SPLibraries/SpectralReferenceFiles/ReferenceLibrary/"
 G2V=np.loadtxt(RefPath+"g2v.dat", dtype=float, usecols=(0,1))
 print("G2V.shape=",G2V.shape)
 AlbedoSpec=GSU.SpectrumMath(MuseSpecGrid,G2V,"Divide")
+
+np.savetxt(path+'MUSE_AlbedoSpec.txt',AlbedoSpec,delimiter=" ",
+           fmt="%10.3F %10.7F")
+
+SmoothedSpec=np.column_stack((WaveGrid,SignalonGrid))
+np.savetxt(path+'MUSE_SmoothedSpec.txt',SmoothedSpec,delimiter=" ",
+           fmt="%10.3F %10.7F")
+
+
 
 fig2,axs2=pl.subplots(1,1,figsize=(7.0,4.5), dpi=150, facecolor="white",
                     sharey=True,sharex=True)      
@@ -167,17 +200,29 @@ axs2.plot(AlbedoSpec[:,0],AlbedoSpec[:,1])
 
 F620_idx=[np.argmin(abs(F620_wvs[0]-WaveGrid)),np.argmin(abs(F620_wvs[1]-WaveGrid))]
 MUSE620Albedo=np.mean(AlbedoSpec[F620_idx[0]:F620_idx[1],1],axis=0)
-print(MUSE620Albedo)
+print("MUSE620Albedo=",MUSE620Albedo)
+
 F632_idx=[np.argmin(abs(F632_wvs[0]-WaveGrid)),np.argmin(abs(F632_wvs[1]-WaveGrid))]
 MUSE632Albedo=np.mean(AlbedoSpec[F632_idx[0]:F632_idx[1],1],axis=0)
-print(MUSE632Albedo)
+print("MUSE632Albedo=",MUSE632Albedo)
+
 F647_idx=[np.argmin(abs(F647_wvs[0]-WaveGrid)),np.argmin(abs(F647_wvs[1]-WaveGrid))]
 MUSE647Albedo=np.mean(AlbedoSpec[F647_idx[0]:F647_idx[1],1],axis=0)
-print(MUSE647Albedo)
+print("MUSE647Albedo=",MUSE647Albedo)
 
 F656_idxRED=[np.argmin(abs(F656_wvsRED[0]-WaveGrid)),np.argmin(abs(F656_wvsRED[1]-WaveGrid))]
 MUSE656AlbedoRED=np.mean(AlbedoSpec[F656_idxRED[0]:F656_idxRED[1],1],axis=0)
 F656_idxBLU=[np.argmin(abs(F656_wvsBLU[0]-WaveGrid)),np.argmin(abs(F656_wvsBLU[1]-WaveGrid))]
 MUSE656AlbedoBLU=np.mean(AlbedoSpec[F656_idxBLU[0]:F656_idxBLU[1],1],axis=0)
 MUSE656Albedo=(MUSE656AlbedoRED+MUSE656AlbedoBLU)/2.
-print(MUSE656Albedo)
+print("MUSE656Albedo=",MUSE656Albedo)
+
+MUSERelSlope=(MUSE656Albedo-MUSE632Albedo)/(656.-632.)
+MUSE647Slope=MUSE632Albedo+MUSERelSlope*15.
+MUSE620Slope=MUSE632Albedo+MUSERelSlope*(-12.)
+MUSENH3Abs=MUSE647Albedo/MUSE647Slope
+MUSECH4Abs=MUSE620Albedo/MUSE620Slope
+
+print("")
+print("NH3 Abs=",MUSENH3Abs)
+print("CH4 Abs=",MUSECH4Abs)

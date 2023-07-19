@@ -24,8 +24,8 @@ def plot_TEXES_Groups(ax,clr="C2",prs=0.43798,mult=1.0):
     data=np.zeros((7,181))
     print("data=",data.shape)
 
-    ind=np.where(np.abs(pressure-prs)/pressure<0.01)
-    PL=np.ndarray.flatten(np.array(ind))[0]
+    ind=np.where(np.abs(pressure-prs)/pressure<0.01)    #Pressure index
+    PL=np.ndarray.flatten(np.array(ind))[0]             #Pressure
     #print('&&&&&&&&&&&&&&&&&&&&&&&&',ind)
     #print('&&&',np.ndarray.flatten(np.array(ind))[0],'***PL=',PL)
     
@@ -105,24 +105,40 @@ def plot_Historical(ax,reference,clr='C0'):
                             "645EW":[11.00,12.90,11.7,8.3,9.3]}}
     ax.scatter(data[reference]["Center_pgLat"],np.array(data[reference]["645EW"])*0.1,label=reference,color=clr)
 
-def plot_VLTMUSEandC11_EW_profiles(ax,reference,clr='C0'):
+def plot_VLTMUSEandC11_EW_profiles(ax,reference,clr='C0',width=1.0,style='solid',smooth=False):
+    #!!!This looks like it plots ABSORPTION and can do so as and EW for 
+    #     comparision to prior work. However, there is only one linear fit
+    #     for converting transmission to EW when separate ones are needed
+    #     for SCT and VLT filters. Also, the disk integrated transmissions
+    #     are hardcoded!!! I need to have a master reference file for these 
+    #     transmissions!
+    #     !!!!And...what are we hardcoded to specific manually generated profile
+    #     files?
+    
     import numpy as np
+    from astropy.convolution import convolve, Box1DKernel
     
     data={"C11 2022":{"path":"/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/",
-                              "fn":"Profile of Jupiter GRS AVG NH3 Transmission 8 files-Celestron11.csv",
-                              "Disk_Int_Trans":0.972},
+                              #"fn":"Profile of Jupiter GRS AVG NH3 Transmission 8 files-Celestron11.csv",
+                              "fn":"Profile of Jupiter GRS AVG NH3 Transmission 5 files-Celestron11 +-20deg.csv",
+                              "Disk_Int_Trans":0.972,
+                              "EW_slope":-12.82831873,
+                              "EW_const":12.82685019},
           "VLTMUSE 2022":{"path":"C:/Astronomy/Projects/Planets/Jupiter/Imaging Data/20220919UT/",
-                              "fn":"Profile of 2022-09-19-0352_3-Jupiter-647NH3AbsMap-VLTMUSE.csv",
-                              "Disk_Int_Trans":0.961}}
+                              "fn":"Profile of 2022-09-19-0352_3-Jupiter-647NH3AbsMap-final1.csv",                           
+                              "Disk_Int_Trans":0.962,
+                              "EW_slope":-12.15343491,
+                              "EW_const":12.15195684}}
                              
-    EW_slope=-12.82831873
-    EW_const=12.82685019                         
     Profile=np.loadtxt(data[reference]["path"]+data[reference]["fn"],usecols=range(2),delimiter=",")
     print("Profile.shape=",Profile.shape)
     Transmission=(Profile[:,1])*data[reference]["Disk_Int_Trans"]
-    EW=EW_slope*Transmission+EW_const
+    EW=data[reference]["EW_slope"]*Transmission+data[reference]["EW_const"]
     print("EW.shape=",EW.shape)
-    ax.plot(Profile[:,0]-45.,EW,color=clr,label=reference)
+    if smooth:
+        ax.plot(Profile[:,0]-45.,convolve(EW, Box1DKernel(7)),color=clr,linewidth=width,linestyle=style,label=reference)
+    else:
+        ax.plot(Profile[:,0]-45.,EW,color=clr,linewidth=width,linestyle=style,label=reference)
 
 
 def Centric_to_Graphic(Latc):

@@ -15,6 +15,8 @@ def make_patch(Map,LatLims,LonLims,CM2deg,LonRng,pad=True):
     """
     import numpy as np
     patch=np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]:LonLims[1]])
+    print("####################### Patch shape",patch.shape)
+
     if CM2deg<LonRng:
         patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]-1:360]),
                               np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]-360])),axis=1)
@@ -23,6 +25,8 @@ def make_patch(Map,LatLims,LonLims,CM2deg,LonRng,pad=True):
                               np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]])),axis=1)
     if pad:
         patch_pad=np.pad(patch,5,mode='reflect')
+    print("####################### Patch shape",patch.shape)
+
     return patch
 
 def make_contours_CH4_patch(ax,CH4Abs_conv,LatLims,LonLims,lvls=[0.71,0.73,0.75,0.77,0.79],frmt='%3.1e',clr='w'):

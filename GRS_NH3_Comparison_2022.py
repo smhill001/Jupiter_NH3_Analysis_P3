@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Nov 23 09:07:27 2022
-
+Example for paper profile plot with +/-20 deg long:
+    GRS_NH3_Comparison_2022(LatLims=[45,135],CM2=25,LonRng=20,target='GRS')
 @author: smhil
 """
 
@@ -35,6 +36,8 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
 #    sourcedata=obsdate+"_"+imagetype
     GRSDates=['20220810UT','20220818UT','20220828UT','20220904UT','20220919UT',
               '20221013UT','20221020UT','20230113UT']
+    GRSCMDates=['20220818UT','20220828UT','20220904UT',
+              '20221013UT','20221020UT']
     GRSFilesSys2={'20220810UT':{'fNH3file':'2022-08-10-1013_0-Jupiter_fNH3Abs647.fits',
                                'RGBfile':'2022-08-10-1030_0-Jupiter_WV-R(AllRED)GB-RGB-WhtBal-Wavelets-Str_CM2_L360_MAP-BARE.png'},
                  '20220818UT':{'fNH3file':'2022-08-18-0733_4-Jupiter_fNH3Abs647.fits',
@@ -82,6 +85,9 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
     
     if target=='GRS':  #CM2~22
         Dates=GRSDates
+        sourcefiles=GRSFilesSys2
+    if target=='GRSCM':  #CM2~22
+        Dates=GRSCMDates
         sourcefiles=GRSFilesSys2
     elif target=="OvalBA":  #CM2~270
         Dates=OvalBADates
@@ -382,9 +388,9 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
     
     path20220919='C:/Astronomy/Projects/Planets/Jupiter/Imaging Data/20220919UT/'
     VLTMUSEProfile=np.loadtxt(path20220919+
-                              'Profile of 2022-09-19-0352_3-Jupiter-fNH3Abs647-VLTMUSE.csv',
+                              'Profile of 2022-09-19-0352_3-Jupiter-fNH3Abs647-VLT-final.csv',
                               usecols=range(2),delimiter=",")
-    axsprof.plot(VLTMUSEProfile[:,0]-45.,VLTMUSEProfile[:,1]*1e6*69./79.,color='k',
+    axsprof.plot(VLTMUSEProfile[:,0]-45.,VLTMUSEProfile[:,1]*1e6,color='k',
                  linestyle="dashed",label=r'This Work, VLT-MUSE, $\bar{f_c} (NH_3)$') 
       
     belt={"SSTB":[-39.6,-36.2],
