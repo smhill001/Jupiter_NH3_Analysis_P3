@@ -23,8 +23,9 @@ import ephem
 import EWLibV006_P3 as EWL
 import plot_TEXES_Groups_P3 as PTG
 import NH3_Filter_Library_P3 as NH3
+from astropy.convolution import convolve, Box1DKernel
 
-
+smooth=True
       
 belt={"SSTB":[-39.6,-36.2],
       "STB":[-32.4,-27.1],
@@ -49,15 +50,26 @@ PTG.plot_Teifel(axsavgprof,clr='0.5',width=3.)
 CMOS2020EW=np.loadtxt(path+
                           '2020 CMOS_NH3_Meridian_EW.csv',
                           usecols=range(3),delimiter=",")
-axsavgprof.plot(CMOS2020EW[:,0],CMOS2020EW[:,1],color="r",linewidth=1.0,label="2020 Celestron 11")
+if smooth:
+    axsavgprof.plot(CMOS2020EW[:,0],convolve(CMOS2020EW[:,1],Box1DKernel(3),boundary='extend'),
+                    color="r",linewidth=1.0,label="2020 Celestron 11")
+else:
+    axsavgprof.plot(CMOS2020EW[:,0],CMOS2020EW[:,1],color="r",linewidth=1.0,label="2020 Celestron 11")
+       
 
 CMOS2021EW=np.loadtxt(path+
                           '2021 CMOS_NH3_Meridian_EW.csv',
                           usecols=range(3),delimiter=",")
-axsavgprof.plot(CMOS2021EW[:,0],CMOS2021EW[:,1],color="b",linewidth=1.0,label="2021 Celestron 11")
+if smooth:
+    axsavgprof.plot(CMOS2021EW[:,0],convolve(CMOS2021EW[:,1],Box1DKernel(3),boundary='extend'),
+                    color="b",linewidth=1.0,label="2021 Celestron 11")
+else:
+    axsavgprof.plot(CMOS2021EW[:,0],CMOS2021EW[:,1],color="b",linewidth=1.0,label="2021 Celestron 11")
 
-PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof,"C11 2022",clr='k',width=1.5)
-PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof,"VLTMUSE 2022",clr='k',width=1.5,style='dashed')
+PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof,"C11 2022",LonRng=1.,CalModel='SCT-Obs-Final',
+                                   clr='k',width=1.5,smooth=smooth)
+PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof,"VLTMUSE 2022",LonRng=1.,CalModel='VLT-Obs-Final',
+                                   clr='k',width=1.5,style='dashed',smooth=smooth)
 #PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof,"VLTMUSE 2022",clr='k',width=1.5,style='dashed',smooth=True)
 
 

@@ -11,7 +11,8 @@ EXAMPLE:    Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20210905UT")
             
 """
 
-def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imagetype='Map'):
+def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",
+                                     imagetype='Map'):
     import sys
     drive='c:'
     sys.path.append(drive+'/Astronomy/Python Play')
@@ -110,7 +111,7 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
                                'CH4labels':['Synth. Continuum @ 730nm','730nm (CH4)','730/Cont. (CH4)'],
                                'Context':{'NUVfile':'NA',
                                           'RGBfile':'2021-12-03-0040_5-Jupiter-WV-R685GB-RGB-WhtBal-ClrSmth-Smth-Wavelets.png'}},
-
+                  #Special 889 CH4 Verson
                   '20220810UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                              'Seeing':'7/10','Transparency':'7/10'},
                                'NH3file':'2022-08-10-1013_0-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
@@ -119,7 +120,8 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
                                'Context':{'NUVfile':'2022-08-10-1052_4-Jupiter_889CH4-WV-DR-ST.png',
                                           'RGBfile':'2022-08-10-1030_0-Jupiter_WV-R(AllRED)GB-RGB-WhtBal-Wavelets-Str.png'},
                                'Contextlabels':['889nm','RGB']},
-                  '20220810UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  
+                  '20220810UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                              'Seeing':'7/10','Transparency':'7/10'},
                                'NH3file':'2022-08-10-1013_0-Jupiter_NoWV-R656G647B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
                                'CH4file':['2022-08-10-1014_8-Jupiter_NoWV-R656G620B632-RGB-WhtBal_CM2_L360_MAP-BARE.png'],
@@ -128,7 +130,7 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
                                           'RGBfile':'2022-08-10-1030_0-Jupiter_WV-R(AllRED)GB-RGB-WhtBal-Wavelets-Str_CM2_L360_MAP-BARE.png'},
                                'Contextlabels':['889nm','RGB']},
 
-                 '20220810UTb':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  '20220810UT':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'7/10','Transparency':'7/10'},
                                'NH3file':'2022-08-10-1013_0-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
                                'CH4file':['2022-08-10-1014_8-Jupiter_NoWV-R656G620B632-RGB-WhtBal.png'],
@@ -172,7 +174,7 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
                                           'RGBfile':'2022-08-18-0745_4-Jupiter_AllRED-WV-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
                                'Contextlabels':['889nm','RGB']},
 
-                  '20220828UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  '20220828UT':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'6/10','Transparency':'7/10'}, 
                                'CH4file':['2022-08-28-0608_2-Jupiter_NoWV-R656G620B632-RGB-WhtBal.png',
                                           '2022-08-28-0608_0-Jupiter_NoWV-R656G730B632-RGB-WhtBal.png',
@@ -182,7 +184,7 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
                                'Context':{'NUVfile':'2022-08-28-0611_6-Jupiter_889CH4-WV-DR-ST.png',
                                           'RGBfile':'2022-08-28-0601_3-Jupiter-RGB-JamesWillinghan-j220828a1-HalfSize.jpg'},
                                'Contextlabels':['889nm','']},
-                  '20220828UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  '20220828UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'6/10','Transparency':'7/10'}, 
                                'CH4file':['2022-08-28-0608_2-Jupiter_NoWV-R656G620B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
                                           '2022-08-28-0608_0-Jupiter_NoWV-R656G730B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
@@ -235,7 +237,7 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
                                           'RGBfile':'2022-09-01-0618_0-Jupiter-Rivera-j220901l1_CM2_L360_MAP-BARE.png'},
                                'Contextlabels':['889nm','']},
 
-                  '20220904UTa_Img':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  '20220904UT_Img':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'7/10','Transparency':'7/10'}, 
                                'CH4file':['2022-09-04-0638_9-Jupiter_NoWV-R656G620B632-RGB-WhtBal.png',
                                           '2022-09-04-0638_6-Jupiter_NoWV-R656G730B632-RGB-WhtBal.png',
@@ -245,7 +247,7 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
                                'Context':{'NUVfile':'2022-09-04-0639_1-Jupiter_889CH4-WV-DR-ST.png',
                                           'RGBfile':'NA'},
                                'Contextlabels':['889nm','']},
-                  '20220904UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  '20220904UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'7/10','Transparency':'7/10'}, 
                                'CH4file':['2022-09-04-0638_9-Jupiter_NoWV-R656G620B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
                                           '2022-09-04-0638_6-Jupiter_NoWV-R656G730B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
@@ -266,7 +268,7 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
                                'Context':{'NUVfile':'2022-09-05-0558_9-Jupiter_889CH4-WV-DR-ST.png',
                                           'RGBfile':'2022-09-05-1559_0-Jupiter_j220905l1_Michael_Wong.png'},
                                'Contextlabels':['889nm','']},
-                  '20220905UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  '20220905UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'7/10','Transparency':'7/10'}, 
                                'CH4file':['2022-09-05-0559_2-Jupiter_NoWV-R656G620B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
                                           '2022-09-05-0559_2-Jupiter_NoWV-R656G730B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
@@ -277,7 +279,7 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
                                           'RGBfile':'2022-09-05-1559_0-Jupiter_j220905l1_Michael_Wong_CM2_L360_MAP-BARE.png'},
                                'Contextlabels':['889nm','']},
 
-                  '20220905UTaSmth_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  '20220905UTSmth_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'7/10','Transparency':'7/10'}, 
                                'CH4file':['2022-09-05-0559_2-Jupiter_NoWV-R656G620B632-RGB-WhtBal-Smth_CM2_L360_MAP-BARE.png',
                                           '2022-09-05-0559_2-Jupiter_NoWV-R656G730B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
@@ -299,7 +301,7 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
                                           'RGBfile':'NA'},
                                'Contextlabels':['889nm','']},
                   
-                  '20220912UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  '20220912UT':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'8/10','Transparency':'7/10'}, 
                                'CH4file':['2022-09-12-0533_4-Jupiter_WV-R656G620B632-RGB-WhtBal.png'],
                                'NH3file':'2022-09-12-0533_4-Jupiter_WV-R656G647B632-RGB-WhtBal.png',
@@ -307,7 +309,7 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
                                'Context':{'NUVfile':'NA',
                                           'RGBfile':'2022-09-12-0532_3-Jupiter_WV-R685G550B450-RGB-WhtBal-ClrSmth-Wavelets.png'},
                                'Contextlabels':['889nm','']},
-                  '20220912UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  '20220912UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'8/10','Transparency':'7/10'}, 
                                'CH4file':['2022-09-12-0533_4-Jupiter_WV-R656G620B632-RGB-WhtBal_CM2_L360_MAP-BARE.png'],
                                'NH3file':'2022-09-12-0533_4-Jupiter_WV-R656G647B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
@@ -342,7 +344,7 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
                                           'RGBfile':'2022-09-13-0455_6-Jupiter_WV-R685G550B450-RGB-WhtBal-ClrSmth-Wavelets_CM2_L360_MAP-BARE.png'},
                                'Contextlabels':['889nm','']},
 
-                  '20220919UTa_Img':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  '20220919UTb_Img':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'6/10','Transparency':'7/10'}, 
                                'CH4file':['2022-09-19-0452_7-Jupiter_NoWV-R656G620B632-RGB-WhtBal.png'],
                                'NH3file':'2022-09-19-0453_4-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
@@ -350,7 +352,7 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
                                'Context':{'NUVfile':'NA',
                                           'RGBfile':'2022-09-19-0518_7-Jupiter_WV-R685G550B450-RGB-WhtBal-Wavelets.png'},
                                'Contextlabels':['889nm','']},
-                  '20220919UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  '20220919UTb_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'6/10','Transparency':'7/10'}, 
                                'CH4file':['2022-09-19-0452_7-Jupiter_NoWV-R656G620B632-RGB-WhtBal_CM2_L360_MAP-BARE.png'],
                                'NH3file':'2022-09-19-0453_4-Jupiter_NoWV-R656G647B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
@@ -359,7 +361,15 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
                                           'RGBfile':'2022-09-19-0518_7-Jupiter_WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
                                'Contextlabels':['889nm','']},
                   
-                  '20220919UTb_Map':{'Metadata':{'Telescope':'VLT','FL':'5600mm','Camera':'ASI120MM',
+                  '20220919UTa_Img':{'Metadata':{'Telescope':'VLT','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'6/10','Transparency':'7/10'}, 
+                               'CH4file':['2022-09-19-0352_3-Jupiter-VLT-R656G620B632-RGB-WhtBal-MedFilt.png'],
+                               'NH3file':'2022-09-19-0352_3-Jupiter-VLT-R656G647B632-RGB-WhtBal-MedFilt.png',
+                               #'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2022-09-19-0352_3-Jupiter-MUSE-R650G550B450-RGB-WhtBal-Filtered.png'},
+                               'Contextlabels':['889nm','']},
+                  '20220919UTa_Map':{'Metadata':{'Telescope':'VLT','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'6/10','Transparency':'7/10'}, 
                                'CH4file':['2022-09-19-0352_3-Jupiter-VLT-R656G620B632-RGB-WhtBal-MedFilt_CM2_L360_MAP-BARE.png'],
                                'NH3file':'2022-09-19-0352_3-Jupiter-VLT-R656G647B632-RGB-WhtBal-MedFilt_CM2_L360_MAP-BARE.png',
@@ -377,7 +387,7 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
                                           'RGBfile':'2022-09-19-0354_0-Saturn_WV-R685G550B450-RGB-WhtBal-Wavelets.png'},
                                'Contextlabels':['889nm','']},
 
-                  '20220925UTa_Img':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  '20220925UT_Img':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'5/10','Transparency':'7/10'}, 
                                'CH4file':['2022-09-25-0615_4-Jupiter_NoWV-R656G620B632-RGB-WhtBal.png'],
                                'NH3file':'2022-09-25-0615_6-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
@@ -385,7 +395,7 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
                                'Context':{'NUVfile':'NA',
                                           'RGBfile':'2022-09-25-0546_6-Jupiter_WV-R685G550B450-RGB-WhtBal-Wavelets.png'},
                                'Contextlabels':['889nm','RGB']},
-                  '20220925UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  '20220925UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'5/10','Transparency':'7/10'}, 
                                'CH4file':['2022-09-25-0615_4-Jupiter_NoWV-R656G620B632-RGB-WhtBal_CM2_L360_MAP-BARE.png'],
                                'NH3file':'2022-09-25-0615_6-Jupiter_NoWV-R656G647B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
@@ -596,10 +606,11 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
     #WRITE PNG FILES WITH MANUAL SCALING
     #  !!!!NEED BETTER FILE NAMING CONVENTION HERE
     #  !!!!OR, FOR SEPARATION OF FUNCTION, CREATE A STANDALONG FILE-WRITING FUNCTION
+    pathClrSlp='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/Color Slope/'
     if imagetype=="Map":
-        fnout=path+'/'+NH3file[0:26]+'ClrSlpMap'
+        fnout=pathClrSlp+NH3file[0:26]+'ClrSlpMap'
     elif imagetype=="Img":
-        fnout=path+'/'+NH3file[0:26]+'ClrSlpAbsImg'
+        fnout=pathClrSlp+NH3file[0:26]+'ClrSlpAbsImg'
     print('#############NH3file[0:26]=',NH3file[0:26])    
     print('#############CH4file[0:26]=',CH4file[0][0:26])    
     hdu = fits.PrimaryHDU(clrslp.astype(np.float32))
@@ -613,15 +624,15 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
         print("file doesn't exist")
     hdul.writeto(fnout+'.fits')
     hdul.close()
-
         
     clrslp16bit = np.nan_to_num((32000+500*(clrslp)).astype(np.uint16))
     imwrite(fnout+'.png', clrslp16bit.astype(np.uint16))
     #  !!!!OR, FOR SEPARATION OF FUNCTION, CREATE A STANDALONG FILE-WRITING FUNCTION   
+    pathNH3Abs='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/NH3 Absorption/'
     if imagetype=="Map":
-        fnout=path+'/'+NH3file[0:26]+'647NH3AbsMap'
+        fnout=pathNH3Abs+NH3file[0:26]+'647NH3AbsMap'
     elif imagetype=="Img":
-        fnout=path+'/'+NH3file[0:26]+'647NH3AbsImg'
+        fnout=pathNH3Abs+NH3file[0:26]+'647NH3AbsImg'
     maskednh3=nh3abs*mask[:,:,1]
     normnh3=maskednh3/maskednh3[maskednh3>0].mean()
     hdu = fits.PrimaryHDU(normnh3.astype(np.float32))
@@ -673,11 +684,13 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
             #ch4abs16bit = np.nan_to_num(((5.*65535.*(ch4abs)-0.1)*mask[:,:,1]).astype(np.uint16))
             #imwrite(path+'/'+CH4file[0][0:26]+'CH4'+wvstr+'AbsPython.png', ch4abs16bit.astype(np.uint16))
             ###!!!!FIX CH4 FILE TIME IN NAMING!!!!
+            pathCH4Abs='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/CH4 Absorption/'
+
             if search("G620", CH4file[ifile]):
                 if imagetype=="Map":
-                    fnout=path+'/'+CH4file[0][0:26]+'620CH4AbsMap'
+                    fnout=pathCH4Abs+CH4file[0][0:26]+'620CH4AbsMap'
                 elif imagetype=="Img":
-                    fnout=path+'/'+CH4file[0][0:26]+'620CH4AbsImg'
+                    fnout=pathCH4Abs+CH4file[0][0:26]+'620CH4AbsImg'
                 maskedch4=ch4abs*mask[:,:,1]
                 normch4=maskedch4/maskednh3[maskedch4>0].mean()
                 hdu = fits.PrimaryHDU(normch4.astype(np.float32))
@@ -715,9 +728,13 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
 
     fig.subplots_adjust(left=0.00, bottom=0.05, right=1.0, top=0.90,
                 wspace=0.001, hspace=0.10)
+    pathmaparraybyfilter=\
+        'C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/Map Array by Filter/'
 
-    fig.savefig(path+obsdate+'-'+target+"_"+imagetype+"_SMHill.png",dpi=150,bbox_inches = 'tight')
-    fig.savefig(path+obsdate+'-'+target+"_"+imagetype+"_SMHill.jpg",dpi=150,bbox_inches = 'tight')
+    fig.savefig(pathmaparraybyfilter+obsdate+'-'+target+"_"+
+                imagetype+"_SMHill.png",dpi=150,bbox_inches = 'tight')
+    fig.savefig(pathmaparraybyfilter+obsdate+'-'+target+"_"+
+                imagetype+"_SMHill.jpg",dpi=150,bbox_inches = 'tight')
     #imageio.imwrite(path+"PublicImageArray16bit"+obsdate+".png",fig.astype(np.uint16))
     
     #figx,axx=pl.subplots(1,1,figsize=(4,4), dpi=150, facecolor="black",
@@ -728,7 +745,8 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",imag
 ###############################################################################
 ###############################################################################
     
-def Ammonia_Panels(NH3file,NH3_RGB,mask,ax,NH3labels=['656nm (Red Cont.)','647nm (NH3)','632nm (Blue Cont.)']):
+def Ammonia_Panels(NH3file,NH3_RGB,mask,ax,
+                   NH3labels=['656nm (Red Cont.)','647nm (NH3)','632nm (Blue Cont.)']):
     ###########################################################################
     # PURPOSE: COMPUTE AND PLOT PANELS FOR NH3 ANALYSIS
     # INPUTS:  NH3 FILE NAME, NH3_RGB PNG FILE, mask, and axis system to plot 
@@ -809,7 +827,8 @@ def Ammonia_Panels(NH3file,NH3_RGB,mask,ax,NH3labels=['656nm (Red Cont.)','647nm
     
     return clrslp,nh3abs
     
-def Methane_Panels(CH4file,CH4_RGB,mask,ax,ifile,CH4labels=['656nm (Cont.)','889nm (CH4)','889/Cont. (CH4))']):
+def Methane_Panels(CH4file,CH4_RGB,mask,ax,ifile,
+                   CH4labels=['656nm (Cont.)','889nm (CH4)','889/Cont. (CH4))']):
     import numpy as np
     #import sharpen as sharp
     ###########################################################################

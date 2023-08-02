@@ -38,6 +38,7 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
               '20221013UT','20221020UT','20230113UT']
     GRSCMDates=['20220818UT','20220828UT','20220904UT',
               '20221013UT','20221020UT']
+    
     GRSFilesSys2={'20220810UT':{'fNH3file':'2022-08-10-1013_0-Jupiter_fNH3Abs647.fits',
                                'RGBfile':'2022-08-10-1030_0-Jupiter_WV-R(AllRED)GB-RGB-WhtBal-Wavelets-Str_CM2_L360_MAP-BARE.png'},
                  '20220818UT':{'fNH3file':'2022-08-18-0733_4-Jupiter_fNH3Abs647.fits',
@@ -176,11 +177,13 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
 
             #MeridEW=np.flip(np.mean(fNH3_patch_smooth[:,:],axis=1),axis=0)
             #MeridEWerror=np.flip(np.std(fNH3_patch_smooth[:,:],axis=1),axis=0)
+            print("############ fNH3_patch.shape",fNH3_patch.shape)
             MeridEW=np.flip(np.mean(fNH3_patch[:,:],axis=1),axis=0)
             MeridEWerror=np.flip(np.std(fNH3_patch[:,:],axis=1),axis=0)
             Lats=np.linspace(-44.5,44.5,90)
             #print DateCounter; Date
             MeridEWArray[:,j]=MeridEW[:]
+
             MeridEWArrayStd[:,j]=MeridEWerror[:]
 
             axs[1,j].set_title("CM2 = "+str(ObsCM2),fontsize=9)
@@ -361,7 +364,8 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
     # MAKE PROFILE AVERAGE PLOT
     ###########################################################################
 
-    figprof,axsprof=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white")
+    #figprof,axsprof=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white")
+    figprof,axsprof=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="white")
     figprof.suptitle('Ammonia Abundance Meridional Profile',x=0.5,ha='center',color='k')
 
     AvgMeridEW=np.mean(MeridEWArray[:,:],axis=1)
@@ -380,15 +384,16 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
     axsprof.fill_between(Lats, AvgMeridEW-StdMeridEW, AvgMeridEW+StdMeridEW,color='k',alpha=.1)
 
     plevel=0.752910
-    #PTG.plot_TEXES_Groups(axsprof,clr='C2',prs=plevel,mult=1000000.)
+    PTG.plot_TEXES_Groups(axsprof,clr='C2',prs=plevel,mult=1000000.)
     plevel=0.657540
     PTG.plot_TEXES_Groups(axsprof,clr='r',prs=plevel,mult=1000000.)
     plevel=0.574240
-    #PTG.plot_TEXES_Groups(axsprof,clr='C4',prs=plevel,mult=1000000.)
+    PTG.plot_TEXES_Groups(axsprof,clr='C4',prs=plevel,mult=1000000.)
     
     path20220919='C:/Astronomy/Projects/Planets/Jupiter/Imaging Data/20220919UT/'
     VLTMUSEProfile=np.loadtxt(path20220919+
-                              'Profile of 2022-09-19-0352_3-Jupiter-fNH3Abs647-VLT-final.csv',
+                              #'Profile of 2022-09-19-0352_3-Jupiter-fNH3Abs647-VLT-final.csv',
+                              'Profile of 2022-09-19-0352_3-Jupiter-fNH3Abs647-VLT-final-2deg-wide.csv',
                               usecols=range(2),delimiter=",")
     axsprof.plot(VLTMUSEProfile[:,0]-45.,VLTMUSEProfile[:,1]*1e6,color='k',
                  linestyle="dashed",label=r'This Work, VLT-MUSE, $\bar{f_c} (NH_3)$') 
@@ -410,16 +415,16 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
         print(zb,belt[zb])
         axsprof.fill_between([belt[zb][0],belt[zb][1]],np.array([0.,0.]),np.array([1000.,1000.]),
                                 color="0.5",alpha=0.2)
-        axsprof.annotate(zb,xy=[np.mean(belt[zb]),51],ha="center")
+        axsprof.annotate(zb,xy=[np.mean(belt[zb]),1],ha="center")
     for zb in zone:
-        axsprof.annotate(zb,xy=[np.mean(zone[zb]),51],ha="center")
+        axsprof.annotate(zb,xy=[np.mean(zone[zb]),1],ha="center")
 
     #for j in range(0,7):
     #    axsprof.plot(Lats,MeridEWArray[:,j])
     #    axsprof.fill_between(Lats, MeridEWArray[:,j]-MeridEWArrayStd[:,j],MeridEWArray[:,j]+MeridEWArrayStd[:,j],alpha=.2)
     axsprof.set_xlim(-30.,30.)
     axsprof.set_xlabel("Planetographic Latitude (deg)",fontsize=10)
-    axsprof.set_ylim(50.,150.)
+    axsprof.set_ylim(0.,300.)
     axsprof.set_ylabel("Ammonia Abundance (ppm)",fontsize=10)
     axsprof.legend(loc=1,ncol=2, borderaxespad=0.,prop={'size':8})
     axsprof.grid(linewidth=0.2)

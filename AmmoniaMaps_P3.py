@@ -154,8 +154,10 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',
         #MeridEW=np.flip(np.mean(NH3Abs_patch_EW[:,:],axis=1),axis=0)
         #MeridEWerror=np.flip(np.std(NH3Abs_patch_EW[:,:],axis=1),axis=0)
         #
-        MeridEW=np.flip(np.mean(NH3Abs_patch_EW[:,45:65],axis=1),axis=0)
-        MeridEWerror=np.flip(np.std(NH3Abs_patch_EW[:,45:65],axis=1),axis=0)
+        #MeridEW=np.flip(np.mean(NH3Abs_patch_EW[:,45:65],axis=1),axis=0)
+        #MeridEWerror=np.flip(np.std(NH3Abs_patch_EW[:,45:65],axis=1),axis=0)
+        MeridEW=np.flip(np.mean(NH3Abs_patch_EW[:,44:46],axis=1),axis=0)
+        MeridEWerror=np.flip(np.std(NH3Abs_patch_EW[:,44:46],axis=1),axis=0)
         
         Lats=np.linspace(-44.5,44.5,90)
         #print DateCounter; Date

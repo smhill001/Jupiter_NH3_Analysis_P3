@@ -105,7 +105,9 @@ def plot_Historical(ax,reference,clr='C0'):
                             "645EW":[11.00,12.90,11.7,8.3,9.3]}}
     ax.scatter(data[reference]["Center_pgLat"],np.array(data[reference]["645EW"])*0.1,label=reference,color=clr)
 
-def plot_VLTMUSEandC11_EW_profiles(ax,reference,clr='C0',width=1.0,style='solid',smooth=False):
+def plot_VLTMUSEandC11_EW_profiles(ax,reference,LatLims=[45,135],LonRng=45.,
+                                   CalModel='SCT-Obs-Final',
+                                   clr='C0',width=1.0,style='solid',smooth=False):
     #!!!This looks like it plots ABSORPTION and can do so as and EW for 
     #     comparision to prior work. However, there is only one linear fit
     #     for converting transmission to EW when separate ones are needed
@@ -117,28 +119,67 @@ def plot_VLTMUSEandC11_EW_profiles(ax,reference,clr='C0',width=1.0,style='solid'
     
     import numpy as np
     from astropy.convolution import convolve, Box1DKernel
-    
-    data={"C11 2022":{"path":"/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/",
+    from astropy.io import fits
+    import RetrievalLibrary as RL
+    import sys
+    sys.path.append('./Services')
+    import read_master_calibration
+    import RetrievalLibrary as RL
+    import extract_profile as EP
+
+    calibration,K_eff=read_master_calibration.read_master_calibration()
+
+    data={"C11 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/NH3 Absorption/",
                               #"fn":"Profile of Jupiter GRS AVG NH3 Transmission 8 files-Celestron11.csv",
-                              "fn":"Profile of Jupiter GRS AVG NH3 Transmission 5 files-Celestron11 +-20deg.csv",
-                              "Disk_Int_Trans":0.972,
+                              "fn":["2022-08-18-0733_4-Jupiter_647NH3AbsMap.fits",
+                                    "2022-08-28-0608_2-Jupiter_647NH3AbsMap.fits",
+                                    "2022-09-04-0638_2-Jupiter_647NH3AbsMap.fits",
+                                    "2022-09-19-0453_4-Jupiter_647NH3AbsMap.fits",
+                                    "2022-10-13-0345_5-Jupiter-647NH3AbsMap.fits",
+                                    "2022-10-20-0440_4-Jupiter-647NH3AbsMap.fits",
+                                    #End of good GRS maps
+                                    "2022-08-30-0559_1-Jupiter_647NH3AbsMap.fits",
+                                    "2022-09-01-0604_9-Jupiter_647NH3AbsMap.fits",
+                                    "2022-09-05-0559_1-Jupiter_647NH3AbsMap.fits",
+                                    "2022-09-12-0533_4-Jupiter_647NH3AbsMap.fits",
+                                    "2022-09-13-0457_4-Jupiter_647NH3AbsMap.fits",
+                                    "2022-09-25-0615_6-Jupiter_647NH3AbsMap.fits",
+                                    "2022-10-09-0401_5-Jupiter_647NH3AbsMap.fits",
+                                    "2022-10-09-0524_5-Jupiter_647NH3AbsMap.fits",
+                                    "2022-10-19-0342_4-Jupiter-647NH3AbsMap.fits",
+                                    "2022-10-21-0358_6-Jupiter-647NH3AbsMap.fits"],
                               "EW_slope":-12.82831873,
                               "EW_const":12.82685019},
-          "VLTMUSE 2022":{"path":"C:/Astronomy/Projects/Planets/Jupiter/Imaging Data/20220919UT/",
-                              "fn":"Profile of 2022-09-19-0352_3-Jupiter-647NH3AbsMap-final1.csv",                           
-                              "Disk_Int_Trans":0.962,
+          "VLTMUSE 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/NH3 Absorption/",
+                              "fn":["2022-09-19-0352_3-Jupiter-647NH3AbsMap.fits"],
                               "EW_slope":-12.15343491,
                               "EW_const":12.15195684}}
-                             
-    Profile=np.loadtxt(data[reference]["path"]+data[reference]["fn"],usecols=range(2),delimiter=",")
-    print("Profile.shape=",Profile.shape)
-    Transmission=(Profile[:,1])*data[reference]["Disk_Int_Trans"]
-    EW=data[reference]["EW_slope"]*Transmission+data[reference]["EW_const"]
-    print("EW.shape=",EW.shape)
+
+    pth=data[reference]["path"]
+    AvgSum=np.zeros(180)
+    StdSum=np.zeros(180)
+    
+    for NH3file in data[reference]["fn"]:                             
+
+        Lats,AvgMerid,StdMerid=EP.extract_profile(pth,NH3file,LonRng=LonRng)       
+        NH3GlobalTrans=calibration[CalModel]['NH3GlobalTrans']
+        Avg_Trans=AvgMerid*NH3GlobalTrans
+        Std_Trans=StdMerid*NH3GlobalTrans
+    
+        Avg_EW=data[reference]["EW_slope"]*Avg_Trans+data[reference]["EW_const"]
+        Std_EW=data[reference]["EW_slope"]*Std_Trans+data[reference]["EW_const"]
+    
+        AvgSum=AvgSum+Avg_EW/len(data[reference]["fn"])    
+    
+    #Profile=np.loadtxt(data[reference]["path"]+data[reference]["fn"],usecols=range(2),delimiter=",")
     if smooth:
-        ax.plot(Profile[:,0]-45.,convolve(EW, Box1DKernel(7)),color=clr,linewidth=width,linestyle=style,label=reference)
+        ax.plot(Lats,convolve(AvgSum, Box1DKernel(3)),color=clr,
+                linewidth=width,linestyle=style,label=reference)        
+        #ax.plot(Profile[:,0]-45.,convolve(EW, Box1DKernel(7)),color=clr,linewidth=width,linestyle=style,label=reference)        ax.plot(Lats,AvgMeridEW,color=clr,linewidth=width,linestyle=style,label=reference)
     else:
-        ax.plot(Profile[:,0]-45.,EW,color=clr,linewidth=width,linestyle=style,label=reference)
+        #ax.plot(Profile[:,0]-45.,EW,color=clr,linewidth=width,linestyle=style,label=reference)
+        ax.plot(Lats,AvgSum,color=clr,linewidth=width,
+                linestyle=style,label=reference)
 
 
 def Centric_to_Graphic(Latc):

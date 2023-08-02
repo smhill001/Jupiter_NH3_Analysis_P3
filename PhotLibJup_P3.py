@@ -33,7 +33,7 @@ def Campaign(dates):
     """
     
     root_path='c:/Astronomy/Projects/Planets/Jupiter/Imaging Data/'
-    pathout='/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/'
+    pathout='/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Photometry/'
     
     # 2020
     observations={'20200902UT':{'mIDs':['1_Io','2_Europa'],
@@ -539,7 +539,8 @@ def SummaryTablePlot(AllTable,dates,MeasFilt,RefFilt,pathout):
     ax[1].set_xlabel(date[0:4],fontsize=12)
     ax[1].set_ylabel("Relative Transmission",fontsize=12)
     ax[1].set_title("Jovian Atmospheric Transmission: "+MeasFilt+" vs "+RefFilt)
-    ascii.write(YY,pathout+'Transmission_'+MeasFilt+'_over_'+RefFilt+'.csv',format='csv',
+    
+    ascii.write(YY,pathout+'Transmission_'+dates[0][0:4]+'-'+MeasFilt+'_over_'+RefFilt+'.csv',format='csv',
                 overwrite=True,delimiter=',')
     #print pathout
     figloc.subplots_adjust(left=0.12, bottom=0.10, right=0.98, top=0.92)

@@ -47,33 +47,37 @@ def cont_absorption_calcs(ContinuumProduct,AbsorptionProduct,wv1,wv2,filtername,
 
     return ContinIntegral,AbsorpIntegral,TransIntegral
 
-def K_eff(P,FilterTransmission,Abs_Crossection,wv1,wv2,filtername,axis):
-    ###########################################################################
-    # COMPUTE K_eff AND l_eff FOR AN ABSORBING GAS, CH4 OR NH3, GIVEN THE 
-    #   CROSSECTION AND FILTER TRANSMISSION
-    #   !!!! AGAIN, NEED TO HAVE TELESCOPE PERFORMANCE HERE ALSO
-    #   !!!! Is pressure, P, actually used? Remove from passed parameters.
-    ###########################################################################
+def K_eff(FilterTransmission,Abs_Crossection,halfwidth, filtr):
+    """
+    COMPUTE K_eff AND l_eff FOR AN ABSORBING GAS, CH4 OR NH3, GIVEN THE 
+      CROSSECTION AND INPUT TRANSMISSION
+    Calls:
+        tbd
+    Called by:
+        -> get_keff 
+    """
     import numpy as np
     import GeneralSpecUtils_P3 as GSU
     import copy
     import NH3_Filter_Library_P3 as NFL
+    
+    #Set index interval based on wavelength interval
+    wv1,wv2=float(filtr)-float(halfwidth),float(filtr)+float(halfwidth)
+    StartIndex=np.where(FilterTransmission[:,0]==wv1)
+    EndIndex=np.where(FilterTransmission[:,0]==wv2)
 
+    #Compute product of transmission and crossection and k_eff
     Abs_Product=GSU.SpectrumMath(FilterTransmission,Abs_Crossection,"Multiply")
+    keff=sum(Abs_Product[StartIndex[0][0]:EndIndex[0][0],1])/ \
+                 sum(FilterTransmission[StartIndex[0][0]:EndIndex[0][0],1])
+
+    #Compute product of transmission and wavelength for center wavelength
     lam=copy.deepcopy(FilterTransmission)
     lam[:,1]=FilterTransmission[:,0]
     lamprod=GSU.SpectrumMath(FilterTransmission,lam,"Multiply")
-    StartIndex=np.where(Abs_Product[:,0]==wv1)
-    EndIndex=np.where(Abs_Product[:,0]==wv2)
-    #print(wv1,wv2)
-    keff=sum(Abs_Product[StartIndex[0][0]:EndIndex[0][0],1])/\
+    leff=sum(lamprod[StartIndex[0][0]:EndIndex[0][0],1])/ \
                  sum(FilterTransmission[StartIndex[0][0]:EndIndex[0][0],1])
-    leff=sum(lamprod[StartIndex[0][0]:EndIndex[0][0],1])/\
-                 sum(FilterTransmission[StartIndex[0][0]:EndIndex[0][0],1])
-    #print("################################")
-    #print(filtername,"K_eff=",keff_CH4)
-    #print(filtername,"K_eff : %4.3f, leff : %5.2f" % (keff, leff))
-    #print("")
+
     return(keff,leff)
 
 def tau_gas_versus_P(P,Keff,filtername,axis,gas='CH4'):
@@ -188,190 +192,16 @@ Get Albedo and Molecular Data
 
 @author: smhil
 """
-def Get_Albedo_and_Absorption(x0,x1,xtks,y0,y1,ytks,Lutz=True,Crossect=True,
-                              ContMod='All'):
-    ###########################################################################
-    # This function:
-    #   1) Retrieves a reference albedo for Jupiter (Karkoschka, 1994)
-    #   2) Computes four approximations for a hypothetical, gas-free
-    #      Jovian albedo. These are referred to as continuum models.
-    #   3) Retrieves gas absorption cross sections for CH4 (Karkoschka, 1994) 
-    #      and NH3 (Lutz and Owen, 1980; Irwin 2022 private communication)
-    #   4) Creates a composite plot including the reference albedo, one
-    #      (or more?) continuum models, and the gas absorption cross sections
-    ###########################################################################
-    import sys
-    sys.path.append('c:/Astronomy/Python Play')
-    sys.path.append('c:/Astronomy/Python Play/Util_P3')
-    sys.path.append('c:/Astronomy/Python Play/SPLibraries_P3')
-    sys.path.append('c:/Astronomy/Python Play/SpectroPhotometry/Spectroscopy_P3')
-    import matplotlib.pyplot as pl
-    import numpy as np
-    from scipy import interpolate
-    import GeneralSpecUtils_P3 as GSU
-    from numpy import genfromtxt
-    import NH3_Filter_Library_P3 as NFL
-    
-    ###############################################################################
-    # LOAD JOVIAN DISK-INTEGRATEDALBEDO DATA FROM KARKOSCHKA, 1994 (DATA FROM 1993)
-    ###############################################################################
-    Jupiter_Karkoschka1993 = np.fromfile(file="c:/Astronomy/Projects/Planets/Saturn/Spectral Data/Karkoschka/1993.tab.txt", dtype=float, count=-1, sep=" ")
-    kark1993nrows=int(Jupiter_Karkoschka1993.size/8)
-    Jupiter_Karkoschka1993=np.reshape(Jupiter_Karkoschka1993,[kark1993nrows,8])
-    
-    Albedo_KarkRef1993=np.zeros((kark1993nrows,2))
-    Albedo_KarkRef1993[:,0]=Jupiter_Karkoschka1993[:,0]
-    Albedo_KarkRef1993[:,1]=Jupiter_Karkoschka1993[:,3] #Albedo
-    WaveGrid,SignalonGrid=GSU.uniform_wave_grid(Albedo_KarkRef1993[:,0],Albedo_KarkRef1993[:,1],
-                                            Extend=False,Fine=False)
-    
-    Albedo=np.zeros((WaveGrid.size,2))
-    Albedo[:,0]=WaveGrid
-    Albedo[:,1]=SignalonGrid
-    ###############################################################################
-    # COMPUTE SPLINE FIT TO ALBEDO, PICKING POINTS WITH MINIMUM GAS ABSORPTION.
-    ###############################################################################
-    SplineWV1= np.array([560.0, 580.0, 600.0,610.0, 632.0, 657.0, 677.0, 690., 714.0,
-                         745.0, 830.0, 945.0,1050.0])
-    SplineWV2 = np.array([560.0, 580.0, 600.0, 632.0, 678.0, 
-                         745.0, 830.0, 945.0,1050.0])
-    ExtrapWV = np.array([632.,657.])
-    Continua={'Spline1':{'WV':SplineWV1,'MType':'Spline'},
-              'Spline2':{'WV':SplineWV2,'MType':'Spline'},
-              'Piecewise1':{'WV':SplineWV1,'MType':'Piecewise'},
-              'Piecewise2':{'WV':SplineWV2,'MType':'Piecewise'},
-              'Linear 2pt.':{'WV':ExtrapWV,'MType':'Linear'}}
-    Models=['Spline1','Spline2','Piecewise1','Piecewise2','Linear 2pt.']
-    
-    for Model in Models:
-        print(Model)
-        Continua[Model]['Mag']=np.ones(Continua[Model]['WV'].size)
-        #Loop through spline wavelengths and look up albedo magnitude
-        for i in range(0,Continua[Model]['WV'].size):
-            Start=Continua[Model]['WV'][i]-.0000001
-            End=Continua[Model]['WV'][i]+.0000001
-            SplineWVIndices=np.where((Albedo[:,0] >Start) & \
-                 (Albedo[:,0] < End))
-            #print("i= ",i,SplineWVIndices)
-            if Continua[Model]['MType']=='Spline':
-                Continua[Model]['Mag'][i]=np.log10(Albedo[SplineWVIndices[0],1])
-            elif Continua[Model]['MType']=='Piecewise' or Continua[Model]['MType']=='Linear':
-                Continua[Model]['Mag'][i]=Albedo[SplineWVIndices[0],1]
         
-        if Continua[Model]['MType']=='Spline':
-            Continua[Model]['Mag'][Continua[Model]['Mag'].size-1]=np.log10(0.42) #what is this hard code?!!
-            #Compute the knots and derivatives of the spline fit
-            tck = interpolate.splrep(Continua[Model]['WV'], Continua[Model]['Mag'], s=0)
-            #Evaluate the spline log magnitudes across the standard wave grid
-            Temp = 10**interpolate.splev(WaveGrid, tck, der=0)
-        elif Continua[Model]['MType']=='Piecewise':
-            WaveGrid,SignalonGrid=GSU.uniform_wave_grid(Continua[Model]['WV'],
-                                                        Continua[Model]['Mag'],
-                                                        Extend=False,Fine=False)
-            Temp=SignalonGrid
-        elif Continua[Model]['MType']=='Linear':
-            print("*********************Linear",Model)
-            print(Continua[Model]['WV'])
-            print(Continua[Model]['Mag'])
-            Slope=(Continua[Model]['Mag'][1]-Continua[Model]['Mag'][0])/ \
-                (Continua[Model]['WV'][1]-Continua[Model]['WV'][0])
-            print("Slope=",Slope)
-            Temp=Slope*(WaveGrid-Continua[Model]['WV'][0])+Continua[Model]['Mag'][0]
-
-        Continua[Model]['WaveGrid']=WaveGrid
-        Continua[Model]['Albedo']=Temp  #Continuum Albedo, that is
-
-    ###############################################################################
-    # LOAD METHANE ABSORPTION DATA FROM KARKOSCHKA, 1994 (DATA FROM 1993)
-    ###############################################################################
-    CH4_KarkRef1993=np.zeros((kark1993nrows,2))
-    CH4_KarkRef1993[:,0]=Jupiter_Karkoschka1993[:,0]
-    CH4_KarkRef1993[:,1]=Jupiter_Karkoschka1993[:,2] #CH4 Coef
-    WaveGrid,SignalonGrid=GSU.uniform_wave_grid(CH4_KarkRef1993[:,0],CH4_KarkRef1993[:,1],
-                                            Extend=False,Fine=False)
-    CH4=np.zeros((WaveGrid.size,2))
-    CH4[:,0]=WaveGrid
-    CH4[:,1]=SignalonGrid
-    ###############################################################################
-    # LOAD AMMONIA ABSORPTION DATA EITHER FROM LUTZ & OWEN 1980 OR FROM EXOMOL 
-    #   (IRWIN, 2022 - PERSONAL COMMUNICATION)
-    ###############################################################################
-    fn='Lutz&Owen1980_Figure5_AmmoniaCrossSection.csv'
-    pth="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
-    NH3_Lutz_Owen_1980 = np.array(genfromtxt(pth+fn, delimiter=','))
-    
-    fn='Exomol_NH3.csv'
-    pth="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
-    NH3_Exomol = np.array(genfromtxt(pth+fn, delimiter=','))
-    #print("***",NH3_Exomol.shape)
-    wv,csec=GSU.uniform_wave_grid(NH3_Exomol[:,0]*1000.,NH3_Exomol[:,1],Extend=False,Fine=False)
-    NH3_Exomol_regrid=np.transpose(np.array([wv,csec]))
-    
-    NH3=NH3_Exomol_regrid
-    
-    ###### Plot disk-integrated reference albedo and simulated ammonia-free albedo
-    fig_molecules,ax_molecules=pl.subplots(1,1,figsize=(6.0,3.5), dpi=150, facecolor="white",
-                          sharex=True)
-    # Set x limits
-    ax_molecules.set_xlim(x0,x1)
-    # Set x ticks
-    ax_molecules.set_xticks(np.linspace(x0,x1,xtks, endpoint=True))
-    # Set y limits
-    ax_molecules.set_ylim(y0,y1)
-    ax_molecules.set_yticks(np.linspace(y0,y1,ytks, endpoint=True))
-    # Set y ticks
-    ax_molecules.grid(linewidth=0.2)
-    ax_molecules.tick_params(axis='both', which='major', labelsize=8)
-    ax_molecules.set_ylabel("Albedo",color="black")
-    
-    ax_molecules.plot(Albedo[:,0],Albedo[:,1],label='Jupiter Albedo (Karkoschka, 1994)',linewidth=1.0,color='C0')
-    if ContMod=='1' or ContMod=='All':
-        ax_molecules.plot(Continua['Spline1']['WaveGrid'],Continua['Spline1']['Albedo'],label='Spline1',
-                     linewidth=1,linestyle='--',color='C0')
-    if ContMod=='2' or ContMod=='All':
-        ax_molecules.plot(Continua['Spline2']['WaveGrid'],Continua['Spline2']['Albedo'],label='Spline2',
-                     linewidth=1,linestyle='-.',color='C1')
-    if ContMod=='3' or ContMod=='All':
-        ax_molecules.plot(Continua['Piecewise1']['WaveGrid'],Continua['Piecewise1']['Albedo'],label='Piecewise1',
-                     linewidth=1,linestyle='-.',color='C2')
-    if ContMod=='4' or ContMod=='All':
-        ax_molecules.plot(Continua['Piecewise2']['WaveGrid'],Continua['Piecewise1']['Albedo'],label='Piecewise2',
-                     linewidth=1,linestyle='-.',color='C2')
-    if ContMod=='5' or ContMod=='All':
-        ax_molecules.plot(Continua['Linear 2pt.']['WaveGrid'],Continua['Piecewise1']['Albedo'],label='Linear 2pt.',
-                     linewidth=1,linestyle='-.',color='C2')
-        
-    ax_molecules.set_title("Albedo and Molecular Absorption")
-    
-    if Crossect:
-        axs1b = ax_molecules.twinx()  # instantiate a second axes that shares the same x-axis
-        axs1b.ticklabel_format(axis='y')
-        axs1b.tick_params(axis='y', which='major', labelsize=8)
-        axs1b.set_yscale('log')
-        axs1b.set_ylim(1e-4,1e3)
-        axs1b.set_ylabel("Absorption Coefficient 1/(km-atm)")#,color="green")
-        
-        axs1b.plot(CH4_KarkRef1993[:,0],CH4_KarkRef1993[:,1],label='CH4 Abs. Coef. (Karkoschka, 1994) ',linewidth=1.0,color='C2')
-        axs1b.plot(NH3[:,0],NH3[:,1],label='NH3 Abs. Coef. (ExoMol) ',linewidth=1.0,color='C3')
-        if Lutz:
-            axs1b.plot(NH3_Lutz_Owen_1980[:,0],NH3_Lutz_Owen_1980[:,1],label='NH3 Abs. Coef. (Lutz & Owen, 1980) ',linewidth=0.5,color='C3')
-        axs1b.legend(fontsize=7, loc=1)
-
-    ax_molecules.set_xlabel("Wavelength (nm)")
-    ax_molecules.legend(fontsize=7, loc=2)
-    fig_molecules.subplots_adjust(left=0.10, right=0.90, top=0.9, bottom=0.14)
-    
-    fig_molecules.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Albedo_Molecular_Absorption.png',dpi=320)
-    
-    return(Albedo,Continua,CH4,NH3)
-        
-    
 def SpectralModeling(s_NH3=0.018,s_CH4=0.304,refl=0.53):
-###############################################################################
-# Model the spectrum of Jupiter using CH4 and NH3 column densities (km-atm)
-# along with a constant reflectivity for the cloud tops. 
-# !!!! Currently does not include Rayleigh scattering.
-###############################################################################
+    """
+    Model the spectrum of Jupiter using CH4 and NH3 column densities (km-atm)
+    along with a constant reflectivity for the cloud tops. 
+    !Currently does not include Rayleigh scattering and cloud top
+    reflectivity is constant
+    Also provides linear fit coefficients between transmission in a given
+    filter and molecular band equivalent width
+    """
     import sys
     sys.path.append('c:/Astronomy/Python Play')
     sys.path.append('c:/Astronomy/Python Play/Util_P3')
@@ -382,6 +212,9 @@ def SpectralModeling(s_NH3=0.018,s_CH4=0.304,refl=0.53):
     import GeneralSpecUtils_P3 as GSU
     import NH3_Filter_Library_P3 as NFL
     import copy
+    sys.path.append('./Services')
+    import get_albedo_continua_crossections as gACC
+
     path='c:/Astronomy/Projects/Techniques/InstrumentPerformance-P3/Filters/'
     filterdata={'620':{'transfile':'620CH4/620CH4_Transmission.txt',
                        'filtname':'620CH4','filtwdth':10.},
@@ -396,8 +229,9 @@ def SpectralModeling(s_NH3=0.018,s_CH4=0.304,refl=0.53):
     #y0,y1,ytks=0.0,0.7,8
     x0,x1,xtks=600.,680.,5
     y0,y1,ytks=0.4,0.6,5
-    Albedo,Continua,CH4,NH3=NFL.Get_Albedo_and_Absorption(x0,x1,xtks,y0,y1,ytks,
-                                                                  ContMod='1',Crossect=False)
+    Albedo,Continua,CH4,NH3= \
+        gACC.get_albedo_continua_crossections(x0,x1,xtks,y0,y1,ytks,
+                                              Crossect=False)
 
     figtest,axtest=pl.subplots(1,1,figsize=(6.0,3.5), dpi=150, facecolor="white")
 
@@ -664,7 +498,8 @@ def MoonAlbedos(Moon):
 
     return MoonGrid
 
-def profile_quad_plot(SupTitle="SupTitle"):
+def vert_profile_quad_plot(SupTitle="SupTitle"):
+    # Simply sets up quad plot for Transmission and Contribution functions
     import matplotlib.pyplot as pl
     fig_trans,axs_trans=pl.subplots(2,2,figsize=(6.0,6.0), dpi=150, facecolor="white",
                                   sharex=True,sharey=True)
@@ -687,55 +522,87 @@ def profile_quad_plot(SupTitle="SupTitle"):
     axs_trans[1,1].set_title("NH3")
     return fig_trans,axs_trans
 
-def compute_effective_abs_and_weighting(Jupiterdata,filterwavelength,CH4,NH3,P,
-                                        fnout='filtereffectivedata.csv'):
+def compute_vertical_transmission_profiles(Jupiterdata,FilterList,CH4,NH3,Pres,
+                                           fout_sfx="Test"):
+    """
+    PURPOSE: Computes vertical profiles of the transmission and weighting 
+             functions for gas absorption (methane and ammonia) along with 
+             Rayleigh scattering then plots the results.
+
+    Parameters
+    ----------
+    Jupiterdata : dict
+        This dictionary will have the basic filter information...TBD
+    FilterList : TYPE
+        DESCRIPTION.
+    CH4 : TYPE
+        DESCRIPTION.
+    NH3 : TYPE
+        DESCRIPTION.
+    P : TYPE
+        DESCRIPTION.
+    fnout : TYPE, optional
+        DESCRIPTION. The default is 'filtereffectivedata.csv'.
+
+    Returns
+    -------
+    Jupiterdata : TYPE
+        DESCRIPTION.
+
+    """
     import numpy as np
     import NH3_Filter_Library_P3 as NFL
+    import sys
+    sys.path.append('./Services')
+    import get_keff
     
-    
-    fig_trans,axs_trans=NFL.profile_quad_plot(SupTitle="Two-way Transmission for Absorbers and Scatterers")
-    fig_Keff,axs_Keff=NFL.profile_quad_plot(SupTitle="Weighting for Absorbers and Scatterers")
+    fig_trans,axs_trans=NFL.vert_profile_quad_plot(SupTitle="Two-way Transmission for Absorbers and Scatterers")
+    fig_Keff,axs_Keff=NFL.vert_profile_quad_plot(SupTitle="Weighting for Absorbers and Scatterers")
     
     # Write file header for filter data csv file
-    pth='c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/'
-    filtereffectivedata = open(pth+fnout, 'w')
-    tmp="Wavelength (nm),Filter Name,k_eff (NH3),l_eff (NH3),k_eff (CH4),l_eff (CH4),Trans,Tau,NH3 (m-atm),CH4 (m-atm)\n"
-    filtereffectivedata.write(tmp)
-    
-    #P=np.geomspace(10.,1.0e7,num=70,endpoint=True,dtype=float) #in Pascals
-    #  !!! Is there a standard pressure grid that could be recommended?
-    
-    for filtr in filterwavelength:
+    #pth='c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/'
+    #filtereffectivedata = open(pth+fnout, 'w')
+    #tmp="Wavelength (nm),Filter Name,k_eff (NH3),l_eff (NH3),k_eff (CH4),l_eff (CH4),Trans,Tau,NH3 (m-atm),CH4 (m-atm)\n"
+    #filtereffectivedata.write(tmp)
+    # Compute effective absorption coefficients for each filter
+    #Jupiterdata=get_keff.get_keff(Jupiterdata,FilterList,CH4,NH3)
+    Jupiterdata=get_keff.get_keff(Jupiterdata,FilterList,CH4,NH3)
+
+    for filtr in FilterList:
         
-        #Compute effective absorption cross sections and center wavelengths for
-        #  each filter using Karkoschka CH4 and Irwin NH3 absorption references.
-        #  This is computed by the NFL.K_eff() function
-        
-        Jupiterdata[filtr]['keff_CH4'],Jupiterdata[filtr]['leff_CH4']=NFL.K_eff(P,Jupiterdata[filtr]['FiltTrans'],CH4,\
-                      float(filtr)-Jupiterdata[filtr]['filtwdth'],float(filtr)+Jupiterdata[filtr]['filtwdth'],Jupiterdata[filtr]['filtname'],axs_Keff)
-        Jupiterdata[filtr]['keff_NH3'],Jupiterdata[filtr]['leff_NH3']=NFL.K_eff(P,Jupiterdata[filtr]['FiltTrans'],NH3,\
-                      float(filtr)-Jupiterdata[filtr]['filtwdth'],float(filtr)+Jupiterdata[filtr]['filtwdth'],Jupiterdata[filtr]['filtname'],axs_Keff)
-            
         #Compute optical depth (tau) independently for methane, ammonia, Rayleigh 
         #  scattering, and total gas (CH4+NH3) for each filter as a function of
         #  pressure level.
             
-        Jupiterdata[filtr]['tau_CH4']=NFL.tau_gas_versus_P(P,Jupiterdata[filtr]['keff_CH4'],Jupiterdata[filtr]['filtname'],axs_Keff,gas='CH4')
-        Jupiterdata[filtr]['tau_NH3']=NFL.tau_gas_versus_P(P,Jupiterdata[filtr]['keff_NH3'],Jupiterdata[filtr]['filtname'],axs_Keff,gas='NH3')
-        Jupiterdata[filtr]['tau_R']=NFL.tau_rayleigh_versus_P(P,Jupiterdata[filtr]['leff_CH4'],Jupiterdata[filtr]['filtname'],axs_Keff)
+        Jupiterdata[filtr]['tau_CH4']= \
+            NFL.tau_gas_versus_P(Pres,Jupiterdata[filtr]['keff_CH4'],
+                                 Jupiterdata[filtr]['filtname'],axs_Keff,gas='CH4')
+        Jupiterdata[filtr]['tau_NH3']= \
+            NFL.tau_gas_versus_P(Pres,Jupiterdata[filtr]['keff_NH3'],
+                                 Jupiterdata[filtr]['filtname'],axs_Keff,gas='NH3')
+        Jupiterdata[filtr]['tau_R']= \
+            NFL.tau_rayleigh_versus_P(Pres,Jupiterdata[filtr]['leff_CH4'],
+                                      Jupiterdata[filtr]['filtname'],axs_Keff)
         tau_gas=Jupiterdata[filtr]['tau_CH4']+Jupiterdata[filtr]['tau_NH3']
         
         #Compute and plot transmission and weighting functions
         
-        tmp=NFL.Compute_Transmission(P,Jupiterdata[filtr]['tau_R'],tau_gas,Jupiterdata[filtr]['filtname'],axs_trans[0,0],axs_Keff[0,0])
-        tmp=NFL.Compute_Transmission(P,Jupiterdata[filtr]['tau_R']*0.0,Jupiterdata[filtr]['tau_CH4'],Jupiterdata[filtr]['filtname']+' CH4',axs_trans[0,1],axs_Keff[0,1])
-        tmp=NFL.Compute_Transmission(P,Jupiterdata[filtr]['tau_R'],tau_gas*0.0,Jupiterdata[filtr]['filtname']+' Ray',axs_trans[1,0],axs_Keff[1,0])
-        tmp=NFL.Compute_Transmission(P,Jupiterdata[filtr]['tau_R']*0.0,Jupiterdata[filtr]['tau_NH3'],Jupiterdata[filtr]['filtname']+' NH3',axs_trans[1,1],axs_Keff[1,1])
-        
-        #print(filtr,Jupiterdata[filtr]['filtname'],Jupiterdata[filtr]['keff_NH3'],Jupiterdata[filtr]['leff_NH3'],\
-        #      Jupiterdata[filtr]['keff_CH4'],Jupiterdata[filtr]['leff_CH4'])
-        
-        Jupiterdata[filtr]['NH3ColDens']=1000.*Jupiterdata[filtr]['Tau_Albedo']/Jupiterdata[filtr]['keff_NH3']
+        tmp=NFL.Compute_Transmission(Pres,Jupiterdata[filtr]['tau_R'],
+                                     tau_gas,Jupiterdata[filtr]['filtname'],
+                                     axs_trans[0,0],axs_Keff[0,0])
+        tmp=NFL.Compute_Transmission(Pres,Jupiterdata[filtr]['tau_R']*0.0,
+                                     Jupiterdata[filtr]['tau_CH4'],
+                                     Jupiterdata[filtr]['filtname']+' CH4',
+                                     axs_trans[0,1],axs_Keff[0,1])
+        tmp=NFL.Compute_Transmission(Pres,Jupiterdata[filtr]['tau_R'],
+                                     tau_gas*0.0,Jupiterdata[filtr]['filtname']+' Ray',
+                                     axs_trans[1,0],axs_Keff[1,0])
+        tmp=NFL.Compute_Transmission(Pres,Jupiterdata[filtr]['tau_R']*0.0,
+                                     Jupiterdata[filtr]['tau_NH3'],
+                                     Jupiterdata[filtr]['filtname']+' NH3',
+                                     axs_trans[1,1],axs_Keff[1,1])
+               
+        """Jupiterdata[filtr]['NH3ColDens']=1000.*Jupiterdata[filtr]['Tau_Albedo']/Jupiterdata[filtr]['keff_NH3']
         Jupiterdata[filtr]['CH4ColDens']=1000.*Jupiterdata[filtr]['Tau_Albedo']/Jupiterdata[filtr]['keff_CH4']
         
         #Create the CSV record string and append it to the output file
@@ -745,62 +612,77 @@ def compute_effective_abs_and_weighting(Jupiterdata,filterwavelength,CH4,NH3,P,
                 +str(Jupiterdata[filtr]['leff_CH4'])+","+str(Jupiterdata[filtr]['TransInt'])+","\
                 +str(Jupiterdata[filtr]['Tau_Albedo'])+","+str(Jupiterdata[filtr]['NH3ColDens'])+","\
                 +str(Jupiterdata[filtr]['CH4ColDens'])+"\n"
-        filtereffectivedata.write(tmp)
+        filtereffectivedata.write(tmp)"""
     
-    filtereffectivedata.close()
+    #filtereffectivedata.close()
     
     axs_trans[0,0].legend(loc=1,ncol=3, borderaxespad=0.,prop={'size':6})
     fig_trans.subplots_adjust(left=0.12, right=0.96, top=0.90, bottom=0.09)
             
     axs_Keff[0,0].legend(loc=1,ncol=3, borderaxespad=0.,prop={'size':6})
     fig_Keff.subplots_adjust(left=0.12, right=0.96, top=0.90, bottom=0.09)
-    
-    fig_trans.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/TransmissionFunctions.png',dpi=320,bbox_inches = 'tight')
-    fig_Keff.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/ContributionFunctions.png',dpi=320,bbox_inches = 'tight')
+    pthout='c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Contribution Functions/'
+    fig_trans.savefig(pthout+'VertTransProf'+fout_sfx+'.png',dpi=320,bbox_inches = 'tight')
+    fig_Keff.savefig(pthout+'VertContFunct'+fout_sfx+'.png',dpi=320,bbox_inches = 'tight')
     
     return Jupiterdata
 
-def compute_filter_Jupiter_transmissions(x0,x1,xtks,y0,y1,ytks,filterwavelength,
+def compute_filter_spectrum(x0,x1,xtks,y0,y1,ytks,FilterList,
                                          Albedo,Continuum_Albedo,ContinuumModel,
                                          Telescope='SCT',scale=True):
-    ###############################################################################
-    # PLOT FILTER TRANSMISSIONS CONVOLVED WITH DISK-INTEGRATED ALBEDO AND CONTINUUM
-    ###############################################################################
+    """
+    PURPOSE: PLOT FILTER TRANSMISSIONS CONVOLVED WITH DISK-INTEGRATED ALBEDO 
+             AND CONTINUUM
+    Calls:
+    Called by:
+        -> JupiterFilterPerformance
+        -> AmmoniaTest_P3.py       
+
+    Parameters
+    ----------
+    x0 : Float
+        DESCRIPTION.
+    x1 : Float
+        DESCRIPTION.
+    xtks : Int
+        DESCRIPTION.
+    y0 : Float
+        DESCRIPTION.
+    y1 : Float
+        DESCRIPTION.
+    ytks : Int
+        DESCRIPTION.
+    filterwavelength : TYPE
+        DESCRIPTION.
+    Albedo : TYPE
+        DESCRIPTION.
+    Continuum_Albedo : TYPE
+        DESCRIPTION.
+    ContinuumModel : TYPE
+        DESCRIPTION.
+    Telescope : Str, optional
+        DESCRIPTION. The default is 'SCT'.
+    scale : Bool, optional
+        DESCRIPTION. The default is True.
+
+    Returns
+    -------
+    Jupiterdata : Dict
+        DESCRIPTION.
+    axs1 : Plot axis object
+        DESCRIPTION.
+
+    """
     import numpy as np
     import NH3_Filter_Library_P3 as NFL
     import matplotlib.pyplot as pl
     import GeneralSpecUtils_P3 as GSU
+    import sys
+    sys.path.append('./Services')
+    import get_filter_base_dict
 
-    if Telescope=='SCT':
-        path='c:/Astronomy/Projects/Techniques/InstrumentPerformance-P3/Filters/'
-        Jupiterdata={'620':{'transfile':'620CH4/620CH4_Transmission.txt',
-                           'filtname':'620CH4','filtwdth':10.},
-                     '632':{'transfile':'632OI/632OI_Transmission.txt',
-                            'filtname':'632OI','filtwdth':10.},
-                     '647':{'transfile':'647CNT/647CNT_Transmission.txt',
-                            'filtname':'647NH3','filtwdth':10.},
-                     '656':{'transfile':'656HIA/656HIA_Transmission.txt',
-                            'filtname':'656HIA','filtwdth':10.},
-                     '658':{'transfile':'658NII/658NII_Transmission.txt',
-                            'filtname':'658NII','filtwdth':5.},
-                     '672':{'transfile':'672SII/672SII_Transmission.txt',
-                            'filtname':'672SII','filtwdth':10.},
-                     '730':{'transfile':'730OII/730OII_Transmission.txt',
-                            'filtname':'730OII','filtwdth':10.},
-                     '889':{'transfile':'889CH4/889CH4_Transmission.txt',
-                            'filtname':'889CH4','filtwdth':10.},
-                     '940':{'transfile':'940NIR/940NIR_Transmission.txt',
-                            'filtname':'940NIR','filtwdth':10.}}
-    elif Telescope=='VLT':
-        path='C:/Astronomy/Projects/SAS 2021 Ammonia/VLT MUSE/'
-        Jupiterdata={'620':{'transfile':'620CH4_MUSE_Transmission.txt',
-                           'filtname':'620CH4','filtwdth':10.},
-                     '632':{'transfile':'632OI_MUSE_Transmission.txt',
-                            'filtname':'632OI','filtwdth':10.},
-                     '647':{'transfile':'647NH3_MUSE_Transmission.txt',
-                            'filtname':'647NH3','filtwdth':10.},
-                     '656':{'transfile':'656HIA_MUSE_Transmission.txt',
-                            'filtname':'656HIA','filtwdth':10.}}
+    # GET JUPITER BASE DICTIONARY AND SET UP PLOT
+    path,Jupiterdata=get_filter_base_dict.get_filter_base_dict(Telescope)
 
     fig1,axs1=pl.subplots(1,1,figsize=(6.0,3.5), dpi=150, facecolor="white",
                           sharex=True)
@@ -813,53 +695,7 @@ def compute_filter_Jupiter_transmissions(x0,x1,xtks,y0,y1,ytks,filterwavelength,
     axs1.set_ylabel("Albedo x Transmission",color="black")
     axs1.set_xlabel("Wavelength (nm)")
 
-    telepath='C:/Astronomy/Projects/Techniques/InstrumentPerformance-P3/'
-    TelescopePerformance=np.loadtxt(telepath+'SystemResponseCLR-1260mm200lpm.txt',usecols=range(2))
-    
-    for filtr in filterwavelength:
-        if Telescope=='SCT':
-            TempFiltTrans=np.loadtxt(path+Jupiterdata[filtr]['transfile'],usecols=range(2))
-            Jupiterdata[filtr]['FiltTrans']=GSU.SpectrumMath(TelescopePerformance,TempFiltTrans,"Multiply")
-        elif Telescope=='VLT':
-            Jupiterdata[filtr]['FiltTrans']=np.loadtxt(path+Jupiterdata[filtr]['transfile'],usecols=range(2))
-        #!!!Add clear filter performance for the C8 + ST2000XM here and convolve!
-        Jupiterdata[filtr]['ContProd']=GSU.SpectrumMath(Jupiterdata[filtr]['FiltTrans'],Continuum_Albedo,"Multiply")
-        Jupiterdata[filtr]['AbsrProd']=GSU.SpectrumMath(Jupiterdata[filtr]['FiltTrans'],Albedo,"Multiply")
-    
-        Jupiterdata[filtr]['Cont_Int'],Jupiterdata[filtr]['Absr_Int'],Jupiterdata[filtr]['TransInt']= \
-            NFL.cont_absorption_calcs(Jupiterdata[filtr]['ContProd'],Jupiterdata[filtr]['AbsrProd'], \
-                                      float(filtr)-Jupiterdata[filtr]['filtwdth'],\
-                                      float(filtr)+Jupiterdata[filtr]['filtwdth'], \
-                                          Jupiterdata[filtr]['filtname'])
-        Jupiterdata[filtr]['Tau_Albedo']=-np.log(Jupiterdata[filtr]['TransInt'])
-    
-        zeros=np.zeros(Jupiterdata[filtr]['FiltTrans'].shape[0])
-        
-        #If statement to scale filter peak to continuum
-        if scale:
-            wvidx=np.argmin(np.abs(Jupiterdata[filtr]['ContProd'][:,0]-np.int(filtr)))
-            print("wvidx=",wvidx)
-            maxcont=np.nanmax(Jupiterdata[filtr]['ContProd'][wvidx-20:wvidx+20,1])
-            print("np.nanmax(ContProd)[:,1]=",maxcont)
-            #temp=np.array(Jupiterdata[filtr]['ContProd'][:,:])
-            temp=np.nan_to_num(Jupiterdata[filtr]['ContProd'][:,:], copy=True, nan=0.0)
-            idx=int(np.argmin(np.abs(temp[:,1]-maxcont)))
-            print(idx)
-            normscale=Continuum_Albedo[idx,1]/maxcont
-            print("")
-        else:
-            normscale=1.0
-        #If statement so the legend doesn't have multiple identical entries
-        if str(filtr)[0:3]=='620':
-            #axs1.plot(Jupiterdata[filtr]['ContProd'][:,0],Jupiterdata[filtr]['ContProd'][:,1]*normscale,linewidth=1,color='0.5')
-            axs1.fill_between(Jupiterdata[filtr]['AbsrProd'][:,0],zeros, Jupiterdata[filtr]['AbsrProd'][:,1]*normscale,label='Jupiter Signal',color='C0',alpha=0.2)
-            axs1.fill_between(Jupiterdata[filtr]['AbsrProd'][:,0],Jupiterdata[filtr]['AbsrProd'][:,1]*normscale, Jupiterdata[filtr]['ContProd'][:,1]*normscale,label='Gas-free Signal',color='C1',alpha=0.2)
-        else:
-            #axs1.plot(Jupiterdata[filtr]['ContProd'][:,0],Jupiterdata[filtr]['ContProd'][:,1]*normscale,linewidth=1,color='0.5')
-            axs1.fill_between(Jupiterdata[filtr]['AbsrProd'][:,0],zeros, Jupiterdata[filtr]['AbsrProd'][:,1]*normscale,color='C0',alpha=0.2)
-            axs1.fill_between(Jupiterdata[filtr]['AbsrProd'][:,0],Jupiterdata[filtr]['AbsrProd'][:,1]*normscale, Jupiterdata[filtr]['ContProd'][:,1]*normscale,color='C1',alpha=0.2)
-            
-    
+    # PLOT ALBEDO AND CONTINUUM MODEL
     axs1.plot(Albedo[:,0],Albedo[:,1],label='Albedo')
     axs1.plot(Continuum_Albedo[:,0],Continuum_Albedo[:,1],label='Continuum')
     if Telescope=='VLT':
@@ -869,8 +705,53 @@ def compute_filter_Jupiter_transmissions(x0,x1,xtks,y0,y1,ytks,filterwavelength,
         #MUSESmoothedSpec=np.loadtxt(MPath+'MUSE_SmoothedSpec.txt',usecols=range(2))
         #axs1.plot(MUSESmoothedSpec[:,0],MUSESmoothedSpec[:,1]*764.,label="MUSE Smoothed")
 
+    # PLOT INSTRUMENT+FILTER TRANSMISSION PROFILES WITH CONTINUUM AND ALBEDO
+    for filtr in FilterList:
+        # COMPUTE PRODUCT OF INSTRUMENT+FILTER TRANSMISSION WITH CONTINUUM AND 
+        # ALBEDO 
+        Jupiterdata[filtr]['ContProd']=\
+            GSU.SpectrumMath(Jupiterdata[filtr]['FiltTrans'],
+                             Continuum_Albedo,"Multiply")
+        Jupiterdata[filtr]['AbsrProd']=\
+            GSU.SpectrumMath(Jupiterdata[filtr]['FiltTrans'],
+                             Albedo,"Multiply")
+    
+        # COMPUTE INTEGRAL TRANSMITTED SIGNAL FOR EACH FILTER WITH CONTINUUM 
+        # AND ALBEDO INPUT
+        Jupiterdata[filtr]['Cont_Int'],Jupiterdata[filtr]['Absr_Int'],Jupiterdata[filtr]['TransInt']= \
+            NFL.cont_absorption_calcs(Jupiterdata[filtr]['ContProd'],Jupiterdata[filtr]['AbsrProd'], \
+                                      float(filtr)-Jupiterdata[filtr]['halfwdth'],\
+                                      float(filtr)+Jupiterdata[filtr]['halfwdth'], \
+                                          Jupiterdata[filtr]['filtname'])
+        # COMPUTE OPTICAL DEPTH IN A FILTER FROM THE TRANSMISSION
+        Jupiterdata[filtr]['Tau_Albedo']=-np.log(Jupiterdata[filtr]['TransInt'])
+        
+        #! WOULD BE A GREAT PLACE TO ADD COMPUTATION OF EQUIVALENT WIDTH FOR
+        #! CH4 AND NH3 BANDS?
+    
+        zeros=np.zeros(Jupiterdata[filtr]['FiltTrans'].shape[0])
+        
+        # SCALE FILTER PEAK TO CONTINUUM OR NOT
+        if scale:
+            wvidx=np.argmin(np.abs(Jupiterdata[filtr]['ContProd'][:,0]-np.int(filtr)))
+            maxcont=np.nanmax(Jupiterdata[filtr]['ContProd'][wvidx-20:wvidx+20,1])
+            temp=np.nan_to_num(Jupiterdata[filtr]['ContProd'][:,:], copy=True, nan=0.0)
+            idx=int(np.argmin(np.abs(temp[:,1]-maxcont)))
+            normscale=Continuum_Albedo[idx,1]/maxcont
+        else:
+            normscale=1.0
+            
+        # ONLY WRITE LEGEND ONE TIME
+        if str(filtr)[0:3]=='620':
+            axs1.fill_between(Jupiterdata[filtr]['AbsrProd'][:,0],zeros, Jupiterdata[filtr]['AbsrProd'][:,1]*normscale,label='Jupiter Signal',color='C0',alpha=0.2)
+            axs1.fill_between(Jupiterdata[filtr]['AbsrProd'][:,0],Jupiterdata[filtr]['AbsrProd'][:,1]*normscale, Jupiterdata[filtr]['ContProd'][:,1]*normscale,label='Gas-free Signal',color='C1',alpha=0.2)
+        else:
+            axs1.fill_between(Jupiterdata[filtr]['AbsrProd'][:,0],zeros, Jupiterdata[filtr]['AbsrProd'][:,1]*normscale,color='C0',alpha=0.2)
+            axs1.fill_between(Jupiterdata[filtr]['AbsrProd'][:,0],Jupiterdata[filtr]['AbsrProd'][:,1]*normscale, Jupiterdata[filtr]['ContProd'][:,1]*normscale,color='C1',alpha=0.2)
+    
     axs1.legend(fontsize=8,loc=2,ncol=2)
     
+    # LABELING FOR PUBLICATION FIGURE
     if Telescope=='SCT':
         Label="a) "
     if Telescope=='VLT':
@@ -878,7 +759,8 @@ def compute_filter_Jupiter_transmissions(x0,x1,xtks,y0,y1,ytks,filterwavelength,
     axs1.set_title(Label+Telescope+" Filter Performance (Continuum "+ContinuumModel+")")
     
     fig1.subplots_adjust(left=0.10, right=0.90, top=0.9, bottom=0.14)
-    
-    fig1.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/JupiterFilterPerformance-'+Telescope+'-'+ContinuumModel+'.png',dpi=320)
+    pth='c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Filter Plots/'
+    fig1.savefig(pth+'JupiterFilterPerformance-'+Telescope+'-'\
+                 +ContinuumModel+'.png',dpi=320)
     
     return Jupiterdata,axs1

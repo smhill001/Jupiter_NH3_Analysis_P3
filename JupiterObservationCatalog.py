@@ -107,10 +107,10 @@ def JupiterObservationCatalog():
                    wv_bool[1],wv_bool[2],wv_bool[3])
     print()
     print(date_list)
-    print()
-    print(map_list)
-    print()
-    print(t)
+    #print()
+    #print(map_list)
+    #print()
+    #print(t)
 
     ascii.write(t,pathout+'JupiterObservationCatalog.csv',format='basic',overwrite=True,delimiter=',')
 

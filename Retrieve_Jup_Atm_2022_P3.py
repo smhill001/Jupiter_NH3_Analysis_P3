@@ -13,6 +13,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     sys.path.append(drive+'/Astronomy/Python Play')
     sys.path.append(drive+'/Astronomy/Python Play/Util_P3')
     sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Spectroscopy')
+    sys.path.append('./Services')
 
     import os
     from matplotlib.pyplot import imread
@@ -26,6 +27,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     from astropy.convolution import convolve
     from astropy.io import fits
     import RetrievalLibrary as RL
+    import read_master_calibration
 
     # Retrieve_Jup_Atm_2022_P3(obsdate="20221019UT",target="Jupiter")   
     
@@ -62,12 +64,12 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
                                             'CH4file':'2022-08-18-0733_4-Jupiter_620CH4AbsMap.fits',
                                             'NH3file':'2022-08-18-0733_4-Jupiter_647NH3AbsMap.fits',
                                             'RGBfile':'2022-08-18-0745_4-Jupiter_AllRED-WV-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20220828UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                 '20220828UT':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                                          'Seeing':'6/10','Transparency':'7/10'}, 
                                             'CH4file':'2022-08-28-0608_2-Jupiter_CH4Abs620.fits',
                                             'NH3file':'2022-08-28-0608_2-Jupiter_NH3Abs647.fits',
                                             'RGBfile':'NA'},
-                 '20220828UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                 '20220828UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                                          'Seeing':'6/10','Transparency':'7/10'}, 
                                             'CH4file':'2022-08-28-0608_2-Jupiter_620CH4AbsMap.fits',
                                             'NH3file':'2022-08-28-0608_2-Jupiter_647NH3AbsMap.fits',
@@ -199,17 +201,8 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
                                             'CH4file':'2023-01-13-0046_2-Jupiter-620CH4AbsMap.fits',
                                             'NH3file':'2023-01-13-0046_2-Jupiter-647NH3AbsMap.fits',
                                             'RGBfile':'2023-01-13-0046_0-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'}}
-
-    calibration={'AGU 2022':{'CH4GlobalTrans':0.858,'NH3GlobalTrans':0.928},
-                 'Model 1':{'CH4GlobalTrans':0.880,'NH3GlobalTrans':0.960},
-                 'Model 2':{'CH4GlobalTrans':0.878,'NH3GlobalTrans':0.940},
-                 'Observed':{'CH4GlobalTrans':0.910,'NH3GlobalTrans':0.972},
-                 'VLT-MUSE':{'CH4GlobalTrans':0.861,'NH3GlobalTrans':0.961},
-                 'SCT-Obs-Final':{'CH4GlobalTrans':0.920,'NH3GlobalTrans':0.972},
-                 'VLT-Obs-Final':{'CH4GlobalTrans':0.893,'NH3GlobalTrans':0.962}}
-
-    K_eff={'CH4_620':{'C11':0.427,'VLT':0.454},
-           'NH3_647':{'C11':2.955,'VLT':3.129}}
+    
+    calibration,K_eff=read_master_calibration.read_master_calibration()
     ###########################################################################
     # OPEN AND READ DATA FILES (FITS MAPS of NH3 and CH4 Absorption (Transmission?))
     ###########################################################################             
@@ -272,10 +265,10 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     CH4_Ncol=1000*CH4_tau/K_eff_CH4620
     NH3_Ncol=1000*NH3_tau/K_eff_NH3647
 
-    CH4_Cloud_Press=(CH4_Ncol/1000.)*amagat*gravity*mean_mol_wt/(fCH4*STP)
-    fNH3=(NH3_Ncol/1000.)*amagat*gravity*mean_mol_wt/(CH4_Cloud_Press*STP)
+    CH4_Cloud_Press=(CH4_Ncol)*amagat*gravity*mean_mol_wt/(fCH4*STP)
+    NH3=(NH3_Ncol/1000.)*amagat*gravity*mean_mol_wt/(CH4_Cloud_Press*STP)
     ##!!!! WOW!!! I need to calculate fNH3 the EASY way also and compare!!!
-    #fNH3=NH3_Ncol/CH4_Ncol
+    fNH3=(1.81e-3)*NH3_Ncol/CH4_Ncol #-> It works 7/20/2023
     ###########################################################################
     # Set up figure and axes for plots
     ###########################################################################             
@@ -409,7 +402,9 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     hdul = fits.HDUList([hdu])
     hdul[0].header['BITPIX']=-32
     print(hdul[0].header[:])
-    fnout=path+'/'+NH3file[0:26]+'fNH3Abs647.fits'
+    pathfNH3='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/fNH3/'
+    #fnout=path+'/'+NH3file[0:26]+'fNH3Abs647.fits'
+    fnout=pathfNH3+NH3file[0:26]+'fNH3.fits'
     try:
         os.remove(fnout)
     except: 
@@ -420,7 +415,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     fNH3scaled=np.nan_to_num(((5000.*65535.*fNH3 - 0.9)))
     fNH3scaled[fNH3scaled<=0.]=0.0
     fNH3abs16bit = fNH3scaled.astype(np.uint16)
-    imwrite(path+'/'+NH3file[0:26]+'fNH3Python.png', fNH3abs16bit)#.astype(np.uint16))
+    imwrite(pathfNH3+NH3file[0:26]+'fNH3.png', fNH3abs16bit)#.astype(np.uint16))
 
     ###########################################################################
     ## Just RGB and Abundance
@@ -504,8 +499,9 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     fig1.subplots_adjust(left=0.10, bottom=0.03, right=0.98, top=0.95,
                 wspace=0.25, hspace=0.05)     
     axs1[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
+    pathmapplots='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/map plots/'
 
-    fig1.savefig(path+"/"+obsdate+"-Jupiter-Retrieval-NH3_RGB_only"+"-CMII_"+
+    fig1.savefig(pathmapplots+obsdate+"-Jupiter-Retrieval-NH3_RGB_only"+"-CMII_"+
               str(Real_CM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
     
     ###########################################################################
@@ -586,13 +582,15 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
     fig2.subplots_adjust(left=0.10, bottom=0.03, right=0.98, top=0.95,
                 wspace=0.25, hspace=0.05)     
     axs2[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
+    pathmapplots='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/map plots/'
 
-    fig2.savefig(path+"/"+obsdate+"-Jupiter-Retrieval-Pcloud_only"+"-CMII_"+
+    fig2.savefig(pathmapplots+obsdate+"-Jupiter-Retrieval-Pcloud_only"+"-CMII_"+
               str(Real_CM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
 
 
+    pathScatter='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/fNH3vPcloud Scatter Plots/'
 
-    plot_scatter(Pcloud_patch,fNH3_patch_mb,path,obsdate,Real_CM2,LatLims)
+    plot_scatter(Pcloud_patch,fNH3_patch_mb,pathScatter,obsdate,Real_CM2,LatLims)
 
 
     return()
@@ -636,14 +634,14 @@ def make_patch_RGB(Map,LatLims,LonLims,CM2deg,LonRng,pad=True):
     """
     import numpy as np
     patch=np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]:LonLims[1],:])
-    print("####################### Patch RGB shape",patch.shape)
+    #print("####################### Patch RGB shape",patch.shape)
     if CM2deg<LonRng:
         patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]-1:360,:]),
                               np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]-360,:])),axis=1)
     if CM2deg>360.-LonRng:
         patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],360+LonLims[0]:360,:]),
                               np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1],:])),axis=1)
-    print("####################### Patch RGB shape",patch.shape)
+    #print("####################### Patch RGB shape",patch.shape)
     #if pad:
     #    patch_pad=np.pad(patch,5,mode='reflect')
 
@@ -687,6 +685,7 @@ def plot_scatter(patch1,patch2,filepath,obsdate,Real_CM2,LatLims):
     import numpy as np
     import copy
     
+    print("000000000: ",patch1.shape,patch2.shape)
     BZ={"SSTB":[-39.6,-36.2],
           "STZ":[-36.2,-32.4],
           "STB":[-32.4,-27.1],
@@ -702,7 +701,7 @@ def plot_scatter(patch1,patch2,filepath,obsdate,Real_CM2,LatLims):
 
     BZind=copy.deepcopy(BZ)   
     BZkeys=BZ.keys()
-    patch1=patch1*1000.
+    #patch1=patch1*1000.
 
     figcor,axscor=pl.subplots(1,1,figsize=(6.0,4.5), dpi=150, facecolor="white",
                         sharey=True,sharex=True)          

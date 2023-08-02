@@ -25,43 +25,28 @@ sys.path.append('c:/Astronomy/Python Play/SpectroPhotometry/Spectroscopy_P3')
 import matplotlib.pyplot as pl
 import numpy as np
 from copy import deepcopy
-#from scipy import interpolate
 import GeneralSpecUtils_P3 as GSU
-#from numpy import genfromtxt
 import NH3_Filter_Library_P3 as NFL
-#import AmmoniaTest_P3 as AT
+sys.path.append('./Services')
+import get_albedo_continua_crossections as gACC
 
-###############################################################################
 # LOAD JOVIAN DISK-INTEGRATEDALBEDO DATA FROM KARKOSCHKA, 1994 (DATA FROM 1993)
-###############################################################################
-#Plot Layout Configuration
-
 x0,x1,xtks=600.,680.,9
 y0,y1,ytks=0.0,0.7,8
-Albedo,Continua,CH4,NH3=NFL.Get_Albedo_and_Absorption(x0,x1,xtks,y0,y1,ytks,
-                                                              ContMod='All',Crossect=True)
-########## END OF FIRST FUNCTION AND PLOT ##############
+Albedo,Continua,CH4,NH3=gACC.get_albedo_continua_crossections(x0,x1,xtks,y0,y1,ytks,
+                                                              Crossect=True)
 
-###############################################################################
-# RETRIEVE FILTER TRANSMISSIONS FROM MASTER FILTER LIBRARY
-#   !!!! NEED TO ADD TELESCOPE THROUGHPUT CALIBRATION HERE
-###############################################################################
-#filterwavelength=['620','632','647','656','658','672','730','889','940']
-filterwavelength=['620','632','647','656']
-
-###############################################################################
 # PLOT FILTER TRANSMISSIONS CONVOLVED WITH DISK-INTEGRATED ALBEDO AND CONTINUUM
-###############################################################################
+FilterList=['620','632','647','656']
 Model='Piecewise1'
 Tele='SCT'
 Continuum_Albedo=np.zeros((Continua[Model]['WaveGrid'].size,2))
 Continuum_Albedo[:,0]=Continua[Model]['WaveGrid']
 Continuum_Albedo[:,1]=Continua[Model]['Albedo']
 
-filterdata,axsFilt=NFL.compute_filter_Jupiter_transmissions(x0,x1,xtks,y0,y1,ytks,
-                                                     filterwavelength,
-                                                     Albedo,Continuum_Albedo,
-                                                     Model,Telescope=Tele)
+filterdata,axsFilt=NFL.compute_filter_spectrum(x0,x1,xtks,y0,y1,ytks,FilterList,
+                                               Albedo,Continuum_Albedo,
+                                               Model,Telescope=Tele)
 
 Jupiterdata = deepcopy(filterdata)
 Iodata = deepcopy(filterdata)
@@ -69,25 +54,21 @@ Europadata = deepcopy(filterdata)
 Ganymededata = deepcopy(filterdata)
 Callistodata = deepcopy(filterdata)
 MoonsAvgdata = deepcopy(filterdata)
-########## END OF SECOND FUNCTION AND PLOT ##############
 
-###############################################################################
-# BEGIN K_eff, l_eff, AND WEIGHTING FUNCTION CALCULATIONS
-###############################################################################
-# Set up figure for plotting transmission and weighting functions
-
-fout='Filter_Keff_Leff-'+Tele+'-'+Model+'.csv'
+# COMPUTE K_eff, l_eff, AND PLOT VERTICAL TRANSMISSIONS AND WEIGHTING FUNCTION
+# PROFILES
+fout_sfx='-'+Tele+'-'+Model
 P=np.geomspace(10.,1.0e7,num=70,endpoint=True,dtype=float) #in Pascals
-Jupiterdata=NFL.compute_effective_abs_and_weighting(Jupiterdata,filterwavelength,
-                                                    CH4,NH3,P,fnout=fout)
+Jupiterdata=NFL.compute_vertical_transmission_profiles(Jupiterdata,FilterList,
+                                                       CH4,NH3,P,fout_sfx=fout_sfx)
 
 ###############################################################################
 # BEGIN CALCULATIONS FOR **RAYLEIGH CANCELING** AND GAS ABSORPTION ONLY
 #   WEIGHTING FUNCTIONS
 ###############################################################################
 
-fig_ray,axs_ray=NFL.profile_quad_plot(SupTitle="Two-way Transmission with Rayleigh Subtraction")
-fig_raycont,axs_raycont=NFL.profile_quad_plot(SupTitle="Weighting with Rayleigh Subtraction")
+fig_ray,axs_ray=NFL.vert_profile_quad_plot(SupTitle="Two-way Transmission with Rayleigh Subtraction")
+fig_raycont,axs_raycont=NFL.vert_profile_quad_plot(SupTitle="Weighting with Rayleigh Subtraction")
 
 filterlistshort=['620','632','647','656']
 for filtr in filterlistshort:
@@ -200,7 +181,7 @@ axs_moons[1].set_xlabel("Wavelength (nm)")
 axs_moons[1].set_title("Convolution with Filters")
 
 firstflag=True
-for filtr in filterwavelength:
+for filtr in FilterList:
     Iodata[filtr]['ContProd']=GSU.SpectrumMath(Jupiterdata[filtr]['FiltTrans'],Io_Grid,"Multiply")
     Europadata[filtr]['ContProd']=GSU.SpectrumMath(Jupiterdata[filtr]['FiltTrans'],EurGrid,"Multiply")
     Ganymededata[filtr]['ContProd']=GSU.SpectrumMath(Jupiterdata[filtr]['FiltTrans'],GanGrid,"Multiply")
@@ -227,23 +208,23 @@ for filt in filterlistshort:
 
     Iodata[filt]['Cont_Int'],Iodata[filt]['Absr_Int'],Iodata[filt]['TransInt']= \
         NFL.cont_absorption_calcs(Iodata[filt]['ContProd'],Jupiterdata[filt]['AbsrProd'], \
-                                  float(filt)-Jupiterdata[filt]['filtwdth'],\
-                                  float(filt)+Jupiterdata[filt]['filtwdth'], \
+                                  float(filt)-Jupiterdata[filt]['halfwdth'],\
+                                  float(filt)+Jupiterdata[filt]['halfwdth'], \
                                       Jupiterdata[filt]['filtname'],prn=False)
     Europadata[filt]['Cont_Int'],Europadata[filt]['Absr_Int'],Europadata[filt]['TransInt']= \
         NFL.cont_absorption_calcs(Europadata[filt]['ContProd'],Jupiterdata[filt]['AbsrProd'], \
-                                  float(filt)-Jupiterdata[filt]['filtwdth'],\
-                                  float(filt)+Jupiterdata[filt]['filtwdth'], \
+                                  float(filt)-Jupiterdata[filt]['halfwdth'],\
+                                  float(filt)+Jupiterdata[filt]['halfwdth'], \
                                       Jupiterdata[filt]['filtname'],prn=False)
     Ganymededata[filt]['Cont_Int'],Ganymededata[filt]['Absr_Int'],Ganymededata[filt]['TransInt']= \
         NFL.cont_absorption_calcs(Ganymededata[filt]['ContProd'],Jupiterdata[filt]['AbsrProd'], \
-                                  float(filt)-Jupiterdata[filt]['filtwdth'],\
-                                  float(filt)+Jupiterdata[filt]['filtwdth'], \
+                                  float(filt)-Jupiterdata[filt]['halfwdth'],\
+                                  float(filt)+Jupiterdata[filt]['halfwdth'], \
                                       Jupiterdata[filt]['filtname'],prn=False)
     Callistodata[filt]['Cont_Int'],Callistodata[filt]['Absr_Int'],Callistodata[filt]['TransInt']= \
         NFL.cont_absorption_calcs(Callistodata[filt]['ContProd'],Jupiterdata[filt]['AbsrProd'], \
-                                  float(filt)-Jupiterdata[filt]['filtwdth'],\
-                                  float(filt)+Jupiterdata[filt]['filtwdth'], \
+                                  float(filt)-Jupiterdata[filt]['halfwdth'],\
+                                  float(filt)+Jupiterdata[filt]['halfwdth'], \
                                       Jupiterdata[filt]['filtname'],prn=False)
 
 
@@ -325,18 +306,18 @@ axsFilt.legend()
 #   USED WITH THE RADIANCE DATA.
 ###############################################################################
 Tele='VLT'
-MUSEwavelength=['620','632','647','656']
 y0,y1,ytks=0.0,0.7,8
-MUSEfilters,axsMUSEFilt=NFL.compute_filter_Jupiter_transmissions(x0,x1,xtks,y0,y1,ytks,MUSEwavelength,
-                                         Albedo,Continuum_Albedo,Model,
-                                         Telescope=Tele)
+MUSEfilters,axsMUSEFilt= \
+    NFL.compute_filter_spectrum(x0,x1,xtks,y0,y1,ytks,FilterList,
+                                             Albedo,Continuum_Albedo,Model,
+                                             Telescope=Tele)
 
 MUSEdata = deepcopy(MUSEfilters)
-for filtr in filterwavelength[0:4]:
+for filtr in FilterList[0:4]:
     MUSEdata[filtr]['Cont_Int'],MUSEdata[filtr]['Absr_Int'],MUSEdata[filtr]['TransInt']= \
         NFL.cont_absorption_calcs(MUSEdata[filtr]['ContProd'],MUSEdata[filtr]['AbsrProd'], \
-                                  float(filtr)-MUSEdata[filtr]['filtwdth'],\
-                                  float(filtr)+MUSEdata[filtr]['filtwdth'], \
+                                  float(filtr)-MUSEdata[filtr]['halfwdth'],\
+                                  float(filtr)+MUSEdata[filtr]['halfwdth'], \
                                       MUSEdata[filtr]['filtname'])
     Jupiterdata[filtr]['Tau_Albedo']=-np.log(MUSEdata[filtr]['TransInt'])
 
@@ -356,9 +337,9 @@ print("************ MUSE CH4 Trans",MUSECH4Abs)
 
 # COMPUTE MUSE TRANSMISSIONS *WITH* ACCOUNTING FOR 6NM WIDTH OF SPLIT HA
 #  FILTER    
-fout='Filter_Keff_Leff-'+Tele+'-'+Model+'.csv'
-MUSEdata=NFL.compute_effective_abs_and_weighting(MUSEdata,MUSEfilters,CH4,NH3,P,
-                                                 fnout=fout)
+fout_sfx='-'+Tele+'-'+Model
+MUSEdata=NFL.compute_vertical_transmission_profiles(MUSEdata,MUSEfilters,CH4,NH3,P,
+                                                 fout_sfx=fout_sfx)
 slopewt656=np.sum(MUSEdata['656']['FiltTrans'][:,1])/np.sum(MUSEdata['632']['FiltTrans'][:,1])
 print("slopewt656=",slopewt656)
 MUSERelSlope=(MUSEdata['656']['Absr_Int']/slopewt656-MUSEdata['632']['Absr_Int'])/(656-632)
