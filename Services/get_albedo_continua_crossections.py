@@ -92,4 +92,4 @@ def get_albedo_continua_crossections(x0,x1,xtks,y0,y1,ytks,
                           'Jupiter_NH3_Analysis_P3/Filter Plots/'+\
                           'Albedo_Continua_Crossections.png',dpi=320)
     
-    return(Albedo,Continua,CH4,NH3)
+    return(Albedo,Continua,CH4,NH3,NH3_Lutz_Owen_1980)

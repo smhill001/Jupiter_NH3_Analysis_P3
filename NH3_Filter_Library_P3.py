@@ -214,24 +214,22 @@ def SpectralModeling(s_NH3=0.018,s_CH4=0.304,refl=0.53):
     import copy
     sys.path.append('./Services')
     import get_albedo_continua_crossections as gACC
+    import get_filter_base_dict as GFBD
 
-    path='c:/Astronomy/Projects/Techniques/InstrumentPerformance-P3/Filters/'
-    filterdata={'620':{'transfile':'620CH4/620CH4_Transmission.txt',
-                       'filtname':'620CH4','filtwdth':10.},
-                '647':{'transfile':'647CNT/647CNT_Transmission.txt',
-                    'filtname':'647NH3','filtwdth':10.},
-                '620MUSE':{'transfile':'',
-                          'filtname':'620MUSE','filtwdth':10},
-                '647MUSE':{'transfile':'',
-                          'filtname':'647MUSE','filtwdth':10}}
+    ###########################################################################
+    # Get albedo, continua, and cross section data and plot
+    ###########################################################################
 
-    #x0,x1,xtks=600.,1000.,9
-    #y0,y1,ytks=0.0,0.7,8
     x0,x1,xtks=600.,680.,5
     y0,y1,ytks=0.4,0.6,5
-    Albedo,Continua,CH4,NH3= \
+    Albedo,Continua,CH4,NH3,NH3_LO1980= \
         gACC.get_albedo_continua_crossections(x0,x1,xtks,y0,y1,ytks,
                                               Crossect=False)
+    #NH3=NH3_LO1980
+    
+    ###########################################################################
+    # Get albedo, continua, and cross section data and plot
+    ###########################################################################
 
     figtest,axtest=pl.subplots(1,1,figsize=(6.0,3.5), dpi=150, facecolor="white")
 
@@ -240,11 +238,11 @@ def SpectralModeling(s_NH3=0.018,s_CH4=0.304,refl=0.53):
     axtest.set_xticks(np.linspace(x0,x1,xtks, endpoint=True))
     axtest.set_ylim(y0,y1)
     axtest.set_yticks(np.linspace(y0,y1,ytks, endpoint=True))
-    print(CH4.shape)
+    #print(CH4.shape)
     CH4_trans=refl*(np.exp(-s_CH4*CH4[:,1]))
     NH3_trans=refl*(np.exp(-s_NH3*NH3[:,1]))
     gas_trans=refl*(np.exp(-s_CH4*CH4[:,1]-s_NH3*NH3[:,1]))
-    print(CH4_trans.shape)
+    #print(CH4_trans.shape)
     axtest.plot(CH4[:,0],CH4_trans,label='CH4 '+str(s_CH4)[:5]+' km-atm',linewidth=0.5,color='C1')
     axtest.plot(NH3[:,0],NH3_trans,label='NH3 '+str(s_NH3)[:5]+' km-atm',linewidth=0.5,color='C2')
     axtest.plot(NH3[:,0],gas_trans,label='gas (CH4+NH3)',linewidth=1.0,color='C3')
@@ -262,221 +260,165 @@ def SpectralModeling(s_NH3=0.018,s_CH4=0.304,refl=0.53):
     # Compute and plot transmission of the 647nm filter and the equivalent
     # width of the band as a function of the column abundance of NH3.
     ###########################################################################
-    filterdata['647']['FiltTrans']=np.loadtxt(path+filterdata['647']['transfile'],usecols=range(2))
 
-    F647_wvs=[642.,652.]
-    F647_idx=[np.argmin(abs(F647_wvs[0]-filterdata['647']['FiltTrans'][:,0])),
-              np.argmin(abs(F647_wvs[1]-filterdata['647']['FiltTrans'][:,0]))]
-    filterdata['647MUSE']['FiltTrans']=copy.deepcopy(filterdata['647']['FiltTrans'])
-    filterdata['647MUSE']['FiltTrans'][:,1]=np.zeros((len(filterdata['647MUSE']['FiltTrans'][:,1])))
-    filterdata['647MUSE']['FiltTrans'][F647_idx[0]:F647_idx[1],1]=1.
-    
-    s_NH3_Arr=np.arange(0.0,0.031,0.002) #column abundance in km-atm
-    NH3_trans_Arr=[]
-    NH3_trans_Arr_MUSE=[]
-    W_Arr=[]
-    
+    FilterList=['620','647']
+    SCTpath,SCTdict=GFBD.get_filter_base_dict('SCT',FilterList=FilterList,
+                             Inst=True)
+    VLTpath,VLTdict=GFBD.get_filter_base_dict('VLT',FilterList=FilterList,
+                             Inst=True)
     Model='Piecewise1'
-    Tele='SCT'
-    Continuum_Albedo=np.zeros((Continua[Model]['WaveGrid'].size,2))
-    Continuum_Albedo[:,0]=Continua[Model]['WaveGrid']
-    Continuum_Albedo[:,1]=Continua[Model]['Albedo']
+
+    for tele in ['SCT','VLT']:
+        #print(tele)
+        if tele=='SCT':
+            filterdata=SCTdict
+            path=SCTpath
+            i=0
+        elif tele=='VLT':
+            filterdata=VLTdict
+            path=VLTpath
+            i=0
+        
+        figsct,axssct=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="white")
+        figsct.suptitle(tele)
+        axssct.plot(filterdata['647']['FiltTrans'][:,0],filterdata['647']['FiltTrans'][:,1])
+        axssct.set_xlim(600.,680.)
+            
+        fig_tau,axs_tau=NFL.Tau_EW_quad_plot(SupTitle="Transmission and Equivalent Width for "+tele)
+        
+        for filtr in FilterList:
+            #print(filtr)
+            if filtr=='647':
+                wvs=[642.,652.] #Original
+                #F647_wvs=[636.,656.]
+                Band_idx=[np.argmin(abs(wvs[0]-filterdata[filtr]['FiltTrans'][:,0])),
+                          np.argmin(abs(wvs[1]-filterdata[filtr]['FiltTrans'][:,0]))]
+                s_Arr=np.arange(0.0,0.031,0.002) #column abundance in km-atm
+                Cont_Wave=[627.,667.] #Original
+                #NH3_Cont_Wave=[636.,656.]
+                ind1,ind2=np.argmin(abs(NH3[:,0]-Cont_Wave[0])),np.argmin(abs(NH3[:,0]-Cont_Wave[1]))
+                j=0
+                gas='Ammonia'
+                csect=NH3
+            elif filtr=='620':
+                wvs=[615.,625.] #Original
+                #F647_wvs=[636.,656.]
+                Band_idx=[np.argmin(abs(wvs[0]-filterdata[filtr]['FiltTrans'][:,0])),
+                          np.argmin(abs(wvs[1]-filterdata[filtr]['FiltTrans'][:,0]))]
+                s_Arr=np.arange(0.0,0.500,0.02) #column abundance in km-atm
+                Cont_Wave=[600.,640.] #Original
+                ind1,ind2=np.argmin(abs(NH3[:,0]-Cont_Wave[0])),np.argmin(abs(NH3[:,0]-Cont_Wave[1]))
+                j=1
+                gas='Methane'
+                csect=CH4
+
+            Trans_Arr=[]
+            W_Arr=[]
+            """
+            filterdata[filtr]['FiltTrans']=copy.deepcopy(filterdata[filtr]['FiltTrans'])
+            filterdata[filtr]['FiltTrans'][:,1]=np.zeros((len(filterdata[filtr]['FiltTrans'][:,1])))
+            filterdata[filtr]['FiltTrans'][Band_idx[0]:Band_idx[1],1]=1.
+            """
+            Continuum_Albedo=np.zeros((Continua[Model]['WaveGrid'].size,2))
+            Continuum_Albedo[:,0]=Continua[Model]['WaveGrid']
+            Continuum_Albedo[:,1]=Continua[Model]['Albedo']
+            
+            Continuum=copy.deepcopy(Continuum_Albedo)
+            Continuum[:,1]=np.ones(Continuum_Albedo.shape[0])
+            Trans=copy.deepcopy(Continuum_Albedo)
+            #print("C",Continuum_Albedo.shape)
+            
+            filterdata[filtr]['ContAlbedoProd']=GSU.SpectrumMath(filterdata[filtr]['FiltTrans'],Continuum_Albedo,"Multiply")
+            filterdata[filtr]['AbsrProd']=GSU.SpectrumMath(filterdata[filtr]['FiltTrans'],Albedo,"Multiply")
+            filterdata[filtr]['ContAlbedo_Int'],filterdata[filtr]['AbsrAlbedo_Int'],filterdata[filtr]['TransAlbedoInt']= \
+                NFL.cont_absorption_calcs(filterdata[filtr]['ContAlbedoProd'],filterdata[filtr]['AbsrProd'], \
+                                          float(filtr)-filterdata[filtr]['halfwdth'],\
+                                          float(filtr)+filterdata[filtr]['halfwdth'], \
+                                              filterdata[filtr]['filtname'],prn=False)
+                
+            #figslopeNH3,axslopeNH3=pl.subplots(1,1,figsize=(6.0,3.5), dpi=150, facecolor="white")
+            for s in s_Arr:
+                #print("############ s=",s)
+                temp=1.0*(np.exp(-s*csect[:,1]))
+                
+                #print('t',temp.shape)
+                Trans[:,1]=temp #NH3 transmission as a function of wavelength
+                #print(NH3_trans.shape)
+                filterdata[filtr]['ContProd']=GSU.SpectrumMath(filterdata[filtr]['FiltTrans'],Continuum,"Multiply")
+                filterdata[filtr]['AbsrProd']=GSU.SpectrumMath(filterdata[filtr]['FiltTrans'],Trans,"Multiply")
+                
+                filterdata[filtr]['Cont_Int'],filterdata[filtr]['Absr_Int'],filterdata[filtr]['TransInt']= \
+                    NFL.cont_absorption_calcs(filterdata[filtr]['ContProd'],filterdata[filtr]['AbsrProd'], \
+                                              float(filtr)-filterdata[filtr]['halfwdth'],\
+                                              float(filtr)+filterdata[filtr]['halfwdth'], \
+                                                  filterdata[filtr]['filtname'],prn=False)
+                                
+                filterdata[filtr]['Tau_Albedo']=-np.log(filterdata[filtr]['TransInt'])
+                
+                Trans_Arr.append(filterdata[filtr]['TransInt'])
+        
+                W=np.sum(1.0-Trans[ind1:ind2,1])*0.5 #for 0.5 nm bins
+                W_Arr.append(W)
+                #print("#### W=",W)
+                            
+            TauSCTNH3=-np.log(Trans_Arr)
+            R_W=np.corrcoef(s_Arr,W_Arr)[0,1]
+            R_trans=np.corrcoef(s_Arr,TauSCTNH3)[0,1]
+            NH3fit=np.polyfit(TauSCTNH3,W_Arr,1)
+            #print()
+            #print(gas+" "+tele+" fit=",NH3fit)
+            NH3transfit=np.polyfit(Trans_Arr,W_Arr,1)
+            print()
+            print(gas+" "+tele+" Trans fit=",NH3transfit)
+
+            #print("************** i,j=",i,j)
+            axs_tau[0,j].plot(s_Arr,TauSCTNH3,color='C0',label='Tau, R=')#+str(R_trans)[:5])
+            axs_tau[i,j].grid(linewidth=0.2)
+            #axs_tau[i,j].set_xlabel("Column Abundance (km-atm)")
+            #axs_tau[0,0].set_ylabel("Opacity")
+            axs_tau[0,j].set_xlim(0.0,0.03)
+            axs_tau[0,j].set_xticks(np.linspace(0.0,0.03,7, endpoint=True))
+            axs_tau[0,0].set_ylim(0.0,0.3)
+            axs_tau[0,0].set_yticks(np.linspace(0.0,0.3,4, endpoint=True))
+            axs_tau[0,1].set_xlim(0.0,0.5)
+            axs_tau[0,1].set_xticks(np.linspace(0.0,0.5,6, endpoint=True))
+            axs_tau[0,1].set_ylim(0.0,0.3)
+            axs_tau[0,1].set_yticks(np.linspace(0.0,0.3,4, endpoint=True))
+
+            axWNH3=axs_tau[i,j].twinx()
+            axWNH3.plot(s_Arr,W_Arr,color='C1',label='Eq. Width (nm), R=')#+str(R_W)[:4])
+            axWNH3.set_ylim(0.0,3.0)
+            axWNH3.set_yticks(np.linspace(0.0,3,6, endpoint=True))
+            
+            axs_tau[1,j].plot(TauSCTNH3,W_Arr,color='C0',label='slope')#+str(R_trans)[:5])
+            fit=NH3fit[0]*np.array(TauSCTNH3)+NH3fit[1]
+            axs_tau[1,j].plot(TauSCTNH3,fit,color='C1',label='fit')#+str(R_trans)[:5])
+
+            axs_tau[1,0].set_xlim(0.0,0.1)
+            axs_tau[1,0].set_xticks(np.linspace(0.0,0.1,5, endpoint=True))
+            axs_tau[1,0].set_ylim(0.0,1.2)
+            axs_tau[1,0].set_yticks(np.linspace(0.0,1.2,7, endpoint=True))
+            
+            axs_tau[1,1].set_xlim(0.0,0.25)
+            axs_tau[1,1].set_xticks(np.linspace(0.0,0.25,6, endpoint=True))
+            axs_tau[1,1].set_ylim(0.0,1.2)
+            axs_tau[1,1].set_yticks(np.linspace(0.0,2.5,6, endpoint=True))
+            
+            axs_tau[i,j].tick_params(axis='both', which='major', labelsize=8)
+
+            if j==0:
+                axWNH3.tick_params(labelright=False)    
+
+            if j==1:
+                axWNH3.set_ylabel("Equivalent Width (nm)")
+                axWNH3.tick_params(axis='both', which='major', labelsize=8)
+
+            axs_tau[0,j].legend(fontsize=7, loc=2)
+            axWNH3.legend(fontsize=7, loc=1)
     
-    Continuum=copy.deepcopy(Continuum_Albedo)
-    Continuum[:,1]=np.ones(Continuum_Albedo.shape[0])
-    NH3_trans=copy.deepcopy(Continuum_Albedo)
-    NH3_trans_MUSE=copy.deepcopy(Continuum_Albedo)
-    print("C",Continuum_Albedo.shape)
-    
-    filterdata['647MUSE']['ContAlbedoProd']=GSU.SpectrumMath(filterdata['647MUSE']['FiltTrans'],Continuum_Albedo,"Multiply")
-    filterdata['647MUSE']['AbsrProd']=GSU.SpectrumMath(filterdata['647MUSE']['FiltTrans'],Albedo,"Multiply")
-    filterdata['647MUSE']['ContAlbedo_Int'],filterdata['647MUSE']['AbsrAlbedo_Int'],filterdata['647MUSE']['TransAlbedoInt']= \
-        NFL.cont_absorption_calcs(filterdata['647MUSE']['ContAlbedoProd'],filterdata['647MUSE']['AbsrProd'], \
-                                  float('647')-filterdata['647MUSE']['filtwdth'],\
-                                  float('647')+filterdata['647MUSE']['filtwdth'], \
-                                      filterdata['647MUSE']['filtname'])
+        fig_tau.subplots_adjust(left=0.10, right=0.90, top=0.9, bottom=0.14)
+        fig_tau.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Tau_vs_EW.png',dpi=320)
 
-
-    figslopeNH3,axslopeNH3=pl.subplots(1,1,figsize=(6.0,3.5), dpi=150, facecolor="white")
-    for s in s_NH3_Arr:
-        print("############ s=",s)
-        temp=1.0*(np.exp(-s*NH3[:,1]))
-        
-        print('t',temp.shape)
-        NH3_trans[:,1]=temp #NH3 transmission as a function of wavelength
-        print(NH3_trans.shape)
-        filterdata['647']['ContProd']=GSU.SpectrumMath(filterdata['647']['FiltTrans'],Continuum,"Multiply")
-        filterdata['647']['AbsrProd']=GSU.SpectrumMath(filterdata['647']['FiltTrans'],NH3_trans,"Multiply")
-        
-        filterdata['647']['Cont_Int'],filterdata['647']['Absr_Int'],filterdata['647']['TransInt']= \
-            NFL.cont_absorption_calcs(filterdata['647']['ContProd'],filterdata['647']['AbsrProd'], \
-                                      float('647')-filterdata['647']['filtwdth'],\
-                                      float('647')+filterdata['647']['filtwdth'], \
-                                          filterdata['647']['filtname'])
-                        
-        filterdata['647']['Tau_Albedo']=-np.log(filterdata['647']['TransInt'])
-        
-        NH3_trans_Arr.append(filterdata['647']['TransInt'])
-
-        ind1,ind2=np.argmin(abs(NH3_trans[:,0]-627.)),np.argmin(abs(NH3_trans[:,0]-667.))
-        W=np.sum(1.0-NH3_trans[ind1:ind2,1])*0.5 #for 0.5 nm bins
-        W_Arr.append(W)
-        print("#### W=",W)
-        
-        ##########
-
-        filterdata['647MUSE']['ContProd']=GSU.SpectrumMath(filterdata['647MUSE']['FiltTrans'],Continuum,"Multiply")
-        filterdata['647MUSE']['AbsrProd']=GSU.SpectrumMath(filterdata['647MUSE']['FiltTrans'],NH3_trans,"Multiply")
-        
-        filterdata['647MUSE']['Cont_Int'],filterdata['647MUSE']['Absr_Int'],filterdata['647MUSE']['TransInt']= \
-            NFL.cont_absorption_calcs(filterdata['647MUSE']['ContProd'],filterdata['647MUSE']['AbsrProd'], \
-                                      float('647')-filterdata['647MUSE']['filtwdth'],\
-                                      float('647')+filterdata['647MUSE']['filtwdth'], \
-                                          filterdata['647MUSE']['filtname'])
-                        
-        filterdata['647MUSE']['Tau_Albedo']=-np.log(filterdata['647MUSE']['TransInt'])
-        
-        NH3_trans_Arr_MUSE.append(filterdata['647MUSE']['TransInt'])
-
-    
-    R_W=np.corrcoef(s_NH3_Arr,W_Arr)[0,1]
-    R_trans=np.corrcoef(s_NH3_Arr,NH3_trans_Arr)[0,1]
-    R_trans_MUSE=np.corrcoef(s_NH3_Arr,NH3_trans_Arr_MUSE)[0,1]
-    NH3fit=np.polyfit(NH3_trans_Arr,W_Arr,1)
-    NH3fitMUSE=np.polyfit(NH3_trans_Arr_MUSE,W_Arr,1)
-
-    axslopeNH3.plot(s_NH3_Arr,NH3_trans_Arr,color='C0',label='Transmission, R='+str(R_trans)[:5])
-    axslopeNH3.plot(s_NH3_Arr,NH3_trans_Arr_MUSE,color='C2',label='Transmission MUSE, R='+str(R_trans_MUSE)[:5])
-    axWNH3=axslopeNH3.twinx()
-    axWNH3.plot(s_NH3_Arr,W_Arr,color='C1',label='Eq. Width (nm), R='+str(R_W)[:4])
-    axslopeNH3.grid(linewidth=0.2)
-    axslopeNH3.set_xlabel("NH3 Column Abundance (km-atm)")
-    axslopeNH3.set_ylabel("Transmission")
-    axWNH3.set_ylabel("Equivalent Width (nm)")
-    axslopeNH3.tick_params(axis='both', which='major', labelsize=8)
-    axWNH3.tick_params(axis='both', which='major', labelsize=8)
-    axslopeNH3.set_xlim(0.0,0.03)
-    axslopeNH3.set_xticks(np.linspace(0.0,0.03,7, endpoint=True))
-    axslopeNH3.set_ylim(0.9,1.02)
-    axslopeNH3.set_yticks(np.linspace(0.9,1.02,7, endpoint=True))
-    axWNH3.set_ylim(0.0,1.2)
-    axWNH3.set_yticks(np.linspace(0.0,1.2,7, endpoint=True))
-    axslopeNH3.legend(fontsize=7, loc=2)
-    axWNH3.legend(fontsize=7, loc=1)
-    axslopeNH3.set_title("Transmission and Equivalent Width for *Pure* NH3")
-
-    figslopeNH3.subplots_adjust(left=0.10, right=0.90, top=0.9, bottom=0.14)
-    figslopeNH3.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/NH3_Transmission_and_EW.png',dpi=320)
-    
-    ###########################################################################
-    # Compute and plot transmission of the 620nm filter and the equivalent
-    # width of the band as a function of the column abundance of CH4.
-    ###########################################################################
-    filterdata['620']['FiltTrans']=np.loadtxt(path+filterdata['620']['transfile'],usecols=range(2))
-
-    F620_wvs=[615.,625.]
-    F620_idx=[np.argmin(abs(F620_wvs[0]-filterdata['620']['FiltTrans'][:,0])),
-              np.argmin(abs(F620_wvs[1]-filterdata['620']['FiltTrans'][:,0]))]
-    filterdata['620MUSE']['FiltTrans']=copy.deepcopy(filterdata['647']['FiltTrans'])
-    filterdata['620MUSE']['FiltTrans'][:,1]=np.zeros((len(filterdata['620MUSE']['FiltTrans'][:,1])))
-    filterdata['620MUSE']['FiltTrans'][F620_idx[0]:F620_idx[1],1]=1.
-
-    s_CH4_Arr=np.arange(0.0,0.500,0.02) #column abundance in km-atm
-    CH4_trans_Arr=[]
-    CH4_trans_Arr_MUSE=[]
-    W_Arr=[]
-    Continuum=np.copy(Continuum_Albedo)
-    Continuum[:,1]=np.ones(Continuum_Albedo.shape[0])
-    CH4_trans=copy.deepcopy(Continuum_Albedo)
-    CH4_trans_MUSE=copy.deepcopy(Continuum_Albedo)
-    print("C",Continuum_Albedo.shape)
-    
-    filterdata['620MUSE']['ContAlbedoProd']=GSU.SpectrumMath(filterdata['620MUSE']['FiltTrans'],Continuum_Albedo,"Multiply")
-    filterdata['620MUSE']['AbsrProd']=GSU.SpectrumMath(filterdata['620MUSE']['FiltTrans'],Albedo,"Multiply")
-    filterdata['620MUSE']['ContAlbedo_Int'],filterdata['620MUSE']['AbsrAlbedo_Int'],filterdata['620MUSE']['TransAlbedoInt']= \
-        NFL.cont_absorption_calcs(filterdata['620MUSE']['ContAlbedoProd'],filterdata['620MUSE']['AbsrProd'], \
-                                  float('620')-filterdata['620MUSE']['filtwdth'],\
-                                  float('620')+filterdata['620MUSE']['filtwdth'], \
-                                      filterdata['620MUSE']['filtname'])
-
-    figslopeCH4,axslopeCH4=pl.subplots(1,1,figsize=(6.0,3.5), dpi=150, facecolor="white")
-    for s in s_CH4_Arr:
-        print("############ s=",s)
-        temp=1.0*(np.exp(-s*CH4[:,1]))
-        
-        print('t',temp.shape)
-        CH4_trans[:,1]=temp
-        print(CH4_trans.shape)
-        filterdata['620']['ContProd']=GSU.SpectrumMath(filterdata['620']['FiltTrans'],Continuum,"Multiply")
-        filterdata['620']['AbsrProd']=GSU.SpectrumMath(filterdata['620']['FiltTrans'],CH4_trans,"Multiply")
-        
-        filterdata['620']['Cont_Int'],filterdata['620']['Absr_Int'],filterdata['620']['TransInt']= \
-            NFL.cont_absorption_calcs(filterdata['620']['ContProd'],filterdata['620']['AbsrProd'], \
-                                      float('620')-filterdata['620']['filtwdth'],\
-                                      float('620')+filterdata['620']['filtwdth'], \
-                                          filterdata['620']['filtname'])
-                        
-        filterdata['620']['Tau_Albedo']=-np.log(filterdata['620']['TransInt'])
-        
-        CH4_trans_Arr.append(filterdata['620']['TransInt'])
-
-        ind1,ind2=np.argmin(abs(CH4_trans[:,0]-600.)),np.argmin(abs(CH4_trans[:,0]-640.))
-        W=np.sum(1.0-CH4_trans[ind1:ind2,1])*0.5 #for 0.5 nm bins
-        W_Arr.append(W)
-        print("#### W=",W)
-
-        ########
-        
-        filterdata['620MUSE']['ContProd']=GSU.SpectrumMath(filterdata['620MUSE']['FiltTrans'],Continuum,"Multiply")
-        filterdata['620MUSE']['AbsrProd']=GSU.SpectrumMath(filterdata['620MUSE']['FiltTrans'],CH4_trans,"Multiply")
-        
-        filterdata['620MUSE']['Cont_Int'],filterdata['620MUSE']['Absr_Int'],filterdata['620MUSE']['TransInt']= \
-            NFL.cont_absorption_calcs(filterdata['620MUSE']['ContProd'],filterdata['620MUSE']['AbsrProd'], \
-                                      float('620')-filterdata['620MUSE']['filtwdth'],\
-                                      float('620')+filterdata['620MUSE']['filtwdth'], \
-                                          filterdata['620MUSE']['filtname'])
-                        
-        filterdata['620MUSE']['Tau_Albedo']=-np.log(filterdata['620MUSE']['TransInt'])
-        
-        CH4_trans_Arr_MUSE.append(filterdata['620MUSE']['TransInt'])
-
-    
-    R_trans=np.corrcoef(s_CH4_Arr,CH4_trans_Arr)[0,1]
-    R_W=np.corrcoef(s_CH4_Arr,W_Arr)[0,1]
-    CH4fit=np.polyfit(CH4_trans_Arr,W_Arr,1)
-    CH4fitMUSE=np.polyfit(CH4_trans_Arr_MUSE,W_Arr,1)
-
-    axslopeCH4.plot(s_CH4_Arr,CH4_trans_Arr,color='C0',label='Transmission, R='+str(R_trans)[:5])
-    axslopeCH4.plot(s_CH4_Arr,CH4_trans_Arr_MUSE,color='C2',label='Transmission MUSE, R='+str(R_trans)[:5])
-    axWCH4=axslopeCH4.twinx()
-    axWCH4.plot(s_CH4_Arr,W_Arr,color='C1',label='Eq. Width (nm), R='+str(R_W)[:4])
-    axslopeCH4.grid(linewidth=0.2)
-    axslopeCH4.set_xlabel("CH4 Column Abundance (km-atm)")
-    axslopeCH4.set_ylabel("Transmission")
-    axWCH4.set_ylabel("Equivalent Width (nm)")
-    axslopeCH4.tick_params(axis='both', which='major', labelsize=8)
-    axWCH4.tick_params(axis='both', which='major', labelsize=8)
-    axslopeCH4.set_xlim(0.0,0.5)
-    axslopeCH4.set_xticks(np.linspace(0.0,0.5,6, endpoint=True))
-    axslopeCH4.set_ylim(0.9,1.1)
-    axslopeCH4.set_yticks(np.linspace(0.8,1.1,7, endpoint=True))
-    axWCH4.set_ylim(0.0,1.2)
-    axWCH4.set_yticks(np.linspace(0.0,3.0,7, endpoint=True))
-    axslopeCH4.legend(fontsize=7, loc=2)
-    axWCH4.legend(fontsize=7, loc=1)
-    axslopeCH4.set_title("Transmission and Equivalent Width for *Pure* CH4")
-
-    figslopeCH4.subplots_adjust(left=0.10, right=0.90, top=0.9, bottom=0.14)
-    figslopeCH4.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/CH4_Transmission_and_EW.png',dpi=320)    
-    
-    print("filterdata['620MUSE']['TransAlbedoInt']=",filterdata['620MUSE']['TransAlbedoInt'])
-    print("filterdata['647MUSE']['TransAlbedoInt']=",filterdata['647MUSE']['TransAlbedoInt'])
-    print()
-    print("NH3fit=",NH3fit)
-    print("NH3fitMUSE=",NH3fitMUSE)
-    print("CH4fit=",CH4fit)
-    print("CH4fitMUSE=",CH4fitMUSE)
-    print()
     
 def MoonAlbedos(Moon):
     import numpy as np
@@ -521,6 +463,28 @@ def vert_profile_quad_plot(SupTitle="SupTitle"):
     axs_trans[1,0].set_title("Rayleigh")
     axs_trans[1,1].set_title("NH3")
     return fig_trans,axs_trans
+
+def Tau_EW_quad_plot(SupTitle="SupTitle"):
+    # Simply sets up quad plot for Transmission and Contribution functions
+    import matplotlib.pyplot as pl
+    fig,axs=pl.subplots(2,2,figsize=(6.0,6.0), dpi=150, facecolor="white")
+    fig.suptitle(SupTitle)
+    for i in range(0,2):
+        for j in range(0,2):
+            #axs[i,j].set_ylim(0.,1)
+            #axs[i,j].set_xlim(0.,2.) 
+            axs[i,j].grid(which='both')
+
+    axs[0,0].set_title("Ammonia")
+    axs[0,0].set_xlabel("S (km-atm)")
+    axs[0,0].set_ylabel("Opacity")
+    axs[0,1].set_xlabel("S (km-atm)")
+    axs[0,1].set_title("Methane")
+    axs[1,0].set_xlabel("Opacity")
+    axs[1,0].set_ylabel("Equivalent Width (nm)")
+    #axs[1,0].set_title("CH4 Tau & EW")
+    #axs[1,1].set_title("CH4 Fit")
+    return fig,axs
 
 def compute_vertical_transmission_profiles(Jupiterdata,FilterList,CH4,NH3,Pres,
                                            fout_sfx="Test"):
