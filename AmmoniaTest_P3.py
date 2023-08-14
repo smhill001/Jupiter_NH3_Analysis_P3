@@ -33,7 +33,7 @@ import get_albedo_continua_crossections as gACC
 # LOAD JOVIAN DISK-INTEGRATEDALBEDO DATA FROM KARKOSCHKA, 1994 (DATA FROM 1993)
 x0,x1,xtks=600.,680.,9
 y0,y1,ytks=0.0,0.7,8
-Albedo,Continua,CH4,NH3=gACC.get_albedo_continua_crossections(x0,x1,xtks,y0,y1,ytks,
+Albedo,Continua,CH4,NH3,LONH3=gACC.get_albedo_continua_crossections(x0,x1,xtks,y0,y1,ytks,
                                                               Crossect=True)
 
 # PLOT FILTER TRANSMISSIONS CONVOLVED WITH DISK-INTEGRATED ALBEDO AND CONTINUUM

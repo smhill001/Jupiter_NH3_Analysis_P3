@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['Retrieve_Jup_Atm_2022_P3.py', 'RetrievalLibrary.py', 'plot_TEXES_Groups_P3.py', 'NH3AbsorptionProfile.py', 'NH3_Filter_Library_P3.py', 'Services\\get_albedo_continua_crossections.py', 'Services\\get_filter_base_dict.py']
+recent_files = ['plot_TEXES_Groups_P3.py', 'Retrieve_Jup_Atm_2022_P3.py', 'NH3_Filter_Library_P3.py']
 
 [main]
 version = 0.2.0

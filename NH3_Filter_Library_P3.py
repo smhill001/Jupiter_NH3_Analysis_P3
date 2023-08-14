@@ -365,9 +365,13 @@ def SpectralModeling(s_NH3=0.018,s_CH4=0.304,refl=0.53):
             R_W=np.corrcoef(s_Arr,W_Arr)[0,1]
             R_trans=np.corrcoef(s_Arr,TauSCTNH3)[0,1]
             NH3fit=np.polyfit(TauSCTNH3,W_Arr,1)
+            NH3transfit=np.polyfit(Trans_Arr,W_Arr,1)
+            
+            #x=copy.deepcopy(TauSCTNH3)
+            #x = x[:,np.newaxis]
+            #a, _, _, _ = np.linalg.lstsq(x, W_Arr)
             #print()
             #print(gas+" "+tele+" fit=",NH3fit)
-            NH3transfit=np.polyfit(Trans_Arr,W_Arr,1)
             print()
             print(gas+" "+tele+" Trans fit=",NH3transfit)
 
@@ -389,10 +393,18 @@ def SpectralModeling(s_NH3=0.018,s_CH4=0.304,refl=0.53):
             axWNH3.plot(s_Arr,W_Arr,color='C1',label='Eq. Width (nm), R=')#+str(R_W)[:4])
             axWNH3.set_ylim(0.0,3.0)
             axWNH3.set_yticks(np.linspace(0.0,3,6, endpoint=True))
-            
-            axs_tau[1,j].plot(TauSCTNH3,W_Arr,color='C0',label='slope')#+str(R_trans)[:5])
+            ###################################################################
+            #Plot EW vs Tau and *fit* of EW vs Tau
+            ###################################################################
+            axs_tau[1,j].plot(TauSCTNH3,W_Arr,color='C0',label='Model')#+str(R_trans)[:5])
             fit=NH3fit[0]*np.array(TauSCTNH3)+NH3fit[1]
-            axs_tau[1,j].plot(TauSCTNH3,fit,color='C1',label='fit')#+str(R_trans)[:5])
+            #FitLin=a*x
+
+            axs_tau[1,j].plot(TauSCTNH3,fit,color='C1',label='Linear Fit')#+str(R_trans)[:5])
+            axErr=axs_tau[1,j].twinx()
+            axErr.plot(TauSCTNH3,W_Arr/fit,color='C2',label='Ratio')
+            axErr.set_ylim(0.9,1.1)
+            axErr.set_yticks(np.linspace(0.9,1.1,5, endpoint=True))
 
             axs_tau[1,0].set_xlim(0.0,0.1)
             axs_tau[1,0].set_xticks(np.linspace(0.0,0.1,5, endpoint=True))
@@ -408,13 +420,16 @@ def SpectralModeling(s_NH3=0.018,s_CH4=0.304,refl=0.53):
 
             if j==0:
                 axWNH3.tick_params(labelright=False)    
+                axErr.tick_params(labelright=False)    
 
             if j==1:
                 axWNH3.set_ylabel("Equivalent Width (nm)")
                 axWNH3.tick_params(axis='both', which='major', labelsize=8)
 
             axs_tau[0,j].legend(fontsize=7, loc=2)
+            axs_tau[1,j].legend(fontsize=7, loc=2)
             axWNH3.legend(fontsize=7, loc=1)
+            axErr.legend(fontsize=7, loc=2)
     
         fig_tau.subplots_adjust(left=0.10, right=0.90, top=0.9, bottom=0.14)
         fig_tau.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Tau_vs_EW.png',dpi=320)

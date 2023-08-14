@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Nov 23 09:07:27 2022
-Example for paper profile plot with +/-20 deg long:
-    GRS_NH3_Comparison_2022(LatLims=[45,135],CM2=25,LonRng=20,target='GRS')
-@author: smhil
-"""
 
 def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
+    """
+    Created on Wed Nov 23 09:07:27 2022
+    Example for paper profile plot with +/-20 deg long:
+        GRS_NH3_Comparison_2022(LatLims=[45,135],CM2=25,LonRng=20,target='GRS')
+    @author: smhil
+    
+    Call used for 2023 Paper:
+        GRS_NH3_Comparison_2022(LatLims=[90,130],CM2=25,LonRng=20,target='GRSCM')
+        
+    """
     import sys
     drive='c:'
     sys.path.append(drive+'/Astronomy/Python Play')
@@ -17,16 +21,13 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
     from matplotlib.pyplot import imread
     import pylab as pl
     import numpy as np
-    from imageio import imwrite
     from numpy import inf
     from re import search
     from astropy.io import fits
     from astropy.convolution import Gaussian2DKernel
     from astropy.convolution import convolve
-    from astropy.io import fits
     import plot_TEXES_Groups_P3 as PTG
     import RetrievalLibrary as RL
-
 
     ###########################################################################
     #  DATA FILES AND METADATA DICTIONARY
@@ -226,7 +227,7 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
     figavg,axsavg=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
     #fig1.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2)),x=0.5,ha='center',color='k')
-    figavg.suptitle('Average 2022 GRS NH3',x=0.5,ha='center',color='k')
+    figavg.suptitle('Average 2022 SCT GRS Observations',x=0.5,ha='center',color='k')
 
     for ix in range(0,1):
         axsavg[ix].grid(linewidth=0.2)
@@ -295,7 +296,7 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
     
     figfletch,axsfletch=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
-    figfletch.suptitle('Fletcher NH3',x=0.5,ha='center',color='k')
+    figfletch.suptitle('Gemini/TEXES observations in 2014',x=0.5,ha='center',color='k')
 
     print(fNH3_patch_avg.shape,RGB_patch_avg.shape)
     print(RGB_patch_avg.min(),RGB_patch_avg.max())
@@ -340,9 +341,14 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
     print(np.nanmean(statsarray[:,0]),np.nanstd(statsarray[:,0]))
     
     #####Fletcher########
-    
+    #!! 8/4/2023 - there's some problem with the Fletcher data scaling properly
+    #              in the map extent for this figure.
+    #show=axsfletch[0].imshow(FletcherNH3,  
+    #           extent=[148,88,90-LatLims[1],
+    #                   90-LatLims[0]],#vmin=0,vmax=1.2,
+    #                   aspect="equal")
     show=axsfletch[0].imshow(FletcherNH3,  
-               extent=[148,88,90-LatLims[1],
+               extent=[135,85,90-LatLims[1],
                        90-LatLims[0]],#vmin=0,vmax=1.2,
                        aspect="equal")
 

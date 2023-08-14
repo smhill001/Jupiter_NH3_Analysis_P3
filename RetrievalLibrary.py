@@ -44,6 +44,7 @@ def make_contours_CH4_patch(ax,CH4Abs_conv,LatLims,LonLims,lvls=[0.71,0.73,0.75,
                   linewidths=[0.5,0.5,0.5,0.5,0.5,0.5],
                   linestyles=['dashed','dashed','dashed','dashed','dashed'])
     #ax.clabel(cs,[19.0,19.5,20.0,20.5,21.0],inline=True,fmt='%2.1f',fontsize=8)
+    print(lvls)
     ax.clabel(cs,lvls,inline=True,fmt=frmt,fontsize=8)
     
 

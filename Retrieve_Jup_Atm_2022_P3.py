@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Nov  6 16:47:21 2022
 
-@author: smhil
-"""
 
-def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
-                             imagetype='Map',CalModel='SCT-Obs-Final',Smoothing=True,
+def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
+                             imagetype='Map',CalModel='VLT-Obs-Final',Smoothing=True,
                              LatLims=[45,135],LonRng=45,delta_CM2=0,showbands=False):
+    """
+    Created on Sun Nov  6 16:47:21 2022
+    
+    @author: smhil
+    """    
     import sys
     drive='c:'
     sys.path.append(drive+'/Astronomy/Python Play')
@@ -261,6 +262,9 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20221009UTa",target="Jupiter",
         CH4_tau=-np.log(CH4data*CH4GlobalTrans)
         NH3_tau=-np.log(NH3data*NH3GlobalTrans)
         smthtitle="Unsmoothed"
+
+    #CH4_tau[~np.isfinite(CH4_tau)] = 0
+    #NH3_tau[~np.isfinite(NH3_tau)] = 0
 
     CH4_Ncol=1000*CH4_tau/K_eff_CH4620
     NH3_Ncol=1000*NH3_tau/K_eff_NH3647
@@ -656,7 +660,9 @@ def plot_patch(fullmap,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,cont=True
     vn,vx,n=0.10,0.20,6
     #vn=np.min(patch)
     #vx=np.max(patch)
-    
+    #patch[~np.isfinite(patch)] = 0
+    #patch[np.isnan(patch)] = 0
+    np.nan_to_num(patch, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
     vn=np.mean(patch)-3.0*np.std(patch)
     vx=np.mean(patch)+3.0*np.std(patch)
     

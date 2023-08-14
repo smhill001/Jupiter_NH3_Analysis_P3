@@ -129,7 +129,7 @@ def plot_VLTMUSEandC11_EW_profiles(ax,reference,LatLims=[45,135],LonRng=45.,
 
     calibration,K_eff=read_master_calibration.read_master_calibration()
 
-    data={"C11 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/NH3 Absorption/",
+    data={"SCT 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/NH3 Absorption/",
                               #"fn":"Profile of Jupiter GRS AVG NH3 Transmission 8 files-Celestron11.csv",
                               "fn":["2022-08-18-0733_4-Jupiter_647NH3AbsMap.fits",
                                     "2022-08-28-0608_2-Jupiter_647NH3AbsMap.fits",
@@ -137,7 +137,7 @@ def plot_VLTMUSEandC11_EW_profiles(ax,reference,LatLims=[45,135],LonRng=45.,
                                     "2022-09-19-0453_4-Jupiter_647NH3AbsMap.fits",
                                     "2022-10-13-0345_5-Jupiter-647NH3AbsMap.fits",
                                     "2022-10-20-0440_4-Jupiter-647NH3AbsMap.fits",
-                                    #End of good GRS maps
+                                    #End of GRS maps that are of high quality and near the CM
                                     "2022-08-30-0559_1-Jupiter_647NH3AbsMap.fits",
                                     "2022-09-01-0604_9-Jupiter_647NH3AbsMap.fits",
                                     "2022-09-05-0559_1-Jupiter_647NH3AbsMap.fits",
@@ -181,7 +181,91 @@ def plot_VLTMUSEandC11_EW_profiles(ax,reference,LatLims=[45,135],LonRng=45.,
         ax.plot(Lats,AvgSum,color=clr,linewidth=width,
                 linestyle=style,label=reference)
 
+def plot_VLTMUSEandC11_fNH3_profiles(ax,reference,LatLims=[45,135],LonRng=45.,
+                                   CalModel='SCT-Obs-Final',
+                                   clr='C0',width=1.0,style='solid',smooth=False):
+    #!!!This looks like it plots ABSORPTION and can do so as and EW for 
+    #     comparision to prior work. However, there is only one linear fit
+    #     for converting transmission to EW when separate ones are needed
+    #     for SCT and VLT filters. Also, the disk integrated transmissions
+    #     are hardcoded!!! I need to have a master reference file for these 
+    #     transmissions!
+    #     !!!!And...what are we hardcoded to specific manually generated profile
+    #     files?
+    
+    import numpy as np
+    from astropy.convolution import convolve, Box1DKernel
+    from astropy.io import fits
+    import RetrievalLibrary as RL
+    import sys
+    sys.path.append('./Services')
+    import read_master_calibration
+    import RetrievalLibrary as RL
+    import extract_profile as EP
 
+    calibration,K_eff=read_master_calibration.read_master_calibration()
+
+    data={"SCT 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/fNH3/",
+                              #"fn":"Profile of Jupiter GRS AVG NH3 Transmission 8 files-Celestron11.csv",
+                              "fn":["2022-08-18-0733_4-Jupiter_fNH3.fits",
+                                    "2022-08-28-0608_2-Jupiter_fNH3.fits",
+                                    "2022-09-04-0638_2-Jupiter_fNH3.fits",
+                                    "2022-09-19-0453_4-Jupiter_fNH3.fits",
+                                    "2022-10-13-0345_5-Jupiter-fNH3.fits",
+                                    "2022-10-20-0440_4-Jupiter-fNH3.fits",
+                                    #End of GRS maps that are of high quality and near the CM
+                                    "2022-08-30-0559_1-Jupiter_fNH3.fits",
+                                    "2022-09-01-0604_9-Jupiter_fNH3.fits",
+                                    "2022-09-05-0559_1-Jupiter_fNH3.fits",
+                                    "2022-09-12-0533_4-Jupiter_fNH3.fits",
+                                    "2022-09-13-0457_4-Jupiter_fNH3.fits",
+                                    "2022-09-25-0615_6-Jupiter_fNH3.fits",
+                                    "2022-10-09-0401_5-Jupiter_fNH3.fits",
+                                    "2022-10-09-0524_5-Jupiter_fNH3.fits",
+                                    "2022-10-19-0342_4-Jupiter-fNH3.fits",
+                                    "2022-10-21-0358_6-Jupiter-fNH3.fits"],
+                              "EW_slope":-12.82831873,
+                              "EW_const":12.82685019},
+          "VLTMUSE 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/fNH3/",
+                              "fn":["2022-09-19-0352_3-Jupiter-fNH3.fits"],
+                              "EW_slope":-12.15343491,
+                              "EW_const":12.15195684}}
+
+    pth=data[reference]["path"]
+    AvgArr=np.zeros(180)
+    #StdSum=np.zeros(180)
+    First=True
+    for NH3file in data[reference]["fn"]:                             
+
+        Lats,AvgMerid,StdMerid=EP.extract_profile(pth,NH3file,LonRng=LonRng)       
+        #Convert from fraction to ppm by multiplying by 10^6
+        if First:
+            AvgArr=AvgMerid
+            AvgArr=np.reshape(AvgArr,(1,180))
+            First=False
+        else:
+            AvgArr=np.vstack((AvgArr,AvgMerid))
+    print("AvgArr.shape=",AvgArr.shape)
+    AvgPro=np.mean(AvgArr[:,:],axis=0)*1.0e6
+    AvgStd=np.std(AvgArr[:,:],axis=0)*1.0e6
+    print("AvgPro.shape=",AvgPro.shape)
+    print("AvgPro=",AvgPro)
+    
+    #Profile=np.loadtxt(data[reference]["path"]+data[reference]["fn"],usecols=range(2),delimiter=",")
+    if smooth:
+        ax.plot(Lats,convolve(AvgPro, Box1DKernel(3)),color=clr,
+                linewidth=width,linestyle=style,label=reference)  
+        ax.fill_between(Lats, AvgPro-AvgStd, AvgPro+AvgStd,color='k',alpha=.1)
+
+        #ax.plot(Profile[:,0]-45.,convolve(EW, Box1DKernel(7)),color=clr,linewidth=width,linestyle=style,label=reference)        ax.plot(Lats,AvgMeridEW,color=clr,linewidth=width,linestyle=style,label=reference)
+    else:
+        #ax.plot(Profile[:,0]-45.,EW,color=clr,linewidth=width,linestyle=style,label=reference)
+        ax.plot(Lats,AvgPro,color=clr,linewidth=width,
+                linestyle=style,label=reference)
+        ax.fill_between(Lats, AvgPro-AvgStd, AvgPro+AvgStd,color='k',alpha=.1)
+
+        
+        
 def Centric_to_Graphic(Latc):
     #Formula used is from Simon and Beebe, 1996
     import numpy as np

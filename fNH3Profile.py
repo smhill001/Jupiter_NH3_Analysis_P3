@@ -25,7 +25,7 @@ import plot_TEXES_Groups_P3 as PTG
 import NH3_Filter_Library_P3 as NH3
 from astropy.convolution import convolve, Box1DKernel
 
-smooth=True
+smooth=False
       
 belt={"SSTB":[-39.6,-36.2],
       "STB":[-32.4,-27.1],
@@ -42,35 +42,19 @@ zone={"STZ":[-36.2,-32.4],
 
 path="/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
    
-figavgprof,axsavgprof=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white")
+figavgprof,axsavgprof=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="white")
 
 
-PTG.plot_Teifel(axsavgprof,clr='0.5',width=3.)
+plevel=0.752910
+PTG.plot_TEXES_Groups(axsavgprof,clr='C2',prs=plevel,mult=1000000.)
+plevel=0.657540
+PTG.plot_TEXES_Groups(axsavgprof,clr='r',prs=plevel,mult=1000000.)
+plevel=0.574240
+PTG.plot_TEXES_Groups(axsavgprof,clr='C4',prs=plevel,mult=1000000.)
 
-CMOS2020EW=np.loadtxt(path+
-                          '2020 CMOS_NH3_Meridian_EW.csv',
-                          usecols=range(3),delimiter=",")
-if smooth:
-    axsavgprof.plot(CMOS2020EW[:,0],convolve(CMOS2020EW[:,1],Box1DKernel(3),boundary='extend'),
-                    color="r",linewidth=1.0,label="SCT 2020")
-else:
-    axsavgprof.plot(CMOS2020EW[:,0],CMOS2020EW[:,1],color="r",linewidth=1.0,
-                    label="SCT 2020")
-       
-
-CMOS2021EW=np.loadtxt(path+
-                          '2021 CMOS_NH3_Meridian_EW.csv',
-                          usecols=range(3),delimiter=",")
-if smooth:
-    axsavgprof.plot(CMOS2021EW[:,0],convolve(CMOS2021EW[:,1],Box1DKernel(3),boundary='extend'),
-                    color="b",linewidth=1.0,label="SCT 2021")
-else:
-    axsavgprof.plot(CMOS2021EW[:,0],CMOS2021EW[:,1],color="b",linewidth=1.0,
-                    label="SCT 2021")
-
-PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof,"SCT 2022",LonRng=1.,CalModel='SCT-Obs-Final',
+PTG.plot_VLTMUSEandC11_fNH3_profiles(axsavgprof,"SCT 2022",LonRng=1.,CalModel='SCT-Obs-Final',
                                    clr='k',width=1.5,smooth=smooth)
-PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof,"VLTMUSE 2022",LonRng=1.,CalModel='VLT-Obs-Final',
+PTG.plot_VLTMUSEandC11_fNH3_profiles(axsavgprof,"VLTMUSE 2022",LonRng=1.,CalModel='VLT-Obs-Final',
                                    clr='k',width=1.5,style='dashed',smooth=smooth)
 #PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof,"VLTMUSE 2022",clr='k',width=1.5,style='dashed',smooth=True)
 
@@ -84,16 +68,13 @@ for zb in zone:
     axsavgprof.annotate(zb,xy=[np.mean(zone[zb]),0.05],ha="center")
 
 # Plot layout details and labeling
-axsavgprof.set_title("Ammonia Absorption Profiles")
+axsavgprof.set_xlim(-30.,30.)
+axsavgprof.set_xlabel("Planetographic Latitude (deg)",fontsize=10)
+axsavgprof.set_ylim(0.,300.)
+axsavgprof.set_ylabel("Ammonia Abundance (ppm)",fontsize=10)
+axsavgprof.legend(loc=1,ncol=2, borderaxespad=0.,prop={'size':8})
 axsavgprof.grid(linewidth=0.2)
-axsavgprof.set_xlim(-45.,45.)
-axsavgprof.set_ylim(0.0,1.0)
-axsavgprof.set_xticks(np.linspace(-45.,45.,7), minor=False)
-axsavgprof.set_yticks(np.linspace(0.0,1.0,6), minor=False)
 axsavgprof.tick_params(axis='both', which='major', labelsize=8)
-axsavgprof.set_xlabel("Latitude (deg)",fontsize=10)
-axsavgprof.set_ylabel("Equivalent Width (nm)",fontsize=10)
-axsavgprof.legend(fontsize=8,loc=2)
-figavgprof.subplots_adjust(left=0.09, right=0.97, top=0.93, bottom=0.11)
-  
-figavgprof.savefig(drive+path+"Jupiter-NH3_MeridProfile_Paper.png",dpi=300)
+
+figavgprof.subplots_adjust(left=0.10, bottom=0.12, right=0.98, top=0.92)  
+figavgprof.savefig(path+"GRS_NH3_AbundanceProfile_AVG_2022.png",dpi=300)
