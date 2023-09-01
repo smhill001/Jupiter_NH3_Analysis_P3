@@ -351,12 +351,13 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',
         DateCounter=DateCounter+1
         fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.90,
                     wspace=0.10, hspace=0.20)            
-        fig.savefig(drive+path+"NH3 Map Plots/"+Date+"-Jupiter-NH3"+"_CMII_"+
-                   CM2str+"-Map.png",dpi=300)
+        pathout="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/Map Plots Diagnostic/"
+        fig.savefig(pathout+Date+"-Jupiter-NH3"+"_CMII_"+CM2str+"-Map.png",dpi=300)
         
         figcor.subplots_adjust(left=0.10, bottom=0.10, right=0.98, top=0.90,
-                    wspace=0.10, hspace=0.20)            
-        figcor.savefig(drive+path+"NH3 Map Plots/"+Date+"-Jupiter-NH3"+"_CMII_"+
+                    wspace=0.10, hspace=0.20)
+        pathout="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/Scatter Plots/"
+        figcor.savefig(pathout+Date+"-Jupiter-NH3"+"_CMII_"+
                    CM2str+"-Correlation.png",dpi=300)
 
     ###########################################################################
@@ -376,7 +377,7 @@ def AmmoniaMaps_P3(coords='map',cont=True,zonecorr=[0,0],DateSelection='All',
 
     PTG.plot_Teifel(axsavgprof[0],clr='C0')   
     PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof[0],"VLTMUSE 2022",clr='C1')
-    PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof[0],"C11 2022",clr='C2')
+    PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof[0],"SCT 2022",clr='C2')
     axsavgprof[0].legend(fontsize=7,loc=2)
 
     """

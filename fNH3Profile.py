@@ -24,6 +24,7 @@ import EWLibV006_P3 as EWL
 import plot_TEXES_Groups_P3 as PTG
 import NH3_Filter_Library_P3 as NH3
 from astropy.convolution import convolve, Box1DKernel
+import extract_profile as EP
 
 smooth=False
       
@@ -48,14 +49,16 @@ figavgprof,axsavgprof=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="whi
 plevel=0.752910
 PTG.plot_TEXES_Groups(axsavgprof,clr='C2',prs=plevel,mult=1000000.)
 plevel=0.657540
-PTG.plot_TEXES_Groups(axsavgprof,clr='r',prs=plevel,mult=1000000.)
+PTG.plot_TEXES_Groups(axsavgprof,clr='C0',prs=plevel,mult=1000000.)
 plevel=0.574240
 PTG.plot_TEXES_Groups(axsavgprof,clr='C4',prs=plevel,mult=1000000.)
 
 PTG.plot_VLTMUSEandC11_fNH3_profiles(axsavgprof,"SCT 2022",LonRng=1.,CalModel='SCT-Obs-Final',
                                    clr='k',width=1.5,smooth=smooth)
 PTG.plot_VLTMUSEandC11_fNH3_profiles(axsavgprof,"VLTMUSE 2022",LonRng=1.,CalModel='VLT-Obs-Final',
-                                   clr='k',width=1.5,style='dashed',smooth=smooth)
+                                   clr='k',width=1.0,style='dashed',smooth=smooth)
+PTG.plot_VLTMUSEandC11_fNH3_profiles(axsavgprof,"SCT 2023",LonRng=1.,CalModel='SCT-Obs-Final',
+                                   clr='r',width=1.5,smooth=smooth)
 #PTG.plot_VLTMUSEandC11_EW_profiles(axsavgprof,"VLTMUSE 2022",clr='k',width=1.5,style='dashed',smooth=True)
 
 
@@ -78,3 +81,12 @@ axsavgprof.tick_params(axis='both', which='major', labelsize=8)
 
 figavgprof.subplots_adjust(left=0.10, bottom=0.12, right=0.98, top=0.92)  
 figavgprof.savefig(path+"GRS_NH3_AbundanceProfile_AVG_2022.png",dpi=300)
+
+"""pth='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/fNH3/'
+fn='2023-08-15-1112_8-Jupiter_fNH3.fits'
+Lats,AvgMerid,StdMerid=EP.extract_profile(pth,fn,LonRng=10.)
+axsavgprof.plot(Lats,AvgMerid*1e6,color='C5')
+
+fn='2023-08-16-1130_1-Jupiter_fNH3.fits'
+Lats,AvgMerid,StdMerid=EP.extract_profile(pth,fn,LonRng=10.)
+axsavgprof.plot(Lats,AvgMerid*1e6,color='C6')"""

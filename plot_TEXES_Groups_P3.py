@@ -205,31 +205,40 @@ def plot_VLTMUSEandC11_fNH3_profiles(ax,reference,LatLims=[45,135],LonRng=45.,
 
     calibration,K_eff=read_master_calibration.read_master_calibration()
 
-    data={"SCT 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/fNH3/",
+    data={"SCT 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/",
                               #"fn":"Profile of Jupiter GRS AVG NH3 Transmission 8 files-Celestron11.csv",
-                              "fn":["2022-08-18-0733_4-Jupiter_fNH3.fits",
-                                    "2022-08-28-0608_2-Jupiter_fNH3.fits",
-                                    "2022-09-04-0638_2-Jupiter_fNH3.fits",
-                                    "2022-09-19-0453_4-Jupiter_fNH3.fits",
-                                    "2022-10-13-0345_5-Jupiter-fNH3.fits",
-                                    "2022-10-20-0440_4-Jupiter-fNH3.fits",
+                              "fn":["2023-08-18-1137_1-Jupiter_fNH3_Sys2.fits",
+                                    "2022-08-28-0608_2-Jupiter_fNH3_Sys2.fits",
+                                    "2022-09-04-0638_2-Jupiter_fNH3_Sys2.fits",
+                                    "2022-09-19-0453_4-Jupiter_fNH3_Sys2.fits",
+                                    "2022-10-13-0345_5-Jupiter-fNH3_Sys2.fits",
+                                    "2022-10-20-0440_4-Jupiter-fNH3_Sys2.fits",
                                     #End of GRS maps that are of high quality and near the CM
-                                    "2022-08-30-0559_1-Jupiter_fNH3.fits",
-                                    "2022-09-01-0604_9-Jupiter_fNH3.fits",
-                                    "2022-09-05-0559_1-Jupiter_fNH3.fits",
-                                    "2022-09-12-0533_4-Jupiter_fNH3.fits",
-                                    "2022-09-13-0457_4-Jupiter_fNH3.fits",
-                                    "2022-09-25-0615_6-Jupiter_fNH3.fits",
-                                    "2022-10-09-0401_5-Jupiter_fNH3.fits",
-                                    "2022-10-09-0524_5-Jupiter_fNH3.fits",
-                                    "2022-10-19-0342_4-Jupiter-fNH3.fits",
-                                    "2022-10-21-0358_6-Jupiter-fNH3.fits"],
+                                    "2022-08-30-0559_1-Jupiter_fNH3_Sys2.fits",
+                                    "2022-09-01-0604_9-Jupiter_fNH3_Sys2.fits",
+                                    "2022-09-05-0559_1-Jupiter_fNH3_Sys2.fits",
+                                    "2022-09-12-0533_4-Jupiter_fNH3_Sys2.fits",
+                                    "2022-09-13-0457_4-Jupiter_fNH3_Sys2.fits",
+                                    "2022-09-25-0615_6-Jupiter_fNH3_Sys2.fits",
+                                    "2022-10-09-0401_5-Jupiter_fNH3_Sys2.fits",
+                                    "2022-10-09-0524_5-Jupiter_fNH3_Sys2.fits",
+                                    "2022-10-19-0342_4-Jupiter-fNH3_Sys2.fits"],
+                                    #why is 10/21 missing??? I've used it before!!!
+                                    #"2022-10-21-0358_6-Jupiter-fNH3_Sys2.fits"],
                               "EW_slope":-12.82831873,
                               "EW_const":12.82685019},
-          "VLTMUSE 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/fNH3/",
-                              "fn":["2022-09-19-0352_3-Jupiter-fNH3.fits"],
+          "VLTMUSE 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/",
+                              "fn":["2022-09-19-0352_3-Jupiter-fNH3_Sys2.fits"],
                               "EW_slope":-12.15343491,
-                              "EW_const":12.15195684}}
+                              "EW_const":12.15195684},
+          "SCT 2023":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/",
+                              "fn":["2023-08-15-1112_8-Jupiter_fNH3_Sys2.fits",
+                                    "2023-08-16-1130_1-Jupiter_fNH3_Sys2.fits",
+                                    "2023-08-17-1121_4-Jupiter_fNH3_Sys2.fits",
+                                    "2023-08-18-1137_1-Jupiter_fNH3_Sys2.fits",
+                                    "2023-08-27-1130_6-Jupiter_fNH3_Sys2.fits"],
+                              "EW_slope":-12.82831873,
+                              "EW_const":12.82685019}}
 
     pth=data[reference]["path"]
     AvgArr=np.zeros(180)
@@ -255,14 +264,14 @@ def plot_VLTMUSEandC11_fNH3_profiles(ax,reference,LatLims=[45,135],LonRng=45.,
     if smooth:
         ax.plot(Lats,convolve(AvgPro, Box1DKernel(3)),color=clr,
                 linewidth=width,linestyle=style,label=reference)  
-        ax.fill_between(Lats, AvgPro-AvgStd, AvgPro+AvgStd,color='k',alpha=.1)
+        ax.fill_between(Lats, AvgPro-AvgStd, AvgPro+AvgStd,color=clr,alpha=.1)
 
         #ax.plot(Profile[:,0]-45.,convolve(EW, Box1DKernel(7)),color=clr,linewidth=width,linestyle=style,label=reference)        ax.plot(Lats,AvgMeridEW,color=clr,linewidth=width,linestyle=style,label=reference)
     else:
         #ax.plot(Profile[:,0]-45.,EW,color=clr,linewidth=width,linestyle=style,label=reference)
         ax.plot(Lats,AvgPro,color=clr,linewidth=width,
                 linestyle=style,label=reference)
-        ax.fill_between(Lats, AvgPro-AvgStd, AvgPro+AvgStd,color='k',alpha=.1)
+        ax.fill_between(Lats, AvgPro-AvgStd, AvgPro+AvgStd,color=clr,alpha=.1)
 
         
         

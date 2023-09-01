@@ -530,6 +530,94 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",
                                #'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
                                'Context':{'NUVfile':'NA',
                                           'RGBfile':'2023-01-13-0046_0-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
+                               'Contextlabels':['889nm','RGB']},
+                  '20230815UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'9/10','Transparency':'9/10'}, 
+                               'CH4file':['2023-08-15-1112_8-Jupiter_R656G620B632-NoWV-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png'],
+                               'NH3file':'2023-08-15-1112_8-Jupiter_R656G647B632-NoWV-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png',
+                               #'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2023-08-15-1129_3-Jupiter_R685G550B450-WV-RGB-WhtBal-ClrSmth-WV_CM2_L360_MAP-BARE.png'},
+                               'Contextlabels':['889nm','RGB']},
+                  '20230815UTSwap_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'9/10','Transparency':'9/10'}, 
+                               'CH4file':['2023-08-15-1112_8-Jupiter_R656G620B632-NoWV-620swap632-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png'],
+                               'NH3file':'2023-08-15-1112_9-Jupiter_R656G647B632-NoWV-620swap632-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png',
+                               #'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2023-08-15-1129_3-Jupiter_R685G550B450-WV-RGB-WhtBal-ClrSmth-WV_CM2_L360_MAP-BARE.png'},
+                               'Contextlabels':['889nm','RGB']},
+                  '20230815UTGauss632_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'9/10','Transparency':'9/10'}, 
+                               'CH4file':['2023-08-15-1112_8-Jupiter_R656G620B632Gauss3pix-NoWV-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png'],
+                               'NH3file':'2023-08-15-1112_8-Jupiter_R656G647B632-NoWV-RGB-Smth-WhtBal-Gauss632NH3_CM2_L360_MAP-BARE.png',
+                               #'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2023-08-15-1129_3-Jupiter_R685G550B450-WV-RGB-WhtBal-ClrSmth-WV_CM2_L360_MAP-BARE.png'},
+                               'Contextlabels':['889nm','RGB']},
+                  '20230816UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'7/10'}, 
+                               'CH4file':['2023-08-16-1130_1-Jupiter_R656G620B632-NoWV-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png'],
+                               'NH3file':'2023-08-16-1130_1-Jupiter_R656G647B632-NoWV-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png',
+                               #'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2023-08-16-1145_3-Jupiter_R685G550B450-WV-RGB-WhtBal-ClrSmth-WV_CM2_L360_MAP-BARE.png'},
+                               'Contextlabels':['889nm','RGB']},
+                  '20230817UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'8/10','Transparency':'7/10'}, 
+                               'CH4file':['2023-08-17-1121_4-Jupiter_R656G620B632-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png'],
+                               'NH3file':'2023-08-17-1121_4-Jupiter_R656G647B632-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png',
+                               #'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2023-08-17-1136_7-Jupiter_R685B550B450-WV-RGB-ClrSmth-WhtBal-WV_CM2_L360_MAP-BARE.png'},
+                               'Contextlabels':['889nm','RGB']},
+                  '20230818UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'4/10'}, 
+                               'CH4file':['2023-08-18-1137_1-Jupiter_R656G620B632-NoWV-RGB-ClrSmth-WhtBal_CM2_L360_MAP-BARE.png'],
+                               'NH3file':'2023-08-18-1137_1-Jupiter_R656G647B632-NoWV-RGB-ClrSmth-WhtBal_CM2_L360_MAP-BARE.png',
+                               #'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2023-08-18-1151_5-Jupiter_R685B550B450-WV-RGB-ClrSmth-WhtBal-WV_CM2_L360_MAP-BARE.png'},
+                               'Contextlabels':['889nm','RGB']},
+                  '20230827UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'10/10','Transparency':'7/10'}, 
+                               'CH4file':['2023-08-27-1130_6-Jupiter_R656G620B632-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png'],
+                               'NH3file':'2023-08-27-1130_6-Jupiter_R656G647B632-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png',
+                               #'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2023-08-27-1144_1-Jupiter_R656B647B632-WV-RGB-WhtBal-ClrSmth-WV-Str0to192_CM2_L360_MAP-BARE.png'},
+                               'Contextlabels':['889nm','RGB']},
+                  '20230827UTb_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'10/10','Transparency':'7/10'}, 
+                               'CH4file':['2023-08-27-1152_6-Jupiter_R656G620B632-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png'],
+                               'NH3file':'2023-08-27-1153_8-Jupiter_R656G647B632-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png',
+                               #'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2023-08-27-1144_1-Jupiter_R656B647B632-WV-RGB-WhtBal-ClrSmth-WV-Str0to192_CM2_L360_MAP-BARE.png'},
+                               'Contextlabels':['889nm','RGB']},
+                  '20230830UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'7/10','Transparency':'8/10'}, 
+                               'CH4file':['2023-08-30-1144_1-Jupiter_R656G620B632-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png'],
+                               'NH3file':'2023-08-30-1144_1-Jupiter_R656G647B632-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png',
+                               #'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2023-08-30-1158_5-Jupiter_R685G550B450-RGB-WhtBal-ClrSmth-WV_CM2_L360_MAP-BARE.png'},
+                               'Contextlabels':['889nm','RGB']},
+                  '20230831UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'6/10','Transparency':'8/10'}, 
+                               'CH4file':['2023-08-31-1130_8-Jupiter_R656G620B632-NoWV-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png'],
+                               'NH3file':'2023-08-31-1130_7-Jupiter_R656G647B632-NoWV-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png',
+                               #'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2023-08-31-1146_4-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV_CM2_L360_MAP-BARE.png'},
+                               'Contextlabels':['889nm','RGB']},
+                  '20230831UTb_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'6/10','Transparency':'8/10'}, 
+                               'CH4file':['2023-08-31-1153_5-Jupiter_R656G620B632-NoWV-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png'],
+                               'NH3file':'2023-08-31-1153_7-Jupiter_R656G647B632-NoWV-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png',
+                               #'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2023-08-31-1146_4-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV_CM2_L360_MAP-BARE.png'},
                                'Contextlabels':['889nm','RGB']}}
 
     ###########################################################################
@@ -559,7 +647,7 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",
     else:
         RGB_RGB=[]
     #print(nny)
-    indices=(NH3_RGB>0.2*NH3_RGB.max())
+    indices=(NH3_RGB>0.05*NH3_RGB.max())
     mask=np.zeros(NH3_RGB.shape)
     mask[indices]=1.
     
@@ -628,11 +716,11 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",
     clrslp16bit = np.nan_to_num((32000+500*(clrslp)).astype(np.uint16))
     imwrite(fnout+'.png', clrslp16bit.astype(np.uint16))
     #  !!!!OR, FOR SEPARATION OF FUNCTION, CREATE A STANDALONG FILE-WRITING FUNCTION   
-    pathNH3Abs='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/NH3 Absorption/'
+    pathL2FITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/'
     if imagetype=="Map":
-        fnout=pathNH3Abs+NH3file[0:26]+'647NH3AbsMap'
+        fnout=pathL2FITS+NH3file[0:26]+'647NH3AbsMap'
     elif imagetype=="Img":
-        fnout=pathNH3Abs+NH3file[0:26]+'647NH3AbsImg'
+        fnout=pathL2FITS+NH3file[0:26]+'647NH3AbsImg'
     maskednh3=nh3abs*mask[:,:,1]
     normnh3=maskednh3/maskednh3[maskednh3>0].mean()
     hdu = fits.PrimaryHDU(normnh3.astype(np.float32))
@@ -684,13 +772,12 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",
             #ch4abs16bit = np.nan_to_num(((5.*65535.*(ch4abs)-0.1)*mask[:,:,1]).astype(np.uint16))
             #imwrite(path+'/'+CH4file[0][0:26]+'CH4'+wvstr+'AbsPython.png', ch4abs16bit.astype(np.uint16))
             ###!!!!FIX CH4 FILE TIME IN NAMING!!!!
-            pathCH4Abs='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/CH4 Absorption/'
 
             if search("G620", CH4file[ifile]):
                 if imagetype=="Map":
-                    fnout=pathCH4Abs+CH4file[0][0:26]+'620CH4AbsMap'
+                    fnout=pathL2FITS+CH4file[0][0:26]+'620CH4AbsMap'
                 elif imagetype=="Img":
-                    fnout=pathCH4Abs+CH4file[0][0:26]+'620CH4AbsImg'
+                    fnout=pathL2FITS+CH4file[0][0:26]+'620CH4AbsImg'
                 maskedch4=ch4abs*mask[:,:,1]
                 normch4=maskedch4/maskednh3[maskedch4>0].mean()
                 hdu = fits.PrimaryHDU(normch4.astype(np.float32))

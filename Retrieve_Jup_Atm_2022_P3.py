@@ -2,8 +2,9 @@
 
 
 def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
-                             imagetype='Map',CalModel='VLT-Obs-Final',Smoothing=True,
-                             LatLims=[45,135],LonRng=45,delta_CM2=0,showbands=False):
+                             imagetype='Map',CalModel='VLT-Obs-Final',
+                             Smoothing=True,LatLims=[45,135],LonRng=45,
+                             delta_CM2=0,LonSys='2',showbands=False):
     """
     Created on Sun Nov  6 16:47:21 2022
     
@@ -26,260 +27,31 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     from astropy.io import fits
     from astropy.convolution import Gaussian2DKernel
     from astropy.convolution import convolve
-    from astropy.io import fits
     import RetrievalLibrary as RL
     import read_master_calibration
-
+    sys.path.append('./Services')
+    import get_abs_obs_data as GAOD
+    import Retrieve_L3_Env_Params as RL3
+    
+    ###########################################################################
     # Retrieve_Jup_Atm_2022_P3(obsdate="20221019UT",target="Jupiter")   
-    
-    amagat=2.69e24 #Lodschmits number. (cm-2)
-    gravity=2228.0 #cm/s^2
-    mean_mol_wt=3.85e-24 #cgs or SI !!!!WHY IS THIS 2.2 FOR MENDIKOA!!!!!
-    fCH4=1.81e-3
-    STP=1.01e6  #dyne/cm^2 [(g-cm/s^2)/cm^2]`
-    
-    ###########################################################################
-    #  DATA FILES AND METADATA DICTIONARY
-    #    !!!!SHOULD MAKE THIS A DATA OBJECT!!!!
-    #    !!!!DOUBLE CHECK THAT FITS FILE TIME TAGS ARE ACCURATE BETWEEN CH4 AND NH3
-    #    !!!!Make sure that variable map boundaries can be input!!!!
-    ###########################################################################
-    sourcedata=obsdate+"_"+imagetype
-    sourcefiles={'20220810UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                          'Seeing':'6/10','Transparency':'7/10'}, 
-                               'CH4file':'2022-08-10-1013_0-Jupiter_620CH4AbsMap.fits',
-                               'NH3file':'2022-08-10-1013_0-Jupiter_647NH3AbsMap.fits',
-                               'RGBfile':'2022-08-10-1030_0-Jupiter_WV-R(AllRED)GB-RGB-WhtBal-Wavelets-Str_CM2_L360_MAP-BARE.png'},
-                 '20220812UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-08-12-1025_5-Jupiter_620CH4AbsMap.fits',
-                                            'NH3file':'2022-08-12-1025_5-Jupiter_647NH3AbsMap.fits',
-                                            'RGBfile':'2022-08-12-1033_8-Jupiter_WV-R(AllRed)GB-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20220818UT':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                            'Seeing':'6/10','Transparency':'7/10'}, 
-                               'CH4file':'2022-08-18-0733_4-Jupiter_CH4Abs620.fits',
-                               'NH3file':'2022-08-18-0733_4-Jupiter_NH3Abs647.fits',
-                               'RGBfile':'2022-08-18-0745_4-Jupiter_AllRED-WV-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20220818UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-08-18-0733_4-Jupiter_620CH4AbsMap.fits',
-                                            'NH3file':'2022-08-18-0733_4-Jupiter_647NH3AbsMap.fits',
-                                            'RGBfile':'2022-08-18-0745_4-Jupiter_AllRED-WV-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20220828UT':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-08-28-0608_2-Jupiter_CH4Abs620.fits',
-                                            'NH3file':'2022-08-28-0608_2-Jupiter_NH3Abs647.fits',
-                                            'RGBfile':'NA'},
-                 '20220828UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-08-28-0608_2-Jupiter_620CH4AbsMap.fits',
-                                            'NH3file':'2022-08-28-0608_2-Jupiter_647NH3AbsMap.fits',
-                                            'RGBfile':'2022-08-28-0601_3-Jupiter-RGB-JamesWillinghan-j220828a1_CM2_L360_MAP-BARE.png'},
-                 '20220830UT_Img':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-08-30-0559_1-Jupiter_CH4Abs620.fits',
-                                            'NH3file':'2022-08-30-0559_1-Jupiter_NH3Abs647.fits'},
-                 '20220830UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-08-30-0559_2-Jupiter_620CH4AbsMap.fits',
-                                            'NH3file':'2022-08-30-0559_1-Jupiter_647NH3AbsMap.fits',
-                                            'RGBfile':'2022-08-28-1429_7-Jupiter-RGB-Arakawa-j220828e1_CM2_L360_MAP-BARE.png'},
-                 #!!! 7/16/2023: SOME SORT OF PROBLEM WITH CONTOUR LEVELS PREVENTS THIS FROM RUNNING; NEED TO RERUN
-                 '20220901UT_Img':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-09-01-0604_9-Jupiter_CH4Abs620.fits',
-                                            'NH3file':'2022-09-01-0604_9-Jupiter_NH3Abs647.fits',
-                                            'RGBfile':'NA'},
-                 '20220901UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-09-01-0604_9-Jupiter_620CH4AbsMap.fits',
-                                            'NH3file':'2022-09-01-0604_9-Jupiter_647NH3AbsMap.fits',
-                                            'RGBfile':'2022-09-01-0618_0-Jupiter-Rivera-j220901l1_CM2_L360_MAP-BARE.png'},
-                 '20220904UTa_Img':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-09-04-0638_9-Jupiter_620CH4AbsImg.fits',
-                                            'NH3file':'2022-09-04-0638_2-Jupiter_647NH3AbsImg.fits',
-                                            'RGBfile':'2022-09-04-1644_7-Jupiter-Yamane-j220904j4.jpg'},
-                 '20220904UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-09-04-0638_9-Jupiter_620CH4AbsMap.fits',
-                                            'NH3file':'2022-09-04-0638_2-Jupiter_647NH3AbsMap.fits',
-                                            'RGBfile':'2022-09-04-1644_7-Jupiter-Yamane-j220904j4_CM2_L360_MAP-BARE.png'},
-                 '20220905UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-09-05-0559_1-Jupiter_620CH4AbsMap.fits',
-                                            'NH3file':'2022-09-05-0559_1-Jupiter_647NH3AbsMap.fits',
-                                            'RGBfile':'2022-09-05-1559_0-Jupiter_j220905l1_Michael_Wong_CM2_L360_MAP-BARE.png'},
-                 '20220905UTaSmth_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-09-05-0559_2-Jupiter_620CH4AbsMap.fits',
-                                            'NH3file':'2022-09-05-0559_1-Jupiter_647NH3AbsMap.fits',
-                                            'RGBfile':'2022-09-05-1559_0-Jupiter_j220905l1_Michael_Wong_CM2_L360_MAP-BARE.png'},
-                 '20220912UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-09-12-0533_4-Jupiter_CH4Abs620.fits',
-                                            'NH3file':'2022-09-12-0533_4-Jupiter_NH3Abs647.fits',
-                                            'RGBfile':'2022-09-12-0532_3-Jupiter_WV-R685G550B450-RGB-WhtBal-ClrSmth-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20220912UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-09-12-0533_4-Jupiter_620CH4AbsMap.fits',
-                                            'NH3file':'2022-09-12-0533_4-Jupiter_647NH3AbsMap.fits',
-                                            'RGBfile':'2022-09-12-0532_3-Jupiter_WV-R685G550B450-RGB-WhtBal-ClrSmth-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20220913UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-09-13-0457_4-Jupiter_620CH4AbsMap.fits',
-                                            'NH3file':'2022-09-13-0457_4-Jupiter_647NH3AbsMap.fits',
-                                            'RGBfile':'2022-09-13-0455_6-Jupiter_WV-R685G550B450-RGB-WhtBal-ClrSmth-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20220919UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-09-19-0453_4-Jupiter_CH4Abs620.fits',
-                                            'NH3file':'2022-09-19-0453_4-Jupiter_NH3Abs647.fits',
-                                            'RGBfile':'2022-09-19-0518_7-Jupiter_WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20220919UTa_Map':{'Metadata':{'Telescope':'VLT','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-09-19-0352_3-Jupiter-620CH4AbsMap.fits',
-                                            'NH3file':'2022-09-19-0352_3-Jupiter-647NH3AbsMap.fits',
-                                            'RGBfile':'2022-09-19-0352_3-Jupiter-MUSE-R650G550B450-RGB-WhtBal-Filtered-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20220919UTb_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-09-19-0453_4-Jupiter_620CH4AbsMap.fits',
-                                            'NH3file':'2022-09-19-0453_4-Jupiter_647NH3AbsMap.fits',
-                                            'RGBfile':'2022-09-19-0518_7-Jupiter_WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20220925UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-09-25-0615_4-Jupiter_620CH4AbsMap.fits',
-                                            'NH3file':'2022-09-25-0615_6-Jupiter_647NH3AbsMap.fits',
-                                            'RGBfile':'2022-09-25-0546_6-Jupiter_WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20221009UTa_Img':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-10-09-0401_5-Jupiter_620CH4AbsImg.fits',
-                                            'NH3file':'2022-10-09-0401_5-Jupiter_647NH3AbsImg.fits',
-                                            'RGBfile':'2022-10-09-0339_0-Jupiter_WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20221009UTa_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-10-09-0401_5-Jupiter_620CH4AbsMap.fits',
-                                            'NH3file':'2022-10-09-0401_5-Jupiter_647NH3AbsMap.fits',
-                                            'RGBfile':'2022-10-09-0339_0-Jupiter_WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20221009UTb':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-10-09-0524_5-Jupiter_CH4Abs620.fits',
-                                            'NH3file':'2022-10-09-0524_5-Jupiter_NH3Abs647.fits',
-                                            'RGBfile':'2022-10-09-0542_8-Jupiter_NoWV-R685G550B450-RGB-WhtBal-Str0to160-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20221009UTb_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-10-09-0524_5-Jupiter_620CH4AbsMap.fits',
-                                            'NH3file':'2022-10-09-0524_5-Jupiter_647NH3AbsMap.fits',
-                                            'RGBfile':'2022-10-09-0542_8-Jupiter_NoWV-R685G550B450-RGB-WhtBal-Str0to160-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20221013UTa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-10-13-0345_5-Jupiter-CH4Abs620.fits',
-                                            'NH3file':'2022-10-13-0345_5-Jupiter-NH3Abs647.fits',
-                                            'RGBfile':'2022-10-13-0402_0-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20221013UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-10-13-0345_5-Jupiter-620CH4AbsMap.fits',
-                                            'NH3file':'2022-10-13-0345_5-Jupiter-647NH3AbsMap.fits',
-                                            'RGBfile':'2022-10-13-0402_0-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20221019UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-10-19-0342_4-Jupiter-620CH4AbsMap.fits',
-                                            'NH3file':'2022-10-19-0342_4-Jupiter-647NH3AbsMap.fits',
-                                            'RGBfile':'2022-10-19-0358_2-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20221020UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-                                            'CH4file':'2022-10-20-0440_4-Jupiter-620CH4AbsMap.fits',
-                                            'NH3file':'2022-10-20-0440_4-Jupiter-647NH3AbsMap.fits',
-                                            'RGBfile':'2022-10-20-0422_6-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20221021UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'6/10','Transparency':'7/10'}, 
-#                                            'CH4file':'2022-10-21-0358_6-Jupiter-620CH4AbsMap-Sharp.fits',
-#                                            'NH3file':'2022-10-21-0358_6-Jupiter-647NH3AbsMap-Gauss2.fits',
-                                            'CH4file':'2022-10-21-0358_6-Jupiter-620CH4AbsMap.fits',
-                                            'NH3file':'2022-10-21-0358_6-Jupiter-647NH3AbsMap.fits',
-                                            'RGBfile':'2022-10-21-0342_1-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
-                 '20230113UT_Map':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                                         'Seeing':'8/10','Transparency':'7/10'}, 
-                                            'CH4file':'2023-01-13-0046_2-Jupiter-620CH4AbsMap.fits',
-                                            'NH3file':'2023-01-13-0046_2-Jupiter-647NH3AbsMap.fits',
-                                            'RGBfile':'2023-01-13-0046_0-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'}}
-    
-    calibration,K_eff=read_master_calibration.read_master_calibration()
-    ###########################################################################
-    # OPEN AND READ DATA FILES (FITS MAPS of NH3 and CH4 Absorption (Transmission?))
-    ###########################################################################             
-    K_eff_CH4620=K_eff['CH4_620'][sourcefiles[sourcedata]['Metadata']['Telescope']]#0.428
-    K_eff_NH3647=K_eff['NH3_647'][sourcefiles[sourcedata]['Metadata']['Telescope']]#2.964
-
-    path='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+obsdate[0:10]+'/'
-    CH4file=sourcefiles[sourcedata]['CH4file']
-    NH3file=sourcefiles[sourcedata]['NH3file']
-    RGBfile=sourcefiles[sourcedata]['RGBfile']
-
-    CH4hdulist=fits.open(path+CH4file)
-    CH4hdulist.info()
-    CH4hdr=CH4hdulist[0].header
-    CH4data=CH4hdulist[0].data
-    CH4hdulist.close()
-    
-    NH3hdulist=fits.open(path+NH3file)
-    NH3hdulist.info()
-    NH3hdr=NH3hdulist[0].header
-    NH3data=NH3hdulist[0].data
-    NH3hdulist.close()
-
-    if RGBfile != 'NA':
-        RGB=imread(path+RGBfile)
-
-    ###########################################################################
-    # Get ephemeris data from file name date-time string and set lat and lon lims
-    ###########################################################################             
-    sec=str(int(str(NH3file[16:17]))*6)
-    NH3time=(NH3file[0:10]+"_"+NH3file[11:13]+":"+NH3file[13:15]+":"+sec.zfill(2))
-    eph=RL.get_WINJupos_ephem(NH3time)
-    Real_CM2=float(eph[1].strip())
-    CM2=Real_CM2+delta_CM2
-    LonLims=[360-int(CM2+LonRng),360-int(CM2-LonRng)]
-
-    ###LatLims=[45,135]
-    ###LonLims=[360-int(CM2+45),360-int(CM2-45)]
-    #LatLims=[30,150]
-    #LonLims=[360-int(CM2+60),360-int(CM2-60)]
-    #LatLims=[70,130]
-    #LonLims=[360-int(25+30),360-int(25-30)]
-
-    ###########################################################################
-    # Set calibration and compute physical parameters
-    ###########################################################################             
-    CH4GlobalTrans=calibration[CalModel]['CH4GlobalTrans']
-    NH3GlobalTrans=calibration[CalModel]['NH3GlobalTrans']
-    
-    kernel = Gaussian2DKernel(1)
-    if Smoothing:
-        CH4_tau=-np.log(convolve((CH4data*CH4GlobalTrans),kernel,boundary='extend'))
-        NH3_tau=-np.log(convolve((NH3data*NH3GlobalTrans),kernel,boundary='extend'))
-        smthtitle="Smoothed"
-    else: 
-        CH4_tau=-np.log(CH4data*CH4GlobalTrans)
-        NH3_tau=-np.log(NH3data*NH3GlobalTrans)
-        smthtitle="Unsmoothed"
-
-    #CH4_tau[~np.isfinite(CH4_tau)] = 0
-    #NH3_tau[~np.isfinite(NH3_tau)] = 0
-
-    CH4_Ncol=1000*CH4_tau/K_eff_CH4620
-    NH3_Ncol=1000*NH3_tau/K_eff_NH3647
-
-    CH4_Cloud_Press=(CH4_Ncol)*amagat*gravity*mean_mol_wt/(fCH4*STP)
-    NH3=(NH3_Ncol/1000.)*amagat*gravity*mean_mol_wt/(CH4_Cloud_Press*STP)
-    ##!!!! WOW!!! I need to calculate fNH3 the EASY way also and compare!!!
-    fNH3=(1.81e-3)*NH3_Ncol/CH4_Ncol #-> It works 7/20/2023
+    CH4_tau,CH4_Ncol,CH4_Cloud_Press,NH3_tau,NH3_Ncol,fNH3,RGBfile,RGB,CM,NH3time,NH3file,path,pathfNH3=\
+        RL3.Retrieve_L3_Env_Params(obsdate=obsdate,target="Jupiter",
+                               imagetype='Map',CalModel='SCT-Obs-Final',
+                               Smoothing=True,LonSys=LonSys)
     ###########################################################################
     # Set up figure and axes for plots
     ###########################################################################             
-
+    #CM2=Real_CM2+delta_CM2
+    LonLims=[360-int(CM+LonRng),360-int(CM-LonRng)]
+    if Smoothing:
+        smthtitle="Smoothed"
+    else: 
+        smthtitle="Unsmoothed"
+        
     fig,axs=pl.subplots(2,3,figsize=(7.0,4.5), dpi=150, facecolor="white",
                         sharey=True,sharex=True)      
-    fig.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(Real_CM2))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+    fig.suptitle(NH3time.replace("_"," ")+", CM"+LonSys+"="+str(int(CM))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
 
     if imagetype=='Map':
         for iPlot in range(0,6):
@@ -299,12 +71,13 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     # Plot CH4 Optical Depth
     ###########################################################################
     if imagetype=='Map':
-        plot_patch(CH4_tau,LatLims,LonLims,CM2,LonRng,"gist_heat",axs[0,0],'%3.3f')
+        plot_patch(CH4_tau,LatLims,LonLims,CM,LonRng,"gist_heat",axs[0,0],
+                   '%3.3f',vn=0.05,vx=0.15,n=6)
     else:
         show=axs[0,0].imshow(CH4_tau, "gist_heat", origin='upper',vmin=0.10,vmax=0.20,
                            aspect="equal")
-        temp=RL.make_contours_CH4(axs[0,0],np.flip(convolve(CH4_tau,kernel),axis=0),
-                               lvls=np.linspace(0.15,0.20,num=5,endpoint=True))
+        #temp=RL.make_contours_CH4(axs[0,0],np.flip(convolve(CH4_tau,kernel),axis=0),
+        #                       lvls=np.linspace(0.15,0.20,num=5,endpoint=True))
     
     axs[0,0].set_title("CH4 620nm Optical Depth",fontsize=8)
 
@@ -312,12 +85,13 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     # Plot CH4 Column Density (m-atm)
     ###########################################################################
     if imagetype=='Map':
-        plot_patch(CH4_Ncol,LatLims,LonLims,CM2,LonRng,"gist_heat",axs[0,1],'%3.0f')
+        plot_patch(CH4_Ncol,LatLims,LonLims,CM,LonRng,"gist_heat",axs[0,1],
+                   '%3.0f',vn=150,vx=350,n=6)
     else:
         show=axs[0,1].imshow(CH4_Ncol*1000., "gist_heat", origin='upper',vmin=200,vmax=500,
                            aspect="equal")
-        temp=RL.make_contours_CH4(axs[0,1],np.flip(convolve(CH4_Ncol,kernel)*1000.,axis=0),
-                               lvls=np.linspace(200.,500.,num=5,endpoint=True),frmt='%3.0f')
+        #temp=RL.make_contours_CH4(axs[0,1],np.flip(convolve(CH4_Ncol,kernel)*1000.,axis=0),
+        #                       lvls=np.linspace(200.,500.,num=5,endpoint=True),frmt='%3.0f')
         
     axs[0,1].set_title("N[CH4] (m-atm)",fontsize=8)
 
@@ -332,7 +106,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
         axs[0,2].set_title("Scattering Pressure (Pa)",fontsize=8)
     else:
         if imagetype=='Map':
-            RGB_patch=make_patch_RGB(RGB,LatLims,LonLims,CM2,LonRng)
+            RGB_patch=make_patch_RGB(RGB,LatLims,LonLims,CM,LonRng)
             print("@@@@@@@ RGB_patch.shape()=",RGB_patch.shape)
             show=axs[0,2].imshow(RGB_patch, vmin=0,vmax=2^16,  
                        extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
@@ -346,12 +120,13 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     # Plot NH3 Optical Depth
     ###########################################################################
     if imagetype=='Map':
-        plot_patch(NH3_tau,LatLims,LonLims,CM2,LonRng,"gist_heat",axs[1,0],'%3.3f')
+        plot_patch(NH3_tau,LatLims,LonLims,CM,LonRng,"gist_heat",axs[1,0],
+                   '%3.3f',vn=0.02,vx=0.05,n=6)
     else:
         show=axs[1,0].imshow(NH3_tau, "gist_heat", origin='upper',vmin=0.02,vmax=0.12,  
                            aspect="equal")
-        temp=RL.make_contours_CH4(axs[1,0],np.flip(convolve(NH3_tau,kernel),axis=0),
-                               lvls=np.linspace(0.02,0.12,num=5,endpoint=True))
+        #temp=RL.make_contours_CH4(axs[1,0],np.flip(convolve(NH3_tau,kernel),axis=0),
+        #                       lvls=np.linspace(0.02,0.12,num=5,endpoint=True))
         
     axs[1,0].set_title("NH3 647nm Optical Depth",fontsize=8)
 
@@ -359,12 +134,13 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     # Plot NH3 Column Density (km-atm)
     ###########################################################################
     if imagetype=='Map':
-        plot_patch(NH3_Ncol,LatLims,LonLims,CM2,LonRng,"gist_heat",axs[1,1],'%3.1f')
+        plot_patch(NH3_Ncol,LatLims,LonLims,CM,LonRng,"gist_heat",axs[1,1],
+                   '%3.1f',vn=5,vx=20,n=6)
     else:    
         show=axs[1,1].imshow(NH3_Ncol*1000., "gist_heat", origin='upper',vmin=10,vmax=40,
                            aspect="equal")
-        temp=RL.make_contours_CH4(axs[1,1],np.flip(convolve(NH3_Ncol,kernel)*1000.,axis=0),
-                               lvls=np.linspace(20.,40.,num=5,endpoint=True),frmt='%3.0f')
+        #temp=RL.make_contours_CH4(axs[1,1],np.flip(convolve(NH3_Ncol,kernel)*1000.,axis=0),
+        #                       lvls=np.linspace(20.,40.,num=5,endpoint=True),frmt='%3.0f')
     
     axs[1,1].set_title("N[NH3] (m-atm)",fontsize=8)
     
@@ -372,13 +148,15 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     # Plot NH3 Mole Fraction - Ammonia Absorption Index
     ###########################################################################
     if imagetype=='Map':
-        fNH3_patch_mb,vn_fNH3,vx_fNH3,tx_fNH3=plot_patch(fNH3*1e6,LatLims,LonLims,CM2,LonRng,"jet",axs[1,2],'%3.0f')
+        fNH3_patch_mb,vn_fNH3,vx_fNH3,tx_fNH3=\
+            plot_patch(fNH3*1e6,LatLims,LonLims,CM,LonRng,"jet",axs[1,2],
+                       '%3.0f',vn=50,vx=150,n=6)
 
     else:    
         show=axs[1,2].imshow(fNH3*1e6, "jet", origin='upper',vmin=100,vmax=160,
                            aspect="equal")
-        temp=RL.make_contours_CH4(axs[1,2],np.flip(convolve(fNH3*1.0e6,kernel),axis=0),
-                               lvls=np.linspace(0.00010*1e6,0.00015*1e6,num=5,endpoint=True),frmt='%3.0f')
+        #temp=RL.make_contours_CH4(axs[1,2],np.flip(convolve(fNH3*1.0e6,kernel),axis=0),
+        #                       lvls=np.linspace(0.00010*1e6,0.00015*1e6,num=5,endpoint=True),frmt='%3.0f')
     
     axs[1,2].set_title("Ammonia Abundance Index (ppm)",fontsize=8)
 
@@ -386,40 +164,28 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
         if imagetype=='Map':
             temp=RL.make_contours_CH4_patch(axs[0,2],fNH3_patch_mb,LatLims,LonLims,
                                    lvls=tx_fNH3,frmt='%3.0f',clr='k')
-        else:
-            temp=RL.make_contours_CH4(axs[0,2],np.flip(convolve(fNH3,kernel),axis=0),
-                                   lvls=np.linspace(0.00010,0.00015,num=5,endpoint=True))
+        #else:
+            #temp=RL.make_contours_CH4(axs[0,2],np.flip(convolve(fNH3,kernel),axis=0),
+            #                       lvls=np.linspace(0.00010,0.00015,num=5,endpoint=True))
 
     axs[0,0].set_ylabel("Planetographic Latitude (deg)",fontsize=8)
     axs[1,0].set_ylabel("Planetographic Latitude (deg)",fontsize=8)
-    axs[1,0].set_xlabel("Sys. 2 Longitude (deg)",fontsize=8)
-    axs[1,1].set_xlabel("Sys. 2 Longitude (deg)",fontsize=8)
-    axs[1,2].set_xlabel("Sys. 2 Longitude (deg)",fontsize=8)
+    axs[1,0].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=8)
+    axs[1,1].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=8)
+    axs[1,2].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=8)
 
     fig.subplots_adjust(left=0.10, bottom=0.08, right=0.94, top=0.90,
                 wspace=0.25, hspace=0.05)     
+    pathout="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/Map Plots Diagnostic/"
+    fig.savefig(pathout+obsdate+"-Jupiter-Retrieval"+"-CMII_"+
+              str(CM)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
 
-    fig.savefig(path+"/"+obsdate+"-Jupiter-Retrieval"+"-CMII_"+
-              str(Real_CM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
-
-    hdu = fits.PrimaryHDU(fNH3.astype(np.float32))
-    hdul = fits.HDUList([hdu])
-    hdul[0].header['BITPIX']=-32
-    print(hdul[0].header[:])
-    pathfNH3='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/fNH3/'
-    #fnout=path+'/'+NH3file[0:26]+'fNH3Abs647.fits'
-    fnout=pathfNH3+NH3file[0:26]+'fNH3.fits'
-    try:
-        os.remove(fnout)
-    except: 
-        print("file doesn't exist")
-    hdul.writeto(fnout)
-    hdul.close()
     #nh3abs16bit = np.nan_to_num(((5.*65535.*(normnh3 - 0.9))*mask[:,:,1]).astype(np.uint16))
     fNH3scaled=np.nan_to_num(((5000.*65535.*fNH3 - 0.9)))
     fNH3scaled[fNH3scaled<=0.]=0.0
     fNH3abs16bit = fNH3scaled.astype(np.uint16)
-    imwrite(pathfNH3+NH3file[0:26]+'fNH3.png', fNH3abs16bit)#.astype(np.uint16))
+    fnout=pathfNH3+NH3file[0:26]+'fNH3_Sys'+LonSys+'.png'
+    imwrite(fnout, fNH3abs16bit)#.astype(np.uint16))
 
     ###########################################################################
     ## Just RGB and Abundance
@@ -428,7 +194,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     fig1,axs1=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
     #fig1.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2)),x=0.5,ha='center',color='k')
-    fig1.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(Real_CM2))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+    fig1.suptitle(NH3time.replace("_"," ")+", CM"+LonSys+"="+str(int(CM))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
 
     for ix in range(0,1):
         axs1[ix].grid(linewidth=0.2)
@@ -497,8 +263,8 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     axs1[1].set_title("RGB Context Image",fontsize=10)
 
     axs1[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
-    axs1[0].set_xlabel("Sys. 2 Longitude (deg)",fontsize=10)
-    axs1[1].set_xlabel("Sys. 2 Longitude (deg)",fontsize=10)
+    axs1[0].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
+    axs1[1].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
 
     fig1.subplots_adjust(left=0.10, bottom=0.03, right=0.98, top=0.95,
                 wspace=0.25, hspace=0.05)     
@@ -506,7 +272,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     pathmapplots='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/map plots/'
 
     fig1.savefig(pathmapplots+obsdate+"-Jupiter-Retrieval-NH3_RGB_only"+"-CMII_"+
-              str(Real_CM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
+              str(CM)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
     
     ###########################################################################
     ## Just RGB and Cloud Pressure
@@ -514,8 +280,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     #!!!!!!!!!! FIX THIS !!!!!!!!!!!!!
     fig2,axs2=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
-    #fig1.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2)),x=0.5,ha='center',color='k')
-    fig2.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(Real_CM2))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+    fig2.suptitle(NH3time.replace("_"," ")+", CM"+LonSys+"="+str(int(CM))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
 
     for ix in range(0,1):
         axs2[ix].grid(linewidth=0.2)
@@ -529,8 +294,9 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
 
         axs2[ix].set_adjustable('box') 
 
-    Pcloud_patch,vn,vx,tx=plot_patch(CH4_Cloud_Press/4.0,LatLims,LonLims,CM2,LonRng,"jet",
-                                     axs2[0],'%3.2f',cont=False,cbar_reverse=True)
+    Pcloud_patch,vn,vx,tx=plot_patch(CH4_Cloud_Press/4.0,LatLims,LonLims,CM,LonRng,"jet",
+                                     axs2[0],'%3.2f',cont=False,
+                                     cbar_reverse=True,vn=400,vx=900,n=6)
 
     temp=RL.make_contours_CH4_patch(axs2[0],Pcloud_patch,LatLims,LonLims,
                            lvls=tx,frmt='%3.2f',clr='k')
@@ -580,8 +346,8 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     axs2[1].set_title("RGB Context Image",fontsize=10)
 
     axs2[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
-    axs2[0].set_xlabel("Sys. 2 Longitude (deg)",fontsize=10)
-    axs2[1].set_xlabel("Sys. 2 Longitude (deg)",fontsize=10)
+    axs2[0].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
+    axs2[1].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
 
     fig2.subplots_adjust(left=0.10, bottom=0.03, right=0.98, top=0.95,
                 wspace=0.25, hspace=0.05)     
@@ -589,13 +355,12 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     pathmapplots='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/map plots/'
 
     fig2.savefig(pathmapplots+obsdate+"-Jupiter-Retrieval-Pcloud_only"+"-CMII_"+
-              str(Real_CM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
+              str(CM)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
 
 
-    pathScatter='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/fNH3vPcloud Scatter Plots/'
+    pathScatter='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/Scatter Plots/'
 
-    plot_scatter(Pcloud_patch,fNH3_patch_mb,pathScatter,obsdate,Real_CM2,LatLims)
-
+    plot_scatter(Pcloud_patch,fNH3_patch_mb,pathScatter,obsdate,CM,LatLims)
 
     return()
 
@@ -651,23 +416,20 @@ def make_patch_RGB(Map,LatLims,LonLims,CM2deg,LonRng,pad=True):
 
     return patch
 
-def plot_patch(fullmap,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,cont=True,cbar_reverse=False):
+def plot_patch(fullmap,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
+               cont=True,cbar_reverse=False,vn=0.10,vx=0.20,n=6):
     import numpy as np
     import pylab as pl
     import RetrievalLibrary as RL
 
     patch=RL.make_patch(fullmap,LatLims,LonLims,CM2,LonRng)
-    vn,vx,n=0.10,0.20,6
-    #vn=np.min(patch)
-    #vx=np.max(patch)
-    #patch[~np.isfinite(patch)] = 0
-    #patch[np.isnan(patch)] = 0
     np.nan_to_num(patch, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
-    vn=np.mean(patch)-3.0*np.std(patch)
-    vx=np.mean(patch)+3.0*np.std(patch)
+    #vn=np.mean(patch)-3.0*np.std(patch)
+    #vx=np.mean(patch)+3.0*np.std(patch)
+    tx=np.linspace(vn,vx,n,endpoint=True)
     
     print(np.mean(patch),vn,vx)
-    tx=np.linspace(vn,vx,n,endpoint=True)
+
     show=axis.imshow(patch, colorscale, origin='upper',vmin=vn,vmax=vx,  
                extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
                        90-LatLims[0]],
