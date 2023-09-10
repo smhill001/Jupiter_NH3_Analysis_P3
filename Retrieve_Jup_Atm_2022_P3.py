@@ -8,6 +8,9 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     """
     Created on Sun Nov  6 16:47:21 2022
     
+    #!!! Need to figure out how best to manage longitude limits on plots,
+    #!!! e.g., where to use NH3LonLims vs something else
+    
     @author: smhil
     """    
     import sys
@@ -35,15 +38,18 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     
     ###########################################################################
     # Retrieve_Jup_Atm_2022_P3(obsdate="20221019UT",target="Jupiter")   
-    CH4_tau,CH4_Ncol,CH4_Cloud_Press,NH3_tau,NH3_Ncol,fNH3,RGBfile,RGB,CM,NH3time,NH3file,path,pathfNH3=\
-        RL3.Retrieve_L3_Env_Params(obsdate=obsdate,target="Jupiter",
+    #CH4_tau,CH4_Ncol,CH4_Cloud_Press,NH3_tau,NH3_Ncol,fNH3,RGBfile,RGB,CM,NH3time,NH3file,path,pathfNH3=\
+    #    RL3.Retrieve_L3_Env_Params(obsdate=obsdate,target="Jupiter",
+    #                           imagetype='Map',CalModel='SCT-Obs-Final',
+    #                           Smoothing=True,LonSys=LonSys)
+    R=RL3.Retrieve_L3_Env_Params(obsdate=obsdate,target="Jupiter",
                                imagetype='Map',CalModel='SCT-Obs-Final',
                                Smoothing=True,LonSys=LonSys)
     ###########################################################################
     # Set up figure and axes for plots
     ###########################################################################             
     #CM2=Real_CM2+delta_CM2
-    LonLims=[360-int(CM+LonRng),360-int(CM-LonRng)]
+    NH3LonLims=[360-int(R["NH3"]["CM"]+LonRng),360-int(R["NH3"]["CM"]-LonRng)]
     if Smoothing:
         smthtitle="Smoothed"
     else: 
@@ -51,7 +57,9 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
         
     fig,axs=pl.subplots(2,3,figsize=(7.0,4.5), dpi=150, facecolor="white",
                         sharey=True,sharex=True)      
-    fig.suptitle(NH3time.replace("_"," ")+", CM"+LonSys+"="+str(int(CM))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+    fig.suptitle(R["NH3"]["time"].replace("_"," ")+", CM"+LonSys+"="
+                 +str(int(R["NH3"]["CM"]))+", Calibration = "+CalModel+", Data "
+                 +smthtitle,x=0.5,ha='center',color='k')
 
     if imagetype=='Map':
         for iPlot in range(0,6):
@@ -59,7 +67,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
             j=np.mod(iPlot,3)                   #Plot column
             axs[i,j].grid(linewidth=0.2)
             axs[i,j].ylim=[-45.,45.]
-            axs[i,j].xlim=[360-LonLims[0],360-LonLims[1]]
+            axs[i,j].xlim=[360-NH3LonLims[0],360-NH3LonLims[1]]
             axs[i,j].set_xticks(np.linspace(450,0,31), minor=False)
             xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
             axs[i,j].set_xticklabels(xticklabels.astype(int))
@@ -71,10 +79,10 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     # Plot CH4 Optical Depth
     ###########################################################################
     if imagetype=='Map':
-        plot_patch(CH4_tau,LatLims,LonLims,CM,LonRng,"gist_heat",axs[0,0],
+        plot_patch(R["CH4"]["tau"],LatLims,NH3LonLims,R["NH3"]["CM"],LonRng,"gist_heat",axs[0,0],
                    '%3.3f',vn=0.05,vx=0.15,n=6)
     else:
-        show=axs[0,0].imshow(CH4_tau, "gist_heat", origin='upper',vmin=0.10,vmax=0.20,
+        show=axs[0,0].imshow(R["CH4"]["tau"], "gist_heat", origin='upper',vmin=0.10,vmax=0.20,
                            aspect="equal")
         #temp=RL.make_contours_CH4(axs[0,0],np.flip(convolve(CH4_tau,kernel),axis=0),
         #                       lvls=np.linspace(0.15,0.20,num=5,endpoint=True))
@@ -85,11 +93,11 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     # Plot CH4 Column Density (m-atm)
     ###########################################################################
     if imagetype=='Map':
-        plot_patch(CH4_Ncol,LatLims,LonLims,CM,LonRng,"gist_heat",axs[0,1],
+        plot_patch(R["CH4"]["Ncol"],LatLims,NH3LonLims,R["CH4"]["CM"],LonRng,"gist_heat",axs[0,1],
                    '%3.0f',vn=150,vx=350,n=6)
     else:
-        show=axs[0,1].imshow(CH4_Ncol*1000., "gist_heat", origin='upper',vmin=200,vmax=500,
-                           aspect="equal")
+        show=axs[0,1].imshow(R["CH4"]["Ncol"]*1000., "gist_heat", 
+                             origin='upper',vmin=200,vmax=500,aspect="equal")
         #temp=RL.make_contours_CH4(axs[0,1],np.flip(convolve(CH4_Ncol,kernel)*1000.,axis=0),
         #                       lvls=np.linspace(200.,500.,num=5,endpoint=True),frmt='%3.0f')
         
@@ -98,33 +106,33 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     ###########################################################################
     # Plot CH4 Cloud Top Pressure (mb?) OR RGB Image
     ###########################################################################    
-    if RGBfile == 'NA':
-        show=axs[0,2].imshow(CH4_Cloud_Press, "gist_heat", origin='upper',vmin=2.0,vmax=6.0,
+    if R["RGB"]["file"] == 'NA':
+        show=axs[0,2].imshow(R["CH4"]["PCloud"], "gist_heat", origin='upper',vmin=2.0,vmax=6.0,
                            aspect="equal")
-        temp=RL.make_contours_CH4(axs[0,2],CH4_Cloud_Press,
+        temp=RL.make_contours_CH4(axs[0,2],R["CH4"]["PCloud"],
                                lvls=np.linspace(2.0,6.0,num=5,endpoint=True))
         axs[0,2].set_title("Scattering Pressure (Pa)",fontsize=8)
     else:
         if imagetype=='Map':
-            RGB_patch=make_patch_RGB(RGB,LatLims,LonLims,CM,LonRng)
+            RGB_patch=make_patch_RGB(R["RGB"]["RGB"],LatLims,NH3LonLims,R["RGB"]["CM"],LonRng)
             print("@@@@@@@ RGB_patch.shape()=",RGB_patch.shape)
             show=axs[0,2].imshow(RGB_patch, vmin=0,vmax=2^16,  
-                       extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
+                       extent=[360-NH3LonLims[0],360-NH3LonLims[1],90-LatLims[1],
                                90-LatLims[0]],#vmin=0,vmax=1.2,
                                aspect="equal")
         else:    
-            show=axs[0,2].imshow(RGB, aspect="equal",vmin=0,vmax=2^16)
+            show=axs[0,2].imshow(R["RGB"]["RGB"], aspect="equal",vmin=0,vmax=2^16)
             axs[0,2].set_title("Scattering Pressure (Pa)",fontsize=8)
 
     ###########################################################################
     # Plot NH3 Optical Depth
     ###########################################################################
     if imagetype=='Map':
-        plot_patch(NH3_tau,LatLims,LonLims,CM,LonRng,"gist_heat",axs[1,0],
-                   '%3.3f',vn=0.02,vx=0.05,n=6)
+        plot_patch(R["NH3"]["tau"],LatLims,NH3LonLims,R["NH3"]["CM"],LonRng,
+                   "gist_heat",axs[1,0],'%3.3f',vn=0.02,vx=0.05,n=6)
     else:
-        show=axs[1,0].imshow(NH3_tau, "gist_heat", origin='upper',vmin=0.02,vmax=0.12,  
-                           aspect="equal")
+        show=axs[1,0].imshow(R["NH3"]["tau"], "gist_heat", origin='upper',
+                             vmin=0.02,vmax=0.12,aspect="equal")
         #temp=RL.make_contours_CH4(axs[1,0],np.flip(convolve(NH3_tau,kernel),axis=0),
         #                       lvls=np.linspace(0.02,0.12,num=5,endpoint=True))
         
@@ -134,11 +142,11 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     # Plot NH3 Column Density (km-atm)
     ###########################################################################
     if imagetype=='Map':
-        plot_patch(NH3_Ncol,LatLims,LonLims,CM,LonRng,"gist_heat",axs[1,1],
+        plot_patch(R["NH3"]["Ncol"],LatLims,NH3LonLims,R["NH3"]["CM"],LonRng,"gist_heat",axs[1,1],
                    '%3.1f',vn=5,vx=20,n=6)
     else:    
-        show=axs[1,1].imshow(NH3_Ncol*1000., "gist_heat", origin='upper',vmin=10,vmax=40,
-                           aspect="equal")
+        show=axs[1,1].imshow(R["NH3"]["Ncol"]*1000., "gist_heat", origin='upper',
+                             vmin=10,vmax=40,aspect="equal")
         #temp=RL.make_contours_CH4(axs[1,1],np.flip(convolve(NH3_Ncol,kernel)*1000.,axis=0),
         #                       lvls=np.linspace(20.,40.,num=5,endpoint=True),frmt='%3.0f')
     
@@ -149,20 +157,20 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     ###########################################################################
     if imagetype=='Map':
         fNH3_patch_mb,vn_fNH3,vx_fNH3,tx_fNH3=\
-            plot_patch(fNH3*1e6,LatLims,LonLims,CM,LonRng,"jet",axs[1,2],
-                       '%3.0f',vn=50,vx=150,n=6)
+            plot_patch(R["NH3"]["fNH3"]*1e6,LatLims,NH3LonLims,R["NH3"]["CM"],
+                       LonRng,"jet",axs[1,2],'%3.0f',vn=50,vx=150,n=6)
 
     else:    
-        show=axs[1,2].imshow(fNH3*1e6, "jet", origin='upper',vmin=100,vmax=160,
-                           aspect="equal")
+        show=axs[1,2].imshow(R["NH3"]["fNH3"], "jet", origin='upper',
+                             vmin=100,vmax=160,aspect="equal")
         #temp=RL.make_contours_CH4(axs[1,2],np.flip(convolve(fNH3*1.0e6,kernel),axis=0),
         #                       lvls=np.linspace(0.00010*1e6,0.00015*1e6,num=5,endpoint=True),frmt='%3.0f')
     
     axs[1,2].set_title("Ammonia Abundance Index (ppm)",fontsize=8)
 
-    if RGBfile != 'NA':
+    if R["RGB"]["file"] != 'NA':
         if imagetype=='Map':
-            temp=RL.make_contours_CH4_patch(axs[0,2],fNH3_patch_mb,LatLims,LonLims,
+            temp=RL.make_contours_CH4_patch(axs[0,2],fNH3_patch_mb,LatLims,NH3LonLims,
                                    lvls=tx_fNH3,frmt='%3.0f',clr='k')
         #else:
             #temp=RL.make_contours_CH4(axs[0,2],np.flip(convolve(fNH3,kernel),axis=0),
@@ -178,13 +186,13 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
                 wspace=0.25, hspace=0.05)     
     pathout="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/Map Plots Diagnostic/"
     fig.savefig(pathout+obsdate+"-Jupiter-Retrieval"+"-CMII_"+
-              str(CM)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
+              str(R["NH3"]["CM"])+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
 
     #nh3abs16bit = np.nan_to_num(((5.*65535.*(normnh3 - 0.9))*mask[:,:,1]).astype(np.uint16))
-    fNH3scaled=np.nan_to_num(((5000.*65535.*fNH3 - 0.9)))
+    fNH3scaled=np.nan_to_num(((5000.*65535.*R["NH3"]["fNH3"] - 0.9)))
     fNH3scaled[fNH3scaled<=0.]=0.0
     fNH3abs16bit = fNH3scaled.astype(np.uint16)
-    fnout=pathfNH3+NH3file[0:26]+'fNH3_Sys'+LonSys+'.png'
+    fnout=R["pathfNH3"]+R["NH3"]["file"][0:26]+'fNH3_Sys'+LonSys+'.png'
     imwrite(fnout, fNH3abs16bit)#.astype(np.uint16))
 
     ###########################################################################
@@ -194,12 +202,13 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     fig1,axs1=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
     #fig1.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2)),x=0.5,ha='center',color='k')
-    fig1.suptitle(NH3time.replace("_"," ")+", CM"+LonSys+"="+str(int(CM))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+    fig1.suptitle(R["NH3"]["time"].replace("_"," ")+", CM"+LonSys+"="
+                  +str(int(R["NH3"]["CM"]))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
 
     for ix in range(0,1):
         axs1[ix].grid(linewidth=0.2)
         axs1[ix].ylim=[-45.,45.]
-        axs1[ix].xlim=[360-LonLims[0],360-LonLims[1]]
+        axs1[ix].xlim=[360-NH3LonLims[0],360-NH3LonLims[1]]
         axs1[ix].set_xticks(np.linspace(450,0,31), minor=False)
         xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
         axs1[ix].set_xticklabels(xticklabels.astype(int))
@@ -210,10 +219,10 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
 
 
     show=axs1[0].imshow(fNH3_patch_mb, "jet", origin='upper',vmin=vn_fNH3,vmax=vx_fNH3,  
-               extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
+               extent=[360-NH3LonLims[0],360-NH3LonLims[1],90-LatLims[1],
                        90-LatLims[0]],#vmin=0,vmax=1.
                        aspect="equal")
-    temp=RL.make_contours_CH4_patch(axs1[0],fNH3_patch_mb,LatLims,LonLims,
+    temp=RL.make_contours_CH4_patch(axs1[0],fNH3_patch_mb,LatLims,NH3LonLims,
                            lvls=tx_fNH3,frmt='%3.0f',clr='k')
     
     cbar = pl.colorbar(show, ticks=tx_fNH3, 
@@ -228,10 +237,10 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     RGB4Display=np.power(np.array(RGB_patch).astype(float),gamma)
     RGB4Display=RGB4Display/RGB4Display.max()
     show=axs1[1].imshow(RGB4Display,
-               extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
+               extent=[360-NH3LonLims[0],360-NH3LonLims[1],90-LatLims[1],
                        90-LatLims[0]],
                        aspect="equal")
-    temp=RL.make_contours_CH4_patch(axs1[1],fNH3_patch_mb,LatLims,LonLims,
+    temp=RL.make_contours_CH4_patch(axs1[1],fNH3_patch_mb,LatLims,NH3LonLims,
                            tx_fNH3,frmt='%3.0f',clr='k')
     box = axs1[1].get_position()
     
@@ -251,9 +260,9 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     if showbands:
         for zb in belt:
             print(zb,belt[zb])
-            axs1[0].fill_between([360-LonLims[0],360-LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+            axs1[0].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
                                     color="0.5",alpha=0.4)
-            axs1[1].fill_between([360-LonLims[0],360-LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+            axs1[1].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
                                     color="0.5",alpha=0.4)
         #axs1[1].annotate(zb,xy=[np.mean(belt[zb]),51],ha="center")
     #for zb in zone:
@@ -272,7 +281,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     pathmapplots='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/map plots/'
 
     fig1.savefig(pathmapplots+obsdate+"-Jupiter-Retrieval-NH3_RGB_only"+"-CMII_"+
-              str(CM)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
+              str(R["NH3"]["CM"])+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
     
     ###########################################################################
     ## Just RGB and Cloud Pressure
@@ -280,12 +289,13 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     #!!!!!!!!!! FIX THIS !!!!!!!!!!!!!
     fig2,axs2=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
-    fig2.suptitle(NH3time.replace("_"," ")+", CM"+LonSys+"="+str(int(CM))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+    fig2.suptitle(R["NH3"]["time"].replace("_"," ")+", CM"+LonSys+"="
+                  +str(int(R["NH3"]["CM"]))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
 
     for ix in range(0,1):
         axs2[ix].grid(linewidth=0.2)
         axs2[ix].ylim=[-45.,45.]
-        axs2[ix].xlim=[360-LonLims[0],360-LonLims[1]]
+        axs2[ix].xlim=[360-NH3LonLims[0],360-NH3LonLims[1]]
         axs2[ix].set_xticks(np.linspace(450,0,31), minor=False)
         xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
         axs2[ix].set_xticklabels(xticklabels.astype(int))
@@ -294,13 +304,14 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
 
         axs2[ix].set_adjustable('box') 
 
-    Pcloud_patch,vn,vx,tx=plot_patch(CH4_Cloud_Press/4.0,LatLims,LonLims,CM,LonRng,"jet",
+    Pcloud_patch,vn,vx,tx=plot_patch(R["CH4"]["PCloud"]/4.0,LatLims,NH3LonLims,
+                                     R["CH4"]["CM"],LonRng,"jet",
                                      axs2[0],'%3.2f',cont=False,
                                      cbar_reverse=True,vn=400,vx=900,n=6)
 
-    temp=RL.make_contours_CH4_patch(axs2[0],Pcloud_patch,LatLims,LonLims,
+    temp=RL.make_contours_CH4_patch(axs2[0],Pcloud_patch,LatLims,NH3LonLims,
                            lvls=tx,frmt='%3.2f',clr='k')
-    #temp=RL.make_contours_CH4_patch(axs2[0],fNH3_patch_mb,LatLims,LonLims,
+    #temp=RL.make_contours_CH4_patch(axs2[0],fNH3_patch_mb,LatLims,NH3LonLims,
     #                       lvls=tx_fNH3,frmt='%3.0f',clr='r')
     
     axs2[0].set_title("Cloud Top Pressure (bars)",fontsize=10)
@@ -309,12 +320,12 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     RGB4Display=np.power(np.array(RGB_patch).astype(float),gamma)
     RGB4Display=RGB4Display/RGB4Display.max()
     show=axs2[1].imshow(RGB4Display,
-               extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
+               extent=[360-NH3LonLims[0],360-NH3LonLims[1],90-LatLims[1],
                        90-LatLims[0]],
                        aspect="equal")
-    temp=RL.make_contours_CH4_patch(axs2[1],Pcloud_patch,LatLims,LonLims,
+    temp=RL.make_contours_CH4_patch(axs2[1],Pcloud_patch,LatLims,NH3LonLims,
                            tx,frmt='%3.2f',clr='k')
-    #temp=RL.make_contours_CH4_patch(axs2[1],fNH3_patch_mb,LatLims,LonLims,
+    #temp=RL.make_contours_CH4_patch(axs2[1],fNH3_patch_mb,LatLims,NH3LonLims,
     #                       lvls=tx_fNH3,frmt='%3.0f',clr='r')
     box = axs2[1].get_position()
     
@@ -334,9 +345,9 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     if showbands:
         for zb in belt:
             print(zb,belt[zb])
-            axs2[0].fill_between([360-LonLims[0],360-LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+            axs2[0].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
                                     color="0.5",alpha=0.4)
-            axs2[1].fill_between([360-LonLims[0],360-LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+            axs2[1].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
                                     color="0.5",alpha=0.4)
         #axs1[1].annotate(zb,xy=[np.mean(belt[zb]),51],ha="center")
     #for zb in zone:
@@ -355,12 +366,13 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     pathmapplots='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/map plots/'
 
     fig2.savefig(pathmapplots+obsdate+"-Jupiter-Retrieval-Pcloud_only"+"-CMII_"+
-              str(CM)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
+              str(R["CH4"]["CM"])+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
 
 
     pathScatter='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/Scatter Plots/'
 
-    plot_scatter(Pcloud_patch,fNH3_patch_mb,pathScatter,obsdate,CM,LatLims)
+    plot_scatter(Pcloud_patch,fNH3_patch_mb,pathScatter,obsdate,R["NH3"]["CM"],
+                 LatLims)
 
     return()
 

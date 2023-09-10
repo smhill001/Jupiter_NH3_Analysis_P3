@@ -105,73 +105,102 @@ def plot_Historical(ax,reference,clr='C0'):
                             "645EW":[11.00,12.90,11.7,8.3,9.3]}}
     ax.scatter(data[reference]["Center_pgLat"],np.array(data[reference]["645EW"])*0.1,label=reference,color=clr)
 
-def plot_VLTMUSEandC11_EW_profiles(ax,reference,LatLims=[45,135],LonRng=45.,
-                                   CalModel='SCT-Obs-Final',
-                                   clr='C0',width=1.0,style='solid',smooth=False):
-    #!!!This looks like it plots ABSORPTION and can do so as and EW for 
-    #     comparision to prior work. However, there is only one linear fit
-    #     for converting transmission to EW when separate ones are needed
-    #     for SCT and VLT filters. Also, the disk integrated transmissions
+
+def plot_profile_EW(ax,reference,LatLims=[45,135],LonRng=45.,band="CH4",
+                    CalModel='SCT-Obs-Final',clr='C0',width=1.0,
+                    style='solid',smooth=False):
+    #Single module for aggregating profiles (meridional for now)
+    #Also, the disk integrated transmissions
     #     are hardcoded!!! I need to have a master reference file for these 
     #     transmissions!
-    #     !!!!And...what are we hardcoded to specific manually generated profile
-    #     files?
+    # This is really profile aggregation- should I rename the program?
     
     import numpy as np
     from astropy.convolution import convolve, Box1DKernel
-    from astropy.io import fits
-    import RetrievalLibrary as RL
     import sys
     sys.path.append('./Services')
     import read_master_calibration
-    import RetrievalLibrary as RL
     import extract_profile as EP
+    import get_abs_obs_data as GAOD
+    import pylab as pl
 
     calibration,K_eff=read_master_calibration.read_master_calibration()
 
-    data={"SCT 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/NH3 Absorption/",
+    sourcefiles=GAOD.get_abs_obs_data()
+
+    data={"SCT 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/",
                               #"fn":"Profile of Jupiter GRS AVG NH3 Transmission 8 files-Celestron11.csv",
-                              "fn":["2022-08-18-0733_4-Jupiter_647NH3AbsMap.fits",
-                                    "2022-08-28-0608_2-Jupiter_647NH3AbsMap.fits",
-                                    "2022-09-04-0638_2-Jupiter_647NH3AbsMap.fits",
-                                    "2022-09-19-0453_4-Jupiter_647NH3AbsMap.fits",
-                                    "2022-10-13-0345_5-Jupiter-647NH3AbsMap.fits",
-                                    "2022-10-20-0440_4-Jupiter-647NH3AbsMap.fits",
-                                    #End of GRS maps that are of high quality and near the CM
-                                    "2022-08-30-0559_1-Jupiter_647NH3AbsMap.fits",
-                                    "2022-09-01-0604_9-Jupiter_647NH3AbsMap.fits",
-                                    "2022-09-05-0559_1-Jupiter_647NH3AbsMap.fits",
-                                    "2022-09-12-0533_4-Jupiter_647NH3AbsMap.fits",
-                                    "2022-09-13-0457_4-Jupiter_647NH3AbsMap.fits",
-                                    "2022-09-25-0615_6-Jupiter_647NH3AbsMap.fits",
-                                    "2022-10-09-0401_5-Jupiter_647NH3AbsMap.fits",
-                                    "2022-10-09-0524_5-Jupiter_647NH3AbsMap.fits",
-                                    "2022-10-19-0342_4-Jupiter-647NH3AbsMap.fits",
-                                    "2022-10-21-0358_6-Jupiter-647NH3AbsMap.fits"],
+                              "fn":[],
                               "EW_slope":-12.82831873,
                               "EW_const":12.82685019},
-          "VLTMUSE 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/NH3 Absorption/",
-                              "fn":["2022-09-19-0352_3-Jupiter-647NH3AbsMap.fits"],
+          "VLTMUSE 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/",
+                              "fn":["2022-09-19-0352_3"],
                               "EW_slope":-12.15343491,
-                              "EW_const":12.15195684}}
+                              "EW_const":12.15195684},
+          "SCT 2023":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/",
+                              "fn":[],
+                              "EW_slope":-12.82831873,
+                              "EW_const":12.82685019}}
+
+    for ID in sourcefiles:
+        if "Map" in ID:
+            print("*******ID=",ID)
+            if sourcefiles[ID][band+'Qual']:
+                if 202207<int(ID[0:6])<202302:
+                    print(int(ID[0:6]))
+                    print("*******sourcefiles[ID]['CH4file'][0:4]=",sourcefiles[ID][band+"file"])
+                    data["SCT 2022"]["fn"].append(sourcefiles[ID][band+"file"])
+                elif 202307<int(ID[0:6])<202403:
+                    print(int(ID[0:6]))
+                    print("*******sourcefiles[ID]['CH4file'][0:4]=",sourcefiles[ID][band+"file"])
+                    data["SCT 2023"]["fn"].append(sourcefiles[ID][band+"file"])
 
     pth=data[reference]["path"]
     AvgSum=np.zeros(180)
     StdSum=np.zeros(180)
     
-    for NH3file in data[reference]["fn"]:                             
+    if band=="CH4":
+        suffix="-Jupiter_620CH4AbsMap.fits"
+        cal='CH4GlobalTrans'
+    elif band=="NH3":
+        suffix="-Jupiter_647NH3AbsMap.fits"
+        cal='NH3GlobalTrans'
+    print("****band=",band)  
+    print("****reference=",reference)
+    print("data[reference]=",data[reference])
+    
+    figspaghetti,axsspaghetti=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="white")
 
-        Lats,AvgMerid,StdMerid=EP.extract_profile(pth,NH3file,LonRng=LonRng)       
-        NH3GlobalTrans=calibration[CalModel]['NH3GlobalTrans']
+    for file in data[reference]["fn"]: 
+        print("****file=",file)
+        fn=file+suffix      
+        print("****fn=",fn)                      
+        Lats,AvgMerid,StdMerid=EP.extract_profile(pth,fn,LonRng=LonRng)       
+        NH3GlobalTrans=calibration[CalModel][cal]
         Avg_Trans=AvgMerid*NH3GlobalTrans
         Std_Trans=StdMerid*NH3GlobalTrans
     
         Avg_EW=data[reference]["EW_slope"]*Avg_Trans+data[reference]["EW_const"]
         Std_EW=data[reference]["EW_slope"]*Std_Trans+data[reference]["EW_const"]
     
+        axsspaghetti.plot(Lats,Avg_EW,linewidth=0.5,label=file[5:20])
+
         AvgSum=AvgSum+Avg_EW/len(data[reference]["fn"])    
     
     #Profile=np.loadtxt(data[reference]["path"]+data[reference]["fn"],usecols=range(2),delimiter=",")
+    axsspaghetti.set_xlim(-45,45)
+    axsspaghetti.set_ylim(0,2)
+    if band=="CH4":
+        axsspaghetti.set_ylim(0,2)
+        axsspaghetti.set_ylabel("Methane Absorption EW (nm)",fontsize=10)
+    elif band=="NH3":
+        axsspaghetti.set_ylim(0,1)
+        axsspaghetti.set_ylabel("Ammonia Absorption EW (nm)",fontsize=10)
+
+    axsspaghetti.legend(fontsize=6,ncol=3)
+    axsspaghetti.set_title(reference)
+    axsspaghetti.set_xlabel("Planetographic Latitude (deg)",fontsize=10)
+
     if smooth:
         ax.plot(Lats,convolve(AvgSum, Box1DKernel(3)),color=clr,
                 linewidth=width,linestyle=style,label=reference)        
@@ -180,14 +209,12 @@ def plot_VLTMUSEandC11_EW_profiles(ax,reference,LatLims=[45,135],LonRng=45.,
         #ax.plot(Profile[:,0]-45.,EW,color=clr,linewidth=width,linestyle=style,label=reference)
         ax.plot(Lats,AvgSum,color=clr,linewidth=width,
                 linestyle=style,label=reference)
+    return(0)
 
-def plot_VLTMUSEandC11_fNH3_profiles(ax,reference,LatLims=[45,135],LonRng=45.,
-                                   CalModel='SCT-Obs-Final',
-                                   clr='C0',width=1.0,style='solid',smooth=False):
-    #!!!This looks like it plots ABSORPTION and can do so as and EW for 
-    #     comparision to prior work. However, there is only one linear fit
-    #     for converting transmission to EW when separate ones are needed
-    #     for SCT and VLT filters. Also, the disk integrated transmissions
+def plot_profiles_L3(ax,reference,LatLims=[45,135],LonRng=45.,
+                         clr='C0',width=1.0,
+                         style='solid',smooth=False,param='PCloud'):
+    #     Also, the disk integrated transmissions
     #     are hardcoded!!! I need to have a master reference file for these 
     #     transmissions!
     #     !!!!And...what are we hardcoded to specific manually generated profile
@@ -199,54 +226,61 @@ def plot_VLTMUSEandC11_fNH3_profiles(ax,reference,LatLims=[45,135],LonRng=45.,
     import RetrievalLibrary as RL
     import sys
     sys.path.append('./Services')
-    import read_master_calibration
+    #import read_master_calibration
     import RetrievalLibrary as RL
     import extract_profile as EP
+    import get_abs_obs_data as GAOD
+    import pylab as pl
 
-    calibration,K_eff=read_master_calibration.read_master_calibration()
+    sourcefiles=GAOD.get_abs_obs_data()
 
     data={"SCT 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/",
                               #"fn":"Profile of Jupiter GRS AVG NH3 Transmission 8 files-Celestron11.csv",
-                              "fn":["2023-08-18-1137_1-Jupiter_fNH3_Sys2.fits",
-                                    "2022-08-28-0608_2-Jupiter_fNH3_Sys2.fits",
-                                    "2022-09-04-0638_2-Jupiter_fNH3_Sys2.fits",
-                                    "2022-09-19-0453_4-Jupiter_fNH3_Sys2.fits",
-                                    "2022-10-13-0345_5-Jupiter-fNH3_Sys2.fits",
-                                    "2022-10-20-0440_4-Jupiter-fNH3_Sys2.fits",
-                                    #End of GRS maps that are of high quality and near the CM
-                                    "2022-08-30-0559_1-Jupiter_fNH3_Sys2.fits",
-                                    "2022-09-01-0604_9-Jupiter_fNH3_Sys2.fits",
-                                    "2022-09-05-0559_1-Jupiter_fNH3_Sys2.fits",
-                                    "2022-09-12-0533_4-Jupiter_fNH3_Sys2.fits",
-                                    "2022-09-13-0457_4-Jupiter_fNH3_Sys2.fits",
-                                    "2022-09-25-0615_6-Jupiter_fNH3_Sys2.fits",
-                                    "2022-10-09-0401_5-Jupiter_fNH3_Sys2.fits",
-                                    "2022-10-09-0524_5-Jupiter_fNH3_Sys2.fits",
-                                    "2022-10-19-0342_4-Jupiter-fNH3_Sys2.fits"],
+                              "fn":[],
                                     #why is 10/21 missing??? I've used it before!!!
                                     #"2022-10-21-0358_6-Jupiter-fNH3_Sys2.fits"],
                               "EW_slope":-12.82831873,
                               "EW_const":12.82685019},
           "VLTMUSE 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/",
-                              "fn":["2022-09-19-0352_3-Jupiter-fNH3_Sys2.fits"],
+                              "fn":["2022-09-19-0352_3"],
                               "EW_slope":-12.15343491,
                               "EW_const":12.15195684},
           "SCT 2023":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/",
-                              "fn":["2023-08-15-1112_8-Jupiter_fNH3_Sys2.fits",
-                                    "2023-08-16-1130_1-Jupiter_fNH3_Sys2.fits",
-                                    "2023-08-17-1121_4-Jupiter_fNH3_Sys2.fits",
-                                    "2023-08-18-1137_1-Jupiter_fNH3_Sys2.fits",
-                                    "2023-08-27-1130_6-Jupiter_fNH3_Sys2.fits"],
+                              "fn":[],
                               "EW_slope":-12.82831873,
                               "EW_const":12.82685019}}
+    if param=="PCloud":
+        band="CH4"
+        suffix="-Jupiter_PCloud_Sys2.fits"
+        factor=1.0
+    elif param=="fNH3":
+        band="NH3"
+        suffix="-Jupiter_fNH3_Sys2.fits"
+        factor=1.0e6
+    
+    figspaghetti,axsspaghetti=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="white")
+
+    for ID in sourcefiles:
+        if "Map" in ID:
+            print("*******ID=",ID)
+            if sourcefiles[ID][band+'Qual']:
+                if 202207<int(ID[0:6])<202302 and sourcefiles[ID]["Metadata"]["Telescope"]=='C11':
+                    print(int(ID[0:6]))
+                    print("*******sourcefiles[ID]['CH4file'][0:4]=",sourcefiles[ID][band+"file"])
+                    data["SCT 2022"]["fn"].append(sourcefiles[ID][band+"file"])
+                elif 202307<int(ID[0:6])<202403:
+                    print(int(ID[0:6]))
+                    print("*******sourcefiles[ID]['CH4file'][0:4]=",sourcefiles[ID][band+"file"])
+                    data["SCT 2023"]["fn"].append(sourcefiles[ID][band+"file"])
 
     pth=data[reference]["path"]
     AvgArr=np.zeros(180)
     #StdSum=np.zeros(180)
     First=True
-    for NH3file in data[reference]["fn"]:                             
-
-        Lats,AvgMerid,StdMerid=EP.extract_profile(pth,NH3file,LonRng=LonRng)       
+    for L3file in data[reference]["fn"]:                             
+        fn=L3file+suffix
+        print("$$$$$$$$$$$$$$fn=",fn)
+        Lats,AvgMerid,StdMerid=EP.extract_profile(pth,fn,LonRng=LonRng)       
         #Convert from fraction to ppm by multiplying by 10^6
         if First:
             AvgArr=AvgMerid
@@ -254,13 +288,27 @@ def plot_VLTMUSEandC11_fNH3_profiles(ax,reference,LatLims=[45,135],LonRng=45.,
             First=False
         else:
             AvgArr=np.vstack((AvgArr,AvgMerid))
+            
+        axsspaghetti.plot(Lats,AvgMerid*factor,linewidth=0.5,label=L3file[5:20])
+
     print("AvgArr.shape=",AvgArr.shape)
-    AvgPro=np.mean(AvgArr[:,:],axis=0)*1.0e6
-    AvgStd=np.std(AvgArr[:,:],axis=0)*1.0e6
+    AvgPro=np.mean(AvgArr[:,:],axis=0)*factor
+    AvgStd=np.std(AvgArr[:,:],axis=0)*factor
     print("AvgPro.shape=",AvgPro.shape)
     print("AvgPro=",AvgPro)
     
     #Profile=np.loadtxt(data[reference]["path"]+data[reference]["fn"],usecols=range(2),delimiter=",")
+    axsspaghetti.set_xlim(-45,45)
+    if param=="PCloud":
+        axsspaghetti.set_ylim(400,1000)
+        axsspaghetti.set_ylabel("Effective Cloud-Top Pressure (mb)",fontsize=10)
+    elif param=="fNH3":
+        axsspaghetti.set_ylim(0,300)
+        axsspaghetti.set_ylabel("Column-Average Ammonia Abundance (ppm)",fontsize=10)
+    axsspaghetti.legend(fontsize=6,ncol=3)
+    axsspaghetti.set_title(reference)
+    axsspaghetti.set_xlabel("Planetographic Latitude (deg)",fontsize=10)
+
     if smooth:
         ax.plot(Lats,convolve(AvgPro, Box1DKernel(3)),color=clr,
                 linewidth=width,linestyle=style,label=reference)  
@@ -273,7 +321,6 @@ def plot_VLTMUSEandC11_fNH3_profiles(ax,reference,LatLims=[45,135],LonRng=45.,
                 linestyle=style,label=reference)
         ax.fill_between(Lats, AvgPro-AvgStd, AvgPro+AvgStd,color=clr,alpha=.1)
 
-        
         
 def Centric_to_Graphic(Latc):
     #Formula used is from Simon and Beebe, 1996

@@ -26,6 +26,7 @@ def Retrieve_L3_Env_Params(obsdate="20220919UTa",target="Jupiter",
     import read_master_calibration
     sys.path.append('./Services')
     import get_abs_obs_data as GAOD
+    import time
     # Retrieve_Jup_Atm_2022_P3(obsdate="20221019UT",target="Jupiter")   
     
     amagat=2.69e24 #Lodschmits number. (cm-2)
@@ -52,10 +53,11 @@ def Retrieve_L3_Env_Params(obsdate="20220919UTa",target="Jupiter",
     pathRGB='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+obsdate[0:10]+'/'
     pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/'
 
-    CH4file=sourcefiles[sourcedata]['CH4file']
-    NH3file=sourcefiles[sourcedata]['NH3file']
-    RGBfile=sourcefiles[sourcedata]['RGBfile']
+    CH4file=sourcefiles[sourcedata]['CH4file']+"-Jupiter_620CH4AbsMap.fits"
+    NH3file=sourcefiles[sourcedata]['NH3file']+"-Jupiter_647NH3AbsMap.fits"
+    RGBfile=sourcefiles[sourcedata]['RGBfile']+"_CM2_L360_MAP-BARE.png"
 
+    print("########## pathFITS+CH4file=",pathFITS+CH4file)
     CH4hdulist=fits.open(pathFITS+CH4file)
     CH4hdulist.info()
     CH4hdr=CH4hdulist[0].header
@@ -74,30 +76,69 @@ def Retrieve_L3_Env_Params(obsdate="20220919UTa",target="Jupiter",
     ###########################################################################
     # Get ephemeris data from file name date-time string and set lat and lon lims
     ###########################################################################             
-    sec=str(int(str(NH3file[16:17]))*6)
-    NH3time=(NH3file[0:10]+"_"+NH3file[11:13]+":"+NH3file[13:15]+":"+sec.zfill(2))
+    RGBsec=str(int(str(RGBfile[16:17]))*6)
+    RGBtime=(RGBfile[0:10]+"_"+RGBfile[11:13]+":"+RGBfile[13:15]+":"+RGBsec.zfill(2))
+    eph=RL.get_WINJupos_ephem(RGBtime)
+    time.sleep(5)
+    RGB_CM1=float(eph[0].strip())
+    RGB_CM2=float(eph[1].strip())
+    RGB_CM3=float(eph[2].strip())
+    
+    NH3sec=str(int(str(NH3file[16:17]))*6)
+    NH3time=(NH3file[0:10]+"_"+NH3file[11:13]+":"+NH3file[13:15]+":"+NH3sec.zfill(2))
     eph=RL.get_WINJupos_ephem(NH3time)
-    Real_CM1=float(eph[0].strip())
-    Real_CM2=float(eph[1].strip())
-    Real_CM3=float(eph[2].strip())
+    time.sleep(5)
+    NH3_CM1=float(eph[0].strip())
+    NH3_CM2=float(eph[1].strip())
+    NH3_CM3=float(eph[2].strip())
+    
+    CH4sec=str(int(str(CH4file[16:17]))*6)
+    CH4time=(CH4file[0:10]+"_"+CH4file[11:13]+":"+CH4file[13:15]+":"+CH4sec.zfill(2))
+    eph=RL.get_WINJupos_ephem(CH4time)
+    time.sleep(5)
+    CH4_CM1=float(eph[0].strip())
+    CH4_CM2=float(eph[1].strip())
+    CH4_CM3=float(eph[2].strip())
         
     if LonSys=='1':
-        roll=Real_CM2-Real_CM1
-        CM=Real_CM1
-        Real_CM=Real_CM1
-        CH4data=np.roll(CH4data,int(roll),axis=1)
-        NH3data=np.roll(NH3data,int(roll),axis=1)
-        RGB=np.roll(RGB,int(roll),axis=1)
+        RGBroll=RGB_CM2-RGB_CM1
+        RGB=np.roll(RGB,int(RGBroll),axis=1)
+        NH3CM=NH3_CM2
+        NH3roll=NH3_CM2-NH3_CM1
+        NH3data=np.roll(NH3data,int(NH3roll),axis=1)
+        CH4roll=CH4_CM2-CH4_CM1
+        CH4data=np.roll(CH4data,int(CH4roll),axis=1)
+        NH3CM=NH3_CM1
+        CH4CM=CH4_CM1
+        RGBCM=RGB_CM1
+
+        #CM=NH3_CM1
+        #Real_CM=NH3_CM1
     elif LonSys=='2':
-        CM=Real_CM2
-        Real_CM=Real_CM2
+        print("LonSys=",LonSys)
+        NH3CM=NH3_CM2
+        CH4CM=CH4_CM2
+        RGBCM=RGB_CM2
+        #CM=Real_CM2
+        #Real_CM=Real_CM2
     elif LonSys=='3':
-        roll=Real_CM2-Real_CM3
-        CM=Real_CM3
-        Real_CM=Real_CM3
-        CH4data=np.roll(CH4data,int(roll),axis=1)
-        NH3data=np.roll(NH3data,int(roll),axis=1)
-        RGB=np.roll(RGB,int(roll),axis=1)
+        RGBroll=RGB_CM2-RGB_CM3
+        RGB=np.roll(RGB,int(RGBroll),axis=1)
+        NH3roll=NH3_CM2-NH3_CM3
+        NH3data=np.roll(NH3data,int(NH3roll),axis=1)
+        CH4roll=CH4_CM2-CH4_CM3
+        CH4data=np.roll(CH4data,int(CH4roll),axis=1)
+        NH3CM=NH3_CM3
+        CH4CM=CH4_CM3
+        RGBCM=RGB_CM3
+
+
+        #roll=Real_CM2-Real_CM3
+        #CM=Real_CM3
+        #Real_CM=Real_CM3
+        #CH4data=np.roll(CH4data,int(roll),axis=1)
+        #NH3data=np.roll(NH3data,int(roll),axis=1)
+        #RGB=np.roll(RGB,int(roll),axis=1)
        
     ###########################################################################
     # Set calibration and compute physical parameters
@@ -129,13 +170,24 @@ def Retrieve_L3_Env_Params(obsdate="20220919UTa",target="Jupiter",
             hdul = fits.HDUList([hdu])
             comment="NH3 ppm"
             fn='fNH3'
+            Real_CM1=NH3_CM1
+            Real_CM2=NH3_CM2
+            Real_CM3=NH3_CM3
+            time=NH3time
+            file=NH3file
         elif BUNIT=='Cloud-top Press':
             hdu = fits.PrimaryHDU((CH4_Cloud_Press/4.).astype(np.float32))
             hdul = fits.HDUList([hdu])
             comment="mb"
             fn='PCloud'
+            Real_CM1=CH4_CM1
+            Real_CM2=CH4_CM2
+            Real_CM3=CH4_CM3
+            time=CH4time
+            file=CH4file
+            
         hdul[0].header['BITPIX']=-32
-        hdul[0].header['DATE-OBS']=NH3time.replace('_','T')+'Z'
+        hdul[0].header['DATE-OBS']=time.replace('_','T')+'Z'
         #hdul[0].header['DATE']=NH3time
         hdul[0].header['AUTHOR']='Hill, S. M.'
     
@@ -162,13 +214,17 @@ def Retrieve_L3_Env_Params(obsdate="20220919UTa",target="Jupiter",
         print(hdul[0].header[:])
         pathfNH3='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/'
         #fnout=path+'/'+NH3file[0:26]+'fNH3Abs647.fits'
-        fnout=pathfNH3+NH3file[0:26]+fn+'_Sys'+LonSys+'.fits'
+        fnout=pathfNH3+file[0:26]+fn+'_Sys'+LonSys+'.fits'
         try:
             os.remove(fnout)
         except: 
             print("file doesn't exist")
         hdul.writeto(fnout)
         hdul.close()
+        
+        outdict={"CH4":{"file":CH4file,"CM":CH4CM,"time":CH4time,"tau":CH4_tau,"Ncol":CH4_Ncol,"PCloud":CH4_Cloud_Press},
+                 "NH3":{"file":NH3file,"CM":NH3CM,"time":NH3time,"tau":NH3_tau,"Ncol":NH3_Ncol,"fNH3":fNH3},
+                 "RGB":{"file":RGBfile,"CM":RGBCM,"time":RGBtime,"RGB":RGB},
+                 "pathFITS":pathFITS,"pathfNH3":pathfNH3}
     
-    return(CH4_tau,CH4_Ncol,CH4_Cloud_Press,NH3_tau,NH3_Ncol,fNH3,RGBfile,RGB,
-           CM,NH3time,NH3file,pathFITS,pathfNH3)
+    return(outdict)
