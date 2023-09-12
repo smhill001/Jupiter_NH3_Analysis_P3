@@ -4,7 +4,7 @@ Created on Thu Sep  7 10:26:54 2023
 
 @author: smhil
 """
-def Profile_L3(param="PCloud"):
+def Profile_L3(param="PCloud",profile="Meridional",LonRng=1):
     import sys
     drive='C:'
     sys.path.append(drive+'/Astronomy/Python Play')
@@ -30,11 +30,11 @@ def Profile_L3(param="PCloud"):
           "NTrZ":[17.4,24.2],
           "NTZ":[31.4,35.4]}
     
-    path="/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
+    path="/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/Profiles/"
        
     figavgprof,axsavgprof=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="white")
     
-    if param=="fNH3":
+    if param=="fNH3" and profile=="Meridional":
         plevel=0.752910
         PTG.plot_TEXES_Groups(axsavgprof,clr='C2',prs=plevel,mult=1000000.)
         plevel=0.657540
@@ -43,21 +43,22 @@ def Profile_L3(param="PCloud"):
         PTG.plot_TEXES_Groups(axsavgprof,clr='C4',prs=plevel,mult=1000000.)
 
     
-    PTG.plot_profiles_L3(axsavgprof,"SCT 2022",LonRng=1.,
+    PTG.plot_profiles_L3(axsavgprof,"SCT 2022",LonRng=LonRng,profile=profile,
                              clr='k',width=1.5,smooth=smooth,param=param)
-    PTG.plot_profiles_L3(axsavgprof,"VLTMUSE 2022",LonRng=1.,
+    PTG.plot_profiles_L3(axsavgprof,"VLTMUSE 2022",LonRng=LonRng,profile=profile,
                              clr='k',width=1.0,smooth=smooth,param=param,
                              style='dashed')
-    PTG.plot_profiles_L3(axsavgprof,"SCT 2023",LonRng=1.,
+    PTG.plot_profiles_L3(axsavgprof,"SCT 2023",LonRng=LonRng,profile=profile,
                              clr='r',width=1.5,smooth=smooth,param=param)
     
-    for zb in belt:
-        print(zb,belt[zb])
-        axsavgprof.fill_between([belt[zb][0],belt[zb][1]],np.array([0.,0.]),np.array([1000.,1000.]),
-                                color="0.5",alpha=0.2)
-        axsavgprof.annotate(zb,xy=[np.mean(belt[zb]),0.01],ha="center")
-    for zb in zone:
-        axsavgprof.annotate(zb,xy=[np.mean(zone[zb]),0.05],ha="center")
+    if profile=="Meridional":
+        for zb in belt:
+            print(zb,belt[zb])
+            axsavgprof.fill_between([belt[zb][0],belt[zb][1]],np.array([0.,0.]),
+                                    np.array([1000.,1000.]),color="0.5",alpha=0.2)
+            axsavgprof.annotate(zb,xy=[np.mean(belt[zb]),0.01],ha="center")
+        for zb in zone:
+            axsavgprof.annotate(zb,xy=[np.mean(zone[zb]),0.05],ha="center")
     
     # Plot layout details and labeling
     axsavgprof.set_xlim(-45.,45.)
@@ -67,6 +68,7 @@ def Profile_L3(param="PCloud"):
         axsavgprof.set_ylim(400.,1000.)
         axsavgprof.set_ylabel("Effective Cloud-Top Pressure (mb)",fontsize=10)
         axsavgprof.set_yticks(np.linspace(400,1000,7), minor=False)
+        axsavgprof.invert_yaxis()
     elif param=="fNH3":
         axsavgprof.set_title("Column-Integrated Ammonia Abundance Profiles")
         axsavgprof.set_ylim(0.,200.)
@@ -78,4 +80,4 @@ def Profile_L3(param="PCloud"):
     axsavgprof.tick_params(axis='both', which='major', labelsize=8)
     
     figavgprof.subplots_adjust(left=0.12, bottom=0.12, right=0.98, top=0.92)  
-    figavgprof.savefig(path+"Profile_PCloud_AVGS.png",dpi=300)
+    figavgprof.savefig(path+"Profile_"+param+"_"+profile+".png",dpi=300)

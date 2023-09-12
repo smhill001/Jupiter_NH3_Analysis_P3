@@ -377,6 +377,14 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",
                                'Context':{'NUVfile':'NA',
                                           'RGBfile':'2022-09-19-0352_3-Jupiter-MUSE-R650G550B450-RGB-WhtBal-Filtered_CM2_L360_MAP-BARE.png'},
                                'Contextlabels':['889nm','']},
+                  '20220919UTc_Map':{'Metadata':{'Telescope':'VLT','FL':'5600mm','Camera':'ASI120MM',
+                                            'Seeing':'6/10','Transparency':'7/10'}, 
+                               'CH4file':['2022-09-19-0352_3-Jupiter-VLT-R656G620B632-RGB-WhtBal-MedFilt-620Gauss5pix_CM2_L360_MAP-BARE.png'],
+                               'NH3file':'2022-09-19-0352_3-Jupiter-VLT-R656G647B632-RGB-WhtBal-MedFilt_CM2_L360_MAP-BARE.png',
+                               #'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
+                               'Context':{'NUVfile':'NA',
+                                          'RGBfile':'2022-09-19-0352_3-Jupiter-MUSE-R650G550B450-RGB-WhtBal-Filtered_CM2_L360_MAP-BARE.png'},
+                               'Contextlabels':['889nm','']},
 
                   '20220919UTSa':{'Metadata':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'6/10','Transparency':'7/10'}, 
@@ -758,9 +766,9 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",
     #  !!!!OR, FOR SEPARATION OF FUNCTION, CREATE A STANDALONG FILE-WRITING FUNCTION   
     pathL2FITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/'
     if imagetype=="Map":
-        fnout=pathL2FITS+NH3file[0:26]+'647NH3AbsMap'
+        fnout=pathL2FITS+NH3file[0:25]+'_647NH3AbsMap'
     elif imagetype=="Img":
-        fnout=pathL2FITS+NH3file[0:26]+'647NH3AbsImg'
+        fnout=pathL2FITS+NH3file[0:25]+'_647NH3AbsImg'
     maskednh3=nh3abs*mask[:,:,1]
     normnh3=maskednh3/maskednh3[maskednh3>0].mean()
     hdu = fits.PrimaryHDU(normnh3.astype(np.float32))
@@ -815,9 +823,9 @@ def Jupiter_NH3_CH4_Images_Arrays_P3(obsdate="20220919UTb",target="Jupiter",
 
             if search("G620", CH4file[ifile]):
                 if imagetype=="Map":
-                    fnout=pathL2FITS+CH4file[0][0:26]+'620CH4AbsMap'
+                    fnout=pathL2FITS+CH4file[0][0:25]+'_620CH4AbsMap'
                 elif imagetype=="Img":
-                    fnout=pathL2FITS+CH4file[0][0:26]+'620CH4AbsImg'
+                    fnout=pathL2FITS+CH4file[0][0:25]+'_620CH4AbsImg'
                 maskedch4=ch4abs*mask[:,:,1]
                 normch4=maskedch4/maskednh3[maskedch4>0].mean()
                 hdu = fits.PrimaryHDU(normch4.astype(np.float32))

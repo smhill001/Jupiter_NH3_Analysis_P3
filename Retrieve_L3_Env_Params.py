@@ -58,6 +58,10 @@ def Retrieve_L3_Env_Params(obsdate="20220919UTa",target="Jupiter",
     RGBfile=sourcefiles[sourcedata]['RGBfile']+"_CM2_L360_MAP-BARE.png"
 
     print("########## pathFITS+CH4file=",pathFITS+CH4file)
+    #temp="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/2022-09-19-0352_3-Jupiter-620CH4AbsMapc.fits"
+    #temp=pathFITS+"2022-09-19-0352_3-Jupiter-620CH4AbsMapc.fits"
+    #print(temp)
+    #CH4hdulist=fits.open(temp)
     CH4hdulist=fits.open(pathFITS+CH4file)
     CH4hdulist.info()
     CH4hdr=CH4hdulist[0].header

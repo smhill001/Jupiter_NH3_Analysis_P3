@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-def extract_profile(pth,filename,LonCtr='CM',LonRng=45.):
+def extract_profile(pth,filename,LonCtr='CM',LonRng=45.,LatLims=[85,95],
+                    profile="Meridional"):
     """
     Created on Mon Jul 31 19:54:53 2023
     
@@ -33,10 +34,19 @@ def extract_profile(pth,filename,LonCtr='CM',LonRng=45.):
     CM2=Real_CM2#+delta_CM2
     LonLims=[360-int(CM2+LonRng),360-int(CM2-LonRng)]
     
-    patch=RL.make_patch(mapdata,[0,180],LonLims,CM2,LonRng,pad=True)
 
-    AvgMerid=np.flip(np.mean(patch[:,:],axis=1))
-    StdMerid=np.flip(np.std(patch[:,:],axis=1))
-    Lats=np.linspace(-89.5,89.5,180)
+    if profile=="Meridional":
+        patch=RL.make_patch(mapdata,[0,180],LonLims,CM2,LonRng,pad=True)
+        AvgProf=np.flip(np.mean(patch[:,:],axis=1))
+        StdProf=np.flip(np.std(patch[:,:],axis=1))
+        Coords=np.linspace(-89.5,89.5,180)
     
-    return(Lats,AvgMerid,StdMerid)
+    if profile=="Zonal":
+        patch=RL.make_patch(mapdata,LatLims,LonLims,CM2,LonRng,pad=True)
+        AvgProf=np.flip(np.mean(patch[:,:],axis=0))
+        StdProf=np.flip(np.std(patch[:,:],axis=0))
+        Coords=np.arange(-LonRng,LonRng,1)+0.5
+
+    print("AvgProfile.shape,Coords.shape=",AvgProf.shape,Coords.shape)
+
+    return(Coords,AvgProf,StdProf)

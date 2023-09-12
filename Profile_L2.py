@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-def Profile_L2(band="CH4"):
+def Profile_L2(band="CH4",profile="Meridional",LonRng=1):
     """
     Created on Thu Sep  7 11:17:51 2023
     
@@ -37,7 +37,7 @@ def Profile_L2(band="CH4"):
        
     figavgprof,axsavgprof=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white")
     
-    if band=="NH3":
+    if band=="NH3" and profile=="Meridional":
         PTG.plot_Teifel(axsavgprof,clr='0.5',width=3.)
 
         CMOS2020EW=np.loadtxt(path+
@@ -62,20 +62,21 @@ def Profile_L2(band="CH4"):
 
 
     
-    PTG.plot_profile_EW(axsavgprof,"SCT 2022",LonRng=1.,CalModel='SCT-Obs-Final',
-                            clr='k',width=1.5,band=band,smooth=smooth)
-    PTG.plot_profile_EW(axsavgprof,"VLTMUSE 2022",LonRng=1.,CalModel='VLT-Obs-Final',
-                            clr='k',width=1.5,band=band,style='dashed',smooth=smooth)
-    PTG.plot_profile_EW(axsavgprof,"SCT 2023",LonRng=1.,CalModel='SCT-Obs-Final',
-                            clr='g',width=1.5,band=band,smooth=smooth)
+    PTG.plot_profile_L2(axsavgprof,"SCT 2022",LonRng=LonRng,CalModel='SCT-Obs-Final',
+                        profile=profile,clr='k',width=1.5,band=band,smooth=smooth)
+    PTG.plot_profile_L2(axsavgprof,"VLTMUSE 2022",LonRng=LonRng,CalModel='VLT-Obs-Final',
+                        profile=profile,clr='k',width=1.5,band=band,style='dashed',smooth=smooth)
+    PTG.plot_profile_L2(axsavgprof,"SCT 2023",LonRng=LonRng,CalModel='SCT-Obs-Final',
+                        profile=profile,clr='g',width=1.5,band=band,smooth=smooth)
     
-    for zb in belt:
-        print(zb,belt[zb])
-        axsavgprof.fill_between([belt[zb][0],belt[zb][1]],np.array([0.,0.]),np.array([1000.,1000.]),
-                                color="0.5",alpha=0.2)
-        axsavgprof.annotate(zb,xy=[np.mean(belt[zb]),0.01],ha="center")
-    for zb in zone:
-        axsavgprof.annotate(zb,xy=[np.mean(zone[zb]),0.05],ha="center")
+    if profile=="Meridional":
+        for zb in belt:
+            #print(zb,belt[zb])
+            axsavgprof.fill_between([belt[zb][0],belt[zb][1]],np.array([0.,0.]),np.array([1000.,1000.]),
+                                    color="0.5",alpha=0.2)
+            axsavgprof.annotate(zb,xy=[np.mean(belt[zb]),0.01],ha="center")
+        for zb in zone:
+            axsavgprof.annotate(zb,xy=[np.mean(zone[zb]),0.05],ha="center")
     
     # Plot layout details and labeling
     axsavgprof.grid(linewidth=0.2)
@@ -88,10 +89,14 @@ def Profile_L2(band="CH4"):
     elif band=="NH3":
         axsavgprof.set_title("Ammonia 646 nm Absorption Profiles")
         axsavgprof.set_yticks(np.linspace(0.0,1.0,5), minor=False)
+    if profile=="Meridional":
+        xlabel="Planetographic Latitude (deg)"
+    elif profile=="Zonal":
+        xlabel="Longitude from CM (deg)"
     axsavgprof.tick_params(axis='both', which='major', labelsize=8)
-    axsavgprof.set_xlabel("Latitude (deg)",fontsize=10)
+    axsavgprof.set_xlabel(xlabel,fontsize=10)
     axsavgprof.set_ylabel("Equivalent Width (nm)",fontsize=10)
     axsavgprof.legend(fontsize=8,loc=2)
     figavgprof.subplots_adjust(left=0.09, right=0.97, top=0.93, bottom=0.11)
       
-    figavgprof.savefig(drive+path+"Profile "+band+"Absorption.png",dpi=300)
+    figavgprof.savefig(drive+path+"Analysis Data/Profiles/Profile_"+band+"_"+profile+"_Absorption.png",dpi=300)

@@ -106,9 +106,9 @@ def plot_Historical(ax,reference,clr='C0'):
     ax.scatter(data[reference]["Center_pgLat"],np.array(data[reference]["645EW"])*0.1,label=reference,color=clr)
 
 
-def plot_profile_EW(ax,reference,LatLims=[45,135],LonRng=45.,band="CH4",
-                    CalModel='SCT-Obs-Final',clr='C0',width=1.0,
-                    style='solid',smooth=False):
+def plot_profile_L2(ax,reference,LatLims=[45,135],LonRng=45.,band="CH4",
+                    CalModel='SCT-Obs-Final',profile="Meridional",clr='C0',
+                    width=1.0,style='solid',smooth=False):
     #Single module for aggregating profiles (meridional for now)
     #Also, the disk integrated transmissions
     #     are hardcoded!!! I need to have a master reference file for these 
@@ -156,8 +156,14 @@ def plot_profile_EW(ax,reference,LatLims=[45,135],LonRng=45.,band="CH4",
                     data["SCT 2023"]["fn"].append(sourcefiles[ID][band+"file"])
 
     pth=data[reference]["path"]
-    AvgSum=np.zeros(180)
-    StdSum=np.zeros(180)
+    if profile=="Meridional":
+        AvgSum=np.zeros(180)
+        StdSum=np.zeros(180)
+        xlabel="Planetographic Latitude (deg)"
+    elif profile=="Zonal":
+        AvgSum=np.zeros(2*LonRng)
+        StdSum=np.zeros(2*LonRng)
+        xlabel="Longitude from CM (deg)"
     
     if band=="CH4":
         suffix="-Jupiter_620CH4AbsMap.fits"
@@ -175,7 +181,7 @@ def plot_profile_EW(ax,reference,LatLims=[45,135],LonRng=45.,band="CH4",
         print("****file=",file)
         fn=file+suffix      
         print("****fn=",fn)                      
-        Lats,AvgMerid,StdMerid=EP.extract_profile(pth,fn,LonRng=LonRng)       
+        Lats,AvgMerid,StdMerid=EP.extract_profile(pth,fn,LonRng=LonRng,profile=profile)       
         NH3GlobalTrans=calibration[CalModel][cal]
         Avg_Trans=AvgMerid*NH3GlobalTrans
         Std_Trans=StdMerid*NH3GlobalTrans
@@ -199,7 +205,7 @@ def plot_profile_EW(ax,reference,LatLims=[45,135],LonRng=45.,band="CH4",
 
     axsspaghetti.legend(fontsize=6,ncol=3)
     axsspaghetti.set_title(reference)
-    axsspaghetti.set_xlabel("Planetographic Latitude (deg)",fontsize=10)
+    axsspaghetti.set_xlabel(xlabel,fontsize=10)
 
     if smooth:
         ax.plot(Lats,convolve(AvgSum, Box1DKernel(3)),color=clr,
@@ -209,9 +215,14 @@ def plot_profile_EW(ax,reference,LatLims=[45,135],LonRng=45.,band="CH4",
         #ax.plot(Profile[:,0]-45.,EW,color=clr,linewidth=width,linestyle=style,label=reference)
         ax.plot(Lats,AvgSum,color=clr,linewidth=width,
                 linestyle=style,label=reference)
+        
+    path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
+
+    figspaghetti.savefig(path+"Analysis Data/Profiles/Profile_"+reference+"_"+band+"_"+profile+"_Absorption.png",dpi=300)
+    
     return(0)
 
-def plot_profiles_L3(ax,reference,LatLims=[45,135],LonRng=45.,
+def plot_profiles_L3(ax,reference,LatLims=[45,135],LonRng=45.,profile="Meridional",
                          clr='C0',width=1.0,
                          style='solid',smooth=False,param='PCloud'):
     #     Also, the disk integrated transmissions
@@ -274,17 +285,26 @@ def plot_profiles_L3(ax,reference,LatLims=[45,135],LonRng=45.,
                     data["SCT 2023"]["fn"].append(sourcefiles[ID][band+"file"])
 
     pth=data[reference]["path"]
-    AvgArr=np.zeros(180)
-    #StdSum=np.zeros(180)
+    if profile=="Meridional":
+        AvgSum=np.zeros(180)
+        StdSum=np.zeros(180)
+    elif profile=="Zonal":
+        AvgSum=np.zeros(2*LonRng)
+        StdSum=np.zeros(2*LonRng)
+
     First=True
     for L3file in data[reference]["fn"]:                             
         fn=L3file+suffix
         print("$$$$$$$$$$$$$$fn=",fn)
-        Lats,AvgMerid,StdMerid=EP.extract_profile(pth,fn,LonRng=LonRng)       
+        Lats,AvgMerid,StdMerid=EP.extract_profile(pth,fn,LonRng=LonRng,profile=profile)       
         #Convert from fraction to ppm by multiplying by 10^6
-        if First:
+        if First and profile=="Meridional":
             AvgArr=AvgMerid
             AvgArr=np.reshape(AvgArr,(1,180))
+            First=False
+        if First and profile=="Zonal":
+            AvgArr=AvgMerid
+            AvgArr=np.reshape(AvgArr,(1,90))
             First=False
         else:
             AvgArr=np.vstack((AvgArr,AvgMerid))
@@ -320,6 +340,10 @@ def plot_profiles_L3(ax,reference,LatLims=[45,135],LonRng=45.,
         ax.plot(Lats,AvgPro,color=clr,linewidth=width,
                 linestyle=style,label=reference)
         ax.fill_between(Lats, AvgPro-AvgStd, AvgPro+AvgStd,color=clr,alpha=.1)
+
+    path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
+
+    figspaghetti.savefig(path+"Analysis Data/Profiles/Profile_"+reference+"_"+param+"_"+profile+".png",dpi=300)
 
         
 def Centric_to_Graphic(Latc):
