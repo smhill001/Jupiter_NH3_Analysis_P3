@@ -62,12 +62,12 @@ def Profile_L2(band="CH4",profile="Meridional",LonRng=1):
 
 
     
-    PTG.plot_profile_L2(axsavgprof,"SCT 2022",LonRng=LonRng,CalModel='SCT-Obs-Final',
+    PTG.plot_profile_L2(axsavgprof,"SCT 2022",LonRng=LonRng,
                         profile=profile,clr='k',width=1.5,band=band,smooth=smooth)
-    PTG.plot_profile_L2(axsavgprof,"VLTMUSE 2022",LonRng=LonRng,CalModel='VLT-Obs-Final',
+    PTG.plot_profile_L2(axsavgprof,"VLTMUSE 2022",LonRng=LonRng,
                         profile=profile,clr='k',width=1.5,band=band,style='dashed',smooth=smooth)
-    PTG.plot_profile_L2(axsavgprof,"SCT 2023",LonRng=LonRng,CalModel='SCT-Obs-Final',
-                        profile=profile,clr='g',width=1.5,band=band,smooth=smooth)
+    #PTG.plot_profile_L2(axsavgprof,"SCT 2023",LonRng=LonRng,
+    #                    profile=profile,clr='g',width=1.5,band=band,smooth=smooth)
     
     if profile=="Meridional":
         for zb in belt:

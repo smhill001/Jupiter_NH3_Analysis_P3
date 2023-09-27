@@ -107,7 +107,7 @@ def plot_Historical(ax,reference,clr='C0'):
 
 
 def plot_profile_L2(ax,reference,LatLims=[45,135],LonRng=45.,band="CH4",
-                    CalModel='SCT-Obs-Final',profile="Meridional",clr='C0',
+                    profile="Meridional",clr='C0',
                     width=1.0,style='solid',smooth=False):
     #Single module for aggregating profiles (meridional for now)
     #Also, the disk integrated transmissions
@@ -121,41 +121,21 @@ def plot_profile_L2(ax,reference,LatLims=[45,135],LonRng=45.,band="CH4",
     sys.path.append('./Services')
     import read_master_calibration
     import extract_profile as EP
-    import get_abs_obs_data as GAOD
+    import get_L2_abs_data as GAOD
     import pylab as pl
+    import get_batch_lists as GBL
 
     calibration,K_eff=read_master_calibration.read_master_calibration()
+    sourcefiles=GAOD.get_L2_abs_data()
+    DataSets=GBL.get_batch_lists()
 
-    sourcefiles=GAOD.get_abs_obs_data()
+    pth="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/"
 
-    data={"SCT 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/",
-                              #"fn":"Profile of Jupiter GRS AVG NH3 Transmission 8 files-Celestron11.csv",
-                              "fn":[],
-                              "EW_slope":-12.82831873,
-                              "EW_const":12.82685019},
-          "VLTMUSE 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/",
-                              "fn":["2022-09-19-0352_3"],
-                              "EW_slope":-12.15343491,
-                              "EW_const":12.15195684},
-          "SCT 2023":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/",
-                              "fn":[],
-                              "EW_slope":-12.82831873,
-                              "EW_const":12.82685019}}
+    Trans2EW={"VLT":{"EW_slope":{"NH3":-12.15343491,"CH4":-12.74115968},
+                     "EW_const":{"NH3":12.15195684,"CH4":12.73323535}},
+              "SCT":{"EW_slope":{"NH3":-12.87087479,"CH4":-13.52007859},
+                     "EW_const":{"NH3":12.86940675,"CH4":13.51315382}}}
 
-    for ID in sourcefiles:
-        if "Map" in ID:
-            print("*******ID=",ID)
-            if sourcefiles[ID][band+'Qual']:
-                if 202207<int(ID[0:6])<202302:
-                    print(int(ID[0:6]))
-                    print("*******sourcefiles[ID]['CH4file'][0:4]=",sourcefiles[ID][band+"file"])
-                    data["SCT 2022"]["fn"].append(sourcefiles[ID][band+"file"])
-                elif 202307<int(ID[0:6])<202403:
-                    print(int(ID[0:6]))
-                    print("*******sourcefiles[ID]['CH4file'][0:4]=",sourcefiles[ID][band+"file"])
-                    data["SCT 2023"]["fn"].append(sourcefiles[ID][band+"file"])
-
-    pth=data[reference]["path"]
     if profile=="Meridional":
         AvgSum=np.zeros(180)
         StdSum=np.zeros(180)
@@ -165,46 +145,67 @@ def plot_profile_L2(ax,reference,LatLims=[45,135],LonRng=45.,band="CH4",
         StdSum=np.zeros(2*LonRng)
         xlabel="Longitude from CM (deg)"
     
-    if band=="CH4":
-        suffix="-Jupiter_620CH4AbsMap.fits"
-        cal='CH4GlobalTrans'
-    elif band=="NH3":
-        suffix="-Jupiter_647NH3AbsMap.fits"
-        cal='NH3GlobalTrans'
-    print("****band=",band)  
-    print("****reference=",reference)
-    print("data[reference]=",data[reference])
+    suffix={"CH4":"_Jupiter_620CH4AbsMap",
+            "NH3":"_Jupiter_647NH3AbsMap"}
     
-    figspaghetti,axsspaghetti=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="white")
-
-    for file in data[reference]["fn"]: 
-        print("****file=",file)
-        fn=file+suffix      
-        print("****fn=",fn)                      
-        Lats,AvgMerid,StdMerid=EP.extract_profile(pth,fn,LonRng=LonRng,profile=profile)       
-        NH3GlobalTrans=calibration[CalModel][cal]
-        Avg_Trans=AvgMerid*NH3GlobalTrans
-        Std_Trans=StdMerid*NH3GlobalTrans
-    
-        Avg_EW=data[reference]["EW_slope"]*Avg_Trans+data[reference]["EW_const"]
-        Std_EW=data[reference]["EW_slope"]*Std_Trans+data[reference]["EW_const"]
-    
-        axsspaghetti.plot(Lats,Avg_EW,linewidth=0.5,label=file[5:20])
-
-        AvgSum=AvgSum+Avg_EW/len(data[reference]["fn"])    
-    
+    figspaghetti,axsspaghetti=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, 
+                                          facecolor="white")
+    First=True
+    Count=0
+    print(reference)
+    print(DataSets[reference])
+    for ID in DataSets[reference]:
+        print("*******ID=",ID)
+        sourceindex=ID[0:4]+ID
+        if len(ID)==11:
+            version=ID[10]
+            dataset=ID[0:10].replace('-','')+'UT'+version+"_Map"
+        else:
+            dataset=ID.replace('-','')+'UT'+"_Map"
+        print("******dataset=",dataset)
+        print(sourcefiles[dataset])
+        file=sourcefiles[dataset][band+"file"]+suffix[band]
+        try:
+            file=file+sourcefiles[dataset]['Metadata']['Variation']
+        except:
+            print('No Variation')
+        print("file=",file)
+        
+        
+        Lats,AvgProf,StdProf=EP.extract_profile(pth,file+".fits",LonRng=LonRng,
+                                                  profile=profile)
+        Avg_EW=Trans2EW[reference[0:3]]["EW_slope"][band]*AvgProf+Trans2EW[reference[0:3]]["EW_const"][band]
+        Std_EW=Trans2EW[reference[0:3]]["EW_slope"][band]*AvgProf+Trans2EW[reference[0:3]]["EW_const"][band]
+        
+        try:
+            lbl=file[5:17]+" "+sourcefiles[dataset]['Metadata']['Variation']
+        except:
+            lbl=file[5:17]
+        axsspaghetti.plot(Lats,Avg_EW,linewidth=0.5,
+                          label=lbl)#+"_"+file[5:20])
+        if First:
+            Sum=Avg_EW
+            Count=1
+            First=False
+        else:
+            Sum=Sum+Avg_EW
+            Count=Count+1
+            print("No File")
+    AvgSum=Sum/Count
     #Profile=np.loadtxt(data[reference]["path"]+data[reference]["fn"],usecols=range(2),delimiter=",")
     axsspaghetti.set_xlim(-45,45)
     axsspaghetti.set_ylim(0,2)
     if band=="CH4":
         axsspaghetti.set_ylim(0,2)
-        axsspaghetti.set_ylabel("Methane Absorption EW (nm)",fontsize=10)
+        axsspaghetti.set_title(reference+" Methane")
+
     elif band=="NH3":
         axsspaghetti.set_ylim(0,1)
-        axsspaghetti.set_ylabel("Ammonia Absorption EW (nm)",fontsize=10)
+        axsspaghetti.set_title(reference+" Ammonia")
 
-    axsspaghetti.legend(fontsize=6,ncol=3)
-    axsspaghetti.set_title(reference)
+    axsspaghetti.set_ylabel("Equivalent Width EW (nm)",fontsize=10)
+
+    axsspaghetti.legend(fontsize=8,ncol=3)
     axsspaghetti.set_xlabel(xlabel,fontsize=10)
 
     if smooth:
@@ -240,10 +241,10 @@ def plot_profiles_L3(ax,reference,LatLims=[45,135],LonRng=45.,profile="Meridiona
     #import read_master_calibration
     import RetrievalLibrary as RL
     import extract_profile as EP
-    import get_abs_obs_data as GAOD
+    import get_L2_abs_data as GAOD
     import pylab as pl
 
-    sourcefiles=GAOD.get_abs_obs_data()
+    sourcefiles=GAOD.get_L2_abs_data()
 
     data={"SCT 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/",
                               #"fn":"Profile of Jupiter GRS AVG NH3 Transmission 8 files-Celestron11.csv",

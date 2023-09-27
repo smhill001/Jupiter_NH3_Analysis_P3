@@ -17,7 +17,7 @@ def extract_profile(pth,filename,LonCtr='CM',LonRng=45.,LatLims=[85,95],
     import sys
     sys.path.append('./Services')
     import read_master_calibration
-    import RetrievalLibrary as RL
+    import get_WINJupos_ephem as get_ephem
                  
     hdulist=fits.open(pth+filename)
     hdulist.info()
@@ -29,9 +29,9 @@ def extract_profile(pth,filename,LonCtr='CM',LonRng=45.,LatLims=[85,95],
     ###########################################################################             
     sec=str(int(str(filename[16:17]))*6)
     obsdate=(filename[0:10]+"_"+filename[11:13]+":"+filename[13:15]+":"+sec.zfill(2))
-    eph=RL.get_WINJupos_ephem(obsdate)
+    eph=get_ephem.get_WINJupos_ephem(obsdate)
     Real_CM2=float(eph[1].strip())
-    CM2=Real_CM2#+delta_CM2
+    CM2=Real_CM2+0.00001 #the addition of 0.00001 eliminates a literal edge case
     LonLims=[360-int(CM2+LonRng),360-int(CM2-LonRng)]
     
 
@@ -43,6 +43,8 @@ def extract_profile(pth,filename,LonCtr='CM',LonRng=45.,LatLims=[85,95],
     
     if profile=="Zonal":
         patch=RL.make_patch(mapdata,LatLims,LonLims,CM2,LonRng,pad=True)
+        print("LonLims=",LonLims)
+        print("patch.shape=",patch.shape)
         AvgProf=np.flip(np.mean(patch[:,:],axis=0))
         StdProf=np.flip(np.std(patch[:,:],axis=0))
         Coords=np.arange(-LonRng,LonRng,1)+0.5

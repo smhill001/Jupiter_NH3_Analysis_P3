@@ -40,7 +40,7 @@ def JupiterFilterPerformance(TelescopeList=["SCT","VLT"],
     # Get molecular and Jovian data   
     x0,x1,xtks=600.,680.,9
     y0,y1,ytks=0.0,0.7,8
-    Albedo,Continua,CH4,NH3= \
+    Albedo,Continua,CH4,NH3,NH3_Lutz_Owen_1980= \
         gACC.get_albedo_continua_crossections(x0,x1,xtks,y0,y1,ytks,Crossect=True)
 
     # PLOT FILTER TRANSMISSIONS CONVOLVED WITH DISK-INTEGRATED ALBEDO AND CONTINUUM

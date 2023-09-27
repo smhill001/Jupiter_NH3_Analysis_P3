@@ -21,19 +21,18 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     sys.path.append('./Services')
 
     import os
-    from matplotlib.pyplot import imread
+    #from matplotlib.pyplot import imread
     import pylab as pl
     import numpy as np
     from imageio import imwrite
-    from numpy import inf
-    from re import search
+    #from numpy import inf
+    #from re import search
     from astropy.io import fits
-    from astropy.convolution import Gaussian2DKernel
-    from astropy.convolution import convolve
+    #from astropy.convolution import Gaussian2DKernel
+    #from astropy.convolution import convolve
     import RetrievalLibrary as RL
-    import read_master_calibration
     sys.path.append('./Services')
-    import get_abs_obs_data as GAOD
+    #import get_L2_abs_data as GAOD
     import Retrieve_L3_Env_Params as RL3
     
     ###########################################################################
@@ -43,7 +42,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     #                           imagetype='Map',CalModel='SCT-Obs-Final',
     #                           Smoothing=True,LonSys=LonSys)
     R=RL3.Retrieve_L3_Env_Params(obsdate=obsdate,target="Jupiter",
-                               imagetype='Map',CalModel='SCT-Obs-Final',
+                               imagetype='Map',CalModel='VLT-Obs-Final',
                                Smoothing=True,LonSys=LonSys)
     ###########################################################################
     # Set up figure and axes for plots
@@ -192,7 +191,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     fNH3scaled=np.nan_to_num(((5000.*65535.*R["NH3"]["fNH3"] - 0.9)))
     fNH3scaled[fNH3scaled<=0.]=0.0
     fNH3abs16bit = fNH3scaled.astype(np.uint16)
-    fnout=R["pathfNH3"]+R["NH3"]["file"][0:26]+'fNH3_Sys'+LonSys+'.png'
+    fnout=R["pathFITS"]+R["NH3"]["file"][0:26]+'fNH3_Sys'+LonSys+'.png'
     imwrite(fnout, fNH3abs16bit)#.astype(np.uint16))
 
     ###########################################################################
@@ -259,7 +258,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
 
     if showbands:
         for zb in belt:
-            print(zb,belt[zb])
+            #print(zb,belt[zb])
             axs1[0].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
                                     color="0.5",alpha=0.4)
             axs1[1].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
@@ -279,6 +278,14 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
                 wspace=0.25, hspace=0.05)     
     axs1[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
     pathmapplots='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/map plots/'
+
+    try:
+        fout=pathmapplots+obsdate+"-Jupiter-Retrieval-NH3_RGB_only"+"-CMII_"+\
+                  str(R["NH3"]["CM"])+"-"+CalModel+"-"+smthtitle+"-Map-"+\
+                  R["Variation"]+".png"
+    except:
+        fout=pathmapplots+obsdate+"-Jupiter-Retrieval-NH3_RGB_only"+"-CMII_"+\
+                  str(R["NH3"]["CM"])+"-"+CalModel+"-"+smthtitle+"-Map.png"
 
     fig1.savefig(pathmapplots+obsdate+"-Jupiter-Retrieval-NH3_RGB_only"+"-CMII_"+
               str(R["NH3"]["CM"])+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
@@ -308,6 +315,19 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
                                      R["CH4"]["CM"],LonRng,"jet",
                                      axs2[0],'%3.2f',cont=False,
                                      cbar_reverse=True,vn=400,vx=900,n=6)
+
+    ##########TEST CODE
+    hdu = fits.PrimaryHDU((R["CH4"]["PCloud"]).astype(np.float32))
+    hdul = fits.HDUList([hdu])
+    try:
+        os.remove(R["pathFITS"]+'PCloud.fits')
+    except: 
+        print("file doesn't exist")
+    hdul.writeto(R["pathFITS"]+'PCloud.fits')
+    hdul.close()
+    ##########TEST CODE
+
+
 
     temp=RL.make_contours_CH4_patch(axs2[0],Pcloud_patch,LatLims,NH3LonLims,
                            lvls=tx,frmt='%3.2f',clr='k')
