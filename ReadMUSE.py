@@ -36,12 +36,39 @@ import scipy
 
 
 path='c:/Astronomy/Projects/SAS 2021 Ammonia/VLT MUSE/'
-MUSEfile='2022-09-19_obs18_proj.fits'
+MUSEfile='2022-07-30_P109_006_obs9_smooth.fits'
+#MUSEfile='2022-09-19_obs18_proj.fits'
 MUSEhdulist=fits.open(path+MUSEfile)
 MUSEhdulist.info()
 MUSEhdr=MUSEhdulist[0].header
 MUSEdata=MUSEhdulist[1].data
+MUSEzen=MUSEhdulist[5].data
+MUSEszen=MUSEhdulist[6].data
 MUSEhdulist.close()
+
+fig,axs=pl.subplots(2,2,figsize=(7.0,4.5), dpi=150, facecolor="white",
+                    sharey=True,sharex=True)      
+fig.suptitle("MUSE Ammonia Analysis Synthetic Band Images",ha='center')
+
+amf=1./np.cos(MUSEzen/180*np.pi)+1./np.cos(MUSEzen/180*np.pi)
+
+axs[0,0].imshow(amf,"gray",origin='lower')
+axs[0,0].set_title("AMF")
+
+hdu = fits.PrimaryHDU(amf.astype(np.float32))
+hdul = fits.HDUList([hdu])
+fnout=path+"Test0730amf.fits"
+try:
+    os.remove(fnout)
+except: 
+    print("file doesn't exist")
+hdul.writeto(fnout)
+hdul.close()
+amfscaled=np.nan_to_num(65535.*amf*0.1)
+amfscaled[amfscaled<=0.]=0.0
+amf16bit = np.flipud(amfscaled.astype(np.uint16))
+imwrite(path+'amf.png', amf16bit)
+
 
 dateobs=MUSEhdr['DATE-OBS']
 fn=dateobs[0:10]+'-'+dateobs[11:13]+dateobs[14:16]+'_'+str(float(dateobs[17:19])/60.)[2]+'-Jupiter-'
@@ -51,8 +78,10 @@ print(fn)
 #print(MUSEhdr)
 #Create MUSE wavelength grid
 #wavelength=np.linspace(470.,935.13,3722)
-delta=-0.2
-wavelength=np.linspace(470.+delta,935.13+delta,3722)
+delta=0
+wavelength=np.linspace(471.+delta,935.+delta,465)
+#delta=-0.2
+#wavelength=np.linspace(470.+delta,935.13+delta,3722)
 
 filterwavelength=['620','632','647','656','658','672','730','889','940']
 filterdata={'620':{'transfile':'620CH4/620CH4_Transmission.txt',
@@ -132,7 +161,8 @@ axs[1,0].set_title("642-652 nm")
 axs[1,1].imshow(MUSE656,"gray",origin='lower')
 axs[1,1].set_title("651-654, 658-661 nm")
 
-F450_wvs=[471.,480.]
+F450_wvs=[475.,480.]
+#F450_wvs=[471.,480.]
 F450_idx=[np.argmin(abs(F450_wvs[0]-wavelength)),np.argmin(abs(F450_wvs[1]-wavelength))]
 MUSE450=np.mean(MUSEdata[F450_idx[0]:F450_idx[1],:,:],axis=0)
 MUSE450scaled=np.nan_to_num(65535.*MUSE450*100.)

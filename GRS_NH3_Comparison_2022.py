@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
+def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRSSCT'):
     """
     Created on Wed Nov 23 09:07:27 2022
     Example for paper profile plot with +/-20 deg long:
@@ -28,27 +28,36 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
     from astropy.convolution import convolve
     import plot_TEXES_Groups_P3 as PTG
     import RetrievalLibrary as RL
+    sys.path.append('./Services')
+
+    import get_WINJupos_ephem
 
     ###########################################################################
     #  DATA FILES AND METADATA DICTIONARY
     #    !!!!SHOULD MAKE THIS A DATA OBJECT!!!!
     #    !!!!DOUBLE CHECK THAT FITS FILE TIME TAGS ARE ACCURATE BETWEEN CH4 AND NH3
     ###########################################################################
-#    sourcedata=obsdate+"_"+imagetype
-    GRSDates=['20220810UT','20220818UT','20220828UT','20220904UT','20220919UT',
-              '20221013UT','20221020UT','20230113UT']
-    GRSCMDates=['20220818UT','20220828UT','20220904UT',
-              '20221013UT','20221020UT']
+    #    sourcedata=obsdate+"_"+imagetype
+    #!!!!Need to clarify GRSDates set vs GRS SCT+VLT or SCT only or VLT only
+    GRSVLTDates=['20220730UT','20220919UTa']
+    GRSSCTDates=['20220810UT','20220818UT','20220828UT','20220904UT',
+                 '20220919UTb','20221013UT','20221020UT','20230113UT']
+    GRSCMDates=['20220730UT','20220818UT','20220828UT','20220904UT',
+                '20220919UTa','20221013UT','20221020UT']
     
-    GRSFilesSys2={'20220810UT':{'fNH3file':'2022-08-10-1013_0-Jupiter_fNH3Abs647.fits',
-                               'RGBfile':'2022-08-10-1030_0-Jupiter_WV-R(AllRED)GB-RGB-WhtBal-Wavelets-Str_CM2_L360_MAP-BARE.png'},
+    GRSFilesSys2={'20220730UT':{'fNH3file':'2022-07-30-0729_8-Jupiter_fNH3_Sys2.fits',
+                               'RGBfile':'2022-07-30-0729_8-Jupiter_R650G550B480-MUSE-RGB-Str_CM2_L360_MAP-BARE.png'},
+                  '20220810UT':{'fNH3file':'2022-08-10-1013_0-Jupiter_fNH3Abs647.fits',
+                                'RGBfile':'2022-08-10-1030_0-Jupiter_WV-R(AllRED)GB-RGB-WhtBal-Wavelets-Str_CM2_L360_MAP-BARE.png'},
                  '20220818UT':{'fNH3file':'2022-08-18-0733_4-Jupiter_fNH3Abs647.fits',
                                'RGBfile':'2022-08-18-0745_4-Jupiter_AllRED-WV-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
                  '20220828UT':{'fNH3file':'2022-08-28-0608_2-Jupiter_fNH3Abs647.fits',
                                'RGBfile':'2022-08-28-0601_3-Jupiter-RGB-JamesWillinghan-j220828a1_CM2_L360_MAP-BARE.png'},
                  '20220904UT':{'fNH3file':'2022-09-04-0638_2-Jupiter_fNH3Abs647.fits',
                                'RGBfile':'2022-09-04-1644_7-Jupiter-Yamane-j220904j4_CM2_L360_MAP-BARE.png'},
-                 '20220919UT':{'fNH3file':'2022-09-19-0453_4-Jupiter_fNH3Abs647.fits',
+                 '20220919UTa':{'fNH3file':'2022-09-19-0352_3-Jupiter-fNH3Abs647.fits',
+                               'RGBfile':'2022-09-19-0518_7-Jupiter_WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
+                 '20220919UTb':{'fNH3file':'2022-09-19-0453_4-Jupiter_fNH3Abs647.fits',
                                'RGBfile':'2022-09-19-0518_7-Jupiter_WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
                  '20221013UT':{'fNH3file':'2022-10-13-0345_5-Jupiter-fNH3Abs647.fits',
                                'RGBfile':'2022-10-13-0402_0-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets_CM2_L360_MAP-BARE.png'},
@@ -85,8 +94,11 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
 
     DarkFeatDates=['20220810UT','20220905UT','20220912UT','20220919UT','20221019UT','20221021UT']
     
-    if target=='GRS':  #CM2~22
-        Dates=GRSDates
+    if target=='GRSSCT':  #CM2~22
+        Dates=GRSSCTDates
+        sourcefiles=GRSFilesSys2
+    if target=='GRSVLT':  #CM2~22
+        Dates=GRSVLTDates
         sourcefiles=GRSFilesSys2
     if target=='GRSCM':  #CM2~22
         Dates=GRSCMDates
@@ -135,7 +147,8 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
         axs[i,j].tick_params(axis='both', which='major', labelsize=7)
 
         axs[i,j].set_adjustable('box') 
-        path='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+Dates[j][0:10]+'/'
+        #path='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+Dates[j][0:10]+'/'
+        path='c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/map plots/'
         print(Dates[j])
 
         fNH3hdulist=fits.open(path+sourcefiles[Dates[j]]['fNH3file'])
@@ -172,7 +185,7 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRS'):
             sfile=sourcefiles[Dates[j]]['fNH3file']
             sec=str(int(str(sfile[16:17]))*6)
             sfiletime=(sfile[0:10]+"_"+sfile[11:13]+":"+sfile[13:15]+":"+sec.zfill(2))
-            eph=RL.get_WINJupos_ephem(sfiletime)
+            eph=get_WINJupos_ephem.get_WINJupos_ephem(sfiletime)
             ObsCM2=float(eph[1].strip())
 
 

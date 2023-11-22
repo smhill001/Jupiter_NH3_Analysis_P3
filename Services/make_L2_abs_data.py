@@ -31,19 +31,14 @@ def make_l2_abs_data(obsdate="20220919UTa",target="Jupiter",
         sourcedata=obsdate+"_"+imagetype
         sourcefiles=getL1.get_L1_img_data()
         calibration,K_eff=RMC.read_master_calibration()
+        
         if sourcefiles[sourcedata]["Metadata"]["Telescope"]=="C11":
             CalModel="SCT-Obs-Final"
         elif sourcefiles[sourcedata]["Metadata"]["Telescope"]=="VLT":
             CalModel="VLT-Obs-Final"
 
-        if a=='L2Cal':
-            CH4GlobalTrans=calibration[CalModel]['CH4GlobalTrans']
-            NH3GlobalTrans=calibration[CalModel]['NH3GlobalTrans']
-        elif a=='L3Cal':
-            CH4GlobalTrans=1.0
-            NH3GlobalTrans=1.0
-        print("aaaaaaaaaaaaa,CH4GlobalTrans,NH3GlobalTrans=",a,CH4GlobalTrans,NH3GlobalTrans)
-    
+        CH4GlobalTrans=calibration[CalModel]['CH4GlobalTrans']
+        NH3GlobalTrans=calibration[CalModel]['NH3GlobalTrans']
         ###########################################################################
         # OBTAIN IMAGES TO DISPLAY, READ DATA, AND DETERMINE IMAGE ARRAY SIZE
         ###########################################################################             
@@ -52,14 +47,13 @@ def make_l2_abs_data(obsdate="20220919UTa",target="Jupiter",
         CH4file=sourcefiles[sourcedata]['CH4file']
         
         NH3_RGB=LP.load_png(path+NH3file)
-                    
         ###########################################################################
-        #!!CREATE MASK. WHY??
+        #!!CREATE MASK. WHY?? - Removed Mask on 11/17/2023. May be desired
+        #   for images (removing limb artifacts) as opposed to maps
         ###########################################################################  
-        indices=(NH3_RGB>0.2*NH3_RGB.max())
-        mask=np.zeros(NH3_RGB.shape)
-        mask[indices]=1.
-    
+        indices=(NH3_RGB>0.002*NH3_RGB.max())
+        mask=np.ones(NH3_RGB.shape)
+        #mask[indices]=1.
         ###########################################################################
         # PARSE WINJUPOS TIME AND GET EPHEMERIS
         ###########################################################################
@@ -67,9 +61,6 @@ def make_l2_abs_data(obsdate="20220919UTa",target="Jupiter",
         NH3time=(NH3file[0:10]+"_"+NH3file[11:13]+":"+NH3file[13:15]+":"
                  +sec.zfill(2))
         eph=WJ_ephem.get_WINJupos_ephem(NH3time)
-        #AmmoniaHeader=NH3time[11:19]+" UT; CM1"+eph[0]+"; CM2"+eph[1]+"; CM3"\
-        #                +eph[2]+"; Alt"+eph[3]
-    
         ###########################################################################
         # COMPUTE COLOR SLOPE BY PIXEL ASSUMING CHANNEL 0 IS R(656) AND CHANNEL 2
         #   IS B(632) AND THERE IS NO BULK COLOR SLOPE. THEN COMPUTE THE EFFECTIVE
@@ -79,7 +70,6 @@ def make_l2_abs_data(obsdate="20220919UTa",target="Jupiter",
                 -np.array(NH3_RGB[:,:,2]).astype(float))/24.0 
         CNT647=15.0*clrslp+np.array(NH3_RGB[:,:,2])
         nh3abs=NH3GlobalTrans*np.array(NH3_RGB[:,:,1])/CNT647
-    
         ###########################################################################
         # SET UP FILE PATH AND NAMES
         ###########################################################################
@@ -92,12 +82,6 @@ def make_l2_abs_data(obsdate="20220919UTa",target="Jupiter",
         except:
             print('No Variation')
 
-        """
-        if a=='L2Cal':
-            fnout=pathout+NH3file[0:26]+'ClrSlp'+a+'_'+imagetype+'.fits'
-        elif a=='L3Cal':
-            fnout=pathout+NH3file[0:26]+'ClrSlp'+a+'_'+imagetype+'.fits'
-            """
         ###########################################################################
         # GET METADATA
         ###########################################################################
@@ -140,19 +124,11 @@ def make_l2_abs_data(obsdate="20220919UTa",target="Jupiter",
         hdul.writeto(fnout+'.fits')
         hdul.close()
     
-        #print(hdul[0].header[:])
-    
         clrslp16bit = np.nan_to_num((32000+500*(clrslp)).astype(np.uint16))
         imwrite(fnout+'.png', clrslp16bit.astype(np.uint16))
         #  !!!!OR, FOR SEPARATION OF FUNCTION, CREATE A STANDALONG FILE-WRITING FUNCTION   
         fn=NH3file[0:25]+'_647NH3Abs'+imagetype
         fnout=pathout+fn
-        """
-        if a=='L2Cal':
-            fnout=pathout+NH3file[0:26]+'_647NH3Abs'+a+'_'+imagetype
-        elif a=='L3Cal':
-            fnout=pathout+NH3file[0:26]+'_647NH3Abs'+a+'_'+imagetype
-            """
         try:
             fnout=fnout+sourcefiles[sourcedata]['Metadata']['Variation']
         except:

@@ -32,22 +32,50 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     #from astropy.convolution import convolve
     import RetrievalLibrary as RL
     sys.path.append('./Services')
-    #import get_L2_abs_data as GAOD
-    import Retrieve_L3_Env_Params as RL3
+    import get_L2_abs_data as GAOD
+    import make_L3_env_data
     
+    sourcedata=obsdate+"_"+imagetype
+    sourcefiles=GAOD.get_L2_abs_data()
+    pathRGB='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+obsdate[0:10]+'/'
+    pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/'
+    pathout='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/map plots/'
+    diagout='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/Map Plots Diagnostic/'
+
+    RGBfile=sourcefiles[sourcedata]['RGBfile']+"_CM2_L360_MAP-BARE.png"
+    
+    try:
+        PCloudfile=sourcefiles[sourcedata]['CH4file']+"-Jupiter_PCloud_Sys2"+\
+                sourcefiles[sourcedata]['Metadata']['Variation']+".fits"
+        variation=sourcefiles[sourcedata]['Metadata']['Variation']
+    except:
+        PCloudfile=sourcefiles[sourcedata]['CH4file']+"-Jupiter_PCloud_Sys2.fits"
+        variation=""
+    try:
+        fNH3file=sourcefiles[sourcedata]['NH3file']+"-Jupiter_fNH3_Sys2"+\
+                sourcefiles[sourcedata]['Metadata']['Variation']+".fits"
+        variation=sourcefiles[sourcedata]['Metadata']['Variation']
+    except:
+        fNH3file=sourcefiles[sourcedata]['NH3file']+"-Jupiter_fNH3_Sys2.fits"
+        variation=""
+
     ###########################################################################
     # Retrieve_Jup_Atm_2022_P3(obsdate="20221019UT",target="Jupiter")   
     #CH4_tau,CH4_Ncol,CH4_Cloud_Press,NH3_tau,NH3_Ncol,fNH3,RGBfile,RGB,CM,NH3time,NH3file,path,pathfNH3=\
     #    RL3.Retrieve_L3_Env_Params(obsdate=obsdate,target="Jupiter",
     #                           imagetype='Map',CalModel='SCT-Obs-Final',
     #                           Smoothing=True,LonSys=LonSys)
-    R=RL3.Retrieve_L3_Env_Params(obsdate=obsdate,target="Jupiter",
-                               imagetype='Map',CalModel='VLT-Obs-Final',
-                               Smoothing=True,LonSys=LonSys)
+    R=make_L3_env_data.make_L3_env_data(obsdate=obsdate,target="Jupiter",
+                           imagetype='Map',CalModel='VLT-Obs-Final',
+                           Smoothing=True,LonSys=LonSys)
+    
     ###########################################################################
     # Set up figure and axes for plots
     ###########################################################################             
     #CM2=Real_CM2+delta_CM2
+    R["NH3"]["CM"]=R["NH3"]["CM"]+delta_CM2
+    R["CH4"]["CM"]=R["CH4"]["CM"]+delta_CM2
+
     NH3LonLims=[360-int(R["NH3"]["CM"]+LonRng),360-int(R["NH3"]["CM"]-LonRng)]
     if Smoothing:
         smthtitle="Smoothed"
@@ -297,7 +325,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     fig2,axs2=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
     fig2.suptitle(R["NH3"]["time"].replace("_"," ")+", CM"+LonSys+"="
-                  +str(int(R["NH3"]["CM"]))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+                  +str(int(R["CH4"]["CM"]))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
 
     for ix in range(0,1):
         axs2[ix].grid(linewidth=0.2)
