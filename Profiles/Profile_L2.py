@@ -11,8 +11,7 @@ def Profile_L2(band="CH4",profile="Meridional",ProfileHalfWidth=45,
     @author: smhil
     """
     import sys
-    drive='C:'
-    sys.path.append(drive+'/Astronomy/Python Play')
+    sys.path.append('c:/Astronomy/Python Play')
     import pylab as pl
     import numpy as np
     from astropy.convolution import convolve
@@ -32,7 +31,7 @@ def Profile_L2(band="CH4",profile="Meridional",ProfileHalfWidth=45,
           "NTrZ":[17.4,24.2],
           "NTZ":[31.4,35.4]}
     
-    path="/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
+    path="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
        
     figavgprof,axsavgprof=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white")
     
@@ -56,16 +55,14 @@ def Profile_L2(band="CH4",profile="Meridional",ProfileHalfWidth=45,
         else:
             axsavgprof.plot(CMOS2021EW[:,0],CMOS2021EW[:,1],color="b",linewidth=1.0,
                             label="SCT 2021")
-
-
     
-    PTG.plot_profile_L2(axsavgprof,"SCT 2022",ProfileHalfWidth=ProfileHalfWidth,
+    LatsSCT22,OutProSCT22,OutStdSCT22=PTG.plot_profile_L2(axsavgprof,"SCT 2022",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='k',width=1.5,band=band,smooth=smooth)
-    PTG.plot_profile_L2(axsavgprof,"VLTMUSE 2022",ProfileHalfWidth=ProfileHalfWidth,
+    LatsVLT22,OutProVLT22,OutStdVLT22=PTG.plot_profile_L2(axsavgprof,"VLTMUSE 2022",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='k',width=1.5,band=band,style='dashed',smooth=smooth)
-    PTG.plot_profile_L2(axsavgprof,"SCT 2023",ProfileHalfWidth=ProfileHalfWidth,
+    LatsSCT23,OutProSCT23,OutStdSCT23=PTG.plot_profile_L2(axsavgprof,"SCT 2023",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='r',width=1.5,band=band,smooth=smooth)
     
@@ -106,4 +103,39 @@ def Profile_L2(band="CH4",profile="Meridional",ProfileHalfWidth=45,
     axsavgprof.legend(fontsize=8,loc=2)
     figavgprof.subplots_adjust(left=0.09, right=0.97, top=0.93, bottom=0.11)
       
-    figavgprof.savefig(drive+path+"Analysis Data/Profiles/Profile_"+band+"_"+profile+"_Absorption.png",dpi=300)
+    figavgprof.savefig(path+"Analysis Data/Profiles/Profile_"+band+"_"+profile+"_Absorption.png",dpi=300)
+    
+    ###########################################################################
+    # Plot change in profile relative to 2022 profile
+    ###########################################################################
+    
+    figresid,axsresid=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white")
+    axsresid.plot(LatsVLT22,OutProSCT23-OutProSCT22,label='2023 minus 2022')
+    #axsresid.plot(LatsVLT22,CMOS2021EW[:,1]-OutProSCT22)
+    #axsresid.plot(LatsVLT22,CMOS2020EW[:,1]-OutProSCT22)
+    if profile=="Meridional":
+        axsresid.set_xlim(90-LatPlotLims[1],90-LatPlotLims[0])
+        axsresid.set_xlabel("Planetographic Latitude (deg)",fontsize=10)
+    if profile=="Zonal":
+        axsresid.set_xlim(-ZonePlotHalfWidth,ZonePlotHalfWidth)
+        axsresid.set_xlabel("Longitude from Sys. II CM (deg)",fontsize=10)
+
+    axsresid.set_title("Change in "+band+" Absorption Profiles")
+    axsresid.set_ylim(-0.2,0.2)
+    axsresid.set_ylabel("Equivalent Width (nm)",fontsize=10)
+    axsresid.set_yticks(np.linspace(-0.2,0.2,9), minor=False)
+    axsresid.grid(linewidth=0.2)
+    axsresid.tick_params(axis='both', which='major', labelsize=8)
+    axsresid.legend(fontsize=8)
+
+    if profile=="Meridional":
+        for zb in belt:
+            print(zb,belt[zb])
+            axsresid.fill_between([belt[zb][0],belt[zb][1]],np.array([-2000.,-2000.]),
+                                    np.array([2000.,2000.]),color="0.5",alpha=0.2)
+            axsresid.annotate(zb,xy=[np.mean(belt[zb]),-0.19],ha="center")
+        for zb in zone:
+            axsresid.annotate(zb,xy=[np.mean(zone[zb]),-0.17],ha="center")
+            
+    figresid.subplots_adjust(left=0.12, bottom=0.12, right=0.98, top=0.92)  
+    figresid.savefig(path+"Analysis Data/Profiles/Residuals_"+band+"_"+profile+".png",dpi=300)

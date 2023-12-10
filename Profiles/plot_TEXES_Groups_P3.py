@@ -18,11 +18,11 @@ def plot_TEXES_Groups(ax,clr="C2",prs=0.43798,mult=1.0):
     import matplotlib.pyplot as pl
     import ComputeNetRateJupiter_P3 as CNRJ
 
-    print('***************** mult=',mult)
+    #print('***************** mult=',mult)
     pth="c:/Astronomy/Projects/SAS 2021 Ammonia/GeminiTEXES2017/ZonalResults/"
     pressure = scipy.fromfile(file=pth+"zmean_g1_retnh3_pressure.txt", dtype=float, count=-1, sep=" ")
     data=np.zeros((7,181))
-    print("data=",data.shape)
+    #print("data=",data.shape)
 
     ind=np.where(np.abs(pressure-prs)/pressure<0.01)    #Pressure index
     PL=np.ndarray.flatten(np.array(ind))[0]             #Pressure
@@ -48,7 +48,7 @@ def plot_TEXES_Groups(ax,clr="C2",prs=0.43798,mult=1.0):
             latc = scipy.fromfile(file=pth+"zmean_g1_retnh3_lat.txt", dtype=float, count=-1, sep=" ")
             latg=Centric_to_Graphic(latc)"""
         #print("Start,End=",Start,End)
-        print(i)
+        #print(i)
         tmp = scipy.fromfile(file=pth+"zmean_g"+str(i)+"_retnh3_data.txt", dtype=float, count=-1, sep=" ")
         dat=tmp[Start:End]
         latgrid,tmpsig=CNRJ.uniform_lat_grid(latg,dat,Fine=True)
@@ -58,14 +58,15 @@ def plot_TEXES_Groups(ax,clr="C2",prs=0.43798,mult=1.0):
     #print(Start,End,pressure[PL])
     scaled_data_mean=np.mean(data,axis=0)*mult#*8.0e4
     scaled_data_std=np.std(data,axis=0)*mult#*8.0e4
-    ax.plot(latgrid,scaled_data_mean,linewidth=1.0,
-            label='Fletcher etal, 2020 ('+str(int(prs*1000.))+'mb)',color=clr)
-    ax.fill_between(latgrid, scaled_data_mean-scaled_data_std, scaled_data_mean+scaled_data_std,
-                    color=clr,alpha=0.08)
+    if ax!='None':
+        ax.plot(latgrid,scaled_data_mean,linewidth=1.0,
+                label='Fletcher etal, 2020 ('+str(int(prs*1000.))+'mb)',color=clr)
+        ax.fill_between(latgrid, scaled_data_mean-scaled_data_std, scaled_data_mean+scaled_data_std,
+                        color=clr,alpha=0.08)
     #ax.plot(latgrid,data[3,:]*mult)
     #for i in range(1,8):
     #    ax.plot(latgrid,data[i-1,:]*mult)
-
+    return(scaled_data_mean,scaled_data_std)
     
 def plot_Teifel(ax,clr='C0',width=1.5):
     """
@@ -192,10 +193,10 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
     suffix={"CH4":"-Jupiter_620CH4AbsMap",
             "NH3":"-Jupiter_647NH3AbsMap"}
     
-    figspaghetti,axsspaghetti=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, 
+    figspaghetti,axsspaghetti=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, 
                                           facecolor="white")
     First=True
-    Count=0
+    Num=0
     print(reference)
     print(DataSets[reference])
     for ID in DataSets[reference]:
@@ -218,25 +219,35 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
         Lats,AvgProf,StdProf,CM2=EP.extract_profile(pth,file+".fits",
                                                 ProfileHalfWidth=ProfileHalfWidth,
                                                 profile=profile)
-        print(Lats.shape,AvgProf.shape,StdProf.shape)
-        Avg_EW=Trans2EW[reference[0:3]]["EW_slope"][band]*AvgProf+Trans2EW[reference[0:3]]["EW_const"][band]
-        Std_EW=Trans2EW[reference[0:3]]["EW_slope"][band]*AvgProf+Trans2EW[reference[0:3]]["EW_const"][band]
-        
-        try:
-            lbl=file[5:17]+" "+sourcefiles[dataset]['Metadata']['Variation']
-        except:
-            lbl=file[5:17]
-        axsspaghetti.plot(Lats,Avg_EW,linewidth=0.5,
-                          label=lbl)#+"_"+file[5:20])
-        if First:
-            Sum=Avg_EW
-            Count=1
+        #print(Lats.shape,AvgProf.shape,StdProf.shape)
+        print("@@@@@@@@@@@@reference[0:3]]=",Trans2EW[reference[0:3]])
+        Avg_EW=Trans2EW[reference[0:3]]["EW_slope"][band]*AvgProf+\
+            Trans2EW[reference[0:3]]["EW_const"][band]
+        Std_EW=Trans2EW[reference[0:3]]["EW_slope"][band]*AvgProf+\
+            Trans2EW[reference[0:3]]["EW_const"][band]
+
+        if First and profile=="Meridional":
+            AvgArr=Avg_EW
+            AvgArr=np.reshape(AvgArr,(1,180))
+            First=False
+        if First and profile=="Zonal":
+            AvgArr=Avg_EW
+            AvgArr=np.reshape(AvgArr,(1,360))
             First=False
         else:
-            Sum=Sum+Avg_EW
-            Count=Count+1
-            print("No File")
-    AvgSum=Sum/Count
+            AvgArr=np.vstack((AvgArr,Avg_EW))
+            
+        Num=Num+1        
+        
+        #try:
+        #    lbl=file[5:17]+" "+sourcefiles[dataset]['Metadata']['Variation']
+        #except:
+        #    lbl=file[5:17]
+        axsspaghetti.plot(Lats,Avg_EW,linewidth=0.5,label=file[5:20])
+        
+    AvgPro=np.mean(AvgArr[:,:],axis=0)
+    AvgStd=np.std(AvgArr[:,:],axis=0)
+
     #Profile=np.loadtxt(data[reference]["path"]+data[reference]["fn"],usecols=range(2),delimiter=",")
     if profile=="Meridional":
         axsspaghetti.set_xlim(90-LatPlotLims[1],90-LatPlotLims[0])
@@ -253,27 +264,37 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
     axsspaghetti.set_ylabel("Equivalent Width EW (nm)",fontsize=10)
     axsspaghetti.grid(linewidth=0.2)
 
-    axsspaghetti.legend(fontsize=8,ncol=3)
+    axsspaghetti.legend(fontsize=6,ncol=3)
     axsspaghetti.set_xlabel(xlabel,fontsize=10)
 
     if smooth:
-        ax.plot(Lats,convolve(AvgSum, Box1DKernel(3)),color=clr,
-                linewidth=width,linestyle=style,label=reference)        
+        AvgProSmth=convolve(AvgPro, Box1DKernel(3))
+        AvgStdSmth=convolve(AvgStd, Box1DKernel(3))
+        ax.plot(Lats,AvgProSmth,color=clr,linewidth=width,linestyle=style,
+                label=reference+' (Avg. '+str(Num)+')')  
+        ax.fill_between(Lats, AvgProSmth-AvgStdSmth, AvgProSmth+AvgStdSmth,
+                        color=clr,alpha=.1)
+        OutPro,OutStd=AvgProSmth,AvgStdSmth
         #ax.plot(Profile[:,0]-45.,convolve(EW, Box1DKernel(7)),color=clr,linewidth=width,linestyle=style,label=reference)        ax.plot(Lats,AvgMeridEW,color=clr,linewidth=width,linestyle=style,label=reference)
     else:
         #ax.plot(Profile[:,0]-45.,EW,color=clr,linewidth=width,linestyle=style,label=reference)
-        ax.plot(Lats,AvgSum,color=clr,linewidth=width,
-                linestyle=style,label=reference)
+        ax.plot(Lats,AvgPro,color=clr,linewidth=width,
+                linestyle=style,label=reference+' (Avg. '+str(Num)+')')
+        ax.fill_between(Lats, AvgPro-AvgStd, AvgPro+AvgStd,color=clr,alpha=.1)
+        OutPro,OutStd=AvgPro,AvgStd
         
     path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
 
-    figspaghetti.savefig(path+"Analysis Data/Profiles/Profile_"+reference+"_"+band+"_"+profile+"_Absorption.png",dpi=300)
-    
-    return(0)
+    figspaghetti.savefig(path+"Analysis Data/Profiles/Profile_"+reference+"_"+band+"_"+profile+"_Absorption.png",dpi=300)  
+
+
+    print(Trans2EW["SCT"]["EW_slope"]["NH3"]*0.97+\
+        Trans2EW["SCT"]["EW_const"]["NH3"])
+    return(Lats,AvgPro,AvgStd)
 
 def plot_profile_L3(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
                     ZonePlotHalfWidth=45.,param="fNH3",profile="Meridional",
-                    clr='C0',width=1.0,style='solid',smooth=False):
+                    clr='C0',width=1.0,style='solid',smooth=True):
 
     #(ax,reference,LatLims=[45,135],LonRng=45.,profile="Meridional",
     #                 clr='C0',width=1.0,
@@ -326,61 +347,30 @@ def plot_profile_L3(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
     from astropy.convolution import convolve, Box1DKernel
     from astropy.io import fits
     import RetrievalLibrary as RL
+    import pylab as pl
     import sys
     sys.path.append('./Services')
     #import read_master_calibration
     import RetrievalLibrary as RL
     import extract_profile as EP
     import get_L2_abs_data as GAOD
-    import pylab as pl
+    import get_batch_lists as GBL
 
     sourcefiles=GAOD.get_L2_abs_data()
-
-    data={"SCT 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/",
-                              #"fn":"Profile of Jupiter GRS AVG NH3 Transmission 8 files-Celestron11.csv",
-                              "fn":[],
-                                    #why is 10/21 missing??? I've used it before!!!
-                                    #"2022-10-21-0358_6-Jupiter-fNH3_Sys2.fits"],
-                              "EW_slope":-12.82831873,
-                              "EW_const":12.82685019},
-          "VLTMUSE 2022":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/",
-                              "fn":["2022-07-30-0729_8",
-                                    "2022-09-19-0352_3"], #
-                              "EW_slope":-12.15343491,
-                              "EW_const":12.15195684},
-          "SCT 2023":{"path":"C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/",
-                              "fn":[],
-                              "EW_slope":-12.82831873,
-                              "EW_const":12.82685019}}
+    DataSets=GBL.get_batch_lists()
+    
     if param=="PCloud":
-        band="CH4"
         suffix="-Jupiter_PCloud_Sys2.fits"
+        paramkey='CH4file'
+        qualkey='CH4Qual'
         factor=1.0
     elif param=="fNH3":
-        band="NH3"
         suffix="-Jupiter_fNH3_Sys2.fits"
+        paramkey='NH3file'
+        qualkey='NH3Qual'
         factor=1.0e6
     
-    figspaghetti,axsspaghetti=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="white")
-
-    for ID in sourcefiles:
-        if "Map" in ID:
-            print("*******ID=",ID)
-            if sourcefiles[ID][band+'Qual']:
-                if 202207<int(ID[0:6])<202302 and sourcefiles[ID]["Metadata"]["Telescope"]=='C11':
-                    print(int(ID[0:6]))
-                    #print("*******sourcefiles[ID]['CH4file'][0:4]=",sourcefiles[ID][band+"file"])
-                    data["SCT 2022"]["fn"].append(sourcefiles[ID][band+"file"])
-                elif 202207<int(ID[0:6])<202302 and sourcefiles[ID]["Metadata"]["Telescope"]=='VLT':
-                    print(int(ID[0:6]))
-                    #print("*******sourcefiles[ID]['CH4file'][0:4]=",sourcefiles[ID][band+"file"])
-                    data["SCT 2022"]["fn"].append(sourcefiles[ID][band+"file"])
-                elif 202307<int(ID[0:6])<202403:
-                    print(int(ID[0:6]))
-                    print("*******sourcefiles[ID]['CH4file'][0:4]=",sourcefiles[ID][band+"file"])
-                    data["SCT 2023"]["fn"].append(sourcefiles[ID][band+"file"])
-
-    pth=data[reference]["path"]
+    #pth=data[reference]["path"]
     if profile=="Meridional":
         AvgSum=np.zeros(180)
         StdSum=np.zeros(180)
@@ -389,37 +379,47 @@ def plot_profile_L3(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
         AvgSum=np.zeros(360)
         StdSum=np.zeros(360)
         xlabel="Longitude from CM (deg)"
-    """
-    if profile=="Meridional":
-        AvgSum=np.zeros(180)
-        StdSum=np.zeros(180)
-    elif profile=="Zonal":
-        AvgSum=np.zeros(2*LonRng)
-        StdSum=np.zeros(2*LonRng)
-    """
-    First=True
-    for L3file in data[reference]["fn"]:                             
-        fn=L3file+suffix
-        print("$$$$$$$$$$$$$$fn=",fn)
-        
-        #Lats,AvgMerid,StdMerid=EP.extract_profile(pth,fn,LonRng=LonRng,profile=profile)
-        Lats,AvgProf,StdProf,CM2=EP.extract_profile(pth,fn,
-                                                ProfileHalfWidth=ProfileHalfWidth,
-                                                profile=profile)
 
-        #Convert from fraction to ppm by multiplying by 10^6
-        if First and profile=="Meridional":
-            AvgArr=AvgProf
-            AvgArr=np.reshape(AvgArr,(1,180))
-            First=False
-        if First and profile=="Zonal":
-            AvgArr=AvgProf
-            AvgArr=np.reshape(AvgArr,(1,360))
-            First=False
+    figspaghetti,axsspaghetti=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white")
+    pth="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/"
+    First=True
+    Num=0
+
+    for ID in DataSets[reference]:
+        print("*******ID=",ID)
+        sourceindex=ID[0:4]+ID
+        if len(ID)==11:
+            version=ID[10]
+            dataset=ID[0:10].replace('-','')+'UT'+version+"_Map"
         else:
-            AvgArr=np.vstack((AvgArr,AvgProf))
+            dataset=ID.replace('-','')+'UT'+"_Map"
+
+        if sourcefiles[dataset][qualkey]:
+            file=sourcefiles[dataset][paramkey]+suffix
+            """try:
+                file=file+sourcefiles[dataset]['Metadata']['Variation']
+            except:
+                print('No Variation')"""
+            print("file=",file)
             
-        axsspaghetti.plot(Lats,AvgProf*factor,linewidth=0.5,label=L3file[5:20])
+            Lats,AvgProf,StdProf,CM2=EP.extract_profile(pth,file,
+                                                    ProfileHalfWidth=ProfileHalfWidth,
+                                                    profile=profile)
+            
+            if First and profile=="Meridional":
+                AvgArr=AvgProf
+                AvgArr=np.reshape(AvgArr,(1,180))
+                First=False
+            if First and profile=="Zonal":
+                AvgArr=AvgProf
+                AvgArr=np.reshape(AvgArr,(1,360))
+                First=False
+            else:
+                AvgArr=np.vstack((AvgArr,AvgProf))
+                
+            Num=Num+1        
+
+            axsspaghetti.plot(Lats,AvgProf*factor,linewidth=0.5,label=file[5:20])
 
     #print("AvgArr.shape=",AvgArr.shape)
     AvgPro=np.mean(AvgArr[:,:],axis=0)*factor
@@ -447,22 +447,32 @@ def plot_profile_L3(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
     axsspaghetti.set_title(reference)
     axsspaghetti.grid(linewidth=0.2)
 
-    if smooth:
-        ax.plot(Lats,convolve(AvgPro, Box1DKernel(3)),color=clr,
-                linewidth=width,linestyle=style,label=reference)  
-        ax.fill_between(Lats, AvgPro-AvgStd, AvgPro+AvgStd,color=clr,alpha=.1)
+    axsspaghetti.annotate("ProfileHalfWidth="+str(ProfileHalfWidth),(0.01,0.01),
+                          xycoords='subfigure fraction',size=8)
+    axsspaghetti.annotate("Smoothing="+str(smooth),(0.01,0.03),
+                          xycoords='subfigure fraction',size=8)
 
+    if smooth:
+        AvgProSmth=convolve(AvgPro, Box1DKernel(3))
+        AvgStdSmth=convolve(AvgStd, Box1DKernel(3))
+        ax.plot(Lats,AvgProSmth,color=clr,linewidth=width,linestyle=style,
+                label=reference+' (Avg. '+str(Num)+')')  
+        ax.fill_between(Lats, AvgProSmth-AvgStdSmth, AvgProSmth+AvgStdSmth,
+                        color=clr,alpha=.1)
+        OutPro,OutStd=AvgProSmth,AvgStdSmth
         #ax.plot(Profile[:,0]-45.,convolve(EW, Box1DKernel(7)),color=clr,linewidth=width,linestyle=style,label=reference)        ax.plot(Lats,AvgMeridEW,color=clr,linewidth=width,linestyle=style,label=reference)
     else:
         #ax.plot(Profile[:,0]-45.,EW,color=clr,linewidth=width,linestyle=style,label=reference)
         ax.plot(Lats,AvgPro,color=clr,linewidth=width,
-                linestyle=style,label=reference)
+                linestyle=style,label=reference+' (Avg. '+str(Num)+')')
         ax.fill_between(Lats, AvgPro-AvgStd, AvgPro+AvgStd,color=clr,alpha=.1)
+        OutPro,OutStd=AvgPro,AvgStd
 
     path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
 
     figspaghetti.savefig(path+"Analysis Data/Profiles/Profile_"+reference+"_"+param+"_"+profile+".png",dpi=300)
 
+    return(Lats,OutPro,OutStd)
         
 def Centric_to_Graphic(Latc):
     #Formula used is from Simon and Beebe, 1996

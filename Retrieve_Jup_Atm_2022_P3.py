@@ -67,7 +67,7 @@ def Retrieve_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     #                           Smoothing=True,LonSys=LonSys)
     R=make_L3_env_data.make_L3_env_data(obsdate=obsdate,target="Jupiter",
                            imagetype='Map',CalModel='VLT-Obs-Final',
-                           Smoothing=True,LonSys=LonSys)
+                           Smoothing=Smoothing,LonSys=LonSys)
     
     ###########################################################################
     # Set up figure and axes for plots

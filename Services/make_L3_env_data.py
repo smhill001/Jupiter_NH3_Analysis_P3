@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 def make_L3_env_data(obsdate="20220919UTa",target="Jupiter",
                      imagetype='Map',CalModel='VLT-Obs-Final',
-                     Smoothing=False,LonSys='2'):
+                     Smoothing=True,LonSys='2'):
     """
     Created on Tue Aug 22 11:01:44 2023
     
@@ -165,7 +165,7 @@ def make_L3_env_data(obsdate="20220919UTa",target="Jupiter",
         if BUNIT=='Mole Fraction':
             hdu = fits.PrimaryHDU(fNH3.astype(np.float32))
             hdul = fits.HDUList([hdu])
-            comment="NH3 ppm"
+            comment="NH3 mole fraction"
             fn='fNH3'
             Real_CM1=NH3_CM1
             Real_CM2=NH3_CM2
@@ -210,7 +210,7 @@ def make_L3_env_data(obsdate="20220919UTa",target="Jupiter",
         #print(hdul[0].header[:])
         #fnout=path+'/'+NH3file[0:26]+'fNH3Abs647.fits'
         fnout=pathout+file[0:26]+fn+'_Sys'+LonSys+smth+'.fits'
-
+        
         try:
             os.remove(fnout)
         except: 

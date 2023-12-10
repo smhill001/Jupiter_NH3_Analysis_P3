@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 def Map_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
                              imagetype='Map',CalModel='VLT-Obs-Final',
                              Smoothing=True,LatLims=[45,135],LonRng=45,
@@ -58,7 +57,7 @@ def Map_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
         amfdata=5.*amf[0].data/65535.
         amf.close()
 
-    pl.imshow(amfdata)
+    #pl.imshow(amfdata)
     ###########################################################################
     # Set up figure and axes for plots
     ###########################################################################             
@@ -99,7 +98,7 @@ def Map_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     #                                 fNH3PlotCM2,LonRng,"jet",
     #                                 axs1[0],'%3.2f',cont=False,n=6,vn=50,vx=150)
 
-    TestfNH3=fNH3data*amfdata**0.65
+    TestfNH3=fNH3data#*amfdata**0.65
     fNH3_patch_mb,vn,vx,tx_fNH3=plot_patch(TestfNH3*1e6,LatLims,NH3LonLims,
                                      fNH3PlotCM2,LonRng,"jet",
                                      axs1[0],'%3.2f',cont=False,n=6,vn=50,vx=150)
@@ -139,9 +138,9 @@ def Map_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
         for zb in belt:
             #print(zb,belt[zb])
             axs1[0].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
-                                    color="0.5",alpha=0.4)
+                                    color="0.5",alpha=0.2)
             axs1[1].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
-                                    color="0.5",alpha=0.4)
+                                    color="0.8",alpha=0.1)
         #axs1[1].annotate(zb,xy=[np.mean(belt[zb]),51],ha="center")
     #for zb in zone:
         #axs1[1].annotate(zb,xy=[np.mean(zone[zb]),51],ha="center")
@@ -194,11 +193,11 @@ def Map_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
     #                                 PCloudPlotCM2,LonRng,"jet",
     #                                 axs2[0],'%3.2f',cont=False,
     #                                 cbar_reverse=True,vn=400,vx=900,n=6)
-    TestPCloud=PClouddata*amfdata**0.25
+    TestPCloud=PClouddata#*amfdata**0.25
     Pcloud_patch,vn,vx,tx=plot_patch(TestPCloud,LatLims,NH3LonLims,
                                      PCloudPlotCM2,LonRng,"jet",
                                      axs2[0],'%3.2f',cont=False,
-                                     cbar_reverse=True,vn=400,vx=1100,n=8)
+                                     cbar_reverse=True,vn=400,vx=900,n=6)
 
     """##########TEST CODE
     hdu = fits.PrimaryHDU((R["CH4"]["PCloud"]).astype(np.float32))
@@ -248,9 +247,9 @@ def Map_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
         for zb in belt:
             print(zb,belt[zb])
             axs2[0].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
-                                    color="0.5",alpha=0.4)
+                                    color="0.5",alpha=0.2)
             axs2[1].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
-                                    color="0.5",alpha=0.4)
+                                    color="0.8",alpha=0.1)
         #axs1[1].annotate(zb,xy=[np.mean(belt[zb]),51],ha="center")
     #for zb in zone:
         #axs1[1].annotate(zb,xy=[np.mean(zone[zb]),51],ha="center")
@@ -385,7 +384,7 @@ def plot_scatter(patch1,patch2,filepath,obsdate,Real_CM2,LatLims):
     BZkeys=BZ.keys()
     #patch1=patch1*1000.
 
-    figcor,axscor=pl.subplots(1,1,figsize=(6.0,4.5), dpi=150, facecolor="white",
+    figcor,axscor=pl.subplots(1,1,figsize=(6.0,4.), dpi=150, facecolor="white",
                         sharey=True,sharex=True)          
 
     for key in BZ.keys():
@@ -407,7 +406,7 @@ def plot_scatter(patch1,patch2,filepath,obsdate,Real_CM2,LatLims):
         else:
             axscor.scatter(patch1[BZind[key][1]:BZind[key][0],:],
                            patch2[BZind[key][1]:BZind[key][0],:],
-                           marker="o",s=5.0,
+                           marker="o",s=2.0,
                            alpha=0.8,label=key)
 
     #print(patch1.shape,patch2.shape)
@@ -421,13 +420,14 @@ def plot_scatter(patch1,patch2,filepath,obsdate,Real_CM2,LatLims):
     #axscor.set_title("Scatter Plot")
      
     axscor.grid(linewidth=0.2)
-    axscor.set_xlim(400.,1100.)
-    axscor.set_ylim(50.,150)
+    axscor.set_xlim(700.,1100.)
+    axscor.set_ylim(70.,160)
     #axscor.set_xticks(np.linspace(-45.,45.,7), minor=False)
     #axscor.set_yticks(np.linspace(0.0,1.0,6), minor=False)
     #axscor.tick_params(axis='both', which='major', labelsize=8)
     axscor.set_xlabel("Effective Cloud-top Pressure (mb)",fontsize=10)
     axscor.set_ylabel("Ammonia Mole Fraction (ppm)",fontsize=10)
+    axscor.set_title("Distribution of Ammonia vs Cloud-Top Pressure")
     axscor.legend(fontsize=9)
     
     figcor.subplots_adjust(left=0.12, right=0.97, top=0.93, bottom=0.11)
