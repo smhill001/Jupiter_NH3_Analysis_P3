@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Thu Oct 21 08:33:27 2021
 
@@ -112,7 +111,8 @@ def JupiterObservationCatalog():
     #print()
     #print(t)
 
-    ascii.write(t,pathout+'JupiterObservationCatalog.csv',format='basic',overwrite=True,delimiter=',')
+    ascii.write(t,pathout+'JupiterObservationCatalog.csv',format='basic',
+                overwrite=True,delimiter=',')
 
 
         
@@ -125,22 +125,26 @@ def JupiterObservationCatalog():
 def PlotJupiterObservations(CM=1):
     import matplotlib.pyplot as pl
     from datetime import datetime
-    fig,ax=pl.subplots(nrows=3,ncols=1,figsize=(6.0,6.0), dpi=150, 
+    fig,ax=pl.subplots(nrows=4,ncols=1,figsize=(6.0,6.0), dpi=150, 
                        sharex=True,facecolor="white")
     fig.suptitle("Jupiter NH3 Observations",x=0.5,ha='center',color='k',
                  fontsize=16)
 
-    startdate=datetime.strptime("2022-07-19","%Y-%m-%d")
-    enddate=datetime.strptime("2023-01-04","%Y-%m-%d")
+    startdate=datetime.strptime("2023-08-01","%Y-%m-%d")
+    enddate=datetime.strptime("2024-01-01","%Y-%m-%d")
     subPlotJupiterObservations(ax[0],startdate,enddate,CM=CM)
+
+    startdate=datetime.strptime("2022-07-19","%Y-%m-%d")
+    enddate=datetime.strptime("2023-01-18","%Y-%m-%d")
+    subPlotJupiterObservations(ax[1],startdate,enddate,CM=CM)
     
     startdate=datetime.strptime("2021-06-21","%Y-%m-%d")
     enddate=datetime.strptime("2021-12-07","%Y-%m-%d")
-    subPlotJupiterObservations(ax[1],startdate,enddate,CM=CM)
+    subPlotJupiterObservations(ax[2],startdate,enddate,CM=CM)
     
     startdate=datetime.strptime("2020-06-21","%Y-%m-%d")
     enddate=datetime.strptime("2020-12-07","%Y-%m-%d")
-    subPlotJupiterObservations(ax[2],startdate,enddate,CM=CM,xtitle=True)
+    subPlotJupiterObservations(ax[3],startdate,enddate,CM=CM,xtitle=True)
     pl.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/JupiterObservations.png',dpi=320)
 
 
@@ -273,7 +277,7 @@ def subPlotJupiterObservations(ax,startdate,enddate,CM=1,xtitle=False):
 
     if xtitle:
         ax.set_xlabel("Sys "+str(CM)+" Longitude (deg)",fontsize=12)
-        ax.legend(ncol=2,fontsize="small")
+        ax.legend(ncol=4,fontsize=7)
     ax.grid(linewidth=0.2)
     pl.subplots_adjust(left=0.15, bottom=0.12, right=0.95, top=0.92)
 

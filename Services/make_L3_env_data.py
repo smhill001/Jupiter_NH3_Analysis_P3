@@ -1,12 +1,13 @@
-# -*- coding: utf-8 -*-
-def make_L3_env_data(obsdate="20220919UTa",target="Jupiter",
-                     imagetype='Map',CalModel='VLT-Obs-Final',
-                     Smoothing=True,LonSys='2'):
+def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
+                     imagetype='Map',CalModel='SCT-Obs-Final',
+                     Smoothing=False,LonSys='2'):
     """
     Created on Tue Aug 22 11:01:44 2023
     
     CALLED by AmmoniaMapsScript_P3.py->Retrieve_Jup_Atm_2022_P3
     
+    # Retrieve_Jup_Atm_2022_P3(obsdate="20221019UT",target="Jupiter")   
+
     @author: smhil
     """
     import sys
@@ -22,15 +23,12 @@ def make_L3_env_data(obsdate="20220919UTa",target="Jupiter",
     from astropy.io import fits
     from astropy.convolution import Gaussian2DKernel
     from astropy.convolution import convolve
-    #import RetrievalLibrary as RL
     import read_master_calibration
     sys.path.append('./Services')
     import get_L2_abs_data as GAOD
     import time
     import get_WINJupos_ephem as WJ_ephem
-
-    # Retrieve_Jup_Atm_2022_P3(obsdate="20221019UT",target="Jupiter")   
-    
+   
     amagat=2.69e24 #Lodschmits number. (cm-2)
     gravity=2228.0 #cm/s^2
     mean_mol_wt=3.85e-24 #cgs or SI !!!!WHY IS THIS 2.2 FOR MENDIKOA!!!!!
@@ -41,17 +39,16 @@ def make_L3_env_data(obsdate="20220919UTa",target="Jupiter",
     #  DATA FILES AND METADATA DICTIONARY
     ###########################################################################
     sourcedata=obsdate+"_"+imagetype
-    #print("obsdate, sourcedata=",obsdate,sourcedata)
     sourcefiles=GAOD.get_L2_abs_data()
     calibration,K_eff=read_master_calibration.read_master_calibration()
     
     ###########################################################################
     # OPEN AND READ DATA FILES (FITS MAPS of NH3 and CH4 Absorption (Transmission?))
     ###########################################################################   
-    print("sourcefiles[sourcedata]['Metadata']=",sourcefiles[sourcedata]['Metadata'])          
-    print("sourcefiles[sourcedata]['Metadata']['Telescope']=",sourcefiles[sourcedata]['Metadata']['Telescope'])          
-    K_eff_CH4620=K_eff['CH4_620'][sourcefiles[sourcedata]['Metadata']['Telescope']]#0.428
-    K_eff_NH3647=K_eff['NH3_647'][sourcefiles[sourcedata]['Metadata']['Telescope']]#2.964
+    print("sourcefiles[sourcedata]=",sourcefiles[sourcedata])          
+    print("sourcefiles[sourcedata]['Telescope']=",sourcefiles[sourcedata]['Telescope'])          
+    K_eff_CH4620=K_eff['CH4_620'][sourcefiles[sourcedata]['Telescope']]#0.428
+    K_eff_NH3647=K_eff['NH3_647'][sourcefiles[sourcedata]['Telescope']]#2.964
 
     pathRGB='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+obsdate[0:10]+'/'
     pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/'
@@ -61,15 +58,15 @@ def make_L3_env_data(obsdate="20220919UTa",target="Jupiter",
 
     try:
         CH4file=sourcefiles[sourcedata]['CH4file']+"-Jupiter_620CH4AbsMap"+\
-                sourcefiles[sourcedata]['Metadata']['Variation']+".fits"
-        variation=sourcefiles[sourcedata]['Metadata']['Variation']
+                sourcefiles[sourcedata]['Variation']+".fits"
+        variation=sourcefiles[sourcedata]['Variation']
     except:
         CH4file=sourcefiles[sourcedata]['CH4file']+"-Jupiter_620CH4AbsMap.fits"
         variation=""
     try:
         NH3file=sourcefiles[sourcedata]['NH3file']+"-Jupiter_647NH3AbsMap"+\
-                sourcefiles[sourcedata]['Metadata']['Variation']+".fits"
-        variation=sourcefiles[sourcedata]['Metadata']['Variation']
+                sourcefiles[sourcedata]['Variation']+".fits"
+        variation=sourcefiles[sourcedata]['Variation']
     except:
         NH3file=sourcefiles[sourcedata]['NH3file']+"-Jupiter_647NH3AbsMap.fits"
         variation=""
@@ -95,7 +92,7 @@ def make_L3_env_data(obsdate="20220919UTa",target="Jupiter",
     RGBsec=str(int(str(RGBfile[16:17]))*6)
     RGBtime=(RGBfile[0:10]+"_"+RGBfile[11:13]+":"+RGBfile[13:15]+":"+RGBsec.zfill(2))
     eph=WJ_ephem.get_WINJupos_ephem(RGBtime)
-    #time.sleep(5)
+    #time.sleep(0.5)
     RGB_CM1=float(eph[0].strip())
     RGB_CM2=float(eph[1].strip())
     RGB_CM3=float(eph[2].strip())
@@ -188,10 +185,10 @@ def make_L3_env_data(obsdate="20220919UTa",target="Jupiter",
         hdul[0].header['AUTHOR']='Hill, S. M.'
     
         hdul[0].header['OBJECT']='Jupiter'
-        hdul[0].header['TELESCOP']=sourcefiles[sourcedata]['Metadata']['Telescope']
-        hdul[0].header['INSTRUME']=sourcefiles[sourcedata]['Metadata']['Camera']
-        hdul[0].header['SEEING']=sourcefiles[sourcedata]['Metadata']['Seeing']
-        hdul[0].header['TRANSPAR']=sourcefiles[sourcedata]['Metadata']['Transparency']
+        hdul[0].header['TELESCOP']=sourcefiles[sourcedata]['Telescope']
+        hdul[0].header['INSTRUME']=sourcefiles[sourcedata]['Camera']
+        hdul[0].header['SEEING']=sourcefiles[sourcedata]['Seeing']
+        hdul[0].header['TRANSPAR']=sourcefiles[sourcedata]['Transparency']
         hdul[0].header['BUNIT']=(BUNIT,comment)
         hdul[0].header['CALIBRA']=(CalModel,'Disk-Integrated Cal Ref')
         hdul[0].header['VERSION']=('TBD','TBD')

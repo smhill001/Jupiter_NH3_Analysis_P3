@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-
-def make_l2_abs_data(obsdate="20220919UTa",target="Jupiter",
+def make_l2_abs_data(obsdate="20231103UTa",target="Jupiter",
                      imagetype='Map'):
     """
     Created on Fri Sep 15 07:48:05 2023

@@ -1,6 +1,6 @@
-def Map_Jup_Atm_2022_P3(obsdate="20220919UTa",target="Jupiter",
-                             imagetype='Map',CalModel='VLT-Obs-Final',
-                             Smoothing=True,LatLims=[45,135],LonRng=45,
+def Map_Jup_Atm_2022_P3(obsdate="20231103UTa",target="Jupiter",
+                             imagetype='Map',CalModel='SCT-Obs-Final',
+                             Smoothing=False,LatLims=[45,135],LonRng=45,
                              delta_CM2=0,LonSys='2',showbands=False):
     """
     Created on Sun Nov  6 16:47:21 2022
