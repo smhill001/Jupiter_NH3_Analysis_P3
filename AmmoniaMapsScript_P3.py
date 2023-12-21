@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 def AmmoniaMapsScript_P3(reference,Level='L3'):
     """
     Created on Sat Dec 04 22:23:20 2021
@@ -9,43 +8,70 @@ def AmmoniaMapsScript_P3(reference,Level='L3'):
     import sys
     import numpy as np
     import AmmoniaMaps_P3 as AMP3
-    import Retrieve_Jup_Atm_2022_P3 as RJA
     sys.path.append('./Services')
     import make_L2_abs_data as make_L2
     import make_L3_env_data as make_L3
     import get_batch_lists as GBL
+    import Map_Jup_Atm_2022_P3 as MapJup
 
+    ###########################################################################
+    # Get the data set to batch process
+    ###########################################################################         
     DataSets=GBL.get_batch_lists()
 
-    print("int(reference[0:4])=",int(reference[0:4]))
-    if int(reference[0:4])>2021:
-        print("int(reference[0:4])=",int(reference[0:4]))
-        
+    if int(reference[0:4])>2021:       
+        #######################################################################
+        # If the year is 2022 or later, all processing options exist
+        # Select calibration based on telescope
+        #######################################################################         
         if "SCT" or "CMOS" in reference:
             Cal="SCT-Obs-Final"
         elif "VLT" in reference:
             Cal="VLT-Obs-Final"
             
+        #######################################################################
+        # Loop over processing options
+        #######################################################################         
+        Frst=True
         for date in DataSets[reference]:
             if len(date)==11:
                 version=date[10]
                 dataset=date[0:10].replace('-','')+'UT'+version
             else:
                 dataset=date.replace('-','')+'UT'
-            if Level=='L3':
-                #RJA.Retrieve_Jup_Atm_2022_P3(obsdate=dataset,target="Jupiter",
-                #                         imagetype='Map',CalModel=Cal,
-                #                         Smoothing=True,LatLims=[45,135],LonRng=45,
-                #                         delta_CM2=0,showbands=False,LonSys='2')
-                make_L3.make_L3_env_data(obsdate=dataset,target="Jupiter",
-                                     imagetype='Map',CalModel=Cal,
-                                     Smoothing=True,LonSys='2')
-            elif Level=='L2':
+                
+            ###################################################################
+            # Execute Processing from L1 to L2
+            ###################################################################
+            if Level=='L2':
                 make_L2.make_l2_abs_data(obsdate=dataset,
                                          target="Jupiter",
                                          imagetype='Map')
                 
+            ###################################################################
+            # Execute Processing from L2 to L3
+            ###################################################################
+            elif Level=='L3':
+                make_L3.make_L3_env_data(obsdate=dataset,target="Jupiter",
+                                     imagetype='Map',CalModel=Cal,
+                                     Smoothing=False,LonSys='2',First=Frst)
+                
+            ###################################################################
+            # Execute Processing from L3 to map of NH3, PCloud, and context
+            ###################################################################
+            elif Level=='plots':
+                MapJup.Map_Jup_Atm_2022_P3(obsdate=dataset,target="Jupiter",
+                                           imagetype='Map',CalModel='SCT-Obs-Final',
+                                           Smoothing=False,LatLims=[45,135],LonRng=45,
+                                           delta_CM2=0,LonSys='2',showbands=False,
+                                           coef=[0.65,0.25])
+            Frst=False
+                
     else:
+        #######################################################################
+        # If the year is 2021 or earlier, use old code to process absorption
+        # data only, e.g., L2.
+        #######################################################################         
         Lats,AvgMeridEW,StdZoneEW=AMP3.AmmoniaMaps_P3(DateSelection=DataSets[reference],
                                                       cont=False)   
         pathout="/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"

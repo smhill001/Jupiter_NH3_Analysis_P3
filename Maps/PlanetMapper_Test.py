@@ -31,11 +31,14 @@ spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/spk/pl
 spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/spk/satellites/jup365.bsp")
 
 
-body = pm.BodyXY('Jupiter', '2020-01-01', sz=500)
+body = pm.BodyXY('Jupiter', '2023-10-26T04:21:18', sz=500)
 y=body.set_disc_params(x0=250, y0=250, r0=200)
 x=body.get_backplane_map('INCIDENCE')
-fig,axs=pl.subplots(figsize=(8.0,4.0), dpi=150, facecolor="white")
 
+print("body.subpoint_lon=",body.subpoint_lon)
+print("body.subpoint_lat=",body.subpoint_lat)
+
+fig,axs=pl.subplots(figsize=(8.0,4.0), dpi=150, facecolor="white")
 axs.imshow(x)
 fn=path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Maps/PlanetmapperTest.png"
 fig.savefig(fn,dpi=300)

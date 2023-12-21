@@ -1,6 +1,6 @@
 def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
                      imagetype='Map',CalModel='SCT-Obs-Final',
-                     Smoothing=False,LonSys='2'):
+                     Smoothing=False,LonSys='2',First=True):
     """
     Created on Tue Aug 22 11:01:44 2023
     
@@ -28,7 +28,11 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
     import get_L2_abs_data as GAOD
     import time
     import get_WINJupos_ephem as WJ_ephem
+    import make_sza_eza_planes as za
    
+    ###########################################################################
+    #  SET NECESSARY CONSTANTS
+    ###########################################################################
     amagat=2.69e24 #Lodschmits number. (cm-2)
     gravity=2228.0 #cm/s^2
     mean_mol_wt=3.85e-24 #cgs or SI !!!!WHY IS THIS 2.2 FOR MENDIKOA!!!!!
@@ -41,29 +45,33 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
     sourcedata=obsdate+"_"+imagetype
     sourcefiles=GAOD.get_L2_abs_data()
     calibration,K_eff=read_master_calibration.read_master_calibration()
-    
-    ###########################################################################
-    # OPEN AND READ DATA FILES (FITS MAPS of NH3 and CH4 Absorption (Transmission?))
-    ###########################################################################   
-    print("sourcefiles[sourcedata]=",sourcefiles[sourcedata])          
-    print("sourcefiles[sourcedata]['Telescope']=",sourcefiles[sourcedata]['Telescope'])          
     K_eff_CH4620=K_eff['CH4_620'][sourcefiles[sourcedata]['Telescope']]#0.428
     K_eff_NH3647=K_eff['NH3_647'][sourcefiles[sourcedata]['Telescope']]#2.964
-
+    
+    ###########################################################################
+    # OPEN AND READ DATA FILES (FITS MAPS of NH3 and CH4 Transmission)
+    ###########################################################################   
     pathRGB='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+obsdate[0:10]+'/'
     pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/'
     pathout='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/'
 
-    RGBfile=sourcefiles[sourcedata]['RGBfile']+"_CM2_L360_MAP-BARE.png"
-
-    try:
+    # CH4 Transmission File name and read
+    try:    #Set up to allow for parametric studies of different processing paths
         CH4file=sourcefiles[sourcedata]['CH4file']+"-Jupiter_620CH4AbsMap"+\
                 sourcefiles[sourcedata]['Variation']+".fits"
         variation=sourcefiles[sourcedata]['Variation']
     except:
         CH4file=sourcefiles[sourcedata]['CH4file']+"-Jupiter_620CH4AbsMap.fits"
         variation=""
-    try:
+
+    CH4hdulist=fits.open(pathFITS+CH4file)
+    CH4hdulist.info()
+    CH4hdr=CH4hdulist[0].header
+    CH4data=CH4hdulist[0].data
+    CH4hdulist.close()
+    
+    # CH4 Transmission File name and read
+    try:    #Set up to allow for parametric studies of different processing paths
         NH3file=sourcefiles[sourcedata]['NH3file']+"-Jupiter_647NH3AbsMap"+\
                 sourcefiles[sourcedata]['Variation']+".fits"
         variation=sourcefiles[sourcedata]['Variation']
@@ -71,18 +79,14 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
         NH3file=sourcefiles[sourcedata]['NH3file']+"-Jupiter_647NH3AbsMap.fits"
         variation=""
     
-    CH4hdulist=fits.open(pathFITS+CH4file)
-    CH4hdulist.info()
-    CH4hdr=CH4hdulist[0].header
-    CH4data=CH4hdulist[0].data
-    CH4hdulist.close()
-    
     NH3hdulist=fits.open(pathFITS+NH3file)
     NH3hdulist.info()
     NH3hdr=NH3hdulist[0].header
     NH3data=NH3hdulist[0].data
     NH3hdulist.close()
-
+    
+    # RGB Context image File name and read
+    RGBfile=sourcefiles[sourcedata]['RGBfile']+"_CM2_L360_MAP-BARE.png"
     if RGBfile != 'NA':
         RGB=imread(pathRGB+RGBfile)
 
@@ -107,6 +111,11 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
     CH4_CM2=float(CH4hdr["CM2"])
     CH4_CM3=float(CH4hdr["CM3"])
         
+    ###########################################################################
+    # Assuming the input (L2) FITS map files are in system 2 longitude 
+    # coordinates, 'roll' the data array in longitude to the desired output
+    # coordinate system 
+    ###########################################################################             
     if LonSys=='1':
         RGBroll=RGB_CM2-RGB_CM1
         RGB=np.roll(RGB,int(RGBroll),axis=1)
@@ -126,22 +135,33 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
         NH3CM=NH3_CM2
         CH4CM=CH4_CM2
         RGBCM=RGB_CM2
+        eza3,sza3=za.make_sza_eza_planes(dateobs=NH3hdr['DATE-OBS'])
+        ZAroll=NH3_CM3-NH3_CM2
+        print("#############")
+        print("ZAroll=",ZAroll)
+        sza=np.roll(sza3,int(ZAroll),axis=1)
+        eza=np.roll(eza3,int(ZAroll),axis=1)
+        #sza=np.fliplr(sza3)
+        #eza=np.fliplr(eza3)
         #CM=Real_CM2
         #Real_CM=Real_CM2
     elif LonSys=='3':
         RGBroll=RGB_CM2-RGB_CM3
         RGB=np.roll(RGB,int(RGBroll),axis=1)
-        NH3roll=NH3_CM2-NH3_CM3
+        NH3roll=NH3_CM3-NH3_CM2
         NH3data=np.roll(NH3data,int(NH3roll),axis=1)
         CH4roll=CH4_CM2-CH4_CM3
         CH4data=np.roll(CH4data,int(CH4roll),axis=1)
         NH3CM=NH3_CM3
         CH4CM=CH4_CM3
         RGBCM=RGB_CM3
-   
-    kernel = Gaussian2DKernel(1)
-  
+      
+    ###########################################################################
+    # If smoothing is selected, smooth transmission data with a 1 pixel
+    # Gaussian kernal and compute opacity.
+    ###########################################################################              
     if Smoothing:
+        kernel = Gaussian2DKernel(1)
         NH3_tau=-np.log(convolve(NH3data,kernel,boundary='extend'))
         CH4_tau=-np.log(convolve(CH4data,kernel,boundary='extend'))
         smth='_Smth'
@@ -150,6 +170,9 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
         NH3_tau=-np.log(NH3data)
         smth=''
 
+    ###########################################################################
+    # Compute column abundance, effective cloud-top pressure, and fc(NH3)
+    ###########################################################################
     CH4_Ncol=1000*CH4_tau/K_eff_CH4620
     NH3_Ncol=1000*NH3_tau/K_eff_NH3647
 
@@ -158,10 +181,12 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
     ##!!!! WOW!!! I need to calculate fNH3 the EASY way also and compare!!!
     fNH3=(1.81e-3)*NH3_Ncol/CH4_Ncol #-> It works 7/20/2023
     
+    ###########################################################################
+    # Create FITS files and headers, including backplanes
+    ###########################################################################
     for BUNIT in ['Mole Fraction','Cloud-top Press']:
         if BUNIT=='Mole Fraction':
             hdu = fits.PrimaryHDU(fNH3.astype(np.float32))
-            hdul = fits.HDUList([hdu])
             comment="NH3 mole fraction"
             fn='fNH3'
             Real_CM1=NH3_CM1
@@ -171,7 +196,6 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
             file=NH3file
         elif BUNIT=='Cloud-top Press':
             hdu = fits.PrimaryHDU((CH4_Cloud_Press/4.).astype(np.float32))
-            hdul = fits.HDUList([hdu])
             comment="mb"
             fn='PCloud'
             Real_CM1=CH4_CM1
@@ -180,6 +204,10 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
             time=CH4time
             file=CH4file
             
+        szadata=fits.ImageHDU(sza)
+        ezadata=fits.ImageHDU(eza)
+        hdul = fits.HDUList([hdu,szadata,ezadata])
+        
         hdul[0].header['BITPIX']=-32
         hdul[0].header['DATE-OBS']=time#.replace('_','T')
         hdul[0].header['AUTHOR']='Hill, S. M.'
@@ -198,7 +226,7 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
         hdul[0].header['CM1']=(Real_CM1,'Sys. 1 Long. Central Meridian')
         hdul[0].header['CM2']=(Real_CM2,'Sys. 1 Long. Central Meridian')
         hdul[0].header['CM3']=(Real_CM3,'Sys. 1 Long. Central Meridian')
-        hdul[0].header['SMOOTH']=(Smoothing,'')
+        hdul[0].header['SMOOTH']=(Smoothing,'Smoothing of transmission data')
         hdul[0].header['KERNEL']=(1,'Gaussian')
         hdul[0].header['CH4ABSFL']=(CH4file,'Source file for CH4 Absorption')
         hdul[0].header['NH3ABSFL']=(NH3file,'Source file for NH3 Absorption')
@@ -215,9 +243,12 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
         hdul.writeto(fnout)
         hdul.close()
         
-        outdict={"CH4":{"file":CH4file,"CM":CH4CM,"time":CH4time,"tau":CH4_tau,"Ncol":CH4_Ncol,"PCloud":CH4_Cloud_Press},
+        ###########################################################################
+        # Return dictionary for programs that need it, e.g., batch processing
+        ###########################################################################
+        dictout={"CH4":{"file":CH4file,"CM":CH4CM,"time":CH4time,"tau":CH4_tau,"Ncol":CH4_Ncol,"PCloud":CH4_Cloud_Press},
                  "NH3":{"file":NH3file,"CM":NH3CM,"time":NH3time,"tau":NH3_tau,"Ncol":NH3_Ncol,"fNH3":fNH3},
                  "RGB":{"file":RGBfile,"CM":RGBCM,"time":RGBtime,"RGB":RGB},
                  "pathFITS":pathFITS,"pathout":pathout}#,"Variation":variation}
         
-    return(outdict)
+    return(dictout)

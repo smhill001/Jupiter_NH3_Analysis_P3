@@ -1,7 +1,7 @@
 def Map_Jup_Atm_2022_P3(obsdate="20231103UTa",target="Jupiter",
-                             imagetype='Map',CalModel='SCT-Obs-Final',
-                             Smoothing=False,LatLims=[45,135],LonRng=45,
-                             delta_CM2=0,LonSys='2',showbands=False):
+                        imagetype='Map',CalModel='SCT-Obs-Final',
+                        Smoothing=False,LatLims=[45,135],LonRng=45,
+                        delta_CM2=0,LonSys='2',showbands=False,coef=[0.,0.]):
     """
     Created on Sun Nov  6 16:47:21 2022
     
@@ -36,12 +36,15 @@ def Map_Jup_Atm_2022_P3(obsdate="20231103UTa",target="Jupiter",
     #import make_L3_env_data
     import read_fits_map_L2_L3 as RFM
     
-    PCloudhdr,PClouddata,fNH3hdr,fNH3data,RGB,RGB_CM2= \
+    PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM2= \
                     RFM.read_fits_map_L2_L3(obsdate=obsdate,
                                             imagetype="Map",Level="L3")
     ###########################################################################
     # Special for limb correction
     ###########################################################################             
+    amfdata=(1.0/sza+1.0/eza)/2.0
+    figamf,axsamf=pl.subplots(figsize=(8.0,4.0), dpi=150, facecolor="white")
+    axsamf.imshow(amfdata,vmin=-5.,vmax=5.)
     if obsdate=="20220730UT":
         pathFITS='C:/Astronomy/Projects/Planets/Jupiter/Imaging Data/Mapping/'
         amf=fits.open(pathFITS+"2022-07-30-amf_CM2_L360_MAP-BARE.fit")
@@ -98,7 +101,7 @@ def Map_Jup_Atm_2022_P3(obsdate="20231103UTa",target="Jupiter",
     #                                 fNH3PlotCM2,LonRng,"jet",
     #                                 axs1[0],'%3.2f',cont=False,n=6,vn=50,vx=150)
 
-    TestfNH3=fNH3data#*amfdata**0.65
+    TestfNH3=fNH3data*amfdata**coef[0]
     fNH3_patch_mb,vn,vx,tx_fNH3=plot_patch(TestfNH3*1e6,LatLims,NH3LonLims,
                                      fNH3PlotCM2,LonRng,"jet",
                                      axs1[0],'%3.2f',cont=False,n=6,vn=50,vx=150)
@@ -193,7 +196,7 @@ def Map_Jup_Atm_2022_P3(obsdate="20231103UTa",target="Jupiter",
     #                                 PCloudPlotCM2,LonRng,"jet",
     #                                 axs2[0],'%3.2f',cont=False,
     #                                 cbar_reverse=True,vn=400,vx=900,n=6)
-    TestPCloud=PClouddata#*amfdata**0.25
+    TestPCloud=PClouddata*amfdata**coef[1]
     Pcloud_patch,vn,vx,tx=plot_patch(TestPCloud,LatLims,NH3LonLims,
                                      PCloudPlotCM2,LonRng,"jet",
                                      axs2[0],'%3.2f',cont=False,
@@ -245,7 +248,7 @@ def Map_Jup_Atm_2022_P3(obsdate="20231103UTa",target="Jupiter",
 
     if showbands:
         for zb in belt:
-            print(zb,belt[zb])
+            #print(zb,belt[zb])
             axs2[0].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
                                     color="0.5",alpha=0.2)
             axs2[1].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
@@ -341,7 +344,7 @@ def plot_patch(fullmap,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
     #vx=np.mean(patch)+3.0*np.std(patch)
     tx=np.linspace(vn,vx,n,endpoint=True)
     
-    print(np.mean(patch),vn,vx)
+    #print(np.mean(patch),vn,vx)
 
     show=axis.imshow(patch, colorscale, origin='upper',vmin=vn,vmax=vx,  
                extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
@@ -366,7 +369,7 @@ def plot_scatter(patch1,patch2,filepath,obsdate,Real_CM2,LatLims):
     import numpy as np
     import copy
     
-    print("000000000: ",patch1.shape,patch2.shape)
+    #print("000000000: ",patch1.shape,patch2.shape)
     BZ={"SSTB":[-39.6,-36.2],
           "STZ":[-36.2,-32.4],
           "STB":[-32.4,-27.1],
@@ -388,7 +391,7 @@ def plot_scatter(patch1,patch2,filepath,obsdate,Real_CM2,LatLims):
                         sharey=True,sharex=True)          
 
     for key in BZ.keys():
-        print(key,BZ[key],[90,90]-np.array(BZ[key]),LatLims)
+        #print(key,BZ[key],[90,90]-np.array(BZ[key]),LatLims)
         BZind[key][0]=int(90-BZ[key][0])-LatLims[0]
         BZind[key][1]=int(90-BZ[key][1])-LatLims[0]
         

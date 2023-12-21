@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-def read_fits_map_L2_L3(obsdate="20220919UTa",imagetype="Map",Level="L3"):
+def read_fits_map_L2_L3(obsdate="20231026UTa",imagetype="Map",Level="L3"):
     """
     Created on Mon Nov 20 08:42:28 2023
     
@@ -13,7 +13,6 @@ def read_fits_map_L2_L3(obsdate="20220919UTa",imagetype="Map",Level="L3"):
     sys.path.append('./Services')
 
     import os
-    #from matplotlib.pyplot import imread
     import pylab as pl
     import numpy as np
     from imageio import imwrite
@@ -82,8 +81,15 @@ def read_fits_map_L2_L3(obsdate="20220919UTa",imagetype="Map",Level="L3"):
     fNH3hdulist.info()
     fNH3hdr=fNH3hdulist[0].header
     fNH3data=fNH3hdulist[0].data
+    fNH3sza=fNH3hdulist[1].data
+    fNH3eza=fNH3hdulist[2].data
     fNH3hdulist.close()
     #pl.imshow(fNH3data)
-        
-    return(PCloudhdr,PClouddata,fNH3hdr,fNH3data,RGB,RGB_CM2)
+    #figamf,axsamf=pl.subplots(3,1,figsize=(8.0,4.0), dpi=150, facecolor="white")
+    #amfdata=(1.0/fNH3sza+1.0/fNH3eza)/2.0
+
+    #axsamf[0].imshow(fNH3data)
+    #axsamf[1].imshow(np.flipud(amfdata),vmin=-5.0,vmax=5.0)
+    #axsamf[2].imshow(fNH3eza,vmin=-5.0,vmax=5.0)
+    return(PCloudhdr,PClouddata,fNH3hdr,fNH3data,fNH3sza,fNH3eza,RGB,RGB_CM2)
 
