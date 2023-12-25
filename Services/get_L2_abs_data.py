@@ -348,6 +348,31 @@ def get_L2_abs_data(writecsv=False,writejson=False):
                                             'CH4file':'2023-11-03-0353_4','CH4Qual':True,
                                             'NH3file':'2023-11-03-0353_4','NH3Qual':True,
                                             'RGBfile':'2023-11-03-0407_3-Jupiter_R685G550B450-WV-RGB-ClrSmth-WhtBal-WV'},
+                 '20231107UTa_Map':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                             'Seeing':'4/10','Transparency':'5/10', 
+                                            'CH4file':'2023-11-07-0305_6','CH4Qual':True,
+                                            'NH3file':'2023-11-07-0305_6','NH3Qual':True,
+                                            'RGBfile':'2023-11-07-0319_2-Jupiter_R686G550B450-RGB-ClrSmth-WhtBal-WV'},
+                 '20231107UTb_Map':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                             'Seeing':'4/10','Transparency':'5/10', 
+                                            'CH4file':'2023-11-07-0333_0','CH4Qual':True,
+                                            'NH3file':'2023-11-07-0333_0','NH3Qual':True,
+                                            'RGBfile':'2023-11-07-0346_7-Jupiter_R686G550B450-RGB-ClrSmth-WhtBal-WV'},
+                 '20231110UTa_Map':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                             'Seeing':'6/10','Transparency':'8/10', 
+                                            'CH4file':'2023-11-10-0339_7','CH4Qual':True,
+                                            'NH3file':'2023-11-10-0339_7','NH3Qual':True,
+                                            'RGBfile':'2023-11-10-0353_6-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                 '20231110UTb_Map':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                             'Seeing':'6/10','Transparency':'8/10', 
+                                            'CH4file':'2023-11-10-0406_3','CH4Qual':True,
+                                            'NH3file':'2023-11-10-0406_3','NH3Qual':True,
+                                            'RGBfile':'2023-11-10-0419_3-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                 '20231110UTc_Map':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                             'Seeing':'6/10','Transparency':'8/10', 
+                                            'CH4file':'2023-11-10-0432_1','CH4Qual':True,
+                                            'NH3file':'2023-11-10-0432_1','NH3Qual':True,
+                                            'RGBfile':'2023-11-10-0448_0-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
 
                  ###Perturbation Study
                  '20220919UTc_Map':{'Telescope':'VLT','FL':'5600mm','Camera':'ASI120MM',
@@ -373,7 +398,7 @@ def get_L2_abs_data(writecsv=False,writejson=False):
                  
                  }
 
-    """
+    
     if writejson:
         filename="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/L2FITS.json"
         with open(filename, "w") as fp:
@@ -446,5 +471,5 @@ def get_L2_abs_data(writecsv=False,writejson=False):
         axs[2].step(bincenters, histCM3)
         
         ascii.write(t,filename,format='basic',overwrite=True,delimiter=',')
-        """
+        
     return(sourcefiles)

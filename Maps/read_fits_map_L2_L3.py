@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-def read_fits_map_L2_L3(obsdate="20231026UTa",imagetype="Map",Level="L3"):
+def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
+                        LonSys='2',Smoothing=False):
     """
     Created on Mon Nov 20 08:42:28 2023
     
@@ -12,28 +13,17 @@ def read_fits_map_L2_L3(obsdate="20231026UTa",imagetype="Map",Level="L3"):
     sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Spectroscopy')
     sys.path.append('./Services')
 
-    import os
-    import pylab as pl
-    import numpy as np
-    from imageio import imwrite
     from matplotlib.pyplot import imread
-    #from numpy import inf
-    #from re import search
     from astropy.io import fits
-    #from astropy.convolution import Gaussian2DKernel
-    #from astropy.convolution import convolve
-    import RetrievalLibrary as RL
     sys.path.append('./Services')
     import get_L2_abs_data as GAOD
-    import make_L3_env_data
     import get_WINJupos_ephem as WJ_ephem
+    import numpy as np
 
     target="Jupiter"
-    sourcedata=obsdate+"_"+imagetype
+    sourcedata=obskey+"_"+imagetype
     sourcefiles=GAOD.get_L2_abs_data()
-    pathRGB='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+obsdate[0:10]+'/'
-    pathout='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/map plots/'
-    diagout='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/Map Plots Diagnostic/'
+    pathRGB='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+obskey[0:10]+'/'
 
     RGBfile=sourcefiles[sourcedata]['RGBfile']+"_CM2_L360_MAP-BARE.png"
     if RGBfile != 'NA':
@@ -51,10 +41,9 @@ def read_fits_map_L2_L3(obsdate="20231026UTa",imagetype="Map",Level="L3"):
         NH3suffix="-Jupiter_647NH3AbsMap"
         pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/'
     elif Level=="L3":
-        CH4suffix="-Jupiter_PCloud_Sys2"
-        NH3suffix="-Jupiter_fNH3_Sys2"
+        CH4suffix="-Jupiter_L3PCld_S0"
+        NH3suffix="-Jupiter_L3fNH3_S0"
         pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/'
-
         
     try:
         PCloudfile=sourcefiles[sourcedata]['CH4file']+CH4suffix+\
@@ -84,6 +73,68 @@ def read_fits_map_L2_L3(obsdate="20231026UTa",imagetype="Map",Level="L3"):
     fNH3sza=fNH3hdulist[1].data
     fNH3eza=fNH3hdulist[2].data
     fNH3hdulist.close()
+    
+    NH3time=fNH3hdr["DATE-OBS"]
+    NH3_CM1=float(fNH3hdr["CM1"])
+    NH3_CM2=float(fNH3hdr["CM2"])
+    NH3_CM3=float(fNH3hdr["CM3"])
+        
+    CH4time=PCloudhdr["DATE-OBS"]
+    CH4_CM1=float(PCloudhdr["CM1"])
+    CH4_CM2=float(PCloudhdr["CM2"])
+    CH4_CM3=float(PCloudhdr["CM3"])
+    
+    if LonSys=='1':
+        print("LonSys=",LonSys)
+        RGBroll=RGB_CM2-RGB_CM1
+        RGB=np.roll(RGB,int(RGBroll),axis=1)
+
+        NH3roll=NH3_CM3-NH3_CM1
+        fNH3datar=np.roll(fNH3data,int(NH3roll),axis=1)
+        CH4roll=CH4_CM3-CH4_CM1
+        PClouddatar=np.roll(PClouddata,int(CH4roll),axis=1)
+        print("#############")
+        print("NH3roll=",NH3roll)
+        fNH3szar=np.roll(fNH3sza,int(NH3roll),axis=1)
+        fNH3ezar=np.roll(fNH3eza,int(NH3roll),axis=1)
+        
+        NH3CM=NH3_CM1
+        CH4CM=CH4_CM1
+        RGBCM=RGB_CM1       
+        #CM=NH3_CM1
+        #Real_CM=NH3_CM1
+    print("######in readfits: LonSys=",LonSys)
+    if LonSys=='2':
+        print("LonSys=",LonSys)
+        NH3roll=NH3_CM3-NH3_CM2
+        fNH3datar=np.roll(fNH3data,int(NH3roll),axis=1)
+        
+        CH4roll=CH4_CM3-CH4_CM2
+        PClouddatar=np.roll(PClouddata,int(CH4roll),axis=1)
+        print("#############")
+        print("NH3roll=",NH3roll)
+        fNH3szar=np.roll(fNH3sza,int(NH3roll),axis=1)
+        fNH3ezar=np.roll(fNH3eza,int(NH3roll),axis=1)
+        
+        NH3CM=NH3_CM2
+        CH4CM=CH4_CM2
+        RGBCM=RGB_CM2
+        
+    if LonSys=='3':
+        print("LonSys=",LonSys)
+        RGBroll=RGB_CM3-RGB_CM2
+        RGB=np.roll(RGB,int(-RGBroll),axis=1)
+
+        fNH3datar=fNH3data
+        PClouddatar=PClouddata
+        fNH3szar=fNH3sza
+        fNH3ezar=fNH3eza
+        
+        NH3CM=NH3_CM3
+        CH4CM=CH4_CM3
+        RGBCM=RGB_CM3
+        print("**** RGB_CM3,RGBCM=",RGB_CM3,RGBCM)
+        
     #pl.imshow(fNH3data)
     #figamf,axsamf=pl.subplots(3,1,figsize=(8.0,4.0), dpi=150, facecolor="white")
     #amfdata=(1.0/fNH3sza+1.0/fNH3eza)/2.0
@@ -91,5 +142,6 @@ def read_fits_map_L2_L3(obsdate="20231026UTa",imagetype="Map",Level="L3"):
     #axsamf[0].imshow(fNH3data)
     #axsamf[1].imshow(np.flipud(amfdata),vmin=-5.0,vmax=5.0)
     #axsamf[2].imshow(fNH3eza,vmin=-5.0,vmax=5.0)
-    return(PCloudhdr,PClouddata,fNH3hdr,fNH3data,fNH3sza,fNH3eza,RGB,RGB_CM2)
+    print("**** RGB_CM3,RGBCM=",RGB_CM3,RGBCM)
+    return(PCloudhdr,PClouddatar,fNH3hdr,fNH3datar,fNH3szar,fNH3ezar,RGB,RGBCM)
 

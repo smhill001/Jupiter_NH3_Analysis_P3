@@ -54,14 +54,13 @@ def AmmoniaMapsScript_P3(reference,Level='L3'):
             elif Level=='L3':
                 make_L3.make_L3_env_data(obsdate=dataset,target="Jupiter",
                                      imagetype='Map',CalModel=Cal,
-                                     Smoothing=False,LonSys='2',First=Frst)
+                                     Smoothing=False,First=Frst)
                 
             ###################################################################
             # Execute Processing from L3 to map of NH3, PCloud, and context
             ###################################################################
             elif Level=='plots':
-                MapJup.Map_Jup_Atm_2022_P3(obsdate=dataset,target="Jupiter",
-                                           imagetype='Map',CalModel='SCT-Obs-Final',
+                MapJup.Map_Jup_Atm_2022_P3(obskey=dataset,imagetype='Map',
                                            Smoothing=False,LatLims=[45,135],LonRng=45,
                                            delta_CM2=0,LonSys='2',showbands=False,
                                            coef=[0.65,0.25])

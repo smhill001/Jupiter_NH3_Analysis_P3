@@ -1,7 +1,7 @@
-def Map_Jup_Atm_2022_P3(obsdate="20231103UTa",target="Jupiter",
-                        imagetype='Map',CalModel='SCT-Obs-Final',
+def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
                         Smoothing=False,LatLims=[45,135],LonRng=45,
-                        delta_CM2=0,LonSys='2',showbands=False,coef=[0.,0.]):
+                        CMpref='sub_obs',LonSys='2',showbands=False,
+                        coef=[0.,0.],subproj=''):
     """
     Created on Sun Nov  6 16:47:21 2022
     
@@ -21,38 +21,36 @@ def Map_Jup_Atm_2022_P3(obsdate="20231103UTa",target="Jupiter",
     sys.path.append('./Services')
 
     import os
-    #from matplotlib.pyplot import imread
     import pylab as pl
     import numpy as np
     from imageio import imwrite
-    #from numpy import inf
-    #from re import search
     from astropy.io import fits
-    #from astropy.convolution import Gaussian2DKernel
-    #from astropy.convolution import convolve
     import RetrievalLibrary as RL
     sys.path.append('./Maps')
-    #import get_L2_abs_data as GAOD
-    #import make_L3_env_data
     import read_fits_map_L2_L3 as RFM
     
-    PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM2= \
-                    RFM.read_fits_map_L2_L3(obsdate=obsdate,
+    target="Jupiter"
+    PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM= \
+                    RFM.read_fits_map_L2_L3(obskey=obskey,LonSys=LonSys,
                                             imagetype="Map",Level="L3")
+                    
+    pathmapplots='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 Plots/'+subproj+'/'
+    if not os.path.exists(pathmapplots):
+        os.makedirs(pathmapplots)
     ###########################################################################
     # Special for limb correction
     ###########################################################################             
     amfdata=(1.0/sza+1.0/eza)/2.0
-    figamf,axsamf=pl.subplots(figsize=(8.0,4.0), dpi=150, facecolor="white")
-    axsamf.imshow(amfdata,vmin=-5.,vmax=5.)
-    if obsdate=="20220730UT":
+    #figamf,axsamf=pl.subplots(figsize=(8.0,4.0), dpi=150, facecolor="white")
+    #axsamf.imshow(amfdata,vmin=-5.,vmax=5.)
+    if obskey=="20220730UT":
         pathFITS='C:/Astronomy/Projects/Planets/Jupiter/Imaging Data/Mapping/'
         amf=fits.open(pathFITS+"2022-07-30-amf_CM2_L360_MAP-BARE.fit")
         amf.info()
         amfhdr=amf[0].header
         amfdata=5.*amf[0].data/65535.
         amf.close()
-    elif obsdate=="20220919UTa":                
+    elif obskey=="20220919UTa":                
         pathFITS='C:/Astronomy/Projects/Planets/Jupiter/Imaging Data/Mapping/'
         amf=fits.open(pathFITS+"2022-09-19-amf_CM2_L360_MAP-BARE.fit")
         amf.info()
@@ -64,25 +62,29 @@ def Map_Jup_Atm_2022_P3(obsdate="20231103UTa",target="Jupiter",
     ###########################################################################
     # Set up figure and axes for plots
     ###########################################################################             
-    fNH3PlotCM2=fNH3hdr["CM2"]+delta_CM2
-    PCloudPlotCM2=PCloudhdr["CM2"]+delta_CM2
-
-    NH3LonLims=[360-int(fNH3PlotCM2+LonRng),360-int(fNH3PlotCM2-LonRng)]
+    print("###############")
+    print(CMpref)
+    if CMpref=='subobs':
+        fNH3PlotCM=fNH3hdr["CM"+LonSys]#+delta_CM2
+        PCldPlotCM=PCloudhdr["CM"+LonSys]#+delta_CM2
+    else:
+        fNH3PlotCM=CMpref
+        PCldPlotCM=CMpref
+    print(fNH3PlotCM,PCldPlotCM)
+    NH3LonLims=[360-int(fNH3PlotCM+LonRng),360-int(fNH3PlotCM-LonRng)]
     if Smoothing:
         smthtitle="Smoothed"
     else: 
         smthtitle="Unsmoothed"
-        
+    CalModel=fNH3hdr['CALIBRA']
 
     ###########################################################################
     ## Just RGB and Abundance
     ###########################################################################
-    
     fig1,axs1=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
-    #fig1.suptitle(NH3time.replace("_"," ")+", CM2="+str(int(CM2)),x=0.5,ha='center',color='k')
     fig1.suptitle(fNH3hdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
-                  +str(int(fNH3PlotCM2))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+                  +str(int(fNH3PlotCM))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
 
     for ix in range(0,1):
         axs1[ix].grid(linewidth=0.2)
@@ -96,14 +98,9 @@ def Map_Jup_Atm_2022_P3(obsdate="20231103UTa",target="Jupiter",
 
         axs1[ix].set_adjustable('box') 
 
-
-    #fNH3_patch_mb,vn,vx,tx_fNH3=plot_patch(fNH3data*1e6,LatLims,NH3LonLims,
-    #                                 fNH3PlotCM2,LonRng,"jet",
-    #                                 axs1[0],'%3.2f',cont=False,n=6,vn=50,vx=150)
-
     TestfNH3=fNH3data*amfdata**coef[0]
     fNH3_patch_mb,vn,vx,tx_fNH3=plot_patch(TestfNH3*1e6,LatLims,NH3LonLims,
-                                     fNH3PlotCM2,LonRng,"jet",
+                                     fNH3PlotCM,LonRng,"jet",
                                      axs1[0],'%3.2f',cont=False,n=6,vn=50,vx=150)
 
     temp=RL.make_contours_CH4_patch(axs1[0],fNH3_patch_mb,LatLims,NH3LonLims,
@@ -112,7 +109,7 @@ def Map_Jup_Atm_2022_P3(obsdate="20231103UTa",target="Jupiter",
     axs1[0].set_title(r'$\bar{f_c}(NH3) (ppm)$',fontsize=10)
 
     gamma=1.3
-    RGB_patch=make_patch_RGB(RGB,LatLims,NH3LonLims,RGB_CM2,LonRng)
+    RGB_patch=make_patch_RGB(RGB,LatLims,NH3LonLims,RGB_CM,LonRng)
 
     RGB4Display=np.power(np.array(RGB_patch).astype(float),gamma)
     RGB4Display=RGB4Display/RGB4Display.max()
@@ -158,18 +155,23 @@ def Map_Jup_Atm_2022_P3(obsdate="20231103UTa",target="Jupiter",
     fig1.subplots_adjust(left=0.10, bottom=0.03, right=0.98, top=0.95,
                 wspace=0.25, hspace=0.05)     
     axs1[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
-    pathmapplots='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/map plots/'
     """
     try:
-        fout=pathmapplots+obsdate+"-Jupiter-Retrieval-NH3_RGB_only"+"-CMII_"+\
-                  str(fNH3PlotCM2)+"-"+CalModel+"-"+smthtitle+"-Map-"#+\
+        fout=pathmapplots+obskey+"-Jupiter-Retrieval-NH3_RGB_only"+"-CMII_"+\
+                  str(fNH3PlotCM)+"-"+CalModel+"-"+smthtitle+"-Map-"#+\
                   R["Variation"]+".png"
     except:
-        fout=pathmapplots+obsdate+"-Jupiter-Retrieval-NH3_RGB_only"+"-CMII_"+\
-                  str(fNH3PlotCM2)+"-"+CalModel+"-"+smthtitle+"-Map.png"
+        fout=pathmapplots+obskey+"-Jupiter-Retrieval-NH3_RGB_only"+"-CMII_"+\
+                  str(fNH3PlotCM)+"-"+CalModel+"-"+smthtitle+"-Map.png"
     """
-    fig1.savefig(pathmapplots+obsdate+"-Jupiter-Retrieval-NH3_RGB_only"+"-CMII_"+
-              str(fNH3PlotCM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
+    if coef[0]==0.0:
+        correction='_C0'
+    else:
+        correction='_C1'
+    fn=fNH3hdr["FILENAME"][:-5]+correction+'_Sys'+LonSys+'_N'+\
+                str(90-LatLims[0])+'-S'+str(LatLims[1]-90)+\
+                '_Lon'+str(NH3LonLims[0]).zfill(3)+'-'+str(NH3LonLims[1]).zfill(3)+'.png'
+    fig1.savefig(pathmapplots+fn,dpi=300)
     
     ###########################################################################
     ## Just RGB and Cloud Pressure
@@ -178,7 +180,7 @@ def Map_Jup_Atm_2022_P3(obsdate="20231103UTa",target="Jupiter",
     fig2,axs2=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
     fig2.suptitle(fNH3hdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
-                  +str(int(PCloudPlotCM2))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+                  +str(int(PCldPlotCM))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
 
     for ix in range(0,1):
         axs2[ix].grid(linewidth=0.2)
@@ -193,12 +195,14 @@ def Map_Jup_Atm_2022_P3(obsdate="20231103UTa",target="Jupiter",
         axs2[ix].set_adjustable('box') 
 
     #Pcloud_patch,vn,vx,tx=plot_patch(PClouddata,LatLims,NH3LonLims,
-    #                                 PCloudPlotCM2,LonRng,"jet",
+    #                                 PCldPlotCM,LonRng,"jet",
     #                                 axs2[0],'%3.2f',cont=False,
     #                                 cbar_reverse=True,vn=400,vx=900,n=6)
     TestPCloud=PClouddata*amfdata**coef[1]
+    print("***LonSys,PCldPlotCM,NH3LonLims,LonRng=",
+          LonSys,PCldPlotCM,NH3LonLims,LonRng)
     Pcloud_patch,vn,vx,tx=plot_patch(TestPCloud,LatLims,NH3LonLims,
-                                     PCloudPlotCM2,LonRng,"jet",
+                                     PCldPlotCM,LonRng,"jet",
                                      axs2[0],'%3.2f',cont=False,
                                      cbar_reverse=True,vn=400,vx=900,n=6)
 
@@ -267,15 +271,22 @@ def Map_Jup_Atm_2022_P3(obsdate="20231103UTa",target="Jupiter",
     fig2.subplots_adjust(left=0.10, bottom=0.03, right=0.98, top=0.95,
                 wspace=0.25, hspace=0.05)     
     axs2[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
-    pathmapplots='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/map plots/'
+    
+    if coef[0]==0.0:
+        correction='_C0'
+    else:
+        correction='_C1'
+    fn=PCloudhdr["FILENAME"][:-5]+correction+'_Sys'+LonSys+'_N'+\
+                str(90-LatLims[0])+'-S'+str(LatLims[1]-90)+\
+                '_Lon'+str(NH3LonLims[0]).zfill(3)+'-'+str(NH3LonLims[1]).zfill(3)+'.png'
 
-    fig2.savefig(pathmapplots+obsdate+"-Jupiter-Retrieval-Pcloud_only"+"-CMII_"+
-              str(PCloudPlotCM2)+"-"+CalModel+"-"+smthtitle+"-Map.png",dpi=300)
+    fig2.savefig(pathmapplots+fn,dpi=300)
 
-
-    pathScatter='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/Scatter Plots/'
-
-    plot_scatter(Pcloud_patch,fNH3_patch_mb,pathScatter,obsdate,fNH3PlotCM2,
+    fn=fNH3hdr["FILENAME"][:-12]+'Scat_'+fNH3hdr["FILENAME"][-7:-5]+\
+                correction+'_Sys'+LonSys+'_N'+\
+                str(90-LatLims[0])+'-S'+str(LatLims[1]-90)+\
+                '_Lon'+str(NH3LonLims[0]).zfill(3)+'-'+str(NH3LonLims[1]).zfill(3)+'.png'
+    plot_scatter(Pcloud_patch,fNH3_patch_mb,pathmapplots,fn,obskey,fNH3PlotCM,
                  LatLims)
 
     return()
@@ -364,7 +375,7 @@ def plot_patch(fullmap,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
 
     return patch,vn,vx,tx
 
-def plot_scatter(patch1,patch2,filepath,obsdate,Real_CM2,LatLims):
+def plot_scatter(patch1,patch2,filepath,fn,obskey,Real_CM2,LatLims):
     import pylab as pl
     import numpy as np
     import copy
@@ -434,6 +445,6 @@ def plot_scatter(patch1,patch2,filepath,obsdate,Real_CM2,LatLims):
     axscor.legend(fontsize=9)
     
     figcor.subplots_adjust(left=0.12, right=0.97, top=0.93, bottom=0.11)
-    figcor.savefig(filepath+"/"+obsdate+"-Jupiter-Retrieval-Scatter"+"-CMII_"+str(Real_CM2)+".png",dpi=300)
+    figcor.savefig(filepath+fn,dpi=300)
   
 

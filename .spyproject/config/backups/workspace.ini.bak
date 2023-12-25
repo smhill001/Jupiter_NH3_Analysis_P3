@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['Analysis Data\\L3 FITS\\aareadme.txt', 'Maps\\Map_Jup_Atm_2022_P3.py', 'Maps\\TestContiguousMap.py', 'Maps\\read_fits_map_L2_L3.py']
+recent_files = ['Maps\\Map_Jup_Atm_2022_P3.py', 'AmmoniaMapsScript_P3.py', '..\\..\\..\\..\\Users\\smhil\\anaconda3\\Lib\\site-packages\\numpy\\lib\\arraypad.py']
 
 [main]
 version = 0.2.0

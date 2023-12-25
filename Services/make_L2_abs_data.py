@@ -3,6 +3,12 @@ def make_l2_abs_data(obsdate="20231103UTa",target="Jupiter",
     """
     Created on Fri Sep 15 07:48:05 2023
     
+    PURPOSE: Converts L1 normalized radiance RGB PNG maps into L2 transmission
+             data for CH4 and NH3. Options are planned for
+             maps vs images.
+             The code can be called in batch mode by:
+                 AmmoniaMapsScript_P3.py
+    
     @author: smhil
     """
     import sys
@@ -10,13 +16,13 @@ def make_l2_abs_data(obsdate="20231103UTa",target="Jupiter",
     sys.path.append(drive+'/Astronomy/Python Play')
     sys.path.append(drive+'/Astronomy/Python Play/Util_P3')
     sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Spectroscopy')
+    sys.path.append('./Services')
 
     import os
     import numpy as np
     from imageio import imwrite
     from numpy import inf
     from astropy.io import fits
-    sys.path.append('./Services')
     import get_L1_img_data as getL1
     import load_png as LP
     import get_WINJupos_ephem as WJ_ephem

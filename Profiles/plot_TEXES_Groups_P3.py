@@ -360,12 +360,12 @@ def plot_profile_L3(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
     DataSets=GBL.get_batch_lists()
     
     if param=="PCloud":
-        suffix="-Jupiter_PCloud_Sys2.fits"
+        suffix="-Jupiter_L3PCld_S0.fits"#"-Jupiter_PCloud_Sys2.fits"
         paramkey='CH4file'
         qualkey='CH4Qual'
         factor=1.0
     elif param=="fNH3":
-        suffix="-Jupiter_fNH3_Sys2.fits"
+        suffix="-Jupiter_L3fNH3_S0.fits"#"-Jupiter_fNH3_Sys2.fits"
         paramkey='NH3file'
         qualkey='NH3Qual'
         factor=1.0e6
@@ -385,14 +385,14 @@ def plot_profile_L3(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
     First=True
     Num=0
 
-    for ID in DataSets[reference]:
-        print("*******ID=",ID)
-        sourceindex=ID[0:4]+ID
-        if len(ID)==11:
-            version=ID[10]
-            dataset=ID[0:10].replace('-','')+'UT'+version+"_Map"
+    for obskey in DataSets[reference]:
+        print("*******obskey=",obskey)
+        sourceindex=obskey[0:4]+obskey
+        if len(obskey)==11:
+            version=obskey[10]
+            dataset=obskey[0:10].replace('-','')+'UT'+version+"_Map"
         else:
-            dataset=ID.replace('-','')+'UT'+"_Map"
+            dataset=obskey.replace('-','')+'UT'+"_Map"
 
         if sourcefiles[dataset][qualkey]:
             file=sourcefiles[dataset][paramkey]+suffix
@@ -402,7 +402,7 @@ def plot_profile_L3(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
                 print('No Variation')"""
             print("file=",file)
             
-            Lats,AvgProf,StdProf,CM2=EP.extract_profile(pth,file,
+            Lats,AvgProf,StdProf,CM3=EP.extract_profile(pth,file,
                                                     ProfileHalfWidth=ProfileHalfWidth,
                                                     profile=profile)
             
@@ -419,7 +419,7 @@ def plot_profile_L3(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
                 
             Num=Num+1        
 
-            axsspaghetti.plot(Lats,AvgProf*factor,linewidth=0.5,label=file[5:20])
+            axsspaghetti.plot(Lats,AvgProf*factor,linewidth=0.5,label=file[5:17])
 
     #print("AvgArr.shape=",AvgArr.shape)
     AvgPro=np.mean(AvgArr[:,:],axis=0)*factor
