@@ -22,6 +22,7 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
     sys.path.append('./Services')
 
     import os
+    from imageio import imwrite
     from matplotlib.pyplot import imread
     import numpy as np
     from astropy.io import fits
@@ -31,7 +32,6 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
     sys.path.append('./Services')
     import get_L2_abs_data as GAOD
     import get_WINJupos_ephem as WJ_ephem
-    import make_sza_eza_planes as za
    
     ###########################################################################
     #  SET NECESSARY CONSTANTS
@@ -61,11 +61,11 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
     ###########################################################################
     # CH4 Transmission File name and read
     try:    #Set up to allow for parametric studies of different processing paths
-        CH4file=sourcefiles[sourcedata]['CH4file']+"-Jupiter_620CH4AbsMap"+\
+        CH4file=sourcefiles[sourcedata]['CH4file']+"-Jupiter_L2TCH4"+\
                 sourcefiles[sourcedata]['Variation']+".fits"
         variation=sourcefiles[sourcedata]['Variation']
     except:
-        CH4file=sourcefiles[sourcedata]['CH4file']+"-Jupiter_620CH4AbsMap.fits"
+        CH4file=sourcefiles[sourcedata]['CH4file']+"-Jupiter_L2TCH4.fits"
         variation=""
 
     CH4hdulist=fits.open(pathFITS+CH4file)
@@ -77,17 +77,19 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
     ###########################################################################
     # NH3 Transmission File name and read
     try:    #Set up to allow for parametric studies of different processing paths
-        NH3file=sourcefiles[sourcedata]['NH3file']+"-Jupiter_647NH3AbsMap"+\
+        NH3file=sourcefiles[sourcedata]['NH3file']+"-Jupiter_L2TNH3"+\
                 sourcefiles[sourcedata]['Variation']+".fits"
         variation=sourcefiles[sourcedata]['Variation']
     except:
-        NH3file=sourcefiles[sourcedata]['NH3file']+"-Jupiter_647NH3AbsMap.fits"
+        NH3file=sourcefiles[sourcedata]['NH3file']+"-Jupiter_L2TNH3.fits"
         variation=""
     
     NH3hdulist=fits.open(pathFITS+NH3file)
     NH3hdulist.info()
     NH3hdr=NH3hdulist[0].header
     NH3data=NH3hdulist[0].data
+    sza=NH3hdulist[1].data
+    eza=NH3hdulist[2].data
     NH3hdulist.close()
     
     ###########################################################################    
@@ -124,6 +126,7 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
     # as the defacto standard. Once the L2 data are converted to system 3,
     # this step will no longer be necessasry.
     ###########################################################################
+    """
     RGBroll=RGB_CM2-RGB_CM3
     RGB=np.roll(RGB,int(RGBroll),axis=1)
     
@@ -132,12 +135,13 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
     
     CH4roll=CH4_CM2-CH4_CM3
     CH4data=np.roll(CH4data,int(CH4roll),axis=1)
-    
+    """
     NH3CM=NH3_CM3
     CH4CM=CH4_CM3
     RGBCM=RGB_CM3
-    eza,sza=za.make_sza_eza_planes(dateobs=NH3hdr['DATE-OBS'])
-
+    
+    #eza,sza=za.make_sza_eza_planes(dateobs=NH3hdr['DATE-OBS'])
+    
     ###########################################################################
     # If smoothing is selected, smooth transmission data with a 1 pixel
     # Gaussian kernal and compute opacity.
@@ -166,6 +170,7 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
     ###########################################################################
     for BUNIT in ['Mole Fraction','Cloud-top Press']:
         if BUNIT=='Mole Fraction':
+            dataarray=fNH3*1.0e6
             hdu = fits.PrimaryHDU(fNH3.astype(np.float32))
             comment="NH3 mole fraction"
             Real_CM1=NH3_CM1
@@ -174,7 +179,9 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
             datetime=NH3time
             file=NH3file
             fn=file[0:26]+'L3fNH3'
+            Range=[50.,150] #scaled range for PNG file
         elif BUNIT=='Cloud-top Press':
+            dataarray=CH4_Cloud_Press/4.
             hdu = fits.PrimaryHDU((CH4_Cloud_Press/4.).astype(np.float32))
             comment="mb"
             Real_CM1=CH4_CM1
@@ -183,6 +190,7 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
             datetime=CH4time
             file=CH4file
             fn=file[0:26]+'L3PCld'
+            Range=[400.,1100] #scaled range for PNG file
             
         szadata=fits.ImageHDU(sza)
         ezadata=fits.ImageHDU(eza)
@@ -229,6 +237,12 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
         hdul.writeto(fnout)
         hdul.close()
         
+        #######################################################################
+        # WRITE Scaled PNG File
+        ######################################################################
+        scl_arr = ((dataarray - Range[0]) * (1/(Range[1] - Range[0]) * 65534.9999)).astype('uint16')#
+        imwrite(fnout+'.png', scl_arr)#.astype(np.uint16))
+
         ###########################################################################
         # Return dictionary for programs that need it, e.g., batch processing
         ###########################################################################

@@ -2,7 +2,7 @@ aareadme_L3.txt
 
 This directory contains Level-3 FITS data files of two types: ammonia
 abundnace and effective cloud-top pressure. They are derived from measurements
-of methane and ammonia absorption using in-band observations compared to 
+of methane and ammonia transmission using in-band observations compared to 
 adjacent continuum measurements. The FITS files represent mapped data in
 system 3 longitude and planetographic latitude. Sampling is 1 deg long x 1 deg
 latitude cells with the full array size being 360x180 cells

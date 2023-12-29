@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
-                        LonSys='2',Smoothing=False):
+                        LonSys='3',Smoothing=False):
     """
     Created on Mon Nov 20 08:42:28 2023
     
@@ -37,8 +37,8 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
         RGB_CM3=float(eph[2].strip())
 
     if Level=="L2":
-        CH4suffix="-Jupiter_620CH4AbsMap"
-        NH3suffix="-Jupiter_647NH3AbsMap"
+        CH4suffix="-Jupiter_L2TCH4"
+        NH3suffix="-Jupiter_L2TNH3"
         pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/'
     elif Level=="L3":
         CH4suffix="-Jupiter_L3PCld_S0"
@@ -85,16 +85,16 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
     CH4_CM3=float(PCloudhdr["CM3"])
     
     if LonSys=='1':
-        print("LonSys=",LonSys)
+        print("LonSys1=",LonSys)
         RGBroll=RGB_CM2-RGB_CM1
         RGB=np.roll(RGB,int(RGBroll),axis=1)
 
         NH3roll=NH3_CM3-NH3_CM1
         fNH3datar=np.roll(fNH3data,int(NH3roll),axis=1)
+        
         CH4roll=CH4_CM3-CH4_CM1
         PClouddatar=np.roll(PClouddata,int(CH4roll),axis=1)
-        print("#############")
-        print("NH3roll=",NH3roll)
+        
         fNH3szar=np.roll(fNH3sza,int(NH3roll),axis=1)
         fNH3ezar=np.roll(fNH3eza,int(NH3roll),axis=1)
         
@@ -103,16 +103,14 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
         RGBCM=RGB_CM1       
         #CM=NH3_CM1
         #Real_CM=NH3_CM1
-    print("######in readfits: LonSys=",LonSys)
+
     if LonSys=='2':
-        print("LonSys=",LonSys)
         NH3roll=NH3_CM3-NH3_CM2
         fNH3datar=np.roll(fNH3data,int(NH3roll),axis=1)
         
         CH4roll=CH4_CM3-CH4_CM2
         PClouddatar=np.roll(PClouddata,int(CH4roll),axis=1)
-        print("#############")
-        print("NH3roll=",NH3roll)
+        
         fNH3szar=np.roll(fNH3sza,int(NH3roll),axis=1)
         fNH3ezar=np.roll(fNH3eza,int(NH3roll),axis=1)
         
@@ -121,7 +119,6 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
         RGBCM=RGB_CM2
         
     if LonSys=='3':
-        print("LonSys=",LonSys)
         RGBroll=RGB_CM3-RGB_CM2
         RGB=np.roll(RGB,int(-RGBroll),axis=1)
 
@@ -133,7 +130,6 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
         NH3CM=NH3_CM3
         CH4CM=CH4_CM3
         RGBCM=RGB_CM3
-        print("**** RGB_CM3,RGBCM=",RGB_CM3,RGBCM)
         
     #pl.imshow(fNH3data)
     #figamf,axsamf=pl.subplots(3,1,figsize=(8.0,4.0), dpi=150, facecolor="white")
@@ -142,6 +138,5 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
     #axsamf[0].imshow(fNH3data)
     #axsamf[1].imshow(np.flipud(amfdata),vmin=-5.0,vmax=5.0)
     #axsamf[2].imshow(fNH3eza,vmin=-5.0,vmax=5.0)
-    print("**** RGB_CM3,RGBCM=",RGB_CM3,RGBCM)
     return(PCloudhdr,PClouddatar,fNH3hdr,fNH3datar,fNH3szar,fNH3ezar,RGB,RGBCM)
 

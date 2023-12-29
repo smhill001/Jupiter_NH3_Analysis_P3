@@ -25,7 +25,7 @@ def extract_profile(pth,filename,LonCtr='CM',ProfileHalfWidth=45.,
     sys.path.append('./Services')
     import read_master_calibration
     import get_WINJupos_ephem as get_ephem
-                 
+    print("filename=",filename)
     hdulist=fits.open(pth+filename)
     hdulist.info()
     hdr=hdulist[0].header

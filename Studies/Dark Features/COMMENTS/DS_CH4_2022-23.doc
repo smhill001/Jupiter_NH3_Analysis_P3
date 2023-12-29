@@ -1,0 +1,90 @@
+WinJUPOS 12.2.6 (Jupiter), Selection protocol, 2023/12/28  19:31
+
+------------------------------------------------------------------------------
+
+Selection file
+C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\Studies\Dark Features\DS_CH4_2022-23.sel
+
+Comment
+
+
+Records
+42
+
+Settings file
+C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\Studies\Dark Features\DS_NH3_2022-23.ses
+
+Objects
+Mp Object Rr Object-ID
+DC SPOT                      
+
+Including MOON + SHAD
+no
+
+Including BELT + ZONE
+no
+
+Measurer
+***
+
+Channel
+****
+
+Computation of object positions
+none
+
+Ref. system
+1
+
+L(T0)
+  0.0ø
+
+Drift
+0.0000ø/d
+
+Ref. date
+2000/01/01
+
+From latitude
+ +0.0ø
+
+To latitude
++10.0ø
+
+From longitude
+  0.0ø
+
+To longitude
+360.0ø
+
+From date
+2022/06/01
+
+To date
+2024/01/01
+
+Sorting
+No sorting
+
+Phase correction C.M.T.
+no
+
+Phase correction Measurements
+no
+
+Nil-error bars in longitude
+no
+
+Nil-error bars in latitude
+no
+
+Directory Central Meridian transits
+
+
+Directory measurements
+C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\Studies\Dark Features
+
+Systematic error of 1 used observer(s)
+Observer                  SR       SV       NR       NV       **
+Hill_ammonia.mea      Measurements                           0.0ø
+------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
                         Smoothing=False,LatLims=[45,135],LonRng=45,
-                        CMpref='sub_obs',LonSys='2',showbands=False,
+                        CMpref='subobs',LonSys='2',showbands=False,
                         coef=[0.,0.],subproj=''):
     """
     Created on Sun Nov  6 16:47:21 2022
@@ -43,7 +43,7 @@ def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
     amfdata=(1.0/sza+1.0/eza)/2.0
     #figamf,axsamf=pl.subplots(figsize=(8.0,4.0), dpi=150, facecolor="white")
     #axsamf.imshow(amfdata,vmin=-5.,vmax=5.)
-    if obskey=="20220730UT":
+    if obskey=="20220730UTa":
         pathFITS='C:/Astronomy/Projects/Planets/Jupiter/Imaging Data/Mapping/'
         amf=fits.open(pathFITS+"2022-07-30-amf_CM2_L360_MAP-BARE.fit")
         amf.info()
@@ -62,15 +62,12 @@ def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
     ###########################################################################
     # Set up figure and axes for plots
     ###########################################################################             
-    print("###############")
-    print(CMpref)
     if CMpref=='subobs':
-        fNH3PlotCM=fNH3hdr["CM"+LonSys]#+delta_CM2
-        PCldPlotCM=PCloudhdr["CM"+LonSys]#+delta_CM2
+        fNH3PlotCM=fNH3hdr["CM"+LonSys]
+        PCldPlotCM=PCloudhdr["CM"+LonSys]
     else:
         fNH3PlotCM=CMpref
         PCldPlotCM=CMpref
-    print(fNH3PlotCM,PCldPlotCM)
     NH3LonLims=[360-int(fNH3PlotCM+LonRng),360-int(fNH3PlotCM-LonRng)]
     if Smoothing:
         smthtitle="Smoothed"
@@ -99,6 +96,7 @@ def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
         axs1[ix].set_adjustable('box') 
 
     TestfNH3=fNH3data*amfdata**coef[0]
+    
     fNH3_patch_mb,vn,vx,tx_fNH3=plot_patch(TestfNH3*1e6,LatLims,NH3LonLims,
                                      fNH3PlotCM,LonRng,"jet",
                                      axs1[0],'%3.2f',cont=False,n=6,vn=50,vx=150)
@@ -109,8 +107,10 @@ def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
     axs1[0].set_title(r'$\bar{f_c}(NH3) (ppm)$',fontsize=10)
 
     gamma=1.3
-    RGB_patch=make_patch_RGB(RGB,LatLims,NH3LonLims,RGB_CM,LonRng)
 
+    #Logic in RGB_patch depends on LonLims and CM being consistent
+    RGB_patch=make_patch_RGB(RGB,LatLims,NH3LonLims,fNH3PlotCM,LonRng)
+    
     RGB4Display=np.power(np.array(RGB_patch).astype(float),gamma)
     RGB4Display=RGB4Display/RGB4Display.max()
     show=axs1[1].imshow(RGB4Display,
@@ -151,6 +151,7 @@ def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
     axs1[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
     axs1[0].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
     axs1[1].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
+    axs1[1].grid(linewidth=0.2)
 
     fig1.subplots_adjust(left=0.10, bottom=0.03, right=0.98, top=0.95,
                 wspace=0.25, hspace=0.05)     
@@ -199,8 +200,6 @@ def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
     #                                 axs2[0],'%3.2f',cont=False,
     #                                 cbar_reverse=True,vn=400,vx=900,n=6)
     TestPCloud=PClouddata*amfdata**coef[1]
-    print("***LonSys,PCldPlotCM,NH3LonLims,LonRng=",
-          LonSys,PCldPlotCM,NH3LonLims,LonRng)
     Pcloud_patch,vn,vx,tx=plot_patch(TestPCloud,LatLims,NH3LonLims,
                                      PCldPlotCM,LonRng,"jet",
                                      axs2[0],'%3.2f',cont=False,
@@ -267,6 +266,7 @@ def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
     axs2[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
     axs2[0].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
     axs2[1].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
+    axs2[1].grid(linewidth=0.2)
 
     fig2.subplots_adjust(left=0.10, bottom=0.03, right=0.98, top=0.95,
                 wspace=0.25, hspace=0.05)     
@@ -330,14 +330,12 @@ def make_patch_RGB(Map,LatLims,LonLims,CM2deg,LonRng,pad=True):
     """
     import numpy as np
     patch=np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]:LonLims[1],:])
-    #print("####################### Patch RGB shape",patch.shape)
     if CM2deg<LonRng:
         patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]-1:360,:]),
                               np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]-360,:])),axis=1)
-    if CM2deg>360.-LonRng:
+    if CM2deg>360-LonRng:
         patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],360+LonLims[0]:360,:]),
                               np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1],:])),axis=1)
-    #print("####################### Patch RGB shape",patch.shape)
     #if pad:
     #    patch_pad=np.pad(patch,5,mode='reflect')
 

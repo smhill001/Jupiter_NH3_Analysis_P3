@@ -190,8 +190,8 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
         StdSum=np.zeros(360)
         xlabel="Longitude from CM (deg)"
     
-    suffix={"CH4":"-Jupiter_620CH4AbsMap",
-            "NH3":"-Jupiter_647NH3AbsMap"}
+    suffix={"CH4":"-Jupiter_L2TCH4",
+            "NH3":"-Jupiter_L2TNH3"}
     
     figspaghetti,axsspaghetti=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, 
                                           facecolor="white")

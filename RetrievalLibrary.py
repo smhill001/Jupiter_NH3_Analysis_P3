@@ -15,16 +15,14 @@ def make_patch(Map,LatLims,LonLims,CM2deg,LonRng,pad=True):
     """
     import numpy as np
     patch=np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]:LonLims[1]])
-    #print("####################### Patch shape",patch.shape)
-    print("RL: make_patch CM2=",CM2deg)
     if CM2deg<LonRng:
         patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]-1:360]),
                               np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]-360])),axis=1)
     if CM2deg>360-LonRng:
         patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],360+LonLims[0]:360]),
                               np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]])),axis=1)
-    if pad:
-        patch_pad=np.pad(patch,5,mode='reflect')
+    #if pad:
+    #    patch_pad=np.pad(patch,5,mode='reflect')
     #print("####################### Patch shape",patch.shape)
 
     return patch
@@ -44,7 +42,7 @@ def make_contours_CH4_patch(ax,CH4Abs_conv,LatLims,LonLims,lvls=[0.71,0.73,0.75,
                   linewidths=[0.5,0.5,0.5,0.5,0.5,0.5],
                   linestyles=['dashed','dashed','dashed','dashed','dashed'])
     #ax.clabel(cs,[19.0,19.5,20.0,20.5,21.0],inline=True,fmt='%2.1f',fontsize=8)
-    print(lvls)
+    #print(lvls)
     ax.clabel(cs,lvls,inline=True,fmt=frmt,fontsize=8)
     
 
