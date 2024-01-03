@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['AmmoniaMapsScript_P3.py', 'Maps\\Map_Jup_Atm_2022_P3.py', 'Studies\\Study_Change_2022.py', 'Studies\\Dark Features\\readmeasfile.py']
+recent_files = ['AmmoniaMapsScript_P3.py', 'Maps\\Map_Jup_Atm_2022_P3.py', 'Studies\\NEZ\\nez_analysis.py', 'Profiles\\Profile_L3.py', '..\\..\\..\\Python Play\\ImageMetadata_P3\\MetaDataScript_P3.py']
 
 [main]
 version = 0.2.0

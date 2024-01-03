@@ -5,7 +5,8 @@ abundnace and effective cloud-top pressure. They are derived from measurements
 of methane and ammonia transmission using in-band observations compared to 
 adjacent continuum measurements. The FITS files represent mapped data in
 system 3 longitude and planetographic latitude. Sampling is 1 deg long x 1 deg
-latitude cells with the full array size being 360x180 cells
+latitude cells with the full array size being 360x180 cells. In addition,
+'browse' images in PNG format are provided for convenience.
 
 The file naming convention is: YYYY-MM-DD-HHMM_S-Jupiter_PARAME_SX.fits,
 where:

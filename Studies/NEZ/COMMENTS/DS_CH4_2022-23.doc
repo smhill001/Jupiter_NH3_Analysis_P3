@@ -1,18 +1,18 @@
-WinJUPOS 12.2.6 (Jupiter), Selection protocol, 2023/12/31  13:38
+WinJUPOS 12.2.6 (Jupiter), Selection protocol, 2024/01/02  16:00
 
 ------------------------------------------------------------------------------
 
 Selection file
-C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\Studies\Dark Features\DS_CH4_2022-23.sel
+C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\Studies\nez\DS_CH4_2022-23.sel
 
 Comment
 
 
 Records
-60
+114
 
 Settings file
-C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\Studies\Dark Features\DS_CH4_2022-23.ses
+C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\Studies\NEZ\DS_CH4_2022-23.ses
 
 Objects
 Mp Object Rr Object-ID
@@ -82,7 +82,7 @@ Directory Central Meridian transits
 
 
 Directory measurements
-C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\Studies\Dark Features
+C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\Studies\NEZ
 
 Systematic error of 1 used observer(s)
 Observer                  SR       SV       NR       NV       **
