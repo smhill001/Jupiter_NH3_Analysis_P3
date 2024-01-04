@@ -388,6 +388,16 @@ def get_L2_abs_data(writecsv=False,writejson=False):
                                             'CH4file':'2023-11-13-0259_4','CH4Qual':True,
                                             'NH3file':'2023-11-13-0259_4','NH3Qual':True,
                                             'RGBfile':'2023-11-13-0314_0-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                 '20231115UTa_Map':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                             'Seeing':'U/10','Transparency':'U/10', 
+                                            'CH4file':'2023-11-15-0321_4','CH4Qual':True,
+                                            'NH3file':'2023-11-15-0321_4','NH3Qual':True,
+                                            'RGBfile':'2023-11-15-0335_0-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                 '20231115UTb_Map':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                             'Seeing':'U/10','Transparency':'U/10', 
+                                            'CH4file':'2023-11-15-0347_9','CH4Qual':True,
+                                            'NH3file':'2023-11-15-0347_9','NH3Qual':True,
+                                            'RGBfile':'2023-11-15-0401_4-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
 
                  ###Perturbation Study
                  '20220919UTc_Map':{'Telescope':'VLT','FL':'5600mm','Camera':'ASI120MM',

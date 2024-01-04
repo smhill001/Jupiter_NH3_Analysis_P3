@@ -5,7 +5,9 @@ abundnace and effective cloud-top pressure. They are derived from measurements
 of methane and ammonia transmission using in-band observations compared to 
 adjacent continuum measurements. The FITS files represent mapped data in
 system 3 longitude and planetographic latitude. Sampling is 1 deg long x 1 deg
-latitude cells with the full array size being 360x180 cells. In addition,
+latitude cells with the full array size being 360x180 cells. Each FITS file 
+contains two back-planes with the cosines of incident and emergent flux angles 
+(mu_0 and mu) that can be used for limb correction computations. In addition,
 'browse' images in PNG format are provided for convenience.
 
 The file naming convention is: YYYY-MM-DD-HHMM_S-Jupiter_PARAME_SX.fits,
@@ -32,8 +34,8 @@ Examples:
     - 2022-07-30-0729_8-Jupiter_L3PCld_S0.fits
     - 2022-07-30-0729_8-Jupiter_L3fNH3_S0.fits
 
-CAUTION: The Level-3 FITS files included in this directory are actively being produced,
-revised, and analyzed. Therefore, they are provided without warrantee as to 
-quality or defects and should be used with caution. For specific questions
-regarding the usability of this dataset, please contact the author directly
-at smhill001@gmail.com.
+CAUTION: The Level-3 FITS files included in this directory are actively being 
+produced, revised, and analyzed. Therefore, they are provided without warrantee 
+as to quality or defects and should be used with caution. For specific 
+questions regarding the usability of this dataset, please contact the author 
+directly at smhill001@gmail.com.
