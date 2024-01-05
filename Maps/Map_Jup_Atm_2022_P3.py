@@ -282,12 +282,63 @@ def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
 
     fig2.savefig(pathmapplots+fn,dpi=300)
 
+    ###########################################################################
+    ## Compute Scatter Plot
+    ###########################################################################
+    fig3,axs3=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white")
+    fig3.suptitle(fNH3hdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
+                  +str(int(PCldPlotCM))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+
+    axs3[0].grid(linewidth=0.2)
+    axs3[0].ylim=[-45.,45.]
+    axs3[0].xlim=[360-NH3LonLims[0],360-NH3LonLims[1]]
+    axs3[0].set_xticks(np.linspace(450,0,31), minor=False)
+    xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
+    axs3[0].set_xticklabels(xticklabels.astype(int))
+    axs3[0].set_yticks(np.linspace(-45,45,7), minor=False)
+    axs3[0].tick_params(axis='both', which='major', labelsize=9)
+    axs3[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
+    axs3[0].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
+    axs3[0].set_title("PCloud and fNH3 (contours)",fontsize=10)
+
+    axs3[0].set_adjustable('box') 
+    axs3[1].set_adjustable('box') 
+
+    #Pcloud_patch,vn,vx,tx=plot_patch(PClouddata,LatLims,NH3LonLims,
+    #                                 PCldPlotCM,LonRng,"jet",
+    #                                 axs2[0],'%3.2f',cont=False,
+    #                                 cbar_reverse=True,vn=400,vx=900,n=6)
+    Pcloud_patch,vn,vx,tx=plot_patch(TestPCloud,LatLims,NH3LonLims,
+                                     PCldPlotCM,LonRng,"Greys",
+                                     axs3[0],'%3.2f',cont=False,
+                                     cbar_reverse=True,vn=400,vx=900,n=6)
+    temp=RL.make_contours_CH4_patch(axs3[0],fNH3_patch_mb,LatLims,NH3LonLims,
+                           tx_fNH3,frmt='%3.0f',clr='b')
+
+    if coef[0]==0.0:
+        correction='_C0'
+    else:
+        correction='_C1'
+    fn=PCloudhdr["FILENAME"][:-5]+correction+'_Sys'+LonSys+'_N'+\
+                str(90-LatLims[0])+'-S'+str(LatLims[1]-90)+\
+                '_Lon'+str(NH3LonLims[0]).zfill(3)+'-'+str(NH3LonLims[1]).zfill(3)+'.png'
+
+    #fig2.savefig(pathmapplots+fn,dpi=300)
     fn=fNH3hdr["FILENAME"][:-12]+'Scat_'+fNH3hdr["FILENAME"][-7:-5]+\
                 correction+'_Sys'+LonSys+'_N'+\
                 str(90-LatLims[0])+'-S'+str(LatLims[1]-90)+\
                 '_Lon'+str(NH3LonLims[0]).zfill(3)+'-'+str(NH3LonLims[1]).zfill(3)+'.png'
-    plot_scatter(Pcloud_patch,fNH3_patch_mb,pathmapplots,fn,obskey,fNH3PlotCM,
-                 LatLims)
+    plot_scatter(Pcloud_patch,fNH3_patch_mb,obskey,fNH3PlotCM,
+                 LatLims,axs3[1])
+    axs3[1].tick_params(axis='both', which='major', labelsize=9)
+    
+    axs3[1].set_title("fNH3 versus PCloud",fontsize=10)
+
+    box = axs3[1].get_position()
+    axs3[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 0.5, box.height * 1.015])    
+    fig3.subplots_adjust(left=0.12, right=0.97, top=0.83, bottom=0.18, 
+                         wspace=0.4)
+    fig3.savefig(pathmapplots+fn,dpi=300)
 
     return()
 
@@ -370,10 +421,12 @@ def plot_patch(fullmap,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
     cbar.ax.tick_params(labelsize=6,color="k")#if iSession >1:
     if cbar_reverse:
         cbar.ax.invert_yaxis()
+    if colorscale=="Greys":
+        cbar.set_label('Cloud Top Pressure (mb)',fontsize=7)
 
     return patch,vn,vx,tx
 
-def plot_scatter(patch1,patch2,filepath,fn,obskey,Real_CM2,LatLims):
+def plot_scatter(patch1,patch2,obskey,Real_CM2,LatLims,axscor):
     import pylab as pl
     import numpy as np
     import copy
@@ -396,8 +449,8 @@ def plot_scatter(patch1,patch2,filepath,fn,obskey,Real_CM2,LatLims):
     BZkeys=BZ.keys()
     #patch1=patch1*1000.
 
-    figcor,axscor=pl.subplots(1,1,figsize=(6.0,4.), dpi=150, facecolor="white",
-                        sharey=True,sharex=True)          
+    #figcor,axscor=pl.subplots(1,1,figsize=(6.0,4.), dpi=150, facecolor="white",
+    #                    sharey=True,sharex=True)          
 
     for key in BZ.keys():
         #print(key,BZ[key],[90,90]-np.array(BZ[key]),LatLims)
@@ -420,29 +473,12 @@ def plot_scatter(patch1,patch2,filepath,fn,obskey,Real_CM2,LatLims):
                            patch2[BZind[key][1]:BZind[key][0],:],
                            marker="o",s=2.0,
                            alpha=0.8,label=key)
-
-    #print(patch1.shape,patch2.shape)
-    #axscor.scatter(patch1,patch2,marker="o",s=0.5,edgecolor='C0',alpha=0.7,label="Other")
-    """axscor.scatter(patch1[0:6,:],patch2[0:6,:],marker="o",s=5.0,color='C1',alpha=0.8,label="NTB")
-    axscor.scatter(patch1[7:13,:],patch2[7:13,:],marker="o",s=5.0,color='C2',alpha=0.8,label="NTrZ")
-    axscor.scatter(patch1[14:22,:],patch2[14:22,:],marker="o",s=5.0,color='C3',alpha=0.8,label="NEB")
-    axscor.scatter(patch1[23:29,:],patch2[23:29,:],marker="o",s=5.0,color='C4',alpha=0.8,label="NEZ")
-    axscor.scatter(patch1[30:36,:],patch2[30:36,:],marker="o",s=5.0,color='C5',alpha=0.8,label="SEZ")
-    axscor.scatter(patch1[37:45,:],patch2[37:45,:],marker="o",s=5.0,color='C6',alpha=0.8,label="SEB")"""
-    #axscor.set_title("Scatter Plot")
      
     axscor.grid(linewidth=0.2)
-    axscor.set_xlim(700.,1100.)
-    axscor.set_ylim(70.,160)
-    #axscor.set_xticks(np.linspace(-45.,45.,7), minor=False)
-    #axscor.set_yticks(np.linspace(0.0,1.0,6), minor=False)
-    #axscor.tick_params(axis='both', which='major', labelsize=8)
+    axscor.set_xlim(400.,1000.)
+    axscor.set_ylim(50.,150)
     axscor.set_xlabel("Effective Cloud-top Pressure (mb)",fontsize=10)
     axscor.set_ylabel("Ammonia Mole Fraction (ppm)",fontsize=10)
-    axscor.set_title("Distribution of Ammonia vs Cloud-Top Pressure")
-    axscor.legend(fontsize=9)
-    
-    figcor.subplots_adjust(left=0.12, right=0.97, top=0.93, bottom=0.11)
-    figcor.savefig(filepath+fn,dpi=300)
+    axscor.legend(fontsize=7)
   
 
