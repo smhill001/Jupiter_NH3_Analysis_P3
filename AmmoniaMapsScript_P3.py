@@ -62,8 +62,8 @@ def AmmoniaMapsScript_P3(reference,Level='L3'):
             elif Level=='plots':
                 MapJup.Map_Jup_Atm_2022_P3(obskey=dataset,imagetype='Map',
                                            Smoothing=False,LatLims=[45,135],LonRng=45,
-                                           CMpref='subobs',LonSys='1',showbands=False,
-                                           coef=[0.0,0.0],subproj='Dark Features')
+                                           CMpref='subobs',LonSys='3',showbands=False,
+                                           coef=[0.0,0.0],subproj='')
             Frst=False
                 
     else:
