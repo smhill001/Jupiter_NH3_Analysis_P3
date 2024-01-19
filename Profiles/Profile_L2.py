@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-def Profile_L2(band="CH4",profile="Meridional",ProfileHalfWidth=45,
+def Profile_L2(band="NH3",profile="Meridional",ProfileHalfWidth=45,
                LatPlotLims=[30,150],ZonePlotHalfWidth=45,smooth=False):
     """
     Created on Thu Sep  7 11:17:51 2023
@@ -56,13 +56,13 @@ def Profile_L2(band="CH4",profile="Meridional",ProfileHalfWidth=45,
             axsavgprof.plot(CMOS2021EW[:,0],CMOS2021EW[:,1],color="b",linewidth=1.0,
                             label="SCT 2021")
     
-    LatsSCT22,OutProSCT22,OutStdSCT22=PTG.plot_profile_L2(axsavgprof,"SCT 2022",ProfileHalfWidth=ProfileHalfWidth,
+    LatsSCT22,OutProSCT22,OutStdSCT22=PTG.plot_profile_L2(axsavgprof,"2022 CMOS",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='k',width=1.5,band=band,smooth=smooth)
-    LatsVLT22,OutProVLT22,OutStdVLT22=PTG.plot_profile_L2(axsavgprof,"VLTMUSE 2022",ProfileHalfWidth=ProfileHalfWidth,
+    LatsVLT22,OutProVLT22,OutStdVLT22=PTG.plot_profile_L2(axsavgprof,"2022 VLTMUSE",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='k',width=1.5,band=band,style='dashed',smooth=smooth)
-    LatsSCT23,OutProSCT23,OutStdSCT23=PTG.plot_profile_L2(axsavgprof,"SCT 2023",ProfileHalfWidth=ProfileHalfWidth,
+    LatsSCT23,OutProSCT23,OutStdSCT23=PTG.plot_profile_L2(axsavgprof,"2023 CMOS",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='r',width=1.5,band=band,smooth=smooth)
     

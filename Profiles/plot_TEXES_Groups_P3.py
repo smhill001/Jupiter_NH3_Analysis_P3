@@ -176,9 +176,9 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
 
     pth="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/"
 
-    Trans2EW={"VLT":{"EW_slope":{"NH3":-12.15343491,"CH4":-12.74115968},
+    Trans2EW={"VLTMUSE":{"EW_slope":{"NH3":-12.15343491,"CH4":-12.74115968},
                      "EW_const":{"NH3":12.15195684,"CH4":12.73323535}},
-              "SCT":{"EW_slope":{"NH3":-12.87087479,"CH4":-13.52007859},
+              "CMOS":{"EW_slope":{"NH3":-12.87087479,"CH4":-13.52007859},
                      "EW_const":{"NH3":12.86940675,"CH4":13.51315382}}}
 
     if profile=="Meridional":
@@ -220,11 +220,11 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
                                                 ProfileHalfWidth=ProfileHalfWidth,
                                                 profile=profile)
         #print(Lats.shape,AvgProf.shape,StdProf.shape)
-        print("@@@@@@@@@@@@reference[0:3]]=",Trans2EW[reference[0:3]])
-        Avg_EW=Trans2EW[reference[0:3]]["EW_slope"][band]*AvgProf+\
-            Trans2EW[reference[0:3]]["EW_const"][band]
-        Std_EW=Trans2EW[reference[0:3]]["EW_slope"][band]*AvgProf+\
-            Trans2EW[reference[0:3]]["EW_const"][band]
+        print("@@@@@@@@@@@@reference[5:]]=",Trans2EW[reference[5:]])
+        Avg_EW=Trans2EW[reference[5:]]["EW_slope"][band]*AvgProf+\
+            Trans2EW[reference[5:]]["EW_const"][band]
+        Std_EW=Trans2EW[reference[5:]]["EW_slope"][band]*AvgProf+\
+            Trans2EW[reference[5:]]["EW_const"][band]
 
         if First and profile=="Meridional":
             AvgArr=Avg_EW
@@ -243,7 +243,7 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
         #    lbl=file[5:17]+" "+sourcefiles[dataset]['Metadata']['Variation']
         #except:
         #    lbl=file[5:17]
-        axsspaghetti.plot(Lats,Avg_EW,linewidth=0.5,label=file[5:20])
+        axsspaghetti.plot(Lats,Avg_EW,linewidth=0.5,label=file[5:17])
         
     AvgPro=np.mean(AvgArr[:,:],axis=0)
     AvgStd=np.std(AvgArr[:,:],axis=0)
@@ -264,7 +264,7 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
     axsspaghetti.set_ylabel("Equivalent Width EW (nm)",fontsize=10)
     axsspaghetti.grid(linewidth=0.2)
 
-    axsspaghetti.legend(fontsize=6,ncol=3)
+    axsspaghetti.legend(fontsize=6,ncol=5)
     axsspaghetti.set_xlabel(xlabel,fontsize=10)
 
     if smooth:
@@ -288,8 +288,8 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
     figspaghetti.savefig(path+"Analysis Data/Profiles/Profile_"+reference+"_"+band+"_"+profile+"_Absorption.png",dpi=300)  
 
 
-    print(Trans2EW["SCT"]["EW_slope"]["NH3"]*0.97+\
-        Trans2EW["SCT"]["EW_const"]["NH3"])
+    print(Trans2EW["CMOS"]["EW_slope"]["NH3"]*0.97+\
+        Trans2EW["CMOS"]["EW_const"]["NH3"])
     return(Lats,AvgPro,AvgStd)
 
 def plot_profile_L3(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
@@ -443,7 +443,7 @@ def plot_profile_L3(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
     elif param=="fNH3":
         axsspaghetti.set_ylim(0,200)
         axsspaghetti.set_ylabel("Column-Average Ammonia Abundance (ppm)",fontsize=10)
-    axsspaghetti.legend(fontsize=6,ncol=3)
+    axsspaghetti.legend(fontsize=6,ncol=5)
     axsspaghetti.set_title(reference)
     axsspaghetti.grid(linewidth=0.2)
 

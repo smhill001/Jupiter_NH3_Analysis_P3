@@ -413,6 +413,21 @@ def get_L2_abs_data(writecsv=False,writejson=False):
                                             'CH4file':'2023-11-28-0426_7','CH4Qual':True,
                                             'NH3file':'2023-11-28-0426_7','NH3Qual':True,
                                             'RGBfile':'2023-11-28-0438_9-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                 '20231129UTa_Map':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                             'Seeing':'7/10','Transparency':'9/10', 
+                                            'CH4file':'2023-11-29-0315_8','CH4Qual':True,
+                                            'NH3file':'2023-11-29-0315_8','NH3Qual':True,
+                                            'RGBfile':'2023-11-29-0330_5-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                 '20231129UTb_Map':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                             'Seeing':'7/10','Transparency':'9/10', 
+                                            'CH4file':'2023-11-29-0344_9','CH4Qual':True,
+                                            'NH3file':'2023-11-29-0344_9','NH3Qual':True,
+                                            'RGBfile':'2023-11-29-0358_9-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                 '20231129UTc_Map':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                             'Seeing':'7/10','Transparency':'9/10', 
+                                            'CH4file':'2023-11-29-0412_6','CH4Qual':True,
+                                            'NH3file':'2023-11-29-0412_6','NH3Qual':True,
+                                            'RGBfile':'2023-11-29-0432_7-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
 
                  ###Perturbation Study
                  '20220919UTc_Map':{'Telescope':'VLT','FL':'5600mm','Camera':'ASI120MM',
@@ -438,13 +453,13 @@ def get_L2_abs_data(writecsv=False,writejson=False):
                  
                  }
 
-    
+    """
     if writejson:
         filename="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/L2FITS.json"
         with open(filename, "w") as fp:
             json.dump(sourcefiles , fp) 
     print("TEST0")
-
+    
     if writecsv:
         filename="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/L2FITS.csv"
     
@@ -511,5 +526,5 @@ def get_L2_abs_data(writecsv=False,writejson=False):
         axs[2].step(bincenters, histCM3)
         
         ascii.write(t,filename,format='basic',overwrite=True,delimiter=',')
-        
+        """
     return(sourcefiles)

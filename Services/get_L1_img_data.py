@@ -739,6 +739,24 @@ def get_L1_img_data():
                                'NH3file':'2023-11-28-0426_7-Jupiter_R656G647B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
                                'RGBfile':'2023-11-28-0438_9-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV_CM2_L360_MAP-BARE.png'},
                   
+                  '20231129UTa_Map':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'7/10','Transparency':'9/10', 
+                               'CH4file':'2023-11-29-0315_8-Jupiter_R656G620B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
+                               'NH3file':'2023-11-29-0315_8-Jupiter_R656G647B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
+                               'RGBfile':'2023-11-29-0330_5-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV_CM2_L360_MAP-BARE.png'},
+                  
+                  '20231129UTb_Map':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'7/10','Transparency':'9/10', 
+                               'CH4file':'2023-11-29-0344_9-Jupiter_R656G620B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
+                               'NH3file':'2023-11-29-0344_9-Jupiter_R656G647B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
+                               'RGBfile':'2023-11-29-0358_9-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV_CM2_L360_MAP-BARE.png'},
+                  
+                  '20231129UTc_Map':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'7/10','Transparency':'9/10', 
+                               'CH4file':'2023-11-29-0412_6-Jupiter_R656G620B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
+                               'NH3file':'2023-11-29-0412_6-Jupiter_R656G647B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
+                               'RGBfile':'2023-11-29-0432_7-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV_CM2_L360_MAP-BARE.png'},
+                  
                   #Begin Variations on VLT data
                   
                   '20220919UTc_Map':{'Telescope':'VLT','FL':'5600mm','Camera':'ASI120MM',

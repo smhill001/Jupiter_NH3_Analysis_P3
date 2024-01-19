@@ -14,6 +14,7 @@ def nez_analysis():
     import csv
     import numpy as np
     import pylab as pl
+    from scipy.stats import gaussian_kde
     
     path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/NEZ/"
     
@@ -24,16 +25,17 @@ def nez_analysis():
     # CH4 DEEP CLOUDS.
     ###########################################################################
     fn="Hill_ammonia_mea.CSV"
+    #Set up empty lists
     #CH4 deep cloud locations
-    lsCH4rec=[]
-    lsCH4obs=[]
-    lsCH4lon=[]
-    lsCH4lat=[]
+    CH4rec=[] #Record number
+    CH4obs=[] #Observation date (UT)
+    CH4lon=[] #System 1 Longitude
+    CH4lat=[] #Planetographic Latitude
     #NH3 enhancement locations
-    lsNH3rec=[]
-    lsNH3obs=[]
-    lsNH3lon=[]
-    lsNH3lat=[]
+    NH3rec=[] #Record number
+    NH3obs=[] #Observation date (UT)
+    NH3lon=[] #System 1 Longitude
+    NH3lat=[] #Planetographic Latitude
     
     with open(path+fn) as csv_file:
         csv_reader = csv.DictReader(csv_file)
@@ -44,32 +46,28 @@ def nez_analysis():
                 line_count += 1
             #print(f'\t{row["REC_NO"]} works in the {row["OBJECT"]} department, and was born in {row["REGION"]}.')
             if row["OBJECT"]=="DC1_SPOT":
-                lsCH4rec.append(row["REC_NO"])
-                lsCH4obs.append(row["DATE"])
-                lsCH4lon.append(float(row["LONG_1"]))
-                lsCH4lat.append(float(row["LAT"]))
+                CH4rec.append(row["REC_NO"])
+                CH4obs.append(row["DATE"])
+                CH4lon.append(float(row["LONG_1"]))
+                CH4lat.append(float(row["LAT"]))
             if row["OBJECT"]=="WC1_SPOT":
-                lsNH3rec.append(row["REC_NO"])
-                lsNH3obs.append(row["DATE"])
-                lsNH3lon.append(float(row["LONG_1"]))
-                lsNH3lat.append(float(row["LAT"]))
+                NH3rec.append(row["REC_NO"])
+                NH3obs.append(row["DATE"])
+                NH3lon.append(float(row["LONG_1"]))
+                NH3lat.append(float(row["LAT"]))
             line_count += 1
     print(f'Processed {line_count} lines.')
     
     ###########################################################################
-    # READ IN HILL MEASUREMENTS (DATE,LON,LAT) OF NH3 ENHANCEMENTS AND
-    # CH4 DEEP CLOUDS.
+    # READ IN WINJupos MEASUREMENTS (DATE,LON,LAT) OF DARK PROJECTIONS 
+    # (AND FESTOONS?)
     ###########################################################################
     
-    #WINJupos measurer PROJection locations
-    lsPRJrec=[]
-    lsPRJobs=[]
-    lsPRJlon=[]
-    lsPRJlat=[]
-    lsPRJdlon=[]
-    lsPRJlonsel=[]
-    lsPRJdlonsel=[]
-    lsPRJlatsel=[]
+    #WINJupos measurer PROJections - all locations
+    PRJrec=[] #Record number
+    PRJobs=[] #Observation date (UT)
+    PRJlon=[] #System 1 Longitude
+    PRJlat=[] #Planetographic Latitude
     
     fn="DC_PROJ_2022-23_sel.CSV"
     with open(path+fn) as csv_file:
@@ -80,15 +78,15 @@ def nez_analysis():
                 print(f'Column names are {", ".join(row)}')
                 line_count += 1
             if "PROJ" in row["OBJECT"]: #=="DC1_PROJ":
-                lsPRJrec.append(row["REC_NO"])
-                lsPRJobs.append(row["DATE"])
-                lsPRJlon.append(float(row["LONG_1"]))
-                lsPRJlat.append(float(row["LAT"]))
+                PRJrec.append(row["REC_NO"])
+                PRJobs.append(row["DATE"])
+                PRJlon.append(float(row["LONG_1"]))
+                PRJlat.append(float(row["LAT"]))
             line_count += 1
 
     print(f'Processed {line_count} lines.')
     
-    #print(lsPRJobs)
+    #print(PRJobs)
     
     ###########################################################################
     # LOOP OVER NH3 ENHANCEMENT MEASUREMENTS TO FIND *ALL* CH4 DEEP CLOUD
@@ -96,111 +94,168 @@ def nez_analysis():
     # FIND THE *ONE* THAT IS THE CLOSEST IN LONGITUDE TO THE SELECTED
     # NH3 ENHANCEMENT.
     ###########################################################################
-    lsNH3dobs=[]    #list of NH3 obs dates with corresponding CH4 obs
-    lsNH3dlon=[]    #list of corresponding delta longidutes (NH3lon-CH4lon)
-    lsNH3dlat=[]    #list of corresponding delta latitudes (NH3lat-CH4lat)
-    lsCH4latSel=[]  #list of CH4 latitudes that have corresponding NH3
+    NH3dobs=[]    #list of NH3 obs dates with corresponding CH4 obs
+    NH3dlon=[]    #list of corresponding delta longidutes (NH3lon-CH4lon)
+    NH3dlat=[]    #list of corresponding delta latitudes (NH3lat-CH4lat)
+    CH4latSel=[]  #list of CH4 latitudes that have corresponding NH3
                     #enhancements (for determining mean CH4 latitude)
-                    
-    for j in range(0,len(lsNH3obs)):
+
+    PRJdlon=[]    #Relative Long to mean CH4 Deep Cloud
+    PRJlonsel=[]  #Long of Dark Projections on same UT dates as CH4 Deep Cloud
+    PRJdlonsel=[] #Relative Long to mean CH4 Deep Cloud on same UT dates as CH4  
+    PRJlatsel=[]  #Lat of Dark Projections on same UT dates as CH4 Deep Cloud
+                        
+    for j in range(0,len(NH3obs)):
         #Get set of indices for the CH4 records with the same UT dates 
         #  (not times) as the current (jth) NH3 enhancement. With multiple
         #  NH3 enhancements on a given date, the set of 'matching' CH4
         #  records can be repeated multiple times.
-        #print("j,lsNH3obs[j]=",j,lsNH3obs[j],lsNH3lon[j])
-        indices=[i for i, e in enumerate(lsCH4obs) if e == lsNH3obs[j]]
-        #print(lsNH33obs[j],indices[:],np.take(lsCH4lon,indices),)
-        #compute the closest CH4 DR in longitude and the index of that value 
-        closesti=np.argmin(np.abs(lsNH3lon[j]-np.take(lsCH4lon,indices)))
-        #print(closesti,np.take(lsCH4lon,indices[closesti]))
-        CH4darklon=np.take(lsCH4lon,indices[closesti])
-        dlonmin=lsNH3lon[j]-np.take(lsCH4lon,indices[closesti])
+        #print("j,NH3obs[j]=",j,NH3obs[j],NH3lon[j])
+        indices=[i for i, e in enumerate(CH4obs) if e == NH3obs[j]]
+        #print(NH33obs[j],indices[:],np.take(CH4lon,indices),)
+        #compute the index of CH4 deep cloud closest in longitude to the
+        # jth NH3 enhancement
+        closesti=np.argmin(np.abs(NH3lon[j]-np.take(CH4lon,indices)))
+        #print(closesti,np.take(CH4lon,indices[closesti]))
+        CH4darklon=np.take(CH4lon,indices[closesti])
+        CH4darklat=np.take(CH4lat,indices[closesti])
+        #dlonmin=NH3lon[j]-np.take(CH4lon,indices[closesti])
+        dlonmin=NH3lon[j]-CH4darklon
         #print(dlonmin)
-        #Filter for CH4 DFs within 10 deg lon of the NH3 enhancement and compute
+        
+        #Filter for CH4 DFs within 15 deg lon of the NH3 enhancement and compute
         #proper sign for dlons that are over 180 deg
-        if np.abs(dlonmin)<15:
+        if np.abs(dlonmin)<135:
             if dlonmin<180:
-                lsNH3dlon.append(dlonmin)
+                NH3dlon.append(dlonmin)
             if dlonmin>=180:
-                lsNH3dlon.append(dlonmin-360.)
-            #lsNH3dobs.append(lsNH3obs[j])
+                NH3dlon.append(dlonmin-360.)
+            #NH3dobs.append(NH3obs[j])
             #Save the differential NH3-CH4 latitude along with the latitude
             # of the CH4 deep cloud spot (for later averaging)
-            lsNH3dlat.append(lsNH3lat[j]-np.take(lsCH4lat,indices[closesti]))
-            lsCH4latSel.append(np.take(lsCH4lat,indices[closesti]))
+            NH3dlat.append(NH3lat[j]-CH4darklat)
+            CH4latSel.append(CH4darklat)
 
             #print("match")
-            #print("NH3obs,NH3lon,CH4lon,dlon=",lsNH3obs[j],lsNH3lon[j],np.take(lsCH4lon,indices[closesti]),dlonmin)
+            #print("NH3obs,NH3lon,CH4lon,dlon=",NH3obs[j],NH3lon[j],np.take(CH4lon,indices[closesti]),dlonmin)
             
         #print()
-#REPEAT FOR WINJUPOS PROJs
-        indicesPRJ=[i for i, e in enumerate(lsPRJobs) if e == lsNH3obs[j]]
-        #print(j,lsNH3obs[j])
+        
+        #Get set of indices for the CH4 records with the same UT dates 
+        #  (not times) as the current (jth) NH3 enhancement. With multiple
+        #  NH3 enhancements on a given date, the set of 'matching' CH4
+        #  records can be repeated multiple times.
+        indicesPRJ=[i for i, e in enumerate(PRJobs) if e == NH3obs[j]]
         #if isinstance(indicesPRJ, list): 
-            #print(lsPRJobs)
+            #print(PRJobs)
         #compute the closest CH4 DR in longitude and the index of that value 
-        #closest=np.min(np.abs(lsNH3lon[j]-np.take(lsCH4lon,indices)))
-        #print("j,lsNH3obs[j]=",j,lsNH3obs[j],lsNH3lon[j])
-        #print(indicesPRJ[:],np.take(lsPRJobs,indicesPRJ),
-        #      np.take(lsPRJlon,indicesPRJ))
+        #closest=np.min(np.abs(NH3lon[j]-np.take(CH4lon,indices)))
+        #print("j,NH3obs[j]=",j,NH3obs[j],NH3lon[j])
+        #print(indicesPRJ[:],np.take(PRJobs,indicesPRJ),
+        #      np.take(PRJlon,indicesPRJ))
         # Load all Sys 1 longitude for PROJs on the given NH3obs date
-        lsPRJlonsel.append(np.take(lsPRJlon,indicesPRJ))
+        PRJlonsel.append(np.take(PRJlon,indicesPRJ))
         # Load all differential longitudes for PROJs on the given NH3obs date
-        lsPRJdlonsel.append(np.take(lsPRJlon,indicesPRJ)-CH4darklon)
+        PRJdlonsel.append(np.take(PRJlon,indicesPRJ)-CH4darklon)
                      # Load all PG latitudes for PROJs on the given NH3obs day
-        lsPRJlatsel.append(np.take(lsPRJlat,indicesPRJ))
+        PRJlatsel.append(np.take(PRJlat,indicesPRJ))
+        print(j,NH3obs[j],len(indicesPRJ),)
+
+        #!!! I THINK I MAY NEED TO DO A SEPARATE LOOP HERE SINCE I NEED
+        #!!! THE PROJECTIONS LOCATIONS RELATIVE TO THE CH4 HOLES, NOT
+        #!!! RELATIVE TO THE NH3 ENHANCEMENTS. EITHER THAT OR I NEED OT ADD
+        #!!! AN OFFSET FOR THE DIFFERENCE IN THE MEAN NH3 POSITION VERSUS.
+        #!!! I ALSO DON'T SEEM TO ACCOUNT FOR THE MODULO 360 AT ALL HERE
+        #!!! WHEREAS I DO FOR THE NH3-CH4 DIFFERENCE.
     
-    lsPRJlatsel=np.array(np.concatenate(lsPRJlatsel, axis=0 ))
-    lsPRJlonsel=np.array(np.concatenate(lsPRJlonsel, axis=0 ))
-    lsPRJdlonsel=np.array(np.concatenate(lsPRJdlonsel, axis=0 ))
+    CH4lon=np.array(CH4lon)
+    CH4lat=np.array(CH4lat)
+    NH3lon=np.array(NH3lon)
+    NH3lat=np.array(NH3lat)
+
+    PRJlatsel=np.array(np.concatenate(PRJlatsel, axis=0 ))
+    PRJlonsel=np.array(np.concatenate(PRJlonsel, axis=0 ))
+    PRJdlonsel=np.array(np.concatenate(PRJdlonsel, axis=0 ))
+    print("PRJlonsel[0:2],PRJdlonsel[0:2]=",PRJlonsel[0:2],PRJdlonsel[0:2])
+    PRJdlonsel[np.where(np.abs(PRJdlonsel)>180.)]=360.-PRJdlonsel[np.where(np.abs(PRJdlonsel)>180.)]
+    #PRJdlon=PRJdlon(np.where(np.abs(PRJdlon)<=10.))
+    #PRJlatsel=PRJdlon(np.where(np.abs(PRJdlon)<=10.))
     
-    #lsPRJdlon=lsPRJdlon(np.where(np.abs(lsPRJdlon)<=10.))
-    #lsPRJlatsel=lsPRJdlon(np.where(np.abs(lsPRJdlon)<=10.))
-    
-    #lsPRJdlon=np.concatenate( lsPRJdlon, axis=0 )
+    #PRJdlon=np.concatenate( PRJdlon, axis=0 )
     print()
-    print(np.mean(lsNH3dlon),np.std(lsNH3dlon))
-    print(np.mean(lsNH3dlat),np.std(lsNH3dlat))
-    #print(np.mean(lsPRJdlonsel),np.std(lsPRJdlonsel))
-    #print(np.mean(lsPRJlatsel),np.std(lsPRJlatsel))
+    print("Mean and STD NH3 delta long=",np.mean(NH3dlon),np.std(NH3dlon))
+    print("Mean and STD NH3 delta lat=",np.mean(NH3dlat),np.std(NH3dlat))
+    #print(np.mean(PRJdlonsel),np.std(PRJdlonsel))
+    #print(np.mean(PRJlatsel),np.std(PRJlatsel))
     ###############################################################################
     # CREATE Plot 0: PG Latitude vs System 1 Longitude
     ###############################################################################        
     fig1,axs1=pl.subplots(2,1,figsize=(6.0,6.0), dpi=150, facecolor="white")
     fig1.suptitle("Relative Positions of NH3 Enhancement and 'Hot Spots'")
-    axs1[0].set_title('From '+str(lsNH3obs[0])+' to '+str(lsNH3obs[len(lsNH3obs)-1]))
-    axs1[0].scatter(np.array(lsCH4lon),np.array(lsCH4lat),color='C0',s=5)
-    axs1[0].scatter(np.array(lsNH3lon),np.array(lsNH3lat),color='C1',s=5)
-    #print(np.array(lsPRJlon).shape,np.array(lsPRJlat).shape)
-    #axs1[0].scatter(np.array(lsPRJlon),np.array(lsPRJlat),color='0.5',s=0.5)
-    axs1[0].scatter(np.array(lsPRJlonsel),np.array(lsPRJlatsel),color='k',s=2)
+    axs1[0].set_title('From '+str(NH3obs[0])+' to '+str(NH3obs[len(NH3obs)-1]))
+    axs1[0].scatter(CH4lon,CH4lat,color='C0',s=5)
+    axs1[0].scatter(NH3lon,NH3lat,color='C1',s=5)
+    #print(np.array(PRJlon).shape,np.array(PRJlat).shape)
+    #axs1[0].scatter(np.array(PRJlon),np.array(PRJlat),color='0.5',s=0.5)
+    axs1[0].scatter(PRJlonsel,PRJlatsel,color='k',s=2)
     axs1[0].set_xlim(0,360)
     axs1[0].set_ylim(0,10)
     axs1[0].set_xlabel("System 1 Longitude (deg)")
     axs1[0].set_ylabel("PG Latitude (deg)")
-    #print(np.array(lsNH3dlon).shape,np.array(lsNH3dlat).shape)
+    #print(np.array(NH3dlon).shape,np.array(NH3dlat).shape)
     
     ###############################################################################
     # CREATE Plot 1: PG Latitude vs Differential Longitude
     ###############################################################################        
-    axs1[1].scatter(np.array([0.0]),np.mean(np.array(lsCH4latSel)),color='C0',s=50,
-                    alpha=0.5)
-    axs1[1].scatter(np.mean(np.array(lsNH3dlon)),np.mean(np.array(lsNH3lat)),color='C1',s=50,
-                    alpha=0.5)
-    axs1[1].scatter(np.array(lsNH3dlon),np.array(lsNH3dlat)+np.mean(np.array(lsCH4latSel)),color='C1',s=5)
-    #axs1[1].scatter(np.array(lsPRJdlonsel),np.array(lsPRJlatsel),color='k',s=2)
-    print(np.array(lsPRJdlon).shape,np.array(lsPRJlat).shape)
+
     
-    lsPRJdlonsela=lsPRJdlonsel[np.where(np.abs(lsPRJdlonsel)<=10.)]
-    lsPRJlatsela=lsPRJlatsel[np.where(np.abs(lsPRJdlonsel)<=10.)]
-    #axs1[1].scatter(np.array(lsPRJdlon),np.array(lsPRJlat),color='k',s=0.5)
-    axs1[1].scatter(np.array(lsPRJdlonsela),np.array(lsPRJlatsela),color='k',s=2)
-    axs1[1].scatter(np.mean(lsPRJdlonsela),np.mean(lsPRJlatsela),color='k',s=50,
+    ############
+    x=np.array(NH3dlon)
+    y=np.array(NH3dlat)+np.mean(np.array(CH4latSel))
+    heatmap, xedges, yedges = np.histogram2d(x,y,bins=(20,10))
+    extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
+    #axs1[1].imshow(heatmap.T, extent=extent, origin='lower',cmap='gist_heat_r')
+    ############
+    nbins = 20
+    k = gaussian_kde([x,y])
+    xi, yi = np.mgrid[x.min():x.max():nbins*1j, y.min():y.max():nbins*1j]
+    zi = k(np.vstack([xi.flatten(), yi.flatten()]))
+    #axs1[1].set_title('Calculate Gaussian KDE')
+    #axs1[1].pcolormesh(xi, yi, zi.reshape(xi.shape), cmap='gist_heat_r')
+    axs1[1].pcolormesh(xi, yi, zi.reshape(xi.shape), shading='gouraud', cmap='gist_heat_r')
+    #axs1[1].contour(xi, yi, zi.reshape(xi.shape) )
+
+
+    axs1[1].scatter(np.array([0.0]),np.mean(np.array(CH4latSel)),color='C0',s=50,
                     alpha=0.5)
-    axs1[1].set_xlim(-15,15)
+    axs1[1].scatter(np.mean(np.array(NH3dlon)),np.mean(np.array(NH3lat)),color='C1',s=50,
+                    alpha=0.5)
+    axs1[1].scatter(np.array(NH3dlon),np.array(NH3dlat)+np.mean(np.array(CH4latSel)),color='C1',s=5)
+    #axs1[1].scatter(np.array(PRJdlonsel),np.array(PRJlatsel),color='k',s=2)
+    
+    PRJdlonsela=PRJdlonsel[np.where(np.abs(PRJdlonsel)<=135.)]
+    PRJlatsela=PRJlatsel[np.where(np.abs(PRJdlonsel)<=135.)]
+    #axs1[1].scatter(np.array(PRJdlon),np.array(PRJlat),color='k',s=0.5)
+    axs1[1].scatter(np.array(PRJdlonsela),np.array(PRJlatsela),color='k',s=2)
+    axs1[1].scatter(np.array(PRJlonsel),np.array(PRJlatsel),color='r',s=2)
+    axs1[1].scatter(np.mean(PRJdlonsela),np.mean(PRJlatsela),color='k',s=50,
+                    alpha=0.5)
+    axs1[1].set_xlim(-135,135)
     axs1[1].invert_xaxis()
     axs1[1].set_ylim(0,10)
     axs1[1].set_xlabel("System 1 Longitude Offset (deg)")
     axs1[1].set_ylabel("PG Latitude (deg)")
     
+    print()
+    print("np.array(PRJdlon).shape,np.array(PRJlat).shape",
+          np.array(PRJdlon).shape,np.array(PRJlat).shape)
+    print()
+    print("np.array(PRJdlonsel).shape,np.array(PRJlatsel).shape",
+          np.array(PRJdlonsel).shape,np.array(PRJlatsel).shape)
+    print()
+    print("np.array(PRJdlonsela).shape,np.array(PRJlatsela).shape",
+          np.array(PRJdlonsela).shape,np.array(PRJlatsela).shape)
+
     fig1.savefig(path+'nez_analysis.png',dpi=300)
+    
+    

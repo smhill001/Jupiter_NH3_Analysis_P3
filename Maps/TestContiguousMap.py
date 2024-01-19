@@ -40,10 +40,10 @@ def TestContiguousMap():
     outputfNH3=np.zeros([180,360])
     outputPCloud=np.zeros([180,360])
     
-    for obsdate in dataset:
-        print("*******obsdate=",obsdate)
+    for obskey in dataset:
+        print("*******obsdate=",obskey)
         PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM2= \
-                        RFM.read_fits_map_L2_L3(obsdate=obsdate,
+                        RFM.read_fits_map_L2_L3(obskey=obskey,
                                                 imagetype="Map",Level="L3")
                         
         amfdata=(1.0/sza+1.0/eza)/2.0
@@ -51,8 +51,8 @@ def TestContiguousMap():
         TestPCloud=PClouddata*amfdata**0.25
         print("**********TestfNH3.shape=",TestfNH3.shape)
         
-        ll_0=360-lonlims[obsdate][0]
-        ll_1=360-lonlims[obsdate][1]
+        ll_0=360-lonlims[obskey][0]
+        ll_1=360-lonlims[obskey][1]
         outputfNH3[45:135,ll_1:ll_0]= \
             TestfNH3[45:135,ll_1:ll_0]
         outputPCloud[45:135,ll_1:ll_0]= \

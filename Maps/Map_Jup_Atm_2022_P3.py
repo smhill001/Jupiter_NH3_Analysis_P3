@@ -69,6 +69,10 @@ def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
         fNH3PlotCM=CMpref
         PCldPlotCM=CMpref
     NH3LonLims=[360-int(fNH3PlotCM+LonRng),360-int(fNH3PlotCM-LonRng)]
+    print("#######fNH3PlotCM=",fNH3PlotCM)
+    print("fNH3PlotCM+LonRng,fNH3PlotCM-LonRng=",fNH3PlotCM+LonRng,fNH3PlotCM-LonRng)
+    print("#######NH3LonLims=",NH3LonLims)
+    print("#######360-NH3LonLims=",360-np.array(NH3LonLims))
     if Smoothing:
         smthtitle="Smoothed"
     else: 
@@ -81,7 +85,8 @@ def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
     fig1,axs1=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
     fig1.suptitle(fNH3hdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
-                  +str(int(fNH3PlotCM))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+                  +str(int(fNH3PlotCM))+", Calibration = "+CalModel+
+                  ", Data "+smthtitle,x=0.5,ha='center',color='k')
 
     for ix in range(0,1):
         axs1[ix].grid(linewidth=0.2)
@@ -169,10 +174,14 @@ def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
         correction='_C0'
     else:
         correction='_C1'
-    fn=fNH3hdr["FILENAME"][:-5]+correction+'_Sys'+LonSys+'_N'+\
+    print("360-NH3LonLims[0],360-NH3LonLims[1]=",
+          360-NH3LonLims[0],360-NH3LonLims[1])
+    fnskeleton=correction+'_Sys'+LonSys+'_N'+\
                 str(90-LatLims[0])+'-S'+str(LatLims[1]-90)+\
-                '_Lon'+str(NH3LonLims[0]).zfill(3)+'-'+str(NH3LonLims[1]).zfill(3)+'.png'
-    fig1.savefig(pathmapplots+fn,dpi=300)
+                '_Lon'+str(np.mod(360-NH3LonLims[1],360)).zfill(3)+'-'+\
+                    str(np.mod(360-NH3LonLims[0],360)).zfill(3)+'.png'
+    fnNH3=fNH3hdr["FILENAME"][:-5]+fnskeleton
+    fig1.savefig(pathmapplots+fnNH3,dpi=300)
     
     ###########################################################################
     ## Just RGB and Cloud Pressure
@@ -181,7 +190,8 @@ def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
     fig2,axs2=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
     fig2.suptitle(fNH3hdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
-                  +str(int(PCldPlotCM))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+                  +str(int(PCldPlotCM))+", Calibration = "+CalModel+
+                  ", Data "+smthtitle,x=0.5,ha='center',color='k')
 
     for ix in range(0,1):
         axs2[ix].grid(linewidth=0.2)
@@ -276,11 +286,10 @@ def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
         correction='_C0'
     else:
         correction='_C1'
-    fn=PCloudhdr["FILENAME"][:-5]+correction+'_Sys'+LonSys+'_N'+\
-                str(90-LatLims[0])+'-S'+str(LatLims[1]-90)+\
-                '_Lon'+str(NH3LonLims[0]).zfill(3)+'-'+str(NH3LonLims[1]).zfill(3)+'.png'
+        
+    fnPCld=PCloudhdr["FILENAME"][:-5]+fnskeleton
 
-    fig2.savefig(pathmapplots+fn,dpi=300)
+    fig2.savefig(pathmapplots+fnPCld,dpi=300)
 
     ###########################################################################
     ## Compute Scatter Plot
@@ -319,15 +328,15 @@ def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
         correction='_C0'
     else:
         correction='_C1'
-    fn=PCloudhdr["FILENAME"][:-5]+correction+'_Sys'+LonSys+'_N'+\
-                str(90-LatLims[0])+'-S'+str(LatLims[1]-90)+\
-                '_Lon'+str(NH3LonLims[0]).zfill(3)+'-'+str(NH3LonLims[1]).zfill(3)+'.png'
-
+    
     #fig2.savefig(pathmapplots+fn,dpi=300)
-    fn=fNH3hdr["FILENAME"][:-12]+'Scat_'+fNH3hdr["FILENAME"][-7:-5]+\
-                correction+'_Sys'+LonSys+'_N'+\
-                str(90-LatLims[0])+'-S'+str(LatLims[1]-90)+\
-                '_Lon'+str(NH3LonLims[0]).zfill(3)+'-'+str(NH3LonLims[1]).zfill(3)+'.png'
+    
+    #fnScat=fNH3hdr["FILENAME"][:-12]+'Scat_'+fNH3hdr["FILENAME"][-7:-5]+\
+    #            correction+'_Sys'+LonSys+'_N'+\
+    #            str(90-LatLims[0])+'-S'+str(LatLims[1]-90)+\
+    #            '_Lon'+str(360-NH3LonLims[1]).zfill(3)+'-'+str(360-NH3LonLims[0]).zfill(3)+'.png'
+
+    fnScat=fnNH3.replace('fNH3','Scat')
     plot_scatter(Pcloud_patch,fNH3_patch_mb,obskey,fNH3PlotCM,
                  LatLims,axs3[1])
     axs3[1].tick_params(axis='both', which='major', labelsize=9)
@@ -338,7 +347,7 @@ def Map_Jup_Atm_2022_P3(obskey="20231103UTa",imagetype='Map',
     axs3[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 0.5, box.height * 1.015])    
     fig3.subplots_adjust(left=0.12, right=0.97, top=0.83, bottom=0.18, 
                          wspace=0.4)
-    fig3.savefig(pathmapplots+fn,dpi=300)
+    fig3.savefig(pathmapplots+fnScat,dpi=300)
 
     return()
 
@@ -469,16 +478,17 @@ def plot_scatter(patch1,patch2,obskey,Real_CM2,LatLims,axscor):
         if BZind[key][0]==BZind[key][1]:
             print("do nothing")
         else:
-            axscor.scatter(patch1[BZind[key][1]:BZind[key][0],:],
-                           patch2[BZind[key][1]:BZind[key][0],:],
-                           marker="o",s=2.0,
+            axscor.scatter(patch2[BZind[key][1]:BZind[key][0],:],
+                           patch1[BZind[key][1]:BZind[key][0],:],
+                           marker="o",s=1.0,
                            alpha=0.8,label=key)
      
     axscor.grid(linewidth=0.2)
-    axscor.set_xlim(400.,1000.)
-    axscor.set_ylim(50.,150)
-    axscor.set_xlabel("Effective Cloud-top Pressure (mb)",fontsize=10)
-    axscor.set_ylabel("Ammonia Mole Fraction (ppm)",fontsize=10)
-    axscor.legend(fontsize=7)
+    axscor.set_ylim(400.,1000.)
+    axscor.set_xlim(40.,160)
+    axscor.set_ylabel("Effective Cloud-top Pressure (mb)",fontsize=10)
+    axscor.invert_yaxis()
+    axscor.set_xlabel("Ammonia Mole Fraction (ppm)",fontsize=10)
+    axscor.legend(fontsize=7,ncols=4)
   
 
