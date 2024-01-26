@@ -29,14 +29,18 @@ import GeneralSpecUtils_P3 as GSU
 import NH3_Filter_Library_P3 as NFL
 sys.path.append('./Services')
 import get_albedo_continua_crossections as gACC
-
+###############################################################################
 # LOAD JOVIAN DISK-INTEGRATEDALBEDO DATA FROM KARKOSCHKA, 1994 (DATA FROM 1993)
+###############################################################################
 x0,x1,xtks=600.,680.,9
 y0,y1,ytks=0.0,0.7,8
-Albedo,Continua,CH4,NH3,LONH3=gACC.get_albedo_continua_crossections(x0,x1,xtks,y0,y1,ytks,
-                                                              Crossect=True)
+Albedo,Continua,CH4,NH3,LONH3=gACC.get_albedo_continua_crossections(x0,x1,xtks,
+                                                                    y0,y1,ytks,
+                                                                    Crossect=True)
 
+###############################################################################
 # PLOT FILTER TRANSMISSIONS CONVOLVED WITH DISK-INTEGRATED ALBEDO AND CONTINUUM
+###############################################################################
 FilterList=['620','632','647','656']
 Model='Piecewise1'
 Tele='SCT'
@@ -55,8 +59,10 @@ Ganymededata = deepcopy(filterdata)
 Callistodata = deepcopy(filterdata)
 MoonsAvgdata = deepcopy(filterdata)
 
+###############################################################################
 # COMPUTE K_eff, l_eff, AND PLOT VERTICAL TRANSMISSIONS AND WEIGHTING FUNCTION
 # PROFILES
+###############################################################################
 fout_sfx='-'+Tele+'-'+Model
 P=np.geomspace(10.,1.0e7,num=70,endpoint=True,dtype=float) #in Pascals
 Jupiterdata=NFL.compute_vertical_transmission_profiles(Jupiterdata,FilterList,
@@ -73,11 +79,19 @@ fig_raycont,axs_raycont=NFL.vert_profile_quad_plot(SupTitle="Weighting with Rayl
 filterlistshort=['620','632','647','656']
 for filtr in filterlistshort:
     tau_gas=Jupiterdata[filtr]['tau_CH4']+Jupiterdata[filtr]['tau_NH3']
-    tmp=NFL.Compute_Transmission(P,Jupiterdata[filtr]['tau_R'],tau_gas,Jupiterdata[filtr]['filtname']+' Ray',axs_ray[0,0],axs_raycont[0,0])
+    tmp=NFL.Compute_Transmission(P,Jupiterdata[filtr]['tau_R'],tau_gas,
+                                 Jupiterdata[filtr]['filtname']+' Ray',
+                                 axs_ray[0,0],axs_raycont[0,0])
     if filtr=='647':
-        tmp=NFL.Compute_Transmission(P,Jupiterdata[filtr]['tau_R']*0.0,Jupiterdata[filtr]['tau_NH3'],Jupiterdata[filtr]['filtname']+' NH3',axs_ray[1,1],axs_raycont[1,1])
+        tmp=NFL.Compute_Transmission(P,Jupiterdata[filtr]['tau_R']*0.0,
+                                     Jupiterdata[filtr]['tau_NH3'],
+                                     Jupiterdata[filtr]['filtname']+' NH3',
+                                     axs_ray[1,1],axs_raycont[1,1])
     elif filtr=='620':
-        tmp=NFL.Compute_Transmission(P,Jupiterdata[filtr]['tau_R']*0.0,Jupiterdata[filtr]['tau_CH4'],Jupiterdata[filtr]['filtname']+' CH4',axs_ray[0,1],axs_raycont[0,1])
+        tmp=NFL.Compute_Transmission(P,Jupiterdata[filtr]['tau_R']*0.0,
+                                     Jupiterdata[filtr]['tau_CH4'],
+                                     Jupiterdata[filtr]['filtname']+' CH4',
+                                     axs_ray[0,1],axs_raycont[0,1])
 
 ###############################################################################
 #!!!! This is a simplified approach only looking at the Rayleigh scattering
@@ -85,8 +99,12 @@ for filtr in filterlistshort:
 #!!!! and gas extinction, but we're assuming that gas extinction is minor.
 #!!!! So I should be looking at both cases, the ideal and the real.
 ###############################################################################
-tmp=NFL.Compute_Transmission(P,Jupiterdata['620']['tau_R'],tau_gas*0.,Jupiterdata['620']['filtname']+' Ray',axs_ray[1,0],axs_raycont[1,0])
-tmp=NFL.Compute_Transmission(P,Jupiterdata['647']['tau_R'],tau_gas*0.,Jupiterdata['647']['filtname']+' Ray',axs_ray[1,0],axs_raycont[1,0])
+tmp=NFL.Compute_Transmission(P,Jupiterdata['620']['tau_R'],tau_gas*0.,
+                             Jupiterdata['620']['filtname']+' Ray',
+                             axs_ray[1,0],axs_raycont[1,0])
+tmp=NFL.Compute_Transmission(P,Jupiterdata['647']['tau_R'],tau_gas*0.,
+                             Jupiterdata['647']['filtname']+' Ray',
+                             axs_ray[1,0],axs_raycont[1,0])
 
 
 NH3RaySlp=(Jupiterdata['656']['tau_R']-Jupiterdata['632']['tau_R'])/24.0 
@@ -97,9 +115,12 @@ tau_All632=Jupiterdata['632']['tau_CH4']+Jupiterdata['632']['tau_NH3']+Jupiterda
 NH3Slp=(tau_All656-tau_All632)/24.0 
 tau_647_Estimated=15.0*NH3Slp+tau_All632
 
-tmp=NFL.Compute_Transmission(P,tau_R647_Estimated,Jupiterdata['647']['tau_NH3']*0.0,"647RayEstimated",axs_ray[1,0],axs_raycont[1,0])
-tmp=NFL.Compute_Transmission(P,Jupiterdata['647']['tau_R']-tau_R647_Estimated,Jupiterdata['647']['tau_NH3']*0.0,"647Ray-647RayEst",axs_ray[1,0],axs_raycont[1,0])
-tmp=NFL.Compute_Transmission(P,Jupiterdata['647']['tau_R']-tau_R647_Estimated,Jupiterdata['647']['tau_NH3']*0.0,"647Ray-647RayEst",axs_ray[1,1],axs_raycont[1,1])
+tmp=NFL.Compute_Transmission(P,tau_R647_Estimated,Jupiterdata['647']['tau_NH3']*0.0,
+                             "647RayEstimated",axs_ray[1,0],axs_raycont[1,0])
+tmp=NFL.Compute_Transmission(P,Jupiterdata['647']['tau_R']-tau_R647_Estimated,Jupiterdata['647']['tau_NH3']*0.0,
+                             "647Ray-647RayEst",axs_ray[1,0],axs_raycont[1,0])
+tmp=NFL.Compute_Transmission(P,Jupiterdata['647']['tau_R']-tau_R647_Estimated,
+                             Jupiterdata['647']['tau_NH3']*0.0,"647Ray-647RayEst",axs_ray[1,1],axs_raycont[1,1])
 
 tmp=NFL.Compute_Transmission(P,tau_647_Estimated,Jupiterdata['647']['tau_NH3']*0.0,"647Estimated",axs_ray[1,0],axs_raycont[1,0])
 tmp=NFL.Compute_Transmission(P,Jupiterdata['647']['tau_R']-tau_647_Estimated,Jupiterdata['647']['tau_NH3']*0.0,"647Ray-647Est",axs_ray[1,0],axs_raycont[1,0])
@@ -127,6 +148,11 @@ axs_raycont[0,1].legend(loc=1,ncol=2, borderaxespad=0.,prop={'size':6})
 axs_raycont[1,0].legend(loc=1,ncol=2, borderaxespad=0.,prop={'size':6})
 axs_raycont[1,1].legend(loc=1,ncol=2, borderaxespad=0.,prop={'size':6})
 fig_raycont.subplots_adjust(left=0.12, right=0.96, top=0.90, bottom=0.09)
+
+foutray_sfx='-'+Tele+'-'+Model
+pthout='c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Contribution Functions/'
+fig_ray.savefig(pthout+'SubVertTransProf'+fout_sfx+'.png',dpi=320,bbox_inches = 'tight')
+fig_raycont.savefig(pthout+'SubVertContProf'+fout_sfx+'.png',dpi=320,bbox_inches = 'tight')
 
 ########## END OF THIRD FUNCTION AND PLOT ##############
 

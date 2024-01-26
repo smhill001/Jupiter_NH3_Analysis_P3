@@ -712,7 +712,7 @@ def compute_filter_spectrum(x0,x1,xtks,y0,y1,ytks,FilterList,
         
         # SCALE FILTER PEAK TO CONTINUUM OR NOT
         if scale:
-            wvidx=np.argmin(np.abs(Jupiterdata[filtr]['ContProd'][:,0]-np.int(filtr)))
+            wvidx=np.argmin(np.abs(Jupiterdata[filtr]['ContProd'][:,0]-int(filtr)))
             maxcont=np.nanmax(Jupiterdata[filtr]['ContProd'][wvidx-20:wvidx+20,1])
             temp=np.nan_to_num(Jupiterdata[filtr]['ContProd'][:,:], copy=True, nan=0.0)
             idx=int(np.argmin(np.abs(temp[:,1]-maxcont)))
