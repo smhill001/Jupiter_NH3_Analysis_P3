@@ -1,4 +1,4 @@
-def make_l2_abs_data(obsdate="20231103UTa",target="Jupiter",
+def make_l2_abs_data(obsdate="20231207UTc",target="Jupiter",
                      imagetype='Map'):
     """
     Created on Fri Sep 15 07:48:05 2023
@@ -30,17 +30,18 @@ def make_l2_abs_data(obsdate="20231103UTa",target="Jupiter",
     from imageio import imwrite
     from numpy import inf
     from astropy.io import fits
-    import get_L1_img_data as getL1
+    import get_obs_list as getlist
     import load_png as LP
     import get_WINJupos_ephem as WJ_ephem
     import read_master_calibration as RMC
     import make_sza_eza_planes as za
+    import pylab as pl
 
     ###########################################################################
     #  DATA FILES AND METADATA DICTIONARY
     ###########################################################################
-    sourcedata=obsdate+"_"+imagetype
-    sourcefiles=getL1.get_L1_img_data()
+    sourcedata=obsdate#+"_"+imagetype
+    sourcefiles=getlist.get_obs_list()
     
     if sourcefiles[sourcedata]["Telescope"]=="C11":
         CalModel="SCT-Obs-Final"
@@ -54,9 +55,13 @@ def make_l2_abs_data(obsdate="20231103UTa",target="Jupiter",
     # OBTAIN IMAGES TO DISPLAY, READ DATA, AND DETERMINE IMAGE ARRAY SIZE
     ###########################################################################             
     path='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+obsdate[0:10]+'/'
-    NH3file=sourcefiles[sourcedata]['NH3file']
+    if imagetype=="Img":
+        NH3file=sourcefiles[sourcedata]['NH3file']+".png"
+        CH4file=sourcefiles[sourcedata]['CH4file']+".png"
+    elif imagetype=="Map":
+        NH3file=sourcefiles[sourcedata]['NH3file']+"_CM2_L360_MAP-BARE.png"
+        CH4file=sourcefiles[sourcedata]['CH4file']+"_CM2_L360_MAP-BARE.png"
     NH3_RGB=LP.load_png(path+NH3file)
-    CH4file=sourcefiles[sourcedata]['CH4file']
     CH4_RGB=LP.load_png(path+CH4file)
 
     ###########################################################################
@@ -86,7 +91,6 @@ def make_l2_abs_data(obsdate="20231103UTa",target="Jupiter",
     CH4_CM3=float(CH4eph[2].strip()) 
     CNTSynth=np.array(CH4_RGB[:,:,2]) #632nm continuum
     ch4abs=CH4GlobalTrans*np.array(CH4_RGB[:,:,1])/CNTSynth
-
     ###########################################################################
     # Assuming the input (L2) FITS map files are in system 2 longitude 
     # coordinates, 'roll' the data array in longitude to System 3 Longitude
@@ -96,16 +100,22 @@ def make_l2_abs_data(obsdate="20231103UTa",target="Jupiter",
     #RGBroll=RGB_CM2-RGB_CM3
     #RGB=np.roll(RGB,int(RGBroll),axis=1)
     
-    NH3roll=NH3_CM2-NH3_CM3
-    NH3data=np.roll(nh3abs,int(NH3roll),axis=1)
-    
-    CLSLdata=np.roll(clrslp,int(NH3roll),axis=1)
-    
-    CH4roll=CH4_CM2-CH4_CM3
-    CH4data=np.roll(ch4abs,int(CH4roll),axis=1)
-    
-    NH3CM=NH3_CM3
-    CH4CM=CH4_CM3
+    if imagetype=="Map":
+        NH3roll=NH3_CM2-NH3_CM3
+        NH3data=np.roll(nh3abs,int(NH3roll),axis=1)
+        
+        CLSLdata=np.roll(clrslp,int(NH3roll),axis=1)
+        
+        CH4roll=CH4_CM2-CH4_CM3
+        CH4data=np.roll(ch4abs,int(CH4roll),axis=1)
+        
+        NH3CM=NH3_CM3
+        CH4CM=CH4_CM3
+    else:
+        NH3data=nh3abs
+        CLSLdata=clrslp
+        CH4data=ch4abs
+
     #RGBCM=RGB_CM3
     eza,sza=za.make_sza_eza_planes(dateobs=NH3time.replace('_','T')+'Z')
  
@@ -133,7 +143,7 @@ def make_l2_abs_data(obsdate="20231103UTa",target="Jupiter",
             Real_CM3=NH3_CM3
             datetime=NH3time
             file=NH3file
-            fn=file[0:25]+'_L2TNH3'
+            fn=file[0:25]+"_"+imagetype+'_L2TNH3'
             Range=[0.90,1.0] #scaled range for PNG file
         elif BUNIT=='CH4 Trans':
             dataarray=CH4data
@@ -144,7 +154,7 @@ def make_l2_abs_data(obsdate="20231103UTa",target="Jupiter",
             Real_CM3=CH4_CM3
             datetime=CH4time
             file=CH4file
-            fn=file[0:25]+'_L2TCH4'
+            fn=file[0:25]+"_"+imagetype+'_L2TCH4'
             Range=[0.80,1.0] #scaled range for PNG file
         elif BUNIT=='Clr Slp':
             dataarray=CLSLdata
@@ -155,7 +165,7 @@ def make_l2_abs_data(obsdate="20231103UTa",target="Jupiter",
             Real_CM3=NH3_CM3
             datetime=NH3time
             file=NH3file
-            fn=file[0:25]+'_L2CLSL'
+            fn=file[0:25]+"_"+imagetype+'_L2CLSL'
             Range=[0.0,100.0] #scaled range for PNG file
 
             

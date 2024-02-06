@@ -3,6 +3,8 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
                         LonSys='3',Smoothing=False):
     """
     Created on Mon Nov 20 08:42:28 2023
+    Called by: Map_Jup_Atm_2022_P3, currently only for L3 data to plot
+               maps of fNH3 and PCld
     
     @author: smhil
     """
@@ -37,12 +39,12 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
         RGB_CM3=float(eph[2].strip())
 
     if Level=="L2":
-        CH4suffix="-Jupiter_L2TCH4"
-        NH3suffix="-Jupiter_L2TNH3"
+        CH4suffix="-Jupiter_Map_L2TCH4"
+        NH3suffix="-Jupiter_Map_L2TNH3"
         pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/'
     elif Level=="L3":
-        CH4suffix="-Jupiter_L3PCld_S0"
-        NH3suffix="-Jupiter_L3fNH3_S0"
+        CH4suffix="-Jupiter_Map_L3PCld_S0"
+        NH3suffix="-Jupiter_Map_L3fNH3_S0"
         pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/'
         
     try:

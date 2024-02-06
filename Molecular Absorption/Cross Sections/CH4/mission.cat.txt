@@ -1,0 +1,116 @@
+PDS_VERSION_ID                   = PDS3                                       
+LABEL_REVISION_NOTE              = "Lyle Huber, 1999-01-29"                   
+RECORD_TYPE                      = FIXED_LENGTH                               
+RECORD_BYTES                     = 80                                         
+                                                                              
+OBJECT                           = MISSION                                    
+  MISSION_NAME                   = "GROUND BASED ATMOSPHERIC OBSERVATIONS"    
+                                                                              
+OBJECT                           = MISSION_INFORMATION                        
+  MISSION_START_DATE            = 1993                                        
+  MISSION_STOP_DATE             = 1995                                        
+  MISSION_ALIAS_NAME            = "UNK"                                       
+  MISSION_DESC                  = "                                           
+                                                                              
+  Mission Overview                                                            
+  ================                                                            
+                                                                              
+     From [KARKOSCHKA1994]                                                    
+     ---------------------                                                    
+      Full-disk albedo spectra of the jovian planets and Titan were           
+      derived from observations at the European Southern                      
+      Observatory in July 1993.  The spectra extend from 300- to              
+      1000-nm wavelength at 1-nm resolution.  The signal-to-noise             
+      ratio is approximately 1000 in the visible.  The accuracy is            
+      2 percent for relative and 4 percent for absolute albedos.              
+      Colors and magnitudes were also determined.  Some 40-60 Raman           
+      scattering features are visible in the spectrum of each                 
+      jovian planet.  A Raman scattering model with five parameters           
+      adjusted for each planet can explain these features.  A                 
+      methane absorption spectrum is given which fits methane                 
+      features in the spectra of the jovian planets and Titan.  It            
+      differs from room-temperature laboratory spectra but it is              
+      consistent with some limited laboratory data at cold                    
+      temperatures.  Three new, weak methane bands were detected in           
+      the spectra of Uranus and Neptune.  A strong absorption band            
+      in Jupiter's spectrum is possibly due to water, confirming a            
+      strong depletion of oxygen in the probed part of Jupiter's              
+      atmosphere.                                                             
+                                                                              
+     From [KARKOSCHKA1998]                                                    
+     ---------------------                                                    
+      Full-disk albedo spectra of the jovian planets and Titan were           
+      derived from observations at the European Southern                      
+      Observatory in July 1995.  The spectra extend from 300 to               
+      1050 nm wavelength.  The spectral resolution is 0.4 nm                  
+      between 520 and 995 nm, and 1 nm elsewhere.  The accuracy of            
+      the albedo calibration is 4 percent.  UBV magnitudes were               
+      also determined.  Raman scattering was quantified for each              
+      planet.  Methane and ammonia bands are shown at 0.4 nm                  
+      spectral resolution, including a new band at 930 nm                     
+      wavelength which is probably due to ammonia.  Maps of the               
+      variation of these absorptions across the disks of Jupiter              
+      and Saturn are displayed.  Saturn's spectrum is undisturbed             
+      by light from its rings due to the edge-on geometry during              
+      the observations.  The albedo of Uranus near 1 micro-m                  
+      wavelength has dropped almost 10 percent between 1993 and               
+      1995, while there has been no change in the ultraviolet.  The           
+      signature of light from Titan's surface yielded a path length           
+      of 4 km-am of methane in Titan's atmosphere.  The temperature           
+      dependence of the width of the 890-nm methane band was used             
+      to measure temperature variations at three altitude levels,             
+      resulting in the first temperature maps of Jupiter and Saturn           
+      based on reflected sunlight.  Jupiter displays a banded                 
+      temperature structure with some discrete features of a few              
+      Kelvin amplitude.  Saturn's north-south temperature asymmetry           
+      has reversed since the Voyager observations.  "                         
+                                                                              
+  MISSION_OBJECTIVES_SUMMARY     = "UNK"                                      
+                                                                              
+END_OBJECT = MISSION_INFORMATION                                              
+                                                                              
+OBJECT                           = MISSION_HOST                               
+INSTRUMENT_HOST_ID               = ESO                                        
+  OBJECT                         = MISSION_TARGET                             
+    TARGET_NAME                  = JUPITER                                    
+  END_OBJECT                     = MISSION_TARGET                             
+END_OBJECT                       = MISSION_HOST                               
+                                                                              
+OBJECT                           = MISSION_HOST                               
+INSTRUMENT_HOST_ID               = ESO                                        
+  OBJECT                         = MISSION_TARGET                             
+    TARGET_NAME                  = SATURN                                     
+  END_OBJECT                     = MISSION_TARGET                             
+END_OBJECT                       = MISSION_HOST                               
+                                                                              
+OBJECT                           = MISSION_HOST                               
+INSTRUMENT_HOST_ID               = ESO                                        
+  OBJECT                         = MISSION_TARGET                             
+    TARGET_NAME                  = URANUS                                     
+  END_OBJECT                     = MISSION_TARGET                             
+END_OBJECT                       = MISSION_HOST                               
+                                                                              
+OBJECT                           = MISSION_HOST                               
+INSTRUMENT_HOST_ID               = ESO                                        
+  OBJECT                         = MISSION_TARGET                             
+    TARGET_NAME                  = NEPTUNE                                    
+  END_OBJECT                     = MISSION_TARGET                             
+END_OBJECT                       = MISSION_HOST                               
+                                                                              
+OBJECT                           = MISSION_HOST                               
+INSTRUMENT_HOST_ID               = ESO                                        
+  OBJECT                         = MISSION_TARGET                             
+    TARGET_NAME                  = TITAN                                      
+  END_OBJECT                     = MISSION_TARGET                             
+END_OBJECT                       = MISSION_HOST                               
+                                                                              
+OBJECT                           = MISSION_REFERENCE_INFORMATION              
+  REFERENCE_KEY_ID               = "KARKOSCHKA1994"                           
+END_OBJECT                       = MISSION_REFERENCE_INFORMATION              
+                                                                              
+OBJECT                           = MISSION_REFERENCE_INFORMATION              
+  REFERENCE_KEY_ID               = "KARKOSCHKA1998"                           
+END_OBJECT                       = MISSION_REFERENCE_INFORMATION              
+                                                                              
+END_OBJECT                       = MISSION                                    
+END                                                                           

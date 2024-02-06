@@ -340,12 +340,9 @@ def get_L1_img_data():
 
                   '20221009UTa_Img':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                             'Seeing':'7/10','Transparency':'7/10', 
-                               'CH4file':['2022-10-09-0401_5-Jupiter_NoWV-R656G620B632-RGB-WhtBal.png'],
+                               'CH4file':'2022-10-09-0401_5-Jupiter_NoWV-R656G620B632-RGB-WhtBal.png',
                                'NH3file':'2022-10-09-0401_5-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
-                               #'CH4labels':['Synth. Continuum @ 620nm','620nm (CH4)','620/Cont. (CH4))'],
-                               'Context':{'NUVfile':'NA',
-                                          'RGBfile':'2022-10-09-0339_0-Jupiter_WV2-R685G550B450-RGB-WhtBal-Wavelets.png'},
-                               'Contextlabels':['889nm','RGB']},
+                               'RGBfile':'2022-10-09-0339_0-Jupiter_WV-R685G550B450-RGB-WhtBal-Wavelets.png'},
 
                   '20221009UTa_Map':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                      'Seeing':'7/10','Transparency':'7/10', 
@@ -786,6 +783,24 @@ def get_L1_img_data():
                                'CH4file':'2023-12-07-0343_7-Jupiter_R656G620B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
                                'NH3file':'2023-12-07-0343_7-Jupiter_R656G647B632-RGB-WhtBal_CM2_L360_MAP-BARE.png',
                                'RGBfile':'2023-12-07-0400_7-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV_CM2_L360_MAP-BARE.png'},
+                  
+                  '20231217UTa_Map':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'8/10','Transparency':'8/10', 
+                               'CH4file':'2023-12-17-0136_2-Jupiter_R656G620B632-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png',
+                               'NH3file':'2023-12-17-0136_2-Jupiter_R656G647B632-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png',
+                               'RGBfile':'2023-12-17-0148_3-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV_CM2_L360_MAP-BARE.png'},
+
+                  '20231217UTb_Map':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'8/10','Transparency':'8/10', 
+                               'CH4file':'2023-12-17-0201_7-Jupiter_R656G620B632-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png',
+                               'NH3file':'2023-12-17-0201_6-Jupiter_R656G647B632-RGB-Smth-WhtBal_CM2_L360_MAP-BARE.png',
+                               'RGBfile':'2023-12-17-0215_3-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV_CM2_L360_MAP-BARE.png'},
+
+                  '20231217UTc':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'8/10','Transparency':'8/10', 
+                               'CH4file':'2023-12-17-0228_2-Jupiter_R656G620B632-RGB-Smth-WhtBal',
+                               'NH3file':'2023-12-17-0228_2-Jupiter_R656G647B632-RGB-Smth-WhtBal',
+                               'RGBfile':'2023-12-17-0240_5-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
                   
                   #Begin Variations on VLT data
                   

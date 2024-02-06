@@ -114,13 +114,6 @@ def JupiterObservationCatalog():
     ascii.write(t,pathout+'JupiterObservationCatalog.csv',format='basic',
                 overwrite=True,delimiter=',')
 
-
-        
-
-
-    
-
-
 ###############################################################################
 def PlotJupiterObservations(CM=1):
     import matplotlib.pyplot as pl
@@ -145,7 +138,8 @@ def PlotJupiterObservations(CM=1):
     startdate=datetime.strptime("2020-06-21","%Y-%m-%d")
     enddate=datetime.strptime("2020-12-07","%Y-%m-%d")
     subPlotJupiterObservations(ax[3],startdate,enddate,CM=CM,xtitle=True)
-    pl.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/JupiterObservations.png',dpi=320)
+    pathout='c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Catalog/'
+    pl.savefig(pathout+'Catalog.png',dpi=320)
 
 
 def subPlotJupiterObservations(ax,startdate,enddate,CM=1,xtitle=False):
@@ -171,13 +165,14 @@ def subPlotJupiterObservations(ax,startdate,enddate,CM=1,xtitle=False):
 
     date_list=[]
     cam_list=[]
-    path='c:/Astronomy/Projects/Planets/Jupiter/Imaging Data/'
-    dateUTarray=os.listdir(path)
+    pathin='c:/Astronomy/Projects/Planets/Jupiter/Imaging Data/'
+    path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
+    dateUTarray=os.listdir(pathin)
     for i in dateUTarray:
         Video=False
-        if os.path.isdir(path+i) and str(i)[0:2]=="20":  #Only look in date directories
+        if os.path.isdir(pathin+i) and str(i)[0:2]=="20":  #Only look in date directories
             print(i)
-            sessionlist=os.listdir(path+i)  #List of files for a given date
+            sessionlist=os.listdir(pathin+i)  #List of files for a given date
             for j in sessionlist:
                 if "Jupiter_VideoMetaData" in j and "csv" in j:
                     Video=True
@@ -186,7 +181,7 @@ def subPlotJupiterObservations(ax,startdate,enddate,CM=1,xtitle=False):
                 if "csv" in j:
                     if "Jupiter_VideoMetaData" in j:
                         #print j
-                        metadata=CF.video_metadata_list(path+i+"/"+j)
+                        metadata=CF.video_metadata_list(pathin+i+"/"+j)
                         metadata.load_records()
                         for k in range(0,metadata.nrecords-1):
                             print(metadata.VideoFile[k])

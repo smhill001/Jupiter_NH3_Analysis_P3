@@ -30,23 +30,23 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
     from astropy.convolution import convolve
     import read_master_calibration
     sys.path.append('./Services')
-    import get_L2_abs_data as GAOD
+    import get_obs_list as getlist
     import get_WINJupos_ephem as WJ_ephem
-   
+
     ###########################################################################
     #  SET NECESSARY CONSTANTS
     ###########################################################################
-    amagat=2.69e24 #Lodschmits number. (cm-2)
+    amagat=2.69e24 #Lodschmits number. (cm-2) This is really km-amagat
     gravity=2228.0 #cm/s^2
-    mean_mol_wt=3.85e-24 #cgs or SI !!!!WHY IS THIS 2.2 FOR MENDIKOA!!!!!
+    mean_mol_wt=3.85e-24 #gm/molecule, which is 2.22 gm/mole
     fCH4=1.81e-3
     STP=1.01e6  #dyne/cm^2 [(g-cm/s^2)/cm^2]`
     
     ###########################################################################
     #  DATA FILES AND METADATA DICTIONARY
     ###########################################################################
-    sourcedata=obsdate+"_"+imagetype
-    sourcefiles=GAOD.get_L2_abs_data()
+    sourcedata=obsdate#+"_"+imagetype
+    sourcefiles=getlist.get_obs_list()
     calibration,K_eff=read_master_calibration.read_master_calibration()
     K_eff_CH4620=K_eff['CH4_620'][sourcefiles[sourcedata]['Telescope']]#0.428
     K_eff_NH3647=K_eff['NH3_647'][sourcefiles[sourcedata]['Telescope']]#2.964
@@ -61,11 +61,11 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
     ###########################################################################
     # CH4 Transmission File name and read
     try:    #Set up to allow for parametric studies of different processing paths
-        CH4file=sourcefiles[sourcedata]['CH4file']+"-Jupiter_L2TCH4"+\
+        CH4file=sourcefiles[sourcedata]['CH4file'][0:17]+"-Jupiter_"+imagetype+"_L2TCH4"+\
                 sourcefiles[sourcedata]['Variation']+".fits"
         variation=sourcefiles[sourcedata]['Variation']
     except:
-        CH4file=sourcefiles[sourcedata]['CH4file']+"-Jupiter_L2TCH4.fits"
+        CH4file=sourcefiles[sourcedata]['CH4file'][0:17]+"-Jupiter_"+imagetype+"_L2TCH4.fits"
         variation=""
 
     CH4hdulist=fits.open(pathFITS+CH4file)
@@ -77,11 +77,11 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
     ###########################################################################
     # NH3 Transmission File name and read
     try:    #Set up to allow for parametric studies of different processing paths
-        NH3file=sourcefiles[sourcedata]['NH3file']+"-Jupiter_L2TNH3"+\
+        NH3file=sourcefiles[sourcedata]['NH3file'][0:17]+"-Jupiter_"+imagetype+"_L2TNH3"+\
                 sourcefiles[sourcedata]['Variation']+".fits"
         variation=sourcefiles[sourcedata]['Variation']
     except:
-        NH3file=sourcefiles[sourcedata]['NH3file']+"-Jupiter_L2TNH3.fits"
+        NH3file=sourcefiles[sourcedata]['NH3file'][0:17]+"-Jupiter_"+imagetype+"_L2TNH3.fits"
         variation=""
     
     NH3hdulist=fits.open(pathFITS+NH3file)
@@ -94,7 +94,10 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
     
     ###########################################################################    
     # RGB Context image File name and read
-    RGBfile=sourcefiles[sourcedata]['RGBfile']+"_CM2_L360_MAP-BARE.png"
+    if imagetype=="Map":
+        RGBfile=sourcefiles[sourcedata]['RGBfile']+"_CM2_L360_MAP-BARE.png"
+    elif imagetype=="Img":
+        RGBfile=sourcefiles[sourcedata]['RGBfile']+".png"
     if RGBfile != 'NA':
         RGB=imread(pathRGB+RGBfile)
 
@@ -178,7 +181,7 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
             Real_CM3=NH3_CM3
             datetime=NH3time
             file=NH3file
-            fn=file[0:26]+'L3fNH3'
+            fn=file[0:26]+imagetype+'_L3fNH3'
             Range=[50.,150] #scaled range for PNG file
         elif BUNIT=='Cloud-top Press':
             dataarray=CH4_Cloud_Press/4.
@@ -189,7 +192,7 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
             Real_CM3=CH4_CM3
             datetime=CH4time
             file=CH4file
-            fn=file[0:26]+'L3PCld'
+            fn=file[0:26]+imagetype+'_L3PCld'
             Range=[400.,1100] #scaled range for PNG file
             
         szadata=fits.ImageHDU(sza)

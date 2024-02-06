@@ -27,6 +27,7 @@ def TestContiguousMap():
     #import make_L3_env_data
     import read_fits_map_L2_L3 as RFM
     
+    """
     dataset={'20230815UTa',
              '20230816UTa',
              '20230817UTa',
@@ -36,7 +37,7 @@ def TestContiguousMap():
              '20230816UTa':[285,359],
              '20230817UTa':[40,130],
              '20230818UTa':[205,285]}
-    
+    """
     outputfNH3=np.zeros([180,360])
     outputPCloud=np.zeros([180,360])
     

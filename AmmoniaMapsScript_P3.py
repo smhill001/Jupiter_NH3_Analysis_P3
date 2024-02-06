@@ -1,4 +1,4 @@
-def AmmoniaMapsScript_P3(reference,Level='plots',LonSys='3'):
+def AmmoniaMapsScript_P3(reference,Level='plots',imtype="Map",LonSys='3'):
     """
     Created on Sat Dec 04 22:23:20 2021
     
@@ -13,7 +13,9 @@ def AmmoniaMapsScript_P3(reference,Level='plots',LonSys='3'):
     import make_L3_env_data as make_L3
     import get_batch_lists as GBL
     import Map_Jup_Atm_2022_P3 as MapJup
+    import time
 
+    start_time=time.time()
     ###########################################################################
     # Get the data set to batch process
     ###########################################################################         
@@ -34,6 +36,7 @@ def AmmoniaMapsScript_P3(reference,Level='plots',LonSys='3'):
         #######################################################################         
         Frst=True
         for date in DataSets[reference]:
+            print(date)
             if len(date)==11:
                 version=date[10]
                 dataset=date[0:10].replace('-','')+'UT'+version
@@ -46,14 +49,14 @@ def AmmoniaMapsScript_P3(reference,Level='plots',LonSys='3'):
             if Level=='L2':
                 make_L2.make_l2_abs_data(obsdate=dataset,
                                          target="Jupiter",
-                                         imagetype='Map')
+                                         imagetype=imtype)
                 
             ###################################################################
             # Execute Processing from L2 to L3
             ###################################################################
             elif Level=='L3':
                 make_L3.make_L3_env_data(obsdate=dataset,target="Jupiter",
-                                     imagetype='Map',CalModel=Cal,
+                                     imagetype=imtype,CalModel=Cal,
                                      Smoothing=False,First=Frst)
                 
             ###################################################################
@@ -77,3 +80,5 @@ def AmmoniaMapsScript_P3(reference,Level='plots',LonSys='3'):
         np.savetxt(pathout+reference+'_NH3_Meridian_EW.csv', 
                    np.transpose([Lats,AvgMeridEW,StdZoneEW]), fmt='%3.5f', 
                    delimiter=',')
+
+    print("--- %s seconds ---" % (time.time() - start_time))
