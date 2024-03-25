@@ -4,8 +4,9 @@ def grs_zoom_maps(year):
     
     @author: smhil
     """
-    
-    import Map_Jup_Atm_2022_P3 as MJP
+    import sys
+    sys.path.append('./Maps')
+    import Map_Jup_Atm_P3 as MJP
     
     GRS2022=['20220730UTa','20220810UTa','20220818UTa','20220828UTa','20220904UTa',
               '20220919UTa','20220919UTb','20221013UTa','20221020UTa','20230113UTa']
@@ -24,6 +25,6 @@ def grs_zoom_maps(year):
         
     for obskey in GRS:
         
-        MJP.Map_Jup_Atm_2022_P3(obskey=obskey,imagetype='Map', Smoothing=False,
-                            LatLims=[90,135],LonRng=30,CMpref=CM,LonSys='2',
+        MJP.Map_Jup_Atm_P3(obskey=obskey,imagetype='Map', Smoothing=False,
+                            LatLims=[90,130],LonRng=20,CMpref=CM,LonSys='2',
                             showbands=False,coef=[0.,0.],subproj='GRS')

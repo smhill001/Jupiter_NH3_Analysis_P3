@@ -38,13 +38,28 @@ def TestContiguousMap():
              '20230817UTa':[40,130],
              '20230818UTa':[205,285]}
     """
+    dataset={'20231218UTa',
+             '20231218UTb',
+             '20231218UTc',
+             '20231218UTd',
+             '20231218UTd',
+             '20231218UTe',
+             '20231218UTf'}
+    
+    lonlims={'20231218UTa':[135,195],
+             '20231218UTb':[195,255],
+             '20231218UTc':[255,285],
+             '20231218UTd':[285,315],
+             '20231218UTe':[315,360],
+             '20231218UTf':[0,45]}
+    
     outputfNH3=np.zeros([180,360])
     outputPCloud=np.zeros([180,360])
     
     for obskey in dataset:
         print("*******obsdate=",obskey)
         PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM2= \
-                        RFM.read_fits_map_L2_L3(obskey=obskey,
+                        RFM.read_fits_map_L2_L3(obskey=obskey,LonSys='2',
                                                 imagetype="Map",Level="L3")
                         
         amfdata=(1.0/sza+1.0/eza)/2.0
@@ -52,22 +67,32 @@ def TestContiguousMap():
         TestPCloud=PClouddata*amfdata**0.25
         print("**********TestfNH3.shape=",TestfNH3.shape)
         
+        lats=[30,150]
         ll_0=360-lonlims[obskey][0]
         ll_1=360-lonlims[obskey][1]
-        outputfNH3[45:135,ll_1:ll_0]= \
-            TestfNH3[45:135,ll_1:ll_0]
-        outputPCloud[45:135,ll_1:ll_0]= \
-            TestPCloud[45:135,ll_1:ll_0]
+        outputfNH3[lats[0]:lats[1],ll_1:ll_0]= \
+            TestfNH3[lats[0]:lats[1],ll_1:ll_0]
+        outputPCloud[lats[0]:lats[1],ll_1:ll_0]= \
+            TestPCloud[lats[0]:lats[1],ll_1:ll_0]
 
     fig1,axs1=pl.subplots(2,1,figsize=(8.0,6.0), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
 
     axs1[0].imshow(outputfNH3*1e6,"jet",vmin=50,vmax=150)
-    axs1[0].xlim=[0,360]
+    axs1[0].xlim=[360,0]
     axs1[0].set_xticks(np.linspace(360,0,13), minor=False)
-    xticklabels=np.array(np.linspace(360,0,13))
+    xticklabels=np.array(np.linspace(0,360,13))
     axs1[0].set_xticklabels(xticklabels.astype(int))
     axs1[1].imshow(outputPCloud,"jet",vmin=400,vmax=900)
-      
-                        
-                        
+    axs1[0].xlim=[360,0]
+    axs1[1].set_xticklabels(xticklabels.astype(int))
+    
+    axs1[0].set_yticks(np.linspace(0,180,13), minor=False)
+    axs1[0].set_yticks(np.linspace(0,180,13), minor=False)
+
+    yticklabels=np.array(np.linspace(90,-90,13))
+    axs1[0].set_yticklabels(yticklabels.astype(int))
+    axs1[1].set_yticklabels(yticklabels.astype(int))
+    
+    axs1[0].grid(linewidth=0.2)
+    axs1[1].grid(linewidth=0.2)

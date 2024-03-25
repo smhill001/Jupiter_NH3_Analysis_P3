@@ -163,7 +163,9 @@ fig_raycont.savefig(projpath+pathout+'Wght_v_Pres_RaySub'+fout_sfx+'.png',dpi=32
 #   !!!! COULD MAKE THIS WHOLE THING LOOP-ABLE AND SELECTABLE WITH A CALL-LIST
 #   !!!!   AND/OR DICTIONARY
 ###############################################################################
-#!!!!!!!!Should do leading and trailing edge of Io (and any other varibility I can find?)
+#!!!!!!!!Should do leading and trailing edge of Io (and any other varibility I 
+#can find?)
+# Get Clark and McCord (1980) data including wavelength and albedo
 Io_Grid=NFL.MoonAlbedos("Io")
 EurGrid=NFL.MoonAlbedos('Europa')
 GanGrid=NFL.MoonAlbedos('Ganymede')
@@ -171,6 +173,7 @@ CalGrid=NFL.MoonAlbedos('Callisto')
 
 fig_moons,axs_moons=pl.subplots(2,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
                       sharex=True)
+
 #Plot Layout Configuration
 x0,x1,xtks=600.,680.,9
 y0,y1,ytks=0.0,1.2,7
@@ -186,7 +189,7 @@ axs_moons[0].grid(linewidth=0.2)
 axs_moons[0].tick_params(axis='both', which='major', labelsize=8)
 axs_moons[0].set_ylabel("Albedo",color="black")
 
-axs_moons[0].set_title("Moons Albedo")
+axs_moons[0].set_title("Galilean Moon Albedos (Clark & McCord, 1980)")
 
 axs_moons[0].plot(CalGrid[:,0],CalGrid[:,1],label='Callisto',linewidth=1,color='b')
 axs_moons[0].plot(GanGrid[:,0],GanGrid[:,1],label='Ganymede',linewidth=1,color='g')
@@ -194,6 +197,8 @@ axs_moons[0].plot(EurGrid[:,0],EurGrid[:,1],label='Europa',linewidth=1,color='r'
 axs_moons[0].plot(Io_Grid[:,0],Io_Grid[:,1],label='Io Leading',linewidth=1,linestyle='dashed',color='k')
 #axs_moons[0].plot(Io_trailing1980[:,0]*1000.,Io_trailing1980[:,1],label='Io Trailing',linewidth=1,color='k')
 axs_moons[0].legend(fontsize=7)
+
+###############################################################################
 
 axs_moons[1].set_xlim(x0,x1)
 # Set x ticks
@@ -210,26 +215,46 @@ axs_moons[1].set_title("Convolution with Filters")
 
 firstflag=True
 for filtr in FilterList:
-    Iodata[filtr]['ContProd']=GSU.SpectrumMath(Jupiterdata[filtr]['FiltTrans'],Io_Grid,"Multiply")
-    Europadata[filtr]['ContProd']=GSU.SpectrumMath(Jupiterdata[filtr]['FiltTrans'],EurGrid,"Multiply")
-    Ganymededata[filtr]['ContProd']=GSU.SpectrumMath(Jupiterdata[filtr]['FiltTrans'],GanGrid,"Multiply")
-    Callistodata[filtr]['ContProd']=GSU.SpectrumMath(Jupiterdata[filtr]['FiltTrans'],CalGrid,"Multiply")
+    Iodata[filtr]['ContProd']=GSU.SpectrumMath(Jupiterdata[filtr]['FiltTrans'],
+                                               Io_Grid,"Multiply")
+    Europadata[filtr]['ContProd']=GSU.SpectrumMath(Jupiterdata[filtr]['FiltTrans'],
+                                                   EurGrid,"Multiply")
+    Ganymededata[filtr]['ContProd']=GSU.SpectrumMath(Jupiterdata[filtr]['FiltTrans'],
+                                                     GanGrid,"Multiply")
+    Callistodata[filtr]['ContProd']=GSU.SpectrumMath(Jupiterdata[filtr]['FiltTrans'],
+                                                     CalGrid,"Multiply")
     if firstflag:
-        axs_moons[1].plot(Iodata[filtr]['ContProd'][:,0],Iodata[filtr]['ContProd'][:,1],linewidth=0.5,color='k',label='Io')
-        axs_moons[1].plot(Europadata[filtr]['ContProd'][:,0],Europadata[filtr]['ContProd'][:,1],linewidth=0.5,color='r',label='Europa')
-        axs_moons[1].plot(Ganymededata[filtr]['ContProd'][:,0],Ganymededata[filtr]['ContProd'][:,1],linewidth=0.5,color='g',label='Ganymede')
-        axs_moons[1].plot(Callistodata[filtr]['ContProd'][:,0],Callistodata[filtr]['ContProd'][:,1],linewidth=0.5,color='b',label='Callisto')
+        axs_moons[1].plot(Iodata[filtr]['ContProd'][:,0],
+                          Iodata[filtr]['ContProd'][:,1],
+                          linewidth=0.5,color='k',label='Io')
+        axs_moons[1].plot(Europadata[filtr]['ContProd'][:,0],
+                          Europadata[filtr]['ContProd'][:,1],
+                          linewidth=0.5,color='r',label='Europa')
+        axs_moons[1].plot(Ganymededata[filtr]['ContProd'][:,0],
+                          Ganymededata[filtr]['ContProd'][:,1],
+                          linewidth=0.5,color='g',label='Ganymede')
+        axs_moons[1].plot(Callistodata[filtr]['ContProd'][:,0],
+                          Callistodata[filtr]['ContProd'][:,1],
+                          linewidth=0.5,color='b',label='Callisto')
         firstflag=False
     else:
-        axs_moons[1].plot(Iodata[filtr]['ContProd'][:,0],Iodata[filtr]['ContProd'][:,1],linewidth=0.5,color='k')
-        axs_moons[1].plot(Europadata[filtr]['ContProd'][:,0],Europadata[filtr]['ContProd'][:,1],linewidth=0.5,color='r')
-        axs_moons[1].plot(Ganymededata[filtr]['ContProd'][:,0],Ganymededata[filtr]['ContProd'][:,1],linewidth=0.5,color='g')
-        axs_moons[1].plot(Callistodata[filtr]['ContProd'][:,0],Callistodata[filtr]['ContProd'][:,1],linewidth=0.5,color='b')
+        axs_moons[1].plot(Iodata[filtr]['ContProd'][:,0],
+                          Iodata[filtr]['ContProd'][:,1],
+                          linewidth=0.5,color='k')
+        axs_moons[1].plot(Europadata[filtr]['ContProd'][:,0],
+                          Europadata[filtr]['ContProd'][:,1],
+                          linewidth=0.5,color='r')
+        axs_moons[1].plot(Ganymededata[filtr]['ContProd'][:,0],
+                          Ganymededata[filtr]['ContProd'][:,1],
+                          linewidth=0.5,color='g')
+        axs_moons[1].plot(Callistodata[filtr]['ContProd'][:,0],
+                          Callistodata[filtr]['ContProd'][:,1],
+                          linewidth=0.5,color='b')
 
 axs_moons[1].legend(fontsize=8)
 fig_moons.subplots_adjust(left=0.10, right=0.90, top=0.94, bottom=0.09)
 
-fig_moons.savefig('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/ColorSlopes.png',dpi=320)
+fig_moons.savefig(projpath+pathout+'MoonSpectra+Filters.png',dpi=320)
 
 for filt in filterlistshort:
     print('^^^^^^^^^^^^^'+filt)

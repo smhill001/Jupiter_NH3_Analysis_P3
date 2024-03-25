@@ -1,5 +1,5 @@
-def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
-                     imagetype='Map',CalModel='SCT-Obs-Final',
+def make_L3_env_data(obsdate="20221009UTa",target="Jupiter",
+                     imagetype='Img',CalModel='SCT-Obs-Final',
                      Smoothing=False,First=True):
     """
     Created on Tue Aug 22 11:01:44 2023
@@ -168,13 +168,41 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
     ##!!!! WOW!!! I need to calculate fNH3 the EASY way also and compare!!!
     fNH3=(1.81e-3)*NH3_Ncol/CH4_Ncol #-> It works 7/20/2023
     
+    
+    from datetime import datetime
+    from time import gmtime, strftime
+
+    now = datetime.now()
+
     ###########################################################################
     # Create FITS files and headers, including backplanes
     ###########################################################################
-    for BUNIT in ['Mole Fraction','Cloud-top Press']:
+    for BUNIT in ['CH4 Opacity','NH3 Opacity','Mole Fraction','Cloud-top Press']:
+        if BUNIT=='CH4 Opacity':
+            dataarray=CH4_tau
+            hdu = fits.PrimaryHDU(CH4_tau.astype(np.float32))
+            comment="CH4 Opacity"
+            Real_CM1=NH3_CM1
+            Real_CM2=NH3_CM2
+            Real_CM3=NH3_CM3
+            datetime=NH3time
+            file=NH3file
+            fn=file[0:26]+imagetype+'_L3OCH4'
+            Range=[0.,1.01] #scaled range for PNG file
+        elif BUNIT=='NH3 Opacity':
+            dataarray=NH3_tau
+            hdu = fits.PrimaryHDU(NH3_tau.astype(np.float32))
+            comment="mb"
+            Real_CM1=CH4_CM1
+            Real_CM2=CH4_CM2
+            Real_CM3=CH4_CM3
+            datetime=CH4time
+            file=CH4file
+            fn=file[0:26]+imagetype+'_L3ONH3'
+            Range=[0.,1.] #scaled range for PNG file
         if BUNIT=='Mole Fraction':
             dataarray=fNH3*1.0e6
-            hdu = fits.PrimaryHDU(fNH3.astype(np.float32))
+            hdu = fits.PrimaryHDU(dataarray.astype(np.float32))
             comment="NH3 mole fraction"
             Real_CM1=NH3_CM1
             Real_CM2=NH3_CM2
@@ -182,7 +210,7 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
             datetime=NH3time
             file=NH3file
             fn=file[0:26]+imagetype+'_L3fNH3'
-            Range=[50.,150] #scaled range for PNG file
+            Range=[0.,200] #scaled range for PNG file
         elif BUNIT=='Cloud-top Press':
             dataarray=CH4_Cloud_Press/4.
             hdu = fits.PrimaryHDU((CH4_Cloud_Press/4.).astype(np.float32))
@@ -193,7 +221,7 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
             datetime=CH4time
             file=CH4file
             fn=file[0:26]+imagetype+'_L3PCld'
-            Range=[400.,1100] #scaled range for PNG file
+            Range=[300.,1200] #scaled range for PNG file
             
         szadata=fits.ImageHDU(sza)
         ezadata=fits.ImageHDU(eza)
@@ -210,6 +238,8 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
         hdul[0].header['FILENAME']=fn
     
         hdul[0].header['OBJECT']='Jupiter'
+        hdul[0].header['TIME']=strftime("%Y-%m-%d %H:%M:%S", gmtime())
+        
         hdul[0].header['TELESCOP']=sourcefiles[sourcedata]['Telescope']
         hdul[0].header['INSTRUME']=sourcefiles[sourcedata]['Camera']
         hdul[0].header['SEEING']=sourcefiles[sourcedata]['Seeing']
@@ -223,6 +253,8 @@ def make_L3_env_data(obsdate="20231103UTa",target="Jupiter",
         hdul[0].header['CM1']=(Real_CM1,'Sys. 1 Long. Central Meridian')
         hdul[0].header['CM2']=(Real_CM2,'Sys. 2 Long. Central Meridian')
         hdul[0].header['CM3']=(Real_CM3,'Sys. 3 Long. Central Meridian')
+        hdul[0].header['RANGE0']=(Range[0],'Scaling Range - Black Level')
+        hdul[0].header['RANGE1']=(Range[1],'Scaling Range - White Level')       
         hdul[0].header['SMOOTH']=(Smoothing,'Smoothing of transmission data')
         hdul[0].header['KERNEL']=(1,'Gaussian')
         hdul[0].header['CH4ABSFL']=(CH4file,'Source file for CH4 Absorption')

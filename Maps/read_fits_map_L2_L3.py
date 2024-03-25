@@ -18,16 +18,21 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
     from matplotlib.pyplot import imread
     from astropy.io import fits
     sys.path.append('./Services')
-    import get_L2_abs_data as GAOD
+    import get_obs_list as getlist
+
     import get_WINJupos_ephem as WJ_ephem
     import numpy as np
 
     target="Jupiter"
-    sourcedata=obskey+"_"+imagetype
-    sourcefiles=GAOD.get_L2_abs_data()
+    sourcedata=obskey#+"_"+imagetype
+    sourcefiles=getlist.get_obs_list()
     pathRGB='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+obskey[0:10]+'/'
 
-    RGBfile=sourcefiles[sourcedata]['RGBfile']+"_CM2_L360_MAP-BARE.png"
+    if imagetype=="Map":
+        RGBfile=sourcefiles[sourcedata]['RGBfile']+"_CM2_L360_MAP-BARE.png"
+    elif imagetype=="Img":
+        RGBfile=sourcefiles[sourcedata]['RGBfile']+".png"
+
     if RGBfile != 'NA':
         RGB=imread(pathRGB+RGBfile)
         RGBsec=str(int(str(RGBfile[16:17]))*6)
@@ -39,27 +44,27 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
         RGB_CM3=float(eph[2].strip())
 
     if Level=="L2":
-        CH4suffix="-Jupiter_Map_L2TCH4"
-        NH3suffix="-Jupiter_Map_L2TNH3"
+        CH4suffix="-Jupiter_"+imagetype+"_L2TCH4"
+        NH3suffix="-Jupiter_"+imagetype+"_L2TNH3"
         pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/'
     elif Level=="L3":
-        CH4suffix="-Jupiter_Map_L3PCld_S0"
-        NH3suffix="-Jupiter_Map_L3fNH3_S0"
+        CH4suffix="-Jupiter_"+imagetype+"_L3PCld_S0"
+        NH3suffix="-Jupiter_"+imagetype+"_L3fNH3_S0"
         pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/'
         
     try:
-        PCloudfile=sourcefiles[sourcedata]['CH4file']+CH4suffix+\
+        PCloudfile=sourcefiles[sourcedata]['CH4file'][0:17]+CH4suffix+\
                 sourcefiles[sourcedata]['Metadata']['Variation']+".fits"
         variation=sourcefiles[sourcedata]['Metadata']['Variation']
     except:
-        PCloudfile=sourcefiles[sourcedata]['CH4file']+CH4suffix+".fits"
+        PCloudfile=sourcefiles[sourcedata]['CH4file'][0:17]+CH4suffix+".fits"
         variation=""
     try:
-        fNH3file=sourcefiles[sourcedata]['NH3file']+NH3suffix+\
+        fNH3file=sourcefiles[sourcedata]['NH3file'][0:17]+NH3suffix+\
                 sourcefiles[sourcedata]['Metadata']['Variation']+".fits"
         variation=sourcefiles[sourcedata]['Metadata']['Variation']
     except:
-        fNH3file=sourcefiles[sourcedata]['NH3file']+NH3suffix+".fits"
+        fNH3file=sourcefiles[sourcedata]['NH3file'][0:17]+NH3suffix+".fits"
         variation=""
 
     PCloudhdulist=fits.open(pathFITS+PCloudfile)
@@ -88,8 +93,9 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
     
     if LonSys=='1':
         print("LonSys1=",LonSys)
-        RGBroll=RGB_CM2-RGB_CM1
-        RGB=np.roll(RGB,int(RGBroll),axis=1)
+        if imagetype=="Map":
+            RGBroll=RGB_CM2-RGB_CM1
+            RGB=np.roll(RGB,int(RGBroll),axis=1)
 
         NH3roll=NH3_CM3-NH3_CM1
         fNH3datar=np.roll(fNH3data,int(NH3roll),axis=1)
@@ -121,8 +127,9 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
         RGBCM=RGB_CM2
         
     if LonSys=='3':
-        RGBroll=RGB_CM3-RGB_CM2
-        RGB=np.roll(RGB,int(-RGBroll),axis=1)
+        if imagetype=="Map":
+            RGBroll=RGB_CM3-RGB_CM2
+            RGB=np.roll(RGB,int(-RGBroll),axis=1)
 
         fNH3datar=fNH3data
         PClouddatar=PClouddata
@@ -140,5 +147,8 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
     #axsamf[0].imshow(fNH3data)
     #axsamf[1].imshow(np.flipud(amfdata),vmin=-5.0,vmax=5.0)
     #axsamf[2].imshow(fNH3eza,vmin=-5.0,vmax=5.0)
-    return(PCloudhdr,PClouddatar,fNH3hdr,fNH3datar,fNH3szar,fNH3ezar,RGB,RGBCM)
+    return(PCloudhdr,PClouddatar,
+           fNH3hdr,fNH3datar,
+           fNH3szar,fNH3ezar,
+           RGB,RGBCM,RGBtime)
 

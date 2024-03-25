@@ -30,6 +30,7 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRSSCT'):
     from astropy.convolution import convolve
     import plot_TEXES_Groups_P3 as PTG
     import RetrievalLibrary as RL
+    import get_obs_list as getlist
 
     import get_WINJupos_ephem
 
@@ -40,9 +41,11 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRSSCT'):
     ###########################################################################
     #    sourcedata=obsdate+"_"+imagetype
     #!!!!Need to clarify GRSDates set vs GRS SCT+VLT or SCT only or VLT only
+    sourcefiles=getlist.get_obs_list()
+
     GRSVLTDates=['20220730UT','20220919UTa']
-    GRSSCTDates=['20220810UT','20220818UT','20220828UT','20220904UT',
-                 '20220919UTb','20221013UT','20221020UT','20230113UT']
+    GRSSCTDates=['20220810UTa','20220818UTa','20220828UTa','20220904UTa',
+                 '20220919UTb','20221013UTa','20221020UTa','20230113UTa']
     GRSCMDates=['20220730UT','20220818UT','20220828UT','20220904UT',
                 '20220919UTa','20221013UT','20221020UT']
     
@@ -149,15 +152,32 @@ def GRS_NH3_Comparison_2022(LatLims=[70,130],CM2=20,LonRng=30,target='GRSSCT'):
 
         axs[i,j].set_adjustable('box') 
         #path='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+Dates[j][0:10]+'/'
-        path='c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/map plots/'
+        path='c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/'
         print(Dates[j])
 
+        try:    #Set up to allow for parametric studies of different processing paths
+            NH3file=sourcefiles[target]['NH3file'][0:17]+"-Jupiter_Map_L2TNH3"+\
+                    sourcefiles[target]['Variation']+".fits"
+            variation=sourcefiles[target]['Variation']
+        except:
+            NH3file=sourcefiles[target]['NH3file'][0:17]+"-Jupiter_Map_L2TNH3.fits"
+            variation=""
+        
+        NH3hdulist=fits.open(path+NH3file)
+        NH3hdulist.info()
+        NH3hdr=NH3hdulist[0].header
+        NH3data=NH3hdulist[0].data
+        sza=NH3hdulist[1].data
+        eza=NH3hdulist[2].data
+        NH3hdulist.close()
+        #!!!WORK IN PROGRESS - MODERNIZING TO USE get_obs_list etc.
+        """
         fNH3hdulist=fits.open(path+sourcefiles[Dates[j]]['fNH3file'])
         fNH3hdulist.info()
         fNH3hdr=fNH3hdulist[0].header
         fNH3data=fNH3hdulist[0].data
         fNH3hdulist.close()
-        
+        """
         fNH3_patch=RL.make_patch(fNH3data,LatLims,LonLims,CM2,LonRng)*1.0e6
         vn=np.mean(fNH3_patch)-3.0*np.std(fNH3_patch)
         vx=np.mean(fNH3_patch)+3.0*np.std(fNH3_patch)

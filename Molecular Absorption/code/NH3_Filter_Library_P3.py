@@ -343,6 +343,7 @@ def SpectralModeling(s_NH3=0.018,s_CH4=0.304,refl=0.53):
             TauSCTNH3=-np.log(Trans_Arr)
             R_W=np.corrcoef(s_Arr,W_Arr)[0,1]
             R_trans=np.corrcoef(s_Arr,TauSCTNH3)[0,1]
+            
             NH3fit=np.polyfit(TauSCTNH3,W_Arr,1)
             NH3transfit=np.polyfit(Trans_Arr,W_Arr,1)
             
@@ -355,7 +356,7 @@ def SpectralModeling(s_NH3=0.018,s_CH4=0.304,refl=0.53):
             print(gas+" "+tele+" Trans fit=",NH3transfit)
 
             #print("************** i,j=",i,j)
-            axs_tau[0,j].plot(s_Arr,TauSCTNH3,color='C0',label='Tau, R=')#+str(R_trans)[:5])
+            axs_tau[0,j].plot(s_Arr,TauSCTNH3,color='C0',label='Tau, R='+str(R_trans)[:5])
             axs_tau[i,j].grid(linewidth=0.2)
             #axs_tau[i,j].set_xlabel("Column Abundance (km-atm)")
             #axs_tau[0,0].set_ylabel("Opacity")
@@ -372,6 +373,7 @@ def SpectralModeling(s_NH3=0.018,s_CH4=0.304,refl=0.53):
             axWNH3.plot(s_Arr,W_Arr,color='C1',label='Eq. Width (nm), R=')#+str(R_W)[:4])
             axWNH3.set_ylim(0.0,3.0)
             axWNH3.set_yticks(np.linspace(0.0,3,6, endpoint=True))
+            
             ###################################################################
             #Plot EW vs Tau and *fit* of EW vs Tau
             ###################################################################

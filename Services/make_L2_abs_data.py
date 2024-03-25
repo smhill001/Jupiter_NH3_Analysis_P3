@@ -1,5 +1,5 @@
-def make_l2_abs_data(obsdate="20231207UTc",target="Jupiter",
-                     imagetype='Map'):
+def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
+                     mask=False,CH4shift=0.0,NH3shift=0.0):
     """
     Created on Fri Sep 15 07:48:05 2023
     
@@ -49,8 +49,8 @@ def make_l2_abs_data(obsdate="20231207UTc",target="Jupiter",
         CalModel="VLT-Obs-Final"
 
     calibration,K_eff=RMC.read_master_calibration()
-    CH4GlobalTrans=calibration[CalModel]['CH4GlobalTrans']
-    NH3GlobalTrans=calibration[CalModel]['NH3GlobalTrans']
+    CH4GlobalTrans=calibration[CalModel]['CH4GlobalTrans']+CH4shift
+    NH3GlobalTrans=calibration[CalModel]['NH3GlobalTrans']+NH3shift
     ###########################################################################
     # OBTAIN IMAGES TO DISPLAY, READ DATA, AND DETERMINE IMAGE ARRAY SIZE
     ###########################################################################             
@@ -115,6 +115,19 @@ def make_l2_abs_data(obsdate="20231207UTc",target="Jupiter",
         NH3data=nh3abs
         CLSLdata=clrslp
         CH4data=ch4abs
+        if mask:
+            print("IN MASK IN MASK")
+            indices=(NH3_RGB>0.2*NH3_RGB.max())
+            mask=np.zeros(NH3_RGB.shape)
+            mask[indices]=1.
+
+            NH3data=nh3abs*mask[:,:,1]
+            CLSLdata=clrslp*mask[:,:,1]
+            CH4data=ch4abs*mask[:,:,1]
+            
+            CH4data[np.isnan(CH4data)] = 0.
+            NH3data[np.isnan(NH3data)] = 0.
+            CLSLdata[np.isnan(CLSLdata)] = 0.
 
     #RGBCM=RGB_CM3
     eza,sza=za.make_sza_eza_planes(dateobs=NH3time.replace('_','T')+'Z')
@@ -136,7 +149,7 @@ def make_l2_abs_data(obsdate="20231207UTc",target="Jupiter",
     for BUNIT in ['NH3 Trans','CH4 Trans','Clr Slp']:
         if BUNIT=='NH3 Trans':
             dataarray=NH3data
-            hdu = fits.PrimaryHDU(NH3data.astype(np.float32))
+            hdu = fits.PrimaryHDU(dataarray.astype(np.float32))
             comment="NH3 Transmission"
             Real_CM1=NH3_CM1
             Real_CM2=NH3_CM2
@@ -147,7 +160,7 @@ def make_l2_abs_data(obsdate="20231207UTc",target="Jupiter",
             Range=[0.90,1.0] #scaled range for PNG file
         elif BUNIT=='CH4 Trans':
             dataarray=CH4data
-            hdu = fits.PrimaryHDU(CH4data.astype(np.float32))
+            hdu = fits.PrimaryHDU(dataarray.astype(np.float32))
             comment="CH4 Transmission"
             Real_CM1=CH4_CM1
             Real_CM2=CH4_CM2
@@ -155,7 +168,7 @@ def make_l2_abs_data(obsdate="20231207UTc",target="Jupiter",
             datetime=CH4time
             file=CH4file
             fn=file[0:25]+"_"+imagetype+'_L2TCH4'
-            Range=[0.80,1.0] #scaled range for PNG file
+            Range=[0.80,0.95] #scaled range for PNG file
         elif BUNIT=='Clr Slp':
             dataarray=CLSLdata
             hdu = fits.PrimaryHDU(CLSLdata.astype(np.float32))
@@ -195,6 +208,8 @@ def make_l2_abs_data(obsdate="20231207UTc",target="Jupiter",
         hdul[0].header['CM1']=(Real_CM1,'Sys. 1 Long. Central Meridian')
         hdul[0].header['CM2']=(Real_CM2,'Sys. 1 Long. Central Meridian')
         hdul[0].header['CM3']=(Real_CM3,'Sys. 1 Long. Central Meridian')
+        hdul[0].header['RANGE0']=(Range[0],'Scaling Range - Black Level')
+        hdul[0].header['RANGE1']=(Range[1],'Scaling Range - White Level')
         hdul[0].header['SOURCEFL']=(file,'Source file')
         
         fnout=pathout+fn
@@ -209,5 +224,11 @@ def make_l2_abs_data(obsdate="20231207UTc",target="Jupiter",
         #######################################################################
         # WRITE Scaled PNG File
         ######################################################################
-        scl_arr = ((dataarray - Range[0]) * (1/(Range[1] - Range[0]) * 65534.9999)).astype('uint16')#
+        temp=((dataarray - Range[0])/(Range[1] - Range[0]) * 65534.9999)#.astype('uint16')#
+        temp[temp < 0] = 0
+        scl_arr=temp.astype('uint16')
+        #fig,axs=pl.subplots(1,1,figsize=(5.0,5.0), dpi=150, facecolor="black")
+        #axs.imshow(scl_arr)
+        #fig1,axs1=pl.subplots(1,1,figsize=(5.0,5.0), dpi=150, facecolor="black")
+        #axs1.imshow(dataarray)
         imwrite(fnout+'.png', scl_arr)#.astype(np.uint16))
