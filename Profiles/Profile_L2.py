@@ -87,12 +87,12 @@ def Profile_L2(band="NH3",profile="Meridional",ProfileHalfWidth=45,
     #axsavgprof.set_xticks(np.linspace(-45.,45.,7), minor=False)
     if band=="CH4":
         axsavgprof.set_title("Methane 619 nm Absorption Profiles")
-        axsavgprof.set_ylim(0.0,2.0)
-        axsavgprof.set_yticks(np.linspace(0.0,2.0,5), minor=False)
+        axsavgprof.set_ylim(0.0,2.5)
+        axsavgprof.set_yticks(np.linspace(0.0,2.5,5), minor=False)
     elif band=="NH3":
         axsavgprof.set_title("Ammonia 646 nm Absorption Profiles")
-        axsavgprof.set_ylim(0.0,1.0)
-        axsavgprof.set_yticks(np.linspace(0.0,1.0,5), minor=False)
+        axsavgprof.set_ylim(0.0,1.5)
+        axsavgprof.set_yticks(np.linspace(0.0,1.5,7), minor=False)
     if profile=="Meridional":
         xlabel="Planetographic Latitude (deg)"
     elif profile=="Zonal":

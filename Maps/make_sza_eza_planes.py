@@ -1,4 +1,4 @@
-def make_sza_eza_planes(dateobs='2023-10-17 04:04:42',First=True):
+def make_sza_eza_planes(dateobs='2022-07-30 03:52:18',First=True):
     """
     Created on Sun Dec 17 07:08:46 2023
     
@@ -52,5 +52,9 @@ def make_sza_eza_planes(dateobs='2023-10-17 04:04:42',First=True):
     #fig.savefig(fn,dpi=300)
     #print("################")
     #print(dateobs)
+    Jup=pm.Body("Jupiter",dateobs)
+    print("Jupiter Dist=",Jup.target_distance)
+    Jup=pm.Body("Jupiter",dateobs)
+    print("Jupiter Dist=",Jup.target_distance)
     
     return(eza,sza)

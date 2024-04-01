@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['Services\\make_L2_abs_data.py', 'Services\\make_L3_env_data.py', 'Maps\\Map_Jup_Atm_P3.py', 'Services\\get_obs_list.py', 'Services\\image_array_new.py', '..\\..\\..\\Python Play\\ImageMetadata_P3\\MetaDataScript_P3.py']
+recent_files = ['Services\\make_L2_abs_data.py', 'Services\\make_L3_env_data.py', 'MUSE\\MUSE_Pipeline.py', 'MUSE\\MUSE_Spectrum.py', 'MUSE\\ReadMUSE.py', 'BatchMapsScript_P3.py', 'Maps\\Map_Jup_Atm_P3.py', 'Profiles\\Profile_L2.py', 'Profiles\\plot_TEXES_Groups_P3.py', 'Profiles\\extract_profile.py']
 
 [main]
 version = 0.2.0

@@ -17,7 +17,8 @@ def read_master_calibration():
                  'Observed':{'CH4GlobalTrans':0.910,'NH3GlobalTrans':0.972},
                  'VLT-MUSE':{'CH4GlobalTrans':0.861,'NH3GlobalTrans':0.961},
                  'SCT-Obs-Final':{'CH4GlobalTrans':0.920,'NH3GlobalTrans':0.972},
-                 'VLT-Obs-Final':{'CH4GlobalTrans':0.893,'NH3GlobalTrans':0.962}}
+                 'VLT-Obs-Final':{'CH4GlobalTrans':0.893,'NH3GlobalTrans':0.962},
+                 'VLT-Filter':{'CH4GlobalTrans':0.885,'NH3GlobalTrans':0.939}}
 
     K_eff={'CH4_620':{'C11':0.427,'VLT':0.454},
            'NH3_647':{'C11':2.955,'VLT':3.129}}

@@ -1,5 +1,5 @@
 def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
-                     mask=False,CH4shift=0.0,NH3shift=0.0):
+                     mask=True,CH4shift=0.0,NH3shift=0.0):
     """
     Created on Fri Sep 15 07:48:05 2023
     
@@ -47,6 +47,7 @@ def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
         CalModel="SCT-Obs-Final"
     elif sourcefiles[sourcedata]["Telescope"]=="VLT":
         CalModel="VLT-Obs-Final"
+    CalModel="VLT-Filter"  ##!!Overwrite with new MUSE observed convolved with filters
 
     calibration,K_eff=RMC.read_master_calibration()
     CH4GlobalTrans=calibration[CalModel]['CH4GlobalTrans']+CH4shift

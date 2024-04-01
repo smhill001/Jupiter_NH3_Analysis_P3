@@ -1,4 +1,4 @@
-def image_array_new(obsdate="20220810UTa",target="Jupiter",
+def image_array_new(obsdate="20221009UTa",target="Jupiter",
                      imagetype='Img',contour=False):
     """
     Created on Fri Sep 15 07:48:05 2023

@@ -40,6 +40,7 @@ def ReadMUSE(date):
     MUSEhdulist.info()
     MUSEhdr=MUSEhdulist[0].header
     MUSEdata=MUSEhdulist[1].data
+    MUSEhdr1=MUSEhdulist[1].header
     MUSEzen=MUSEhdulist[5].data
     MUSEszen=MUSEhdulist[6].data
     MUSEhdulist.close()
@@ -48,6 +49,9 @@ def ReadMUSE(date):
     # Load filter metadata for MUSE
     ########################################################################### 
     filterwavelength=['620','632','647','656','658','672','730','889','940']
+    """
+    #Filter wv lims geared toward the core of the filter band for direct integration
+    #without filter convolution
     filterdata={'620':{'transfile':'620CH4/620CH4_Transmission.txt',
                        'filtname':'620CH4','filtwdth':10.,'wvs':[615.,625.]},
                  '632':{'transfile':'632OI/632OI_Transmission.txt',
@@ -56,7 +60,7 @@ def ReadMUSE(date):
                         'filtname':'647NH3','filtwdth':10.,'wvs':[642.,652.]},
                  '656':{'transfile':'656HIA/656HIA_Transmission.txt',
                         'filtname':'656HIA','filtwdth':10.,
-                        'wvsRED':[658.0,661.0],'wvsBLU':[651.0,654.0]},
+                        'wvsRED':[658.0,660.5],'wvsBLU':[651.0,654.0]},
                  '658':{'transfile':'658NII/658NII_Transmission.txt',
                         'filtname':'658NII','filtwdth':5.},
                  '672':{'transfile':'672SII/672SII_Transmission.txt',
@@ -67,5 +71,24 @@ def ReadMUSE(date):
                         'filtname':'889CH4','filtwdth':10.},
                  '940':{'transfile':'940NIR/940NIR_Transmission.txt',
                         'filtname':'940NIR','filtwdth':10.}}
-    
-    return(MUSEhdr,MUSEdata,MUSEzen,MUSEszen,wavelength,filterdata,path)
+    """
+    filterdata={'620':{'transfile':'620CH4/620CH4_Transmission.txt',
+                       'filtname':'620CH4','filtwdth':10.,'wvs':[610.,630.]},
+                 '632':{'transfile':'632OI/632OI_Transmission.txt',
+                        'filtname':'632OI','filtwdth':10.,'wvs':[622.,642.]},
+                 '647':{'transfile':'647CNT/647CNT_Transmission.txt',
+                        'filtname':'647NH3','filtwdth':10.,'wvs':[637.,657.]},
+                 '656':{'transfile':'656HIA/656HIA_Transmission.txt',
+                        'filtname':'656HIA','filtwdth':10.,
+                        'wvsRED':[658.0,666.0],'wvsBLU':[646.0,654.0]},
+                 '658':{'transfile':'658NII/658NII_Transmission.txt',
+                        'filtname':'658NII','filtwdth':5.},
+                 '672':{'transfile':'672SII/672SII_Transmission.txt',
+                        'filtname':'672SII','filtwdth':10.},
+                 '730':{'transfile':'730OII/730OII_Transmission.txt',
+                        'filtname':'730OII','filtwdth':10.},
+                 '889':{'transfile':'889CH4/889CH4_Transmission.txt',
+                        'filtname':'889CH4','filtwdth':10.},
+                 '940':{'transfile':'940NIR/940NIR_Transmission.txt',
+                        'filtname':'940NIR','filtwdth':10.}}
+    return(MUSEhdr,MUSEhdr1,MUSEdata,MUSEzen,MUSEszen,wavelength,filterdata,path)

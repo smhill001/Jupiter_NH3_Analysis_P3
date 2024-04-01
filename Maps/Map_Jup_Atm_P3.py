@@ -105,7 +105,7 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     
     fNH3_patch_mb,vn,vx,tx_fNH3=plot_patch(TestfNH3,LatLims,NH3LonLims,
                                      fNH3PlotCM,LonRng,"jet",
-                                     axs1[0],'%3.2f',cont=False,n=6,vn=50,vx=150)
+                                     axs1[0],'%3.2f',cont=False,n=6,vn=70,vx=200)
 
     temp=RL.make_contours_CH4_patch(axs1[0],fNH3_patch_mb,LatLims,NH3LonLims,
                            lvls=tx_fNH3,frmt='%3.0f',clr='k')
@@ -214,7 +214,7 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     Pcloud_patch,vn,vx,tx=plot_patch(TestPCloud,LatLims,NH3LonLims,
                                      PCldPlotCM,LonRng,"jet",
                                      axs2[0],'%3.2f',cont=False,
-                                     cbar_reverse=True,vn=400,vx=900,n=6)
+                                     cbar_reverse=True,vn=700,vx=1300,n=6)
 
     """##########TEST CODE
     hdu = fits.PrimaryHDU((R["CH4"]["PCloud"]).astype(np.float32))
@@ -321,7 +321,7 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     Pcloud_patch,vn,vx,tx=plot_patch(TestPCloud,LatLims,NH3LonLims,
                                      PCldPlotCM,LonRng,"Greys",
                                      axs3[0],'%3.2f',cont=False,
-                                     cbar_reverse=True,vn=400,vx=900,n=7)
+                                     cbar_reverse=True,vn=700,vx=1300,n=7)
     temp=RL.make_contours_CH4_patch(axs3[0],fNH3_patch_mb,LatLims,NH3LonLims,
                            tx_fNH3,frmt='%3.0f',clr='b')
 
@@ -432,7 +432,7 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     Pcloud_patch,vn,vx,tx=plot_patch(TestPCloud,LatLims,NH3LonLims,
                                      PCldPlotCM,LonRng,"Greys",
                                      axs4[0],'%3.2f',cont=False,
-                                     cbar_reverse=True,vn=400,vx=900,n=6)
+                                     cbar_reverse=True,vn=700,vx=1300,n=6)
 
     temp=RL.make_contours_CH4_patch(axs4[0],fNH3_patch_mb,LatLims,NH3LonLims,
                            tx_fNH3,frmt='%3.0f',clr='b')
@@ -753,8 +753,8 @@ def plot_scatter(patch1,patch2,obskey,Real_CM2,LatLims,axscor):
                            alpha=0.8,label=key)
      
     axscor.grid(linewidth=0.2)
-    axscor.set_ylim(400.,900.)
-    axscor.set_xlim(50.,150)
+    axscor.set_ylim(700.,1300.)
+    axscor.set_xlim(70.,200)
     axscor.set_ylabel("Effective Cloud-top Pressure (mb)",fontsize=10)
     axscor.invert_yaxis()
     axscor.set_xlabel("Ammonia Mole Fraction (ppm)",fontsize=10)

@@ -31,6 +31,7 @@ def BatchMapsScript_P3(reference,Level='plots',imagetype="Map",LonSys='3'):
             Cal="SCT-Obs-Final"
         elif "VLT" in reference:
             Cal="VLT-Obs-Final"
+        Cal="VLT-Filter"  #Hard coded to use VLT 2022-09-19UT
             
         #######################################################################
         # Loop over processing options

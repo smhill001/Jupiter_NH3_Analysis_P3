@@ -97,11 +97,11 @@ def get_obs_list():
                                'NH3file':'2022-07-30-0729_8-Jupiter_R656G647B632-MUSE-RGB-Smth-WthBal',
                                'RGBfile':'2022-07-30-0729_8-Jupiter_R650G550B480-MUSE-RGB-Str'},
                   #Special 889 CH4 Verson
-                  '20220810UTa':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
-                                 'Seeing':'7/10','Transparency':'7/10',
-                               'NH3file':'2022-08-10-1013_0-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
-                               'CH4file':'2022-08-10-1031_8-Jupiter_NoWV-R656(G)B889-R(G)B-WhtBal.png',
-                               'RGBfile':'2022-08-10-1030_0-Jupiter_WV-R(AllRED)GB-RGB-WhtBal-Wavelets-Str.png'},
+                  #'20220810UTa':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  #               'Seeing':'7/10','Transparency':'7/10',
+                  #             'NH3file':'2022-08-10-1013_0-Jupiter_NoWV-R656G647B632-RGB-WhtBal.png',
+                  #             'CH4file':'2022-08-10-1031_8-Jupiter_NoWV-R656(G)B889-R(G)B-WhtBal.png',
+                  #             'RGBfile':'2022-08-10-1030_0-Jupiter_WV-R(AllRED)GB-RGB-WhtBal-Wavelets-Str.png'},
                   
                   '20220810UTa':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                     'Seeing':'7/10','Transparency':'7/10',

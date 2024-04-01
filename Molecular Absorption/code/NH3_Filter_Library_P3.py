@@ -273,7 +273,7 @@ def SpectralModeling(s_NH3=0.018,s_CH4=0.304,refl=0.53):
                 Band_idx=[np.argmin(abs(wvs[0]-filterdata[filtr]['FiltTrans'][:,0])),
                           np.argmin(abs(wvs[1]-filterdata[filtr]['FiltTrans'][:,0]))]
                 s_Arr=np.arange(0.0,0.031,0.002) #column abundance in km-atm
-                Cont_Wave=[627.,667.] #Original
+                Cont_Wave=[637.,657.] #Original
                 #NH3_Cont_Wave=[636.,656.]
                 ind1,ind2=np.argmin(abs(NH3[:,0]-Cont_Wave[0])),np.argmin(abs(NH3[:,0]-Cont_Wave[1]))
                 j=0
@@ -285,7 +285,7 @@ def SpectralModeling(s_NH3=0.018,s_CH4=0.304,refl=0.53):
                 Band_idx=[np.argmin(abs(wvs[0]-filterdata[filtr]['FiltTrans'][:,0])),
                           np.argmin(abs(wvs[1]-filterdata[filtr]['FiltTrans'][:,0]))]
                 s_Arr=np.arange(0.0,0.500,0.02) #column abundance in km-atm
-                Cont_Wave=[600.,640.] #Original
+                Cont_Wave=[610.,630.] #Original
                 ind1,ind2=np.argmin(abs(NH3[:,0]-Cont_Wave[0])),np.argmin(abs(NH3[:,0]-Cont_Wave[1]))
                 j=1
                 gas='Methane'

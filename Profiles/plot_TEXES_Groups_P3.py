@@ -12,10 +12,14 @@ def plot_TEXES_Groups(ax,clr="C2",prs=0.43798,mult=1.0):
                 seven groups of observations and computes an average and
                 standard deviation for plotting.
     """
+    import sys
     import matplotlib.pyplot as pl
     import scipy
     import numpy as np
     import matplotlib.pyplot as pl
+    sys.path.append('./Photometry/code')
+    sys.path.append('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Photometry/code/')
+
     import ComputeNetRateJupiter_P3 as CNRJ
 
     #print('***************** mult=',mult)
@@ -166,20 +170,26 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
     sys.path.append('./Services')
     import read_master_calibration
     import extract_profile as EP
-    import get_L2_abs_data as GAOD
+    import get_obs_list as GOL
     import pylab as pl
     import get_batch_lists as GBL
 
     calibration,K_eff=read_master_calibration.read_master_calibration()
-    sourcefiles=GAOD.get_L2_abs_data()
+    sourcefiles=GOL.get_obs_list()
     DataSets=GBL.get_batch_lists()
 
     pth="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/"
 
-    Trans2EW={"VLTMUSE":{"EW_slope":{"NH3":-12.15343491,"CH4":-12.74115968},
+    Trans2EW={"VLTXUSE":{"EW_slope":{"NH3":-12.15343491,"CH4":-12.74115968},
                      "EW_const":{"NH3":12.15195684,"CH4":12.73323535}},
-              "CMOS":{"EW_slope":{"NH3":-12.87087479,"CH4":-13.52007859},
-                     "EW_const":{"NH3":12.86940675,"CH4":13.51315382}}}
+              #"CMOS":{"EW_slope":{"NH3":-12.87087479,"CH4":-13.52007859},
+              #       "EW_const":{"NH3":12.86940675,"CH4":13.51315382}},
+              #"VLTMUSE":{"EW_slope":{"NH3":-12.87087479,"CH4":-13.52007859},
+              #       "EW_const":{"NH3":12.86940675,"CH4":13.51315382}}}
+              "CMOS":{"EW_slope":{"NH3":-12.04629662,"CH4":-12.86742542},
+                     "EW_const":{"NH3":12.04540329,"CH4":12.86268728}},
+              "VLTMUSE":{"EW_slope":{"NH3":-12.04629662,"CH4":-12.86742542},
+                     "EW_const":{"NH3":12.04540329,"CH4":12.86268728}}}
 
     if profile=="Meridional":
         AvgSum=np.zeros(180)
@@ -190,8 +200,8 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
         StdSum=np.zeros(360)
         xlabel="Longitude from CM (deg)"
     
-    suffix={"CH4":"-Jupiter_L2TCH4",
-            "NH3":"-Jupiter_L2TNH3"}
+    suffix={"CH4":"-Jupiter_Map_L2TCH4",
+            "NH3":"-Jupiter_Map_L2TNH3"}
     
     figspaghetti,axsspaghetti=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, 
                                           facecolor="white")
@@ -204,23 +214,25 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
         sourceindex=ID[0:4]+ID
         if len(ID)==11:
             version=ID[10]
-            dataset=ID[0:10].replace('-','')+'UT'+version+"_Map"
+            dataset=ID[0:10].replace('-','')+'UT'+version#+"_Map"
         else:
-            dataset=ID.replace('-','')+'UT'+"_Map"
+            dataset=ID.replace('-','')+'UT'#+"_Map"
         print("******dataset=",dataset)
-        print(sourcefiles[dataset])
-        file=sourcefiles[dataset][band+"file"]+suffix[band]
+
         try:
-            file=file+sourcefiles[dataset]['Metadata']['Variation']
+            file=sourcefiles[dataset][band+'file'][0:17]+suffix[band]+\
+                    sourcefiles[dataset]['Metadata']['Variation']
+            variation=sourcefiles[dataset]['Metadata']['Variation']
         except:
-            print('No Variation')
-        print("file=",file)
+            file=sourcefiles[dataset][band+'file'][0:17]+suffix[band]
+            variation=""
+
         
         Lats,AvgProf,StdProf,CM2=EP.extract_profile(pth,file+".fits",
                                                 ProfileHalfWidth=ProfileHalfWidth,
                                                 profile=profile)
         #print(Lats.shape,AvgProf.shape,StdProf.shape)
-        print("@@@@@@@@@@@@reference[5:]]=",Trans2EW[reference[5:]])
+        print("@@@@@@@@@@@@reference[5:]]=",reference[5:],Trans2EW[reference[5:]])
         Avg_EW=Trans2EW[reference[5:]]["EW_slope"][band]*AvgProf+\
             Trans2EW[reference[5:]]["EW_const"][band]
         Std_EW=Trans2EW[reference[5:]]["EW_slope"][band]*AvgProf+\
@@ -255,10 +267,10 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
         axsspaghetti.set_xlim(-ZonePlotHalfWidth,ZonePlotHalfWidth)
         
     if band=="CH4":
-        axsspaghetti.set_ylim(0,2)
+        axsspaghetti.set_ylim(0,2.5)
         axsspaghetti.set_title(reference+" Methane")
     elif band=="NH3":
-        axsspaghetti.set_ylim(0,1)
+        axsspaghetti.set_ylim(0,1.5)
         axsspaghetti.set_title(reference+" Ammonia")
 
     axsspaghetti.set_ylabel("Equivalent Width EW (nm)",fontsize=10)
