@@ -32,6 +32,9 @@ def JupiterFilterPerformance(TelescopeList=["SCT","VLT"],
     import get_keff
     projpath="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
 
+    ###########################################################################
+    #!!!!NEED A MICRO SERVICE FOR THIS!!!!
+    ###########################################################################
     gravity=22.280 #m/s^2
     mmolwt=3.85e-27 #kg/molecule
     fCH4=1.81e-3

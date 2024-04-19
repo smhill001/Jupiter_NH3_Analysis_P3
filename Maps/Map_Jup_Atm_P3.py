@@ -28,6 +28,8 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     import RetrievalLibrary as RL
     sys.path.append('./Maps')
     import read_fits_map_L2_L3 as RFM
+    import plot_patch as PP
+    import make_patch_RGB as MPRGB
     import copy
 
     target="Jupiter"
@@ -103,9 +105,9 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
 
     TestfNH3=fNH3data*amfdata**coef[0]
     
-    fNH3_patch_mb,vn,vx,tx_fNH3=plot_patch(TestfNH3,LatLims,NH3LonLims,
+    fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(TestfNH3,LatLims,NH3LonLims,
                                      fNH3PlotCM,LonRng,"jet",
-                                     axs1[0],'%3.2f',cont=False,n=6,vn=70,vx=200)
+                                     axs1[0],'%3.2f',cont=False,n=6,vn=50,vx=130)
 
     temp=RL.make_contours_CH4_patch(axs1[0],fNH3_patch_mb,LatLims,NH3LonLims,
                            lvls=tx_fNH3,frmt='%3.0f',clr='k')
@@ -115,7 +117,7 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     gamma=1.3
 
     #Logic in RGB_patch depends on LonLims and CM being consistent
-    RGB_patch=make_patch_RGB(RGB,LatLims,NH3LonLims,fNH3PlotCM,LonRng)
+    RGB_patch=MPRGB.make_patch_RGB(RGB,LatLims,NH3LonLims,fNH3PlotCM,LonRng)
     
     RGB4Display=np.power(np.array(RGB_patch).astype(float),gamma)
     RGB4Display=RGB4Display/RGB4Display.max()
@@ -206,15 +208,15 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
 
         axs2[ix].set_adjustable('box') 
 
-    #Pcloud_patch,vn,vx,tx=plot_patch(PClouddata,LatLims,NH3LonLims,
+    #Pcloud_patch,vn,vx,tx=PP.plot_patch(PClouddata,LatLims,NH3LonLims,
     #                                 PCldPlotCM,LonRng,"jet",
     #                                 axs2[0],'%3.2f',cont=False,
     #                                 cbar_reverse=True,vn=400,vx=900,n=6)
     TestPCloud=PClouddata*amfdata**coef[1]
-    Pcloud_patch,vn,vx,tx=plot_patch(TestPCloud,LatLims,NH3LonLims,
+    Pcloud_patch,vn,vx,tx=PP.plot_patch(TestPCloud,LatLims,NH3LonLims,
                                      PCldPlotCM,LonRng,"jet",
                                      axs2[0],'%3.2f',cont=False,
-                                     cbar_reverse=True,vn=700,vx=1300,n=6)
+                                     cbar_reverse=True,vn=800,vx=1300,n=6)
 
     """##########TEST CODE
     hdu = fits.PrimaryHDU((R["CH4"]["PCloud"]).astype(np.float32))
@@ -314,14 +316,14 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     axs3[0].set_adjustable('box') 
     axs3[1].set_adjustable('box') 
 
-    #Pcloud_patch,vn,vx,tx=plot_patch(PClouddata,LatLims,NH3LonLims,
+    #Pcloud_patch,vn,vx,tx=PP.plot_patch(PClouddata,LatLims,NH3LonLims,
     #                                 PCldPlotCM,LonRng,"jet",
     #                                 axs2[0],'%3.2f',cont=False,
     #                                 cbar_reverse=True,vn=400,vx=900,n=6)
-    Pcloud_patch,vn,vx,tx=plot_patch(TestPCloud,LatLims,NH3LonLims,
+    Pcloud_patch,vn,vx,tx=PP.plot_patch(TestPCloud,LatLims,NH3LonLims,
                                      PCldPlotCM,LonRng,"Greys",
                                      axs3[0],'%3.2f',cont=False,
-                                     cbar_reverse=True,vn=700,vx=1300,n=7)
+                                     cbar_reverse=True,vn=800,vx=1300,n=6)
     temp=RL.make_contours_CH4_patch(axs3[0],fNH3_patch_mb,LatLims,NH3LonLims,
                            tx_fNH3,frmt='%3.0f',clr='b')
 
@@ -424,15 +426,15 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
 
         axs4[ix].set_adjustable('box') 
 
-    #Pcloud_patch,vn,vx,tx=plot_patch(PClouddata,LatLims,NH3LonLims,
+    #Pcloud_patch,vn,vx,tx=PP.plot_patch(PClouddata,LatLims,NH3LonLims,
     #                                 PCldPlotCM,LonRng,"jet",
     #                                 axs4[0],'%3.2f',cont=False,
     #                                 cbar_reverse=True,vn=400,vx=900,n=6)
     TestPCloud=PClouddata*amfdata**coef[1]
-    Pcloud_patch,vn,vx,tx=plot_patch(TestPCloud,LatLims,NH3LonLims,
+    Pcloud_patch,vn,vx,tx=PP.plot_patch(TestPCloud,LatLims,NH3LonLims,
                                      PCldPlotCM,LonRng,"Greys",
                                      axs4[0],'%3.2f',cont=False,
-                                     cbar_reverse=True,vn=700,vx=1300,n=6)
+                                     cbar_reverse=True,vn=800,vx=1300,n=6)
 
     temp=RL.make_contours_CH4_patch(axs4[0],fNH3_patch_mb,LatLims,NH3LonLims,
                            tx_fNH3,frmt='%3.0f',clr='b')
@@ -647,62 +649,6 @@ def load_png(file_path):
         flow[i, :, 2] = flow_data[i][2::3]
 
     return flow.astype(np.uint16) 
-    
-
-def make_patch_RGB(Map,LatLims,LonLims,CM2deg,LonRng,pad=True):
-    """
-    Purpose: Make a map patch and handle the case where the data overlap
-             the map edges. This is designed for a map with Jovian longitude
-             conventions that with the left boundary at 360 ascending from
-             the right boundary at 0. In WinJUPOS, the actual map setting
-             shows the left boundary at zero, which is of course, also 360.
-    """
-    import numpy as np
-    patch=np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]:LonLims[1],:])
-    if CM2deg<LonRng:
-        patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]-1:360,:]),
-                              np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]-360,:])),axis=1)
-    if CM2deg>360-LonRng:
-        patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],360+LonLims[0]:360,:]),
-                              np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1],:])),axis=1)
-    #if pad:
-    #    patch_pad=np.pad(patch,5,mode='reflect')
-
-    return patch
-
-def plot_patch(fullmap,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
-               cont=True,cbar_reverse=False,vn=0.10,vx=0.20,n=6):
-    import numpy as np
-    import pylab as pl
-    import RetrievalLibrary as RL
-
-    patch=RL.make_patch(fullmap,LatLims,LonLims,CM2,LonRng)
-    np.nan_to_num(patch, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
-    #vn=np.mean(patch)-3.0*np.std(patch)
-    #vx=np.mean(patch)+3.0*np.std(patch)
-    tx=np.linspace(vn,vx,n,endpoint=True)
-    
-    #print(np.mean(patch),vn,vx)
-
-    show=axis.imshow(patch, colorscale, origin='upper',vmin=vn,vmax=vx,  
-               extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
-                       90-LatLims[0]],
-                       aspect="equal")
-    if cont:
-        temp=RL.make_contours_CH4_patch(axis,patch,LatLims,LonLims,
-                           lvls=tx,frmt=frmt,clr='k')
-
-    cbar = pl.colorbar(show, ticks=tx, 
-               orientation='vertical',cmap='gist_heat',
-               ax=axis,fraction=0.046, pad=0.04)
-    cbar.ax.set_yticklabels(np.around(tx,3))
-    cbar.ax.tick_params(labelsize=6,color="k")#if iSession >1:
-    if cbar_reverse:
-        cbar.ax.invert_yaxis()
-    #if colorscale=="Greys":
-    #    cbar.set_label('Cloud Top Pressure (mb)',fontsize=7)
-
-    return patch,vn,vx,tx
 
 def plot_scatter(patch1,patch2,obskey,Real_CM2,LatLims,axscor):
     import pylab as pl
@@ -753,8 +699,8 @@ def plot_scatter(patch1,patch2,obskey,Real_CM2,LatLims,axscor):
                            alpha=0.8,label=key)
      
     axscor.grid(linewidth=0.2)
-    axscor.set_ylim(700.,1300.)
-    axscor.set_xlim(70.,200)
+    axscor.set_ylim(800.,1300.)
+    axscor.set_xlim(30.,130)
     axscor.set_ylabel("Effective Cloud-top Pressure (mb)",fontsize=10)
     axscor.invert_yaxis()
     axscor.set_xlabel("Ammonia Mole Fraction (ppm)",fontsize=10)

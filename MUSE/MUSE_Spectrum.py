@@ -1,4 +1,4 @@
-def MUSE_Spectrum(date,MUSEhdr,MUSEdata,wavelength,filterdata,path):
+def MUSE_Spectrum(date):#,MUSEhdr,MUSEdata,wavelength,filterdata,path):
     """
     Created on Thu Jan 12 14:21:05 2023
     
@@ -34,7 +34,7 @@ def MUSE_Spectrum(date,MUSEhdr,MUSEdata,wavelength,filterdata,path):
     ###########################################################################
     # Read MUSE data cube and filter metadata
     ###########################################################################
-    #MUSEhdr,MUSEdata,MUSEzen,MUSEszen,wavelength,filterdata,path=RM.ReadMUSE(date)
+    MUSEhdr,MUSEhdr1,MUSEdata,MUSEzen,MUSEszen,wavelength,filterdata,path=RM.ReadMUSE(date)
 
     ###########################################################################
     # Compute spectrum and smooth
@@ -52,18 +52,21 @@ def MUSE_Spectrum(date,MUSEhdr,MUSEdata,wavelength,filterdata,path):
     count=np.nansum(mask[:,:,:],axis=(1,2)) 
     MUSESum=np.nansum(MUSEdata[:,:,:],axis=(1,2))    
     
-    kernel_size = 14
+    if date=="20220919UT":
+        kernel_size = 14
+        Gkernel_size=1
+    elif date=="20220730UT":
+        kernel_size = 1
+        Gkernel_size=5
     kernel = np.ones(kernel_size) / kernel_size
+    print(kernel.shape)
     data_convolved0 = np.convolve(MUSESpec, kernel, mode='same')
     data_convolved = np.convolve(data_convolved0, kernel, mode='same')
     
     ###########################################################################
-    # Regrid spectra to 0.5 nm; use smoothed spectrum for 2022-09-19
+    # Regrid smoothed spectra to 0.5 nm
     ###########################################################################
-    if date=="20220919UT":
-        WaveGrid,SignalonGrid=GSU.uniform_wave_grid(wavelength,data_convolved,Extend=False,Fine=False)
-    elif date=="20220730UT":
-        WaveGrid,SignalonGrid=GSU.uniform_wave_grid(wavelength,MUSESpec,Extend=False,Fine=False)        
+    WaveGrid,SignalonGrid=GSU.uniform_wave_grid(wavelength,data_convolved,Extend=False,Fine=False)
     MuseSpecGrid=np.column_stack((WaveGrid,SignalonGrid))
     print("MuseSpecGrid.shape=",MuseSpecGrid.shape)
     
@@ -90,7 +93,13 @@ def MUSE_Spectrum(date,MUSEhdr,MUSEdata,wavelength,filterdata,path):
         G2V[:,1]=G2V[:,1]/(10000*(4.*np.pi*(5.2*1.496e11)**2)) #convert from M**-2 to cm**-2
         G2V[:,1]=G2V[:,1]/(2.*np.pi)
         WaveGrid2,SignalonGrid2=GSU.uniform_wave_grid(G2V[:,0],G2V[:,1],Extend=False,Fine=False)
-        G2Vgrid=np.column_stack((WaveGrid2,SignalonGrid2))
+
+        Gkernel = np.ones(Gkernel_size) / Gkernel_size
+        print(Gkernel.shape)
+        temp0 = np.convolve(SignalonGrid2, Gkernel, mode='same')
+        temp1 = np.convolve(temp0, Gkernel, mode='same')
+
+        G2Vgrid=np.column_stack((WaveGrid2,temp1))
     #fig,axs=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white",
     #                    sharey=True,sharex=True)      
     #axs.plot(G2V[:,0],G2V[:,1])
@@ -196,11 +205,12 @@ def MUSE_Spectrum(date,MUSEhdr,MUSEdata,wavelength,filterdata,path):
     AvgTrans656K=sum(MUSE656_ProductK[F656_idxBLU[0]:F656_idxRED[1],1])/ \
                     sum(FilterTransmission656[F656_idxBLU[0]:F656_idxRED[1],1])
     print("AvgTrans656=",AvgTrans656V,AvgTrans656K) 
+    print()
 
     NH3RelSlopeV=(AvgTrans656V-AvgTrans632V)/(656.-632.)
     NH3contV=AvgTrans632V+NH3RelSlopeV*15.
     NH3RelSlopeK=(AvgTrans656K-AvgTrans632K)/(656.-632.)
-    NH3contK=AvgTrans632K+NH3RelSlopeV*15.
+    NH3contK=AvgTrans632K+NH3RelSlopeK*15.
 
     NH3TransV=AvgTrans647V/NH3contV
     NH3TransK=AvgTrans647K/NH3contK
@@ -258,3 +268,16 @@ def MUSE_Spectrum(date,MUSEhdr,MUSEdata,wavelength,filterdata,path):
     print("Jupiter Dist=",Jup.target_distance)
     JupSun=pm.Body("Jupiter",MUSEhdr["DATE-OBS"],"Sun")
     print("Jupiter Dist=",JupSun.target_distance)
+
+    fig4,axs4=pl.subplots(1,1,figsize=(6.0,3.5), dpi=150, facecolor="white",
+                        sharey=True,sharex=True)
+    axs4.set_xlim(600.,680.)
+    axs4.set_ylim(0,1)
+    axs4.set_xlabel("Wavelength (nm)")
+    axs4.plot(FilterTransmission620[:,0],FilterTransmission620[:,1]/np.nanmax(FilterTransmission620[:,1]),label='620')
+    axs4.plot(FilterTransmission632[:,0],FilterTransmission632[:,1]/np.nanmax(FilterTransmission632[:,1]),label='632')
+    axs4.plot(FilterTransmission647[:,0],FilterTransmission647[:,1]/np.nanmax(FilterTransmission647[:,1]),label='647')
+    axs4.plot(FilterTransmission656[:,0],FilterTransmission656[:,1]/np.nanmax(FilterTransmission656[:,1]),label='656')
+    axs4.set_ylim(0,1.)
+    axs4.set_ylabel("Normalized Transmission")
+    axs4.legend(fontsize=8,loc="upper right")

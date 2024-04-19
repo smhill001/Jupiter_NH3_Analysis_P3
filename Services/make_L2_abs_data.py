@@ -63,7 +63,8 @@ def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
         NH3file=sourcefiles[sourcedata]['NH3file']+"_CM2_L360_MAP-BARE.png"
         CH4file=sourcefiles[sourcedata]['CH4file']+"_CM2_L360_MAP-BARE.png"
     NH3_RGB=LP.load_png(path+NH3file)
-    CH4_RGB=LP.load_png(path+CH4file)
+    if CH4file!="_CM2_L360_MAP-BARE.png":
+        CH4_RGB=LP.load_png(path+CH4file)
 
     ###########################################################################
     # EPHEMERIS, COLOR SLOPE AND NH3 TRANSMISSION CALCULATIONS
@@ -83,15 +84,16 @@ def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
     ###########################################################################
     # EPHEMERIS AND CH4 TRANSMISSION CALCULATIONS
     ###########################################################################
-    CH4sec=str(int(str(CH4file[16:17]))*6) #COMPUTE FROM FRACTIONAL WINJUPOS MINUTE
-    CH4time=(CH4file[0:10]+"_"+CH4file[11:13]+":"+CH4file[13:15]+":"
-             +CH4sec.zfill(2))
-    CH4eph=WJ_ephem.get_WINJupos_ephem(CH4time)
-    CH4_CM1=float(CH4eph[0].strip())
-    CH4_CM2=float(CH4eph[1].strip())
-    CH4_CM3=float(CH4eph[2].strip()) 
-    CNTSynth=np.array(CH4_RGB[:,:,2]) #632nm continuum
-    ch4abs=CH4GlobalTrans*np.array(CH4_RGB[:,:,1])/CNTSynth
+    if CH4file!="_CM2_L360_MAP-BARE.png":
+        CH4sec=str(int(str(CH4file[16:17]))*6) #COMPUTE FROM FRACTIONAL WINJUPOS MINUTE
+        CH4time=(CH4file[0:10]+"_"+CH4file[11:13]+":"+CH4file[13:15]+":"
+                 +CH4sec.zfill(2))
+        CH4eph=WJ_ephem.get_WINJupos_ephem(CH4time)
+        CH4_CM1=float(CH4eph[0].strip())
+        CH4_CM2=float(CH4eph[1].strip())
+        CH4_CM3=float(CH4eph[2].strip()) 
+        CNTSynth=np.array(CH4_RGB[:,:,2]) #632nm continuum
+        ch4abs=CH4GlobalTrans*np.array(CH4_RGB[:,:,1])/CNTSynth
     ###########################################################################
     # Assuming the input (L2) FITS map files are in system 2 longitude 
     # coordinates, 'roll' the data array in longitude to System 3 Longitude
@@ -106,16 +108,17 @@ def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
         NH3data=np.roll(nh3abs,int(NH3roll),axis=1)
         
         CLSLdata=np.roll(clrslp,int(NH3roll),axis=1)
-        
-        CH4roll=CH4_CM2-CH4_CM3
-        CH4data=np.roll(ch4abs,int(CH4roll),axis=1)
-        
         NH3CM=NH3_CM3
-        CH4CM=CH4_CM3
+        
+        if CH4file!="_CM2_L360_MAP-BARE.png":
+            CH4roll=CH4_CM2-CH4_CM3
+            CH4data=np.roll(ch4abs,int(CH4roll),axis=1)
+            CH4CM=CH4_CM3
     else:
         NH3data=nh3abs
         CLSLdata=clrslp
-        CH4data=ch4abs
+        if CH4file!="_CM2_L360_MAP-BARE.png":
+            CH4data=ch4abs
         if mask:
             print("IN MASK IN MASK")
             indices=(NH3_RGB>0.2*NH3_RGB.max())
@@ -124,12 +127,12 @@ def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
 
             NH3data=nh3abs*mask[:,:,1]
             CLSLdata=clrslp*mask[:,:,1]
-            CH4data=ch4abs*mask[:,:,1]
-            
-            CH4data[np.isnan(CH4data)] = 0.
             NH3data[np.isnan(NH3data)] = 0.
             CLSLdata[np.isnan(CLSLdata)] = 0.
 
+        if CH4file!="_CM2_L360_MAP-BARE.png":
+            CH4data=ch4abs*mask[:,:,1]           
+            CH4data[np.isnan(CH4data)] = 0.
     #RGBCM=RGB_CM3
     eza,sza=za.make_sza_eza_planes(dateobs=NH3time.replace('_','T')+'Z')
  
@@ -147,7 +150,13 @@ def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
     ###########################################################################
     # Create FITS files and headers, including backplanes
     ###########################################################################
-    for BUNIT in ['NH3 Trans','CH4 Trans','Clr Slp']:
+    if CH4file=="_CM2_L360_MAP-BARE.png":
+        BUNITS=['NH3 Trans','Clr Slp']
+    else:
+        BUNITS=['NH3 Trans','CH4 Trans','Clr Slp']
+
+    print(BUNITS)
+    for BUNIT in BUNITS:
         if BUNIT=='NH3 Trans':
             dataarray=NH3data
             hdu = fits.PrimaryHDU(dataarray.astype(np.float32))

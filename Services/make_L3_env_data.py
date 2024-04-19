@@ -1,6 +1,5 @@
 def make_L3_env_data(obsdate="20221009UTa",target="Jupiter",
-                     imagetype='Img',CalModel='SCT-Obs-Final',
-                     Smoothing=False,First=True):
+                     imagetype='Img',Smoothing=False,First=True):
     """
     Created on Tue Aug 22 11:01:44 2023
     
@@ -37,7 +36,8 @@ def make_L3_env_data(obsdate="20221009UTa",target="Jupiter",
     #  SET NECESSARY CONSTANTS
     ###########################################################################
     amagat=2.69e24 #Lodschmits number. (cm-2) This is really km-amagat
-    gravity=2228.0 #cm/s^2
+    #gravity=2228.0 #cm/s^2
+    gravity=2479.0 #cm/s^2
     mean_mol_wt=3.85e-24 #gm/molecule, which is 2.22 gm/mole
     fCH4=1.81e-3
     STP=1.01e6  #dyne/cm^2 [(g-cm/s^2)/cm^2]`
@@ -178,6 +178,7 @@ def make_L3_env_data(obsdate="20221009UTa",target="Jupiter",
     # Create FITS files and headers, including backplanes
     ###########################################################################
     for BUNIT in ['CH4 Opacity','NH3 Opacity','Mole Fraction','Cloud-top Press']:
+        CalModel=NH3hdulist[0].header['CALIBRA']
         if BUNIT=='CH4 Opacity':
             dataarray=CH4_tau
             hdu = fits.PrimaryHDU(CH4_tau.astype(np.float32))
@@ -185,8 +186,8 @@ def make_L3_env_data(obsdate="20221009UTa",target="Jupiter",
             Real_CM1=NH3_CM1
             Real_CM2=NH3_CM2
             Real_CM3=NH3_CM3
-            datetime=NH3time
-            file=NH3file
+            datetime=CH4time
+            file=CH4file
             fn=file[0:26]+imagetype+'_L3OCH4'
             Range=[0.,1.01] #scaled range for PNG file
         elif BUNIT=='NH3 Opacity':
@@ -196,8 +197,8 @@ def make_L3_env_data(obsdate="20221009UTa",target="Jupiter",
             Real_CM1=CH4_CM1
             Real_CM2=CH4_CM2
             Real_CM3=CH4_CM3
-            datetime=CH4time
-            file=CH4file
+            datetime=NH3time
+            file=NH3file
             fn=file[0:26]+imagetype+'_L3ONH3'
             Range=[0.,1.] #scaled range for PNG file
         if BUNIT=='Mole Fraction':
@@ -221,7 +222,7 @@ def make_L3_env_data(obsdate="20221009UTa",target="Jupiter",
             datetime=CH4time
             file=CH4file
             fn=file[0:26]+imagetype+'_L3PCld'
-            Range=[300.,1200] #scaled range for PNG file
+            Range=[800.,1300] #scaled range for PNG file
             
         szadata=fits.ImageHDU(sza)
         ezadata=fits.ImageHDU(eza)
@@ -276,7 +277,7 @@ def make_L3_env_data(obsdate="20221009UTa",target="Jupiter",
         # WRITE Scaled PNG File
         ######################################################################
         scl_arr = ((dataarray - Range[0]) * (1/(Range[1] - Range[0]) * 65534.9999)).astype('uint16')#
-        imwrite(fnout+'.png', scl_arr)#.astype(np.uint16))
+        imwrite(fnout.replace('fits','png'), scl_arr)#.astype(np.uint16))
 
         ###########################################################################
         # Return dictionary for programs that need it, e.g., batch processing
