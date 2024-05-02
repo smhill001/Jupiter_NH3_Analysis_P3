@@ -183,3 +183,4 @@ def grs_zoom_maps(year=2022):
     fnNH3=str(int(year))+"_fNH3_Avg5"+fnskeleton
     fig1.savefig(pathmapplots+fnNH3,dpi=300)
     
+    return(fig1,MapAvg)

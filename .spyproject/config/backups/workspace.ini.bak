@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['Services\\get_batch_lists.py', 'Services\\get_obs_list.py', 'Services\\make_L2_abs_data.py', 'Profiles\\code\\Profile_L2.py', 'Profiles\\code\\plot_TEXES_Groups_P3.py', 'Profiles\\code\\Profile_L3.py', 'Maps\\Map_Jup_Atm_P3.py', 'BatchMapsScript_P3.py', 'Studies\\GRS\\GRS_NH3_Comparison_2022.py', 'Studies\\GRS\\grs_zoom_maps.py']
+recent_files = ['ESS2024_Figures.py', 'Molecular Absorption\\code\\get_albedo_continua_crossections.py', '..\\..\\Planets\\Jupiter\\Spectral Data\\JupiterSpectralAnalysis\\AirmassFactor_mu.py']
 
 [main]
 version = 0.2.0

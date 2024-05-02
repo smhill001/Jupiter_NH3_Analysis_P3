@@ -178,7 +178,7 @@ def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
             datetime=CH4time
             file=CH4file
             fn=file[0:25]+"_"+imagetype+'_L2TCH4'
-            Range=[0.80,0.95] #scaled range for PNG file
+            Range=[0.8,1.0] #scaled range for PNG file
         elif BUNIT=='Clr Slp':
             dataarray=CLSLdata
             hdu = fits.PrimaryHDU(CLSLdata.astype(np.float32))

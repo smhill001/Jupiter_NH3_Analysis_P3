@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 def Profile_L2(band="NH3",profile="Meridional",ProfileHalfWidth=45,
                LatPlotLims=[30,150],ZonePlotHalfWidth=45,smooth=False):
     """
@@ -151,3 +149,5 @@ def Profile_L2(band="NH3",profile="Meridional",ProfileHalfWidth=45,
             
     figresid.subplots_adjust(left=0.12, bottom=0.12, right=0.98, top=0.92)  
     figresid.savefig(path+"Profiles/output/Residuals_"+band+"_"+profile+".png",dpi=300)
+
+    return(figavgprof,axsavgprof)

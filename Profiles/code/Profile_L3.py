@@ -4,7 +4,8 @@ Created on Thu Sep  7 10:26:54 2023
 @author: smhil
 """
 def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
-               LatPlotLims=[60,120],ZonePlotHalfWidth=45,smooth=False):
+               LatPlotLims=[60,120],ZonePlotHalfWidth=45,smooth=False,
+               inset=True):
 
     #(param="PCloud",profile="Meridional",LonRng=1):
     import sys
@@ -35,12 +36,17 @@ def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     figavgprof,axsavgprof=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="white")
     
     ax=axsavgprof
+    x1,x2,y1,y2=-30.,10.,85.,110.
+    axsins=axsavgprof.inset_axes([0.08,0.45,0.45,0.25],xlim=(x1,x2),ylim=(y1,y2))
+    axsavgprof.indicate_inset_zoom(axsins,edgecolor="black")
     #ax='None'
     if param=="fNH3" and profile=="Meridional":
         plevel=0.752910
         PTG.plot_TEXES_Groups(ax,clr='C2',prs=plevel,mult=1.0e6)
         plevel=0.657540
         PTG.plot_TEXES_Groups(ax,clr='C0',prs=plevel,mult=1.0e6)
+        if inset==True:
+            PTG.plot_TEXES_Groups(axsins,clr='C0',prs=plevel,mult=1.0e6)
         plevel=0.574240
         PTG.plot_TEXES_Groups(ax,clr='C4',prs=plevel,mult=1.0e6)
     
@@ -55,6 +61,17 @@ def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     LatsSCT23,OutProSCT23,OutStdSCT23=PTG.plot_profile_L3(axsavgprof,"2023 CMOS",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='r',width=1.5,param=param,smooth=smooth)
+    if inset==True and param=="fNH3" and profile=="Meridional":
+        LatsSCT22,OutProSCT22,OutStdSCT22=PTG.plot_profile_L3(axsins,"2022 CMOS",ProfileHalfWidth=ProfileHalfWidth,
+                            LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
+                            profile=profile,clr='k',width=1.5,param=param,smooth=smooth)
+        LatsVLT22,OutProVLT22,OutStdVLT22=PTG.plot_profile_L3(axsins,"2022 VLTMUSE",ProfileHalfWidth=ProfileHalfWidth,
+                            LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
+                            profile=profile,clr='k',width=1.5,param=param,smooth=smooth,
+                            style='dashed')
+        LatsSCT23,OutProSCT23,OutStdSCT23=PTG.plot_profile_L3(axsins,"2023 CMOS",ProfileHalfWidth=ProfileHalfWidth,
+                            LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
+                            profile=profile,clr='r',width=1.5,param=param,smooth=smooth)
 
     # Plot layout details and labeling
     if profile=="Meridional":
@@ -93,6 +110,7 @@ def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     axsavgprof.legend(loc=1,ncol=2, borderaxespad=0.,prop={'size':8})
     axsavgprof.grid(linewidth=0.2)
     axsavgprof.tick_params(axis='both', which='major', labelsize=8)
+    axsins.tick_params(axis='both', which='major', labelsize=8)
     
     axsavgprof.annotate("ProfileHalfWidth="+str(ProfileHalfWidth),(0.01,0.01),
                         xycoords='subfigure fraction',size=8)
@@ -152,3 +170,5 @@ def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     
     figresid.subplots_adjust(left=0.12, bottom=0.12, right=0.98, top=0.92)  
     figresid.savefig(path+"Residuals_"+param+"_"+profile+".png",dpi=300)
+
+    return(figavgprof,axsavgprof)

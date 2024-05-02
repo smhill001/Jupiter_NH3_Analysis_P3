@@ -344,7 +344,7 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
                  LatLims,axs3[1])
     axs3[1].tick_params(axis='both', which='major', labelsize=9)
     
-    axs3[1].set_title("fNH3 versus PCloud",fontsize=10)
+    axs3[1].set_title("PCloud versus fNH3",fontsize=10)
 
     BZind=copy.deepcopy(BZ)   
     BZkeys=BZ.keys()
@@ -615,12 +615,9 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
         
     fnPCld=PCloudhdr["FILENAME"][:-5]+fnskeleton
 
-    #fig5.savefig(pathmapplots+fnPCld,dpi=300)
-
+    #fig5.savefig(pathmapplots+fnPCld,dpi=300) 
     
-    
-    
-    return()
+    return(fig1,axs1,fig2,axs2,fig3,axs3)
 
 
 def load_png(file_path):

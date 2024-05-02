@@ -151,7 +151,7 @@ def image_array_new(obsdate="20221009UTa",target="Jupiter",
     CH4scl=temp.astype('uint16')
     show=axs[0,1].imshow(CH4scl,'gray')
     if contour:
-        axs[0,1].contourf(CH4data,levels=[CH4hdr["RANGE1"],1.2],colors=['red'])
+        axs[0,1].contourf(CH4data,levels=[CH4hdr["RANGE1"],1.2],colors=['C0'],alpha=0.3)
     axs[0,1].set_title("b) CH4 Transmission",color='1.0',fontsize=9)
     axs[0,1].annotate(CH4hdr["DATE-OBS"],[0.5,0.95],ha='center',
                   xycoords="axes fraction",fontsize=8,color='1.0')
@@ -168,7 +168,7 @@ def image_array_new(obsdate="20221009UTa",target="Jupiter",
     NH3scl=temp.astype('uint16')
     show=axs[1,1].imshow(NH3scl,'gray')
     if contour:
-        axs[1,1].contourf(NH3data,levels=[NH3hdr["RANGE1"],1.2],colors=['red'])
+        axs[1,1].contourf(NH3data,levels=[NH3hdr["RANGE1"],1.2],colors=['C0'],alpha=0.4)
     axs[1,1].set_title("e) NH3 Transmission",color='1.0',fontsize=9)
     axs[1,1].annotate(NH3hdr["DATE-OBS"],[0.5,0.95],ha='center',
                   xycoords="axes fraction",fontsize=8,color='1.0')
@@ -187,7 +187,7 @@ def image_array_new(obsdate="20221009UTa",target="Jupiter",
     CH4scl=temp.astype('uint16')
     show=axs[0,2].imshow(CH4scl,'gray')
     if contour:
-        axs[0,2].contourf(CH4data,levels=[CH4hdr["RANGE1"],1.2],colors=['red'])
+        axs[0,2].contourf(CH4data,levels=[CH4hdr["RANGE1"],1.2],colors=['C0'],alpha=0.4)
     axs[0,2].set_title("c) CH4 Opacity",color='1.0',fontsize=9)
     axs[0,2].annotate(CH4hdr["DATE-OBS"],[0.5,0.95],ha='center',
                   xycoords="axes fraction",fontsize=8,color='1.0')
@@ -205,7 +205,7 @@ def image_array_new(obsdate="20221009UTa",target="Jupiter",
     NH3scl=temp.astype('uint16')
     show=axs[1,2].imshow(NH3scl,'gray')
     if contour:
-        axs[1,2].contourf(NH3data,levels=[NH3hdr["RANGE1"],1.2],colors=['red'])
+        axs[1,2].contourf(NH3data,levels=[NH3hdr["RANGE1"],1.2],colors=['C0'],alpha=0.4)
     axs[1,2].set_title("f) NH3 Opacity",color='1.0',fontsize=9)
     axs[1,2].annotate(NH3hdr["DATE-OBS"],[0.5,0.95],ha='center',
                   xycoords="axes fraction",fontsize=8,color='1.0')
@@ -226,7 +226,7 @@ def image_array_new(obsdate="20221009UTa",target="Jupiter",
     axs[2,0].annotate(PCloudhdr["DATE-OBS"],[0.5,0.95],ha='center',
                   xycoords="axes fraction",fontsize=8,color='1.0')
     if contour:
-        axs[2,0].contourf(CH4data,levels=[CH4hdr["RANGE1"],1.2],colors=['red'])
+        axs[2,0].contourf(CH4data,levels=[CH4hdr["RANGE1"],1.2],colors=['C0'],alpha=0.4)
 
     cbar = pl.colorbar(show,ticks=tx,
                orientation='vertical',cmap='gray',
@@ -249,8 +249,8 @@ def image_array_new(obsdate="20221009UTa",target="Jupiter",
     axs[2,2].annotate(fNH3hdr["DATE-OBS"],[0.5,0.95],ha='center',
                   xycoords="axes fraction",fontsize=8,color='1.0')
     if contour:
-        axs[2,2].contourf(CH4data,levels=[CH4hdr["RANGE1"],1.2],colors=['red'])
-        axs[2,2].contourf(NH3data,levels=[NH3hdr["RANGE1"],1.2],colors=['red'])
+        axs[2,2].contourf(CH4data,levels=[CH4hdr["RANGE1"],1.2],colors=['C0'],alpha=0.4)
+        axs[2,2].contourf(NH3data,levels=[NH3hdr["RANGE1"],1.2],colors=['C0'],alpha=0.4)
 
     cbar = pl.colorbar(show,ticks=tx,
                orientation='vertical',cmap='gray',
@@ -270,3 +270,5 @@ def image_array_new(obsdate="20221009UTa",target="Jupiter",
                 wspace=0.25, hspace=0.15)     
 
     fig.savefig(pathout+fnout+'.png',dpi=300,bbox_inches = 'tight')
+
+    return(fig)

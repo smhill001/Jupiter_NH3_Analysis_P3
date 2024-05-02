@@ -222,7 +222,7 @@ def make_L3_env_data(obsdate="20221009UTa",target="Jupiter",
             datetime=CH4time
             file=CH4file
             fn=file[0:26]+imagetype+'_L3PCld'
-            Range=[800.,1300] #scaled range for PNG file
+            Range=[250.,1250] #scaled range for PNG file
             
         szadata=fits.ImageHDU(sza)
         ezadata=fits.ImageHDU(eza)
