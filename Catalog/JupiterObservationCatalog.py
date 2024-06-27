@@ -37,7 +37,7 @@ def JupiterObservationCatalog():
     #print(DIRarray)
     temp1=[k for k in DIRarray if os.path.isdir(path+k)]
     dateUTarray=[k for k in temp1 if "UT" in k]
-    pathout='/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/'
+    pathout='/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Catalog/'
     t = Table(names=('Date', 'Camera','Map',
                      '380NUV','450BLU','467HeII','501OIII','550GRN','550OPN',
                      '620CH4','632OI', '647', '650RED', '656HIA','658NII',

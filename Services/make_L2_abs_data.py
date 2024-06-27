@@ -79,6 +79,7 @@ def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
     clrslp=(np.array(NH3_RGB[:,:,0]).astype(float)
             -np.array(NH3_RGB[:,:,2]).astype(float))/24.0 
     CNT647=15.0*clrslp+np.array(NH3_RGB[:,:,2])
+    #CNT647=np.array(CH4_RGB[:,:,2]) #632nm continuum
     nh3abs=NH3GlobalTrans*np.array(NH3_RGB[:,:,1])/CNT647
 
     ###########################################################################

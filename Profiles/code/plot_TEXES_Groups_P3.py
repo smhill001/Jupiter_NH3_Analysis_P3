@@ -111,7 +111,7 @@ def plot_Historical(ax,reference,clr='C0'):
     ax.scatter(data[reference]["Center_pgLat"],np.array(data[reference]["645EW"])*0.1,label=reference,color=clr)
 
 
-def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
+def plot_profile_L2(ax1,ax2,ax3,ax4,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
                     ZonePlotHalfWidth=45.,band="CH4",profile="Meridional",
                     clr='C0',width=1.0,style='solid',smooth=False):
     """
@@ -196,13 +196,6 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
     suffix={"CH4":"-Jupiter_Map_L2TCH4",
             "NH3":"-Jupiter_Map_L2TNH3"}
     
-    figspaghetti,axsspaghetti=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, 
-                                          facecolor="white")
-    
-    print("##########reference=",reference)
-    print(DataSets)
-    print(DataSets[reference])
-    
     First=True
     Num=0
     for obskey in DataSets[reference]:
@@ -218,10 +211,11 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
             file=sourcefiles[dataset][band+'file'][0:17]+suffix[band]
             variation=""
         
+        print("file=",file)
         #######################################################################
         # Extract a profile out of a Level 2 or 3 FITS map file
         #######################################################################
-        Lats,AvgProf,StdProf,CM2=EP.extract_profile(pth,file+".fits",
+        Lats,AvgProf,StdProf,CM2,amfAvgProf=EP.extract_profile(pth,file+".fits",
                                                 ProfileHalfWidth=ProfileHalfWidth,
                                                 profile=profile)
 
@@ -238,43 +232,53 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
 
         if First:
             AvgArr=Avg_EW
+            AvgamfArr=amfAvgProf
             if profile=="Meridional":
                 AvgArr=np.reshape(AvgArr,(1,180))
+                AvgamfArr=np.reshape(AvgamfArr,(1,180))
             elif profile=="Zonal":
                 AvgArr=np.reshape(AvgArr,(1,360))
+                AvgamfArr=np.reshape(AvgamfArr,(1,360))
             First=False
         else:
             AvgArr=np.vstack((AvgArr,Avg_EW))
+            AvgamfArr=np.vstack((AvgamfArr,amfAvgProf))
 
         #######################################################################
         # Increment counter and plot a line of spaghetti
         #######################################################################
         Num=Num+1                
-        axsspaghetti.plot(Lats,Avg_EW,linewidth=0.5,label=file[5:17])
+        ax3.plot(Lats,Avg_EW,linewidth=0.5,label=file[5:15])
+        ax4.scatter(amfAvgProf,Avg_EW,s=2,label=file[5:15])
         
+    ###########################################################################
+    # Configure plot layout parameters, labels, and titles
+    ###########################################################################
     if profile=="Meridional":
         xlabel="Planetographic Latitude (deg)"
-        axsspaghetti.set_xlim(90-LatPlotLims[1],90-LatPlotLims[0])
     elif profile=="Zonal":
         xlabel="Longitude from CM (deg)"
-        axsspaghetti.set_xlim(-ZonePlotHalfWidth,ZonePlotHalfWidth)
         
-    if band=="CH4":
-        axsspaghetti.set_ylim(0,2.5)
-        axsspaghetti.set_title(reference+" Methane")
-    elif band=="NH3":
-        axsspaghetti.set_ylim(0,1.0)
-        axsspaghetti.set_title(reference+" Ammonia")
+    ax3.tick_params(axis='both', which='major', labelsize=7)
+    ax3.grid(linewidth=0.2)
+    ax3.set_title(reference,fontsize=9)
+    if reference=="2023 CMOS":
+        ax3.legend(fontsize=5,ncol=4,loc="upper right",bbox_to_anchor=(2.0, 1.0))
+    else:
+        ax3.legend(fontsize=5,ncol=4)
+    
+    ax4.tick_params(axis='both', which='major', labelsize=7)
+    ax4.grid(linewidth=0.2)
+    ax4.set_title(reference,fontsize=9)
+    if reference=="2023 CMOS":
+        ax4.legend(fontsize=5,ncol=4,loc="upper right",bbox_to_anchor=(2.0, 1.0))
+    else:
+        ax4.legend(fontsize=5,ncol=4)
 
-    axsspaghetti.set_ylabel("Equivalent Width EW (nm)",fontsize=10)
-    axsspaghetti.grid(linewidth=0.2)
-
-    axsspaghetti.legend(fontsize=6,ncol=5)
-    axsspaghetti.set_xlabel(xlabel,fontsize=10)
     
     path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
-    figspaghetti.savefig(path+"Profiles/output/Profile_"+reference+
-                         "_"+band+"_"+profile+"_Absorption.png",dpi=300)  
+    #figspaghetti.savefig(path+"Profiles/output/Profile_"+reference+
+    #                     "_"+band+"_"+profile+"_Absorption.png",dpi=300)  
 
     ###########################################################################
     # Compute average and standard deviation (unweighted) from all the 
@@ -282,22 +286,27 @@ def plot_profile_L2(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
     ###########################################################################
     AvgPro=np.mean(AvgArr[:,:],axis=0)
     AvgStd=np.std(AvgArr[:,:],axis=0)
+    Avgamf=np.mean(AvgamfArr[:,:],axis=0)
 
     if smooth:
         AvgProSmth=convolve(AvgPro, Box1DKernel(3))
         AvgStdSmth=convolve(AvgStd, Box1DKernel(3))
         OutPro,OutStd=AvgProSmth,AvgStdSmth
     else:
-        OutPro,OutStd=AvgPro,AvgStd
-        
-    ax.plot(Lats,OutPro,color=clr,linewidth=width,linestyle=style,
+        OutPro,OutStd,Outamf=AvgPro,AvgStd,Avgamf
+
+    ax1.plot(Lats,OutPro,color=clr,linewidth=width,linestyle=style,
             label=reference+' (Avg. '+str(Num)+')')  
-    ax.fill_between(Lats, OutPro-OutStd, OutPro+OutStd,
+    ax1.fill_between(Lats, OutPro-OutStd, OutPro+OutStd,
                     color=clr,alpha=.1)
 
-    return(Lats,OutPro,OutStd)
+    print(AvgamfArr.shape,OutPro.shape)
+    ax2.scatter(Avgamf,OutPro,s=2,label=reference+' (Avg. '+str(Num)+')')
 
-def plot_profile_L3(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
+
+    return(Lats,OutPro,OutStd,Outamf)
+
+def plot_profile_L3(ax1,ax2,ax3,ax4,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
                     ZonePlotHalfWidth=45.,param="fNH3",profile="Meridional",
                     clr='C0',width=1.0,style='solid',smooth=True):
 
@@ -384,8 +393,11 @@ def plot_profile_L3(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
     suffix={"PCld":"-Jupiter_Map_L3PCld_S0.fits",
             "fNH3":"-Jupiter_Map_L3fNH3_S0.fits"}
 
-    figspaghetti,axsspaghetti=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150,
-                                          facecolor="white")
+    #figspaghetti,axsspaghetti=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150,
+    #                                      facecolor="white")
+    #figamfscat,axsamfscat=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, 
+    #                                      facecolor="white")
+
     First=True
     Num=0
 
@@ -405,53 +417,72 @@ def plot_profile_L3(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
             variation=""
         print("file=",file)
         
-        Lats,AvgProf,StdProf,CM3=EP.extract_profile(pth,file,
+        #######################################################################
+        # Extract a profile out of a Level 2 or 3 FITS map file
+        #######################################################################
+        Lats,AvgProf,StdProf,CM3,amfAvgProf=EP.extract_profile(pth,file,
                                                 ProfileHalfWidth=ProfileHalfWidth,
                                                 profile=profile)
         if First:
             AvgArr=AvgProf
+            AvgamfArr=amfAvgProf
             if profile=="Meridional":
                 AvgArr=np.reshape(AvgArr,(1,180))
+                AvgamfArr=np.reshape(AvgamfArr,(1,180))
             elif profile=="Zonal":
                 AvgArr=np.reshape(AvgArr,(1,360))
+                AvgamfArr=np.reshape(AvgamfArr,(1,360))
             First=False
         else:
             AvgArr=np.vstack((AvgArr,AvgProf))
+            AvgamfArr=np.vstack((AvgamfArr,amfAvgProf))
 
         #######################################################################
         # Increment counter and plot a line of spaghetti
         #######################################################################
         Num=Num+1                
-        axsspaghetti.plot(Lats,AvgProf*factor,linewidth=0.5,label=file[5:17])
+        ax3.plot(Lats,AvgProf*factor,linewidth=0.5,label=file[5:17])
+        ax4.scatter(amfAvgProf,AvgProf,s=5,label=file[5:17])
+
 
     AvgPro=np.mean(AvgArr[:,:],axis=0)*factor
     AvgStd=np.std(AvgArr[:,:],axis=0)*factor
-    
+    Avgamf=np.mean(AvgamfArr[:,:],axis=0)*factor
+
     if profile=="Meridional":
-        axsspaghetti.set_xlim(90-LatPlotLims[1],90-LatPlotLims[0])
-        axsspaghetti.set_xlabel("Planetographic Latitude (deg)",fontsize=10)
+        ax3.set_xlim(90-LatPlotLims[1],90-LatPlotLims[0])
+        ax3.set_xlabel("Planetographic Latitude (deg)",fontsize=10)
+        ax4.set_xlim(1,3)
+        ax4.set_xlabel("Planetographic Latitude (deg)",fontsize=10)
     elif profile=="Zonal":
-        axsspaghetti.set_xlim(-ZonePlotHalfWidth,ZonePlotHalfWidth)
-        axsspaghetti.set_xlabel("Longitude from CM (deg)",fontsize=10)
+        ax3.set_xlim(-ZonePlotHalfWidth,ZonePlotHalfWidth)
+        ax3.set_xlabel("Longitude from CM (deg)",fontsize=10)
+        ax4.set_xlim(1,3)
+        ax4.set_xlabel("Longitude from CM (deg)",fontsize=10)
 
-    if param=="PCloud":
-        axsspaghetti.set_ylim(0,1100)
-        axsspaghetti.set_ylabel("Effective Cloud-Top Pressure (mb)",fontsize=10)
-        axsspaghetti.invert_yaxis()
+    if param=="PCld":
+        ax3.set_ylim(0,1100)
+        ax3.set_ylabel("Effective Cloud-Top Pressure (mb)",fontsize=10)
+        ax3.invert_yaxis()
+        ax4.set_ylim(0,1100)
+        ax4.set_ylabel("Effective Cloud-Top Pressure (mb)",fontsize=10)
+        ax4.invert_yaxis()
     elif param=="fNH3":
-        axsspaghetti.set_ylim(0,200)
-        axsspaghetti.set_ylabel("Column-Average Ammonia Abundance (ppm)",fontsize=10)
-    axsspaghetti.legend(fontsize=6,ncol=5)
-    axsspaghetti.set_title(reference)
-    axsspaghetti.grid(linewidth=0.2)
+        ax3.set_ylim(0,200)
+        ax3.set_ylabel("Column-Average Ammonia Abundance (ppm)",fontsize=10)
+        ax4.set_ylim(0,200)
+        ax4.set_ylabel("Column-Average Ammonia Abundance (ppm)",fontsize=10)
+    #axsspaghetti.legend(fontsize=6,ncol=5)
+    ax3.set_title(reference)
+    ax3.grid(linewidth=0.2)
 
-    axsspaghetti.annotate("ProfileHalfWidth="+str(ProfileHalfWidth),(0.01,0.01),
+    ax3.annotate("ProfileHalfWidth="+str(ProfileHalfWidth),(0.01,0.01),
                           xycoords='subfigure fraction',size=8)
-    axsspaghetti.annotate("Smoothing="+str(smooth),(0.01,0.03),
+    ax3.annotate("Smoothing="+str(smooth),(0.01,0.03),
                           xycoords='subfigure fraction',size=8)
 
-    path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
-    figspaghetti.savefig(path+"Profiles/output/Profile_"+reference+"_"+param+"_"+profile+".png",dpi=300)
+    #path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
+    #figspaghetti.savefig(path+"Profiles/output/Profile_"+reference+"_"+param+"_"+profile+".png",dpi=300)
 
     ###########################################################################
     # Compute average and standard deviation (unweighted) from all the 
@@ -459,20 +490,23 @@ def plot_profile_L3(ax,reference,ProfileHalfWidth=45.,LatPlotLims=[45,135],
     ###########################################################################
     AvgPro=np.mean(AvgArr[:,:],axis=0)
     AvgStd=np.std(AvgArr[:,:],axis=0)
+    Avgamf=np.mean(AvgamfArr[:,:],axis=0)
 
     if smooth:
         AvgProSmth=convolve(AvgPro, Box1DKernel(3))
         AvgStdSmth=convolve(AvgStd, Box1DKernel(3))
         OutPro,OutStd=AvgProSmth,AvgStdSmth
     else:
-        OutPro,OutStd=AvgPro,AvgStd
+        OutPro,OutStd,Outamf=AvgPro,AvgStd,Avgamf
         
-    ax.plot(Lats,OutPro,color=clr,linewidth=width,linestyle=style,
+    ax1.plot(Lats,OutPro,color=clr,linewidth=width,linestyle=style,
             label=reference+' (Avg. '+str(Num)+')')  
-    ax.fill_between(Lats, OutPro-OutStd, OutPro+OutStd,
+    ax1.fill_between(Lats, OutPro-OutStd, OutPro+OutStd,
                     color=clr,alpha=.1)
+    ax2.scatter(Outamf,OutPro,s=5,label=reference+' (Avg. '+str(Num)+')')
 
-    return(Lats,OutPro,OutStd)
+
+    return(Lats,OutPro,OutStd,Outamf)
         
 def Centric_to_Graphic(Latc):
     #Formula used is from Simon and Beebe, 1996

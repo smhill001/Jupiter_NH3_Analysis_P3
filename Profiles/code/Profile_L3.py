@@ -1,11 +1,6 @@
-"""
-Created on Thu Sep  7 10:26:54 2023
-
-@author: smhil
-"""
 def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
                LatPlotLims=[60,120],ZonePlotHalfWidth=45,smooth=False,
-               inset=True):
+               inset=True,Batch0="2022 CMOS",Batch1="2023 CMOS"):
 
     #(param="PCloud",profile="Meridional",LonRng=1):
     import sys
@@ -34,66 +29,85 @@ def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     path="/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Profiles/output/"
        
     figavgprof,axsavgprof=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="white")
-    
-    ax=axsavgprof
+    figspg,axsspg=pl.subplots(2,2,figsize=(8.0,6.0), dpi=150,
+                                    sharex=True,sharey=True,facecolor="white")
+
+    figamf,axsamf=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="white")
+    figamfspg,axsamfspg=pl.subplots(2,2,figsize=(8.0,6.0), dpi=150,
+                                    sharex=True,sharey=True,facecolor="white")
+
     x1,x2,y1,y2=-30.,10.,85.,110.
     axsins=axsavgprof.inset_axes([0.08,0.45,0.45,0.25],xlim=(x1,x2),ylim=(y1,y2))
     axsavgprof.indicate_inset_zoom(axsins,edgecolor="black")
     #ax='None'
     if param=="fNH3" and profile=="Meridional":
         plevel=0.752910
-        PTG.plot_TEXES_Groups(ax,clr='C2',prs=plevel,mult=1.0e6)
+        PTG.plot_TEXES_Groups(axsavgprof,clr='C2',prs=plevel,mult=1.0e6)
         plevel=0.657540
-        PTG.plot_TEXES_Groups(ax,clr='C0',prs=plevel,mult=1.0e6)
+        PTG.plot_TEXES_Groups(axsavgprof,clr='C0',prs=plevel,mult=1.0e6)
         if inset==True:
             PTG.plot_TEXES_Groups(axsins,clr='C0',prs=plevel,mult=1.0e6)
         plevel=0.574240
-        PTG.plot_TEXES_Groups(ax,clr='C4',prs=plevel,mult=1.0e6)
+        PTG.plot_TEXES_Groups(axsavgprof,clr='C4',prs=plevel,mult=1.0e6)
     
     
-    LatsSCT22,OutProSCT22,OutStdSCT22=PTG.plot_profile_L3(axsavgprof,"2022 CMOS",ProfileHalfWidth=ProfileHalfWidth,
+   
+    LatsSCT22,OutProSCT22,OutStdSCT22,OutamfSCT22=PTG.plot_profile_L3(axsavgprof,axsamf,axsspg[0,0],axsamfspg[0,0],Batch0,ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='k',width=1.5,param=param,smooth=smooth)
-    LatsVLT22,OutProVLT22,OutStdVLT22=PTG.plot_profile_L3(axsavgprof,"2022 VLTMUSE",ProfileHalfWidth=ProfileHalfWidth,
+    LatsVLT22,OutProVLT22,OutStdVLT22,OutamfVLT22=PTG.plot_profile_L3(axsavgprof,axsamf,axsspg[0,1],axsamfspg[0,1],"2022 VLTMUSE",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='k',width=1.5,param=param,smooth=smooth,
                         style='dashed')
-    LatsSCT23,OutProSCT23,OutStdSCT23=PTG.plot_profile_L3(axsavgprof,"2023 CMOS",ProfileHalfWidth=ProfileHalfWidth,
+    LatsSCT23,OutProSCT23,OutStdSCT23,OutamfSCT23=PTG.plot_profile_L3(axsavgprof,axsamf,axsspg[1,0],axsamfspg[1,1],Batch1,ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='r',width=1.5,param=param,smooth=smooth)
     if inset==True and param=="fNH3" and profile=="Meridional":
-        LatsSCT22,OutProSCT22,OutStdSCT22=PTG.plot_profile_L3(axsins,"2022 CMOS",ProfileHalfWidth=ProfileHalfWidth,
+        LatsSCT22,OutProSCT22,OutStdSCT22,OutamfSCT22=PTG.plot_profile_L3(axsins,axsamf,axsspg[0,0],axsamfspg[0,0],Batch0,ProfileHalfWidth=ProfileHalfWidth,
                             LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                             profile=profile,clr='k',width=1.5,param=param,smooth=smooth)
-        LatsVLT22,OutProVLT22,OutStdVLT22=PTG.plot_profile_L3(axsins,"2022 VLTMUSE",ProfileHalfWidth=ProfileHalfWidth,
+        LatsVLT22,OutProVLT22,OutStdVLT22,OutamfVLT22=PTG.plot_profile_L3(axsins,axsamf,axsspg[0,1],axsamfspg[0,1],"2022 VLTMUSE",ProfileHalfWidth=ProfileHalfWidth,
                             LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                             profile=profile,clr='k',width=1.5,param=param,smooth=smooth,
                             style='dashed')
-        LatsSCT23,OutProSCT23,OutStdSCT23=PTG.plot_profile_L3(axsins,"2023 CMOS",ProfileHalfWidth=ProfileHalfWidth,
+        LatsSCT23,OutProSCT23,OutStdSCT23,OutamfSCT23=PTG.plot_profile_L3(axsins,axsamf,axsspg[1,0],axsamfspg[1,1],Batch1,ProfileHalfWidth=ProfileHalfWidth,
                             LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                             profile=profile,clr='r',width=1.5,param=param,smooth=smooth)
+
 
     # Plot layout details and labeling
     if profile=="Meridional":
         axsavgprof.set_xlim(90-LatPlotLims[1],90-LatPlotLims[0])
         axsavgprof.set_xlabel("Planetographic Latitude (deg)",fontsize=10)
+        axsamf.set_xlim(1,3)
+        axsamf.set_xlabel("One-Way Air Mass",fontsize=10)
     if profile=="Zonal":
         axsavgprof.set_xlim(-ZonePlotHalfWidth,ZonePlotHalfWidth)
         axsavgprof.set_xlabel("Longitude from Sys. II CM (deg)",fontsize=10)
+        axsamf.set_xlim(1,3)
+        axsamf.set_xlabel("One-Way Air Mass",fontsize=10)
 
     if param=="PCld":
         axsavgprof.set_title("Effective Cloud-Top Pressure Profiles")
-        axsavgprof.set_ylim(0.,1100.)
+        axsavgprof.set_ylim(0.,1200.)
         axsavgprof.set_ylabel("Effective Cloud-Top Pressure (mb)",fontsize=10)
+        axsamf.set_title("Effective Cloud-Top Pressure Profiles")
+        axsamf.set_ylim(0.,1200.)
+        axsamf.set_ylabel("Effective Cloud-Top Pressure (mb)",fontsize=10)
         #axsavgprof.set_yticks(np.linspace(400,1100,8), minor=False)
         yb=1090
         yz=1040
         axsavgprof.invert_yaxis()
+        axsamf.invert_yaxis()
     elif param=="fNH3":
         axsavgprof.set_title("Column-Integrated Ammonia Abundance Profiles")
         axsavgprof.set_ylim(0.,300.)
         axsavgprof.set_ylabel("Column-Integrated Ammonia Abundance (ppm)",fontsize=10)
         axsavgprof.set_yticks(np.linspace(0,300,7), minor=False)
+        axsamf.set_title("Column-Integrated Ammonia Abundance Profiles")
+        axsamf.set_ylim(0.,300.)
+        axsamf.set_ylabel("Column-Integrated Ammonia Abundance (ppm)",fontsize=10)
+        axsamf.set_yticks(np.linspace(0,300,7), minor=False)
         yb=1
         yz=10
         
@@ -126,7 +140,7 @@ def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     
     figresid,axsresid=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white")
     proresid=OutProSCT23-OutProSCT22
-    axsresid.plot(LatsVLT22,proresid,label='2023 minus 2022')
+    axsresid.plot(LatsVLT22,proresid,label=Batch1+' - '+Batch0)
     stdresid=np.sqrt(OutStdSCT22**2+OutStdSCT23**2)
     axsresid.fill_between(LatsVLT22,proresid-stdresid,proresid+stdresid,
                           color='C0',alpha=.1)
@@ -171,4 +185,10 @@ def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     figresid.subplots_adjust(left=0.12, bottom=0.12, right=0.98, top=0.92)  
     figresid.savefig(path+"Residuals_"+param+"_"+profile+".png",dpi=300)
 
-    return(figavgprof,axsavgprof)
+    SCT22={'Lats':LatsSCT22,'Pro':OutProSCT22,'Std':OutStdSCT22,'Amf':OutamfSCT22}
+    VLT22={'Lats':LatsVLT22,'Pro':OutProVLT22,'Std':OutStdVLT22,'Amf':OutamfVLT22}
+    SCT23={'Lats':LatsSCT23,'Pro':OutProSCT23,'Std':OutStdSCT23,'Amf':OutamfSCT23}
+
+    #return(figavgprof,axsavgprof)
+   
+    return(SCT22,VLT22,SCT23)

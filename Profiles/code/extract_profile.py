@@ -30,7 +30,11 @@ def extract_profile(pth,filename,LonCtr='CM',ProfileHalfWidth=45.,
     hdulist.info()
     hdr=hdulist[0].header
     mapdata=hdulist[0].data
+    sza=hdulist[1].data
+    eza=hdulist[2].data
     hdulist.close()
+    amfdata=(1.0/sza+1.0/eza)/2.0
+
     ###########################################################################
     # Get ephemeris data from file name date-time string and set lat and lon lims
     ###########################################################################             
@@ -43,6 +47,10 @@ def extract_profile(pth,filename,LonCtr='CM',ProfileHalfWidth=45.,
         AvgProf=np.flip(np.mean(patch[:,:],axis=1))
         StdProf=np.flip(np.std(patch[:,:],axis=1))
         Coords=np.linspace(-89.5,89.5,180)
+
+        amfpatch=RL.make_patch(amfdata,[0,180],LonLims,CM3,ProfileHalfWidth,pad=True)
+        amfAvgProf=np.flip(np.mean(amfpatch[:,:],axis=1))
+        amfStdProf=np.flip(np.std(amfpatch[:,:],axis=1))
     
     if profile=="Zonal":
         LonLims=[360-int(CM3+180),360-int(CM3-180)]
@@ -53,7 +61,12 @@ def extract_profile(pth,filename,LonCtr='CM',ProfileHalfWidth=45.,
         AvgProf=np.flip(np.mean(patch[:,:],axis=0))
         StdProf=np.flip(np.std(patch[:,:],axis=0))
         Coords=np.arange(-180,180,1)#+0.5
+        
+        amfpatch=RL.make_patch(amfdata,LatLims,LonLims,CM3,180,pad=True)
+        amfAvgProf=np.flip(np.mean(amfpatch[:,:],axis=0))
+        amfStdProf=np.flip(np.std(amfpatch[:,:],axis=0))
+
 
     print("AvgProfile.shape,Coords.shape=",AvgProf.shape,Coords.shape)
 
-    return(Coords,AvgProf,StdProf,CM3)
+    return(Coords,AvgProf,StdProf,CM3,amfAvgProf)

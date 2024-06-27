@@ -25,9 +25,10 @@ def plot_patch(fullmap,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
         temp=RL.make_contours_CH4_patch(axis,patch,LatLims,LonLims,
                            lvls=tx,frmt=frmt,clr='k')
 
+    im_ratio = patch.shape[0]/patch.shape[1]
     cbar = pl.colorbar(show, ticks=tx, 
                orientation='vertical',cmap='gist_heat',
-               ax=axis,fraction=0.046, pad=0.04)
+               ax=axis,fraction=0.046*im_ratio, pad=0.04)
     cbar.ax.set_yticklabels(np.around(tx,3))
     cbar.ax.tick_params(labelsize=6,color="k")#if iSession >1:
     if cbar_reverse:

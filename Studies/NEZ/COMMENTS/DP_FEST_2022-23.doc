@@ -1,0 +1,446 @@
+WinJUPOS 12.2.6 (Jupiter), Selection protocol, 2024/05/27  11:05
+
+------------------------------------------------------------------------------
+
+Selection file
+C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\Studies\NEZ\DP_FEST_2022-23.sel
+
+Comment
+
+
+Records
+117
+
+Settings file
+C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\Studies\NEZ\DP_FEST_2022-23.ses
+
+Objects
+Mp Object Rr Object-ID
+DP FEST                      
+
+Including MOON + SHAD
+no
+
+Including BELT + ZONE
+no
+
+Measurer
+***
+
+Channel
+****
+
+Computation of object positions
+none
+
+Ref. system
+1
+
+L(T0)
+  0.0ø
+
+Drift
+0.0000ø/d
+
+Ref. date
+2000/01/01
+
+From latitude
+ +0.0ø
+
+To latitude
++10.0ø
+
+From longitude
+  0.0ø
+
+To longitude
+360.0ø
+
+From date
+2022/06/01
+
+To date
+2024/07/01
+
+Sorting
+No sorting
+
+Phase correction C.M.T.
+no
+
+Phase correction Measurements
+no
+
+Nil-error bars in longitude
+no
+
+Nil-error bars in latitude
+no
+
+Directory Central Meridian transits
+
+
+Directory measurements
+C:\Astronomy\Projects\Planets\Jupiter\WINJupos Measurements Downloaded
+
+Systematic error of 357 used observer(s)
+Observer                  SR       SV       NR       NV       **
+$$$TEMP.mea           Measurements                           0.0ø
+&Adamoli.mea          Measurements                           0.0ø
+&Adcock.mea           Measurements                           0.0ø
+&Akuts_1.mea          Measurements                           0.0ø
+&Akuts_2.mea          Measurements                           0.0ø
+&Amadori.mea          Measurements                           0.0ø
+&Aquaron.mea          Measurements                           0.0ø
+&Arditti.mea          Measurements                           0.0ø
+&ASO.mea              Measurements                           0.0ø
+&Avocone.mea          Measurements                           0.0ø
+&Baldani.mea          Measurements                           0.0ø
+&Baldanz.mea          Measurements                           0.0ø
+&Baldoni.mea          Measurements                           0.0ø
+&Barbier.mea          Measurements                           0.0ø
+&Barcelo.mea          Measurements                           0.0ø
+&Bardell.mea          Measurements                           0.0ø
+&Barry.mea            Measurements                           0.0ø
+&Bartoli.mea          Measurements                           0.0ø
+&Barucco.mea          Measurements                           0.0ø
+&Barzacc.mea          Measurements                           0.0ø
+&Bazzucc.mea          Measurements                           0.0ø
+&Beltram.mea          Measurements                           0.0ø
+&Bernasc.mea          Measurements                           0.0ø
+&Bertogl.mea          Measurements                           0.0ø
+&Bertran.mea          Measurements                           0.0ø
+&Bianc_M.mea          Measurements                           0.0ø
+&Bianchi.mea          Measurements                           0.0ø
+&Biancon.mea          Measurements                           0.0ø
+&Bortolo.mea          Measurements                           0.0ø
+&Botallo.mea          Measurements                           0.0ø
+&Bottari.mea          Measurements                           0.0ø
+&Botti.mea            Measurements                           0.0ø
+&Bourdin.mea          Measurements                           0.0ø
+&Braga.mea            Measurements                           0.0ø
+&Brion.mea            Measurements                           0.0ø
+&Bryant.mea           Measurements                           0.0ø
+&Buda.mea             Measurements                           0.0ø
+&Bullen.mea           Measurements                           0.0ø
+&Camaiti.mea          Measurements                           0.0ø
+&Carbogn.mea          Measurements                           0.0ø
+&Cardin.mea           Measurements                           0.0ø
+&Carvalh.mea          Measurements                           0.0ø
+&Casely.mea           Measurements                           0.0ø
+&Caso.mea             Measurements                           0.0ø
+&Casqu_1.mea          Measurements                           0.0ø
+&Casqu_2.mea          Measurements                           0.0ø
+&Castell.mea          Measurements                           0.0ø
+&Cecchin.mea          Measurements                           0.0ø
+&Cellini.mea          Measurements                           0.0ø
+&Ceracch.mea          Measurements                           0.0ø
+&Cervoni.mea          Measurements                           0.0ø
+&Chang.mea            Measurements                           0.0ø
+&Chavez.mea           Measurements                           0.0ø
+&Chevall.mea          Measurements                           0.0ø
+&Cicogna.mea          Measurements                           0.0ø
+&Cidad_1.mea          Measurements                           0.0ø
+&Cidad_2.mea          Measurements                           0.0ø
+&Cocco.mea            Measurements                           0.0ø
+&Cocconc.mea          Measurements                           0.0ø
+&Coelho.mea           Measurements                           0.0ø
+&Colvill.mea          Measurements                           0.0ø
+&Combs.mea            Measurements                           0.0ø
+&Comolli.mea          Measurements                           0.0ø
+&Consoli.mea          Measurements                           0.0ø
+&Coombs.mea           Measurements                           0.0ø
+&Corrao.mea           Measurements                           0.0ø
+&Cosenza.mea          Measurements                           0.0ø
+&Costant.mea          Measurements                           0.0ø
+&Cristof.mea          Measurements                           0.0ø
+&Crudeli.mea          Measurements                           0.0ø
+&Dalpret.mea          Measurements                           0.0ø
+&Daniele.mea          Measurements                           0.0ø
+&Daniels.mea          Measurements                           0.0ø
+&Dauverg.mea          Measurements                           0.0ø
+&Daversi.mea          Measurements                           0.0ø
+&D'Avino.mea          Measurements                           0.0ø
+&Debacke.mea          Measurements                           0.0ø
+&DeBened.mea          Measurements                           0.0ø
+&DeGrego.mea          Measurements                           0.0ø
+&Delcroi.mea          Measurements                           0.0ø
+&Dellave.mea          Measurements                           0.0ø
+&Dickins.mea          Measurements                           0.0ø
+&Dijon.mea            Measurements                           0.0ø
+&DiMauro.mea          Measurements                           0.0ø
+&DiNasso.mea          Measurements                           0.0ø
+&Dionisi.mea          Measurements                           0.0ø
+&DiScala.mea          Measurements                           0.0ø
+&DiSciul.mea          Measurements                           0.0ø
+&Distazi.mea          Measurements                           0.0ø
+&Dittie.mea           Measurements                           0.0ø
+&Dobbins.mea          Measurements                           0.0ø
+&Dorazio.mea          Measurements                           0.0ø
+&Dupont.mea           Measurements                           0.0ø
+&Earl.mea             Measurements                           0.0ø
+&Esornat.mea          Measurements                           0.0ø
+&Fabrizi.mea          Measurements                           0.0ø
+&Farroni.mea          Measurements                           0.0ø
+&Fattinn.mea          Measurements                           0.0ø
+&Favero.mea           Measurements                           0.0ø
+&Ferri.mea            Measurements                           0.0ø
+&Fiaccon.mea          Measurements                           0.0ø
+&Foste_1.mea          Measurements                           0.0ø
+&Foste_2.mea          Measurements                           0.0ø
+&Foulkes.mea          Measurements                           0.0ø
+&Frassat.mea          Measurements                           0.0ø
+&Galiann.mea          Measurements                           0.0ø
+&Garbeli.mea          Measurements                           0.0ø
+&Garofal.mea          Measurements                           0.0ø
+&Gasparr.mea          Measurements                           0.0ø
+&Ghomiza.mea          Measurements                           0.0ø
+&Go_1.mea             Measurements                           0.0ø
+&Go_2.mea             Measurements                           0.0ø
+&Grafton.mea          Measurements                           0.0ø
+&Grassi.mea           Measurements                           0.0ø
+&Grassma.mea          Measurements                           0.0ø
+&Gross_T.mea          Measurements                           0.0ø
+&Gudensb.mea          Measurements                           0.0ø
+&Guidi.mea            Measurements                           0.0ø
+&Habran.mea           Measurements                           0.0ø
+&Haese.mea            Measurements                           0.0ø
+&Hansen.mea           Measurements                           0.0ø
+&Hatton.mea           Measurements                           0.0ø
+&Iga.mea              Measurements                           0.0ø
+&Ikemura.mea          Measurements                           0.0ø
+&IRTF.mea             Measurements                           0.0ø
+&Jacqu_1.mea          Measurements                           0.0ø
+&Jacqu_2.mea          Measurements                           0.0ø
+&Jaeschk.mea          Measurements                           0.0ø
+&Jolly.mea            Measurements                           0.0ø
+&Justice.mea          Measurements                           0.0ø
+&Kardasi.mea          Measurements                           0.0ø
+&Kazanas.mea          Measurements                           0.0ø
+&Koet.mea             Measurements                           0.0ø
+&Kolovos.mea          Measurements                           0.0ø
+&Kowolli.mea          Measurements                           0.0ø
+&Kraaika.mea          Measurements                           0.0ø
+&Laberge.mea          Measurements                           0.0ø
+&Lazzaro.mea          Measurements                           0.0ø
+&Lecleir.mea          Measurements                           0.0ø
+&Legall.mea           Measurements                           0.0ø
+&Lombard.mea          Measurements                           0.0ø
+&Lorenzi.mea          Measurements                           0.0ø
+&Mackint.mea          Measurements                           0.0ø
+&MacNeil.mea          Measurements                           0.0ø
+&Magris.mea           Measurements                           0.0ø
+&Mancini.mea          Measurements                           0.0ø
+&Mangano.mea          Measurements                           0.0ø
+&Maniero.mea          Measurements                           0.0ø
+&Mariani.mea          Measurements                           0.0ø
+&Marino.mea           Measurements                           0.0ø
+&Martine.mea          Measurements                           0.0ø
+&Marzo.mea            Measurements                           0.0ø
+&Massey.mea           Measurements                           0.0ø
+&Maxson.mea           Measurements                           0.0ø
+&Medugno.mea          Measurements                           0.0ø
+&Meier.mea            Measurements                           0.0ø
+&Melandr.mea          Measurements                           0.0ø
+&Melillo.mea          Measurements                           0.0ø
+&Mete.mea             Measurements                           0.0ø
+&Milika.mea           Measurements                           0.0ø
+&Mingo.mea            Measurements                           0.0ø
+&Mirabel.mea          Measurements                           0.0ø
+&Mistret.mea          Measurements                           0.0ø
+&Miyaz_1.mea          Measurements                           0.0ø
+&Miyaz_2.mea          Measurements                           0.0ø
+&Miyaz_3.mea          Measurements                           0.0ø
+&Miyaz_4.mea          Measurements                           0.0ø
+&Miyaz_5.mea          Measurements                           0.0ø
+&Miyaz_6.mea          Measurements                           0.0ø
+&Miyaz_7.mea          Measurements                           0.0ø
+&Miyaz_8.mea          Measurements                           0.0ø
+&Mobberl.mea          Measurements                           0.0ø
+&Moore.mea            Measurements                           0.0ø
+&Morales.mea          Measurements                           0.0ø
+&Morelli.mea          Measurements                           0.0ø
+&Morini.mea           Measurements                           0.0ø
+&Morisan.mea          Measurements                           0.0ø
+&Moroni.mea           Measurements                           0.0ø
+&Morrone.mea          Measurements                           0.0ø
+&Munster.mea          Measurements                           0.0ø
+&Nava.mea             Measurements                           0.0ø
+&Negri.mea            Measurements                           0.0ø
+&Ng.mea               Measurements                           0.0ø
+&Nikolai.mea          Measurements                           0.0ø
+&Olive_1.mea          Measurements                           0.0ø
+&Olive_2.mea          Measurements                           0.0ø
+&Orsi.mea             Measurements                           0.0ø
+&Owens.mea            Measurements                           0.0ø
+&Pace.mea             Measurements                           0.0ø
+&Padulos.mea          Measurements                           0.0ø
+&Palmier.mea          Measurements                           0.0ø
+&Park_Ti.mea          Measurements                           0.0ø
+&Parker.mea           Measurements                           0.0ø
+&Patry.mea            Measurements                           0.0ø
+&Peach_1.mea          Measurements                           0.0ø
+&Peach_2.mea          Measurements                           0.0ø
+&Peach_3.mea          Measurements                           0.0ø
+&Pellier.mea          Measurements                           0.0ø
+&Peltran.mea          Measurements                           0.0ø
+&Pereira.mea          Measurements                           0.0ø
+&Petrone.mea          Measurements                           0.0ø
+&Phill_M.mea          Measurements                           0.0ø
+&Phillip.mea          Measurements                           0.0ø
+&PicMidi.mea          Measurements                           0.0ø
+&Pinheir.mea          Measurements                           0.0ø
+&Pirazzo.mea          Measurements                           0.0ø
+&Pistrit.mea          Measurements                           0.0ø
+&Placent.mea          Measurements                           0.0ø
+&Pluchin.mea          Measurements                           0.0ø
+&Pompeo.mea           Measurements                           0.0ø
+&Poupeau.mea          Measurements                           0.0ø
+&Pretori.mea          Measurements                           0.0ø
+&Prost.mea            Measurements                           0.0ø
+&Pujic.mea            Measurements                           0.0ø
+&Quin.mea             Measurements                           0.0ø
+&Rattei.mea           Measurements                           0.0ø
+&Ravagni.mea          Measurements                           0.0ø
+&Rhodes.mea           Measurements                           0.0ø
+&Rich_TJ.mea          Measurements                           0.0ø
+&Rieugni.mea          Measurements                           0.0ø
+&Rizzi.mea            Measurements                           0.0ø
+&Rocchi.mea           Measurements                           0.0ø
+&Ruocco.mea           Measurements                           0.0ø
+&Saltamo.mea          Measurements                           0.0ø
+&Salway.mea           Measurements                           0.0ø
+&Sanchez.mea          Measurements                           0.0ø
+&Sbarufa.mea          Measurements                           0.0ø
+&Scopell.mea          Measurements                           0.0ø
+&Sedrani.mea          Measurements                           0.0ø
+&Sellini.mea          Measurements                           0.0ø
+&Sforza.mea           Measurements                           0.0ø
+&Sharp.mea            Measurements                           0.0ø
+&Silva.mea            Measurements                           0.0ø
+&Sivo.mea             Measurements                           0.0ø
+&Soldevi.mea          Measurements                           0.0ø
+&Sordini.mea          Measurements                           0.0ø
+&Sorense.mea          Measurements                           0.0ø
+&Starace.mea          Measurements                           0.0ø
+&Stemmel.mea          Measurements                           0.0ø
+&Storey.mea           Measurements                           0.0ø
+&Stourai.mea          Measurements                           0.0ø
+&Strikis.mea          Measurements                           0.0ø
+&Suarez.mea           Measurements                           0.0ø
+&Tanga.mea            Measurements                           0.0ø
+&Tejfel.mea           Measurements                           0.0ø
+&Testa.mea            Measurements                           0.0ø
+&Tonon.mea            Measurements                           0.0ø
+&Triana.mea           Measurements                           0.0ø
+&Trivisa.mea          Measurements                           0.0ø
+&Turner.mea           Measurements                           0.0ø
+&Tyler.mea            Measurements                           0.0ø
+&Ulbrich.mea          Measurements                           0.0ø
+&Uri.mea              Measurements                           0.0ø
+&Valenti.mea          Measurements                           0.0ø
+&Valimbe.mea          Measurements                           0.0ø
+&Vandebe.mea          Measurements                           0.0ø
+&Vanderv.mea          Measurements                           0.0ø
+&Vedovat.mea          Measurements                           0.0ø
+&Verga.mea            Measurements                           0.0ø
+&Verza.mea            Measurements                           0.0ø
+&Viladri.mea          Measurements                           0.0ø
+&Walker.mea           Measurements                           0.0ø
+&Weileon.mea          Measurements                           0.0ø
+&Wesley.mea           Measurements                           0.0ø
+&Willems.mea          Measurements                           0.0ø
+&William.mea          Measurements                           0.0ø
+&Yan.mea              Measurements                           0.0ø
+&Zannell.mea          Measurements                           0.0ø
+&Zanotti.mea          Measurements                           0.0ø
+&Zattera.mea          Measurements                           0.0ø
+&Zompato.mea          Measurements                           0.0ø
+&Zontone.mea          Measurements                           0.0ø
+&Zorzeno.mea          Measurements                           0.0ø
+Alzner.mea            Measurements                           0.0ø
+Auchere.mea           Measurements                           0.0ø
+Backhous.mea          Measurements                           0.0ø
+Barnard.mea           Measurements                           0.0ø
+Baxendel.mea          Measurements                           0.0ø
+Beaume.mea            Measurements                           0.0ø
+Beer_Mae.mea          Measurements                           0.0ø
+Bernasco.mea          Measurements                           0.0ø
+Birmingh.mea          Measurements                           0.0ø
+Biver.mea             Measurements                           0.0ø
+Bond.mea              Measurements                           0.0ø
+Botton.mea            Measurements                           0.0ø
+Brambill.mea          Measurements                           0.0ø
+Bredichi.mea          Measurements                           0.0ø
+Brenner.mea           Measurements                           0.0ø
+Browning.mea          Measurements                           0.0ø
+Carpente.mea          Measurements                           0.0ø
+Chacorna.mea          Measurements                           0.0ø
+Chaput.mea            Measurements                           0.0ø
+Cicognan.mea          Measurements                           0.0ø
+Copeland.mea          Measurements                           0.0ø
+Dawes.mea             Measurements                           0.0ø
+Debacker.mea          Measurements                           0.0ø
+Dennett.mea           Measurements                           0.0ø
+Ditz.mea              Measurements                           0.0ø
+Ducellie.mea          Measurements                           0.0ø
+Farroni.mea           Measurements                           0.0ø
+Favero.mea            Measurements                           0.0ø
+Galle.mea             Measurements                           0.0ø
+Garro.mea             Measurements                           0.0ø
+Gledhill.mea          Measurements                           0.0ø
+Gorton.mea            Measurements                           0.0ø
+Gratadou.mea          Measurements                           0.0ø
+Green.mea             Measurements                           0.0ø
+Hartmann.mea          Measurements                           0.0ø
+Helier.mea            Measurements                           0.0ø
+Hellot.mea            Measurements                           0.0ø
+Hirst.mea             Measurements                           0.0ø
+Holden.mea            Measurements                           0.0ø
+Hough.mea             Measurements                           0.0ø
+Huggins.mea           Measurements                           0.0ø
+Jacob.mea             Measurements                           0.0ø
+Jacquess.mea          Measurements                           0.0ø
+Jouannea.mea          Measurements                           0.0ø
+Knobel.mea            Measurements                           0.0ø
+Kritzing.mea          Measurements                           0.0ø
+Lachaud.mea           Measurements                           0.0ø
+Lau.mea               Measurements                           0.0ø
+Lecleire.mea          Measurements                           0.0ø
+Lemasle.mea           Measurements                           0.0ø
+LickObsy.mea          Measurements                           0.0ø
+Lionne.mea            Measurements                           0.0ø
+Lobering.mea          Measurements                           0.0ø
+Lohse.mea             Measurements                           0.0ø
+Long.mea              Measurements                           0.0ø
+Luplau.mea            Measurements                           0.0ø
+Madorre.mea           Measurements                           0.0ø
+Mayer_AM.mea          Measurements                           0.0ø
+Mechling.mea          Measurements                           0.0ø
+Miyazaki.mea          Measurements                           0.0ø
+Noble.mea             Measurements                           0.0ø
+Pelegrin.mea          Measurements                           0.0ø
+Pratt.mea             Measurements                           0.0ø
+Pritchet.mea          Measurements                           0.0ø
+Rieugnie.mea          Measurements                           0.0ø
+Russell.mea           Measurements                           0.0ø
+Schmidt.mea           Measurements                           0.0ø
+Schroete.mea          Measurements                           0.0ø
+Schwabe.mea           Measurements                           0.0ø
+Secchi.mea            Measurements                           0.0ø
+SGPG.mea              Measurements                           0.0ø
+Stenuit.mea           Measurements                           0.0ø
+Struve.mea            Measurements                           0.0ø
+Tacchini.mea          Measurements                           0.0ø
+Tanga.mea             Measurements                           0.0ø
+Tebbutt.mea           Measurements                           0.0ø
+Terby.mea             Measurements                           0.0ø
+Testa.mea             Measurements                           0.0ø
+Therin.mea            Measurements                           0.0ø
+Treptow.mea           Measurements                           0.0ø
+Viscardy.mea          Measurements                           0.0ø
+Warren.mea            Measurements                           0.0ø
+Williams.mea          Measurements                           0.0ø
+Zannelli.mea          Measurements                           0.0ø
+------------------------------------------------------------------------------

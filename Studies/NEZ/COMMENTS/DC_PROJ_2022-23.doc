@@ -1,18 +1,18 @@
-WinJUPOS 12.2.6 (Jupiter), Selection protocol, 2023/12/31  17:07
+WinJUPOS 12.2.6 (Jupiter), Selection protocol, 2024/05/24  16:44
 
 ------------------------------------------------------------------------------
 
 Selection file
-C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\Studies\Dark Features\DC_PROJ_2022-23.sel
+C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\Studies\NEZ\DC_PROJ_2022-23.sel
 
 Comment
 
 
 Records
-7082
+8096
 
 Settings file
-C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\Studies\Dark Features\DC_PROJ_2022-23.ses
+C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\Studies\NEZ\DC_PROJ_2022-23.ses
 
 Objects
 Mp Object Rr Object-ID
@@ -61,7 +61,7 @@ From date
 2022/06/01
 
 To date
-2024/01/01
+2024/07/01
 
 Sorting
 No sorting

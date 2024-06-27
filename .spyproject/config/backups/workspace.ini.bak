@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['ESS2024_Figures.py', 'Molecular Absorption\\code\\get_albedo_continua_crossections.py', '..\\..\\Planets\\Jupiter\\Spectral Data\\JupiterSpectralAnalysis\\AirmassFactor_mu.py']
+recent_files = ['Maps\\Map_Jup_Atm_P3.py', 'Profiles\\code\\Profile_L2.py', 'Profiles\\code\\IrwinFig9.py', 'Studies\\NEZ\\nez_analysis.py', 'Profiles\\code\\Profile_L3.py', 'Services\\make_L2_abs_data.py']
 
 [main]
 version = 0.2.0

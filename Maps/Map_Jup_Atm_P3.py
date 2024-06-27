@@ -1,7 +1,7 @@
 def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
                         Smoothing=False,LatLims=[45,135],LonRng=45,
                         CMpref='subobs',LonSys='2',showbands=False,
-                        coef=[0.,0.],subproj=''):
+                        coef=[0.,0.],subproj='',figxy=[8.0,4.0]):
     """
     Created on Sun Nov  6 16:47:21 2022
     
@@ -85,7 +85,7 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     ###########################################################################
     ## Just RGB and Abundance
     ###########################################################################
-    fig1,axs1=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
+    fig1,axs1=pl.subplots(1,2,figsize=(figxy[0],figxy[1]), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
     fig1.suptitle(fNH3hdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
                   +str(int(fNH3PlotCM))+", Calibration = "+CalModel+
@@ -190,7 +190,7 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     ## Just RGB and Cloud Pressure
     ###########################################################################
     #!!!!!!!!!! FIX THIS !!!!!!!!!!!!!
-    fig2,axs2=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
+    fig2,axs2=pl.subplots(1,2,figsize=(figxy[0],figxy[1]), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
     fig2.suptitle(fNH3hdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
                   +str(int(PCldPlotCM))+", Calibration = "+CalModel+
@@ -297,7 +297,7 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     ###########################################################################
     ## Compute Scatter Plot
     ###########################################################################
-    fig3,axs3=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white")
+    fig3,axs3=pl.subplots(1,2,figsize=(figxy[0],figxy[1]), dpi=150, facecolor="white")
     fig3.suptitle(fNH3hdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
                   +str(int(PCldPlotCM))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
 
