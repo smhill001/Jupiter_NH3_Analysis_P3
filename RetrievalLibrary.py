@@ -38,12 +38,13 @@ def make_contours_CH4_patch(ax,CH4Abs_conv,LatLims,LonLims,lvls=[0.71,0.73,0.75,
         clrs.append(clr)
     cs=ax.contour(CH4Abs_conv,origin='upper', 
                   extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],90-LatLims[0]],
-                  colors=clrs, alpha=0.5,levels=lvls,
-                  linewidths=[0.5,0.5,0.5,0.5,0.5,0.5],
+                  colors=clrs, alpha=0.8,levels=lvls,
+                  #linewidths=[0.5,0.5,0.5,0.5,0.5,0.5],
+                  linewidths=[1.0,1.0,1.0,1.0,1.0,1.0],
                   linestyles=['dashed','dashed','dashed','dashed','dashed'])
     #ax.clabel(cs,[19.0,19.5,20.0,20.5,21.0],inline=True,fmt='%2.1f',fontsize=8)
     #print(lvls)
-    ax.clabel(cs,lvls,inline=True,fmt=frmt,fontsize=8)
+    ax.clabel(cs,lvls,inline=True,fmt=frmt,fontsize=9)
     
 
 def make_contours_CH4(ax,CH4Abs_conv,lvls=[0.71,0.73,0.75,0.77,0.79],frmt='%3.1e'):

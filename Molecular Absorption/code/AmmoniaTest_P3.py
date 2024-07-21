@@ -36,7 +36,7 @@ projpath="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
 ###############################################################################
 x0,x1,xtks=600.,680.,9
 y0,y1,ytks=0.0,0.7,8
-Albedo,Continua,CH4,NH3,LONH3=gACC.get_albedo_continua_crossections(x0,x1,xtks,
+Albedo,Continua,CH4,NH3,NH3_Lutz_Owen_1980,fig_molecules,ax_molecules=gACC.get_albedo_continua_crossections(x0,x1,xtks,
                                                                     y0,y1,ytks,
                                                                     Crossect=True)
 
@@ -80,6 +80,13 @@ fig_raycont,axs_raycont=NFL.vert_profile_quad_plot(SupTitle="Weighting with Rayl
 
 filterlistshort=['620','632','647','656']
 for filtr in filterlistshort:
+    print()
+    print("-------------------------------")            
+    print("filtr,Jupiterdata[filtr]['keff_CH4'],Jupiterdata[filtr]['keff_NH3']=",
+          filtr,Jupiterdata[filtr]['keff_CH4'],Jupiterdata[filtr]['keff_NH3'])
+    print("-------------------------------")            
+    print()
+
     tau_gas=Jupiterdata[filtr]['tau_CH4']+Jupiterdata[filtr]['tau_NH3']
     tmp=NFL.Compute_Transmission(P,Jupiterdata[filtr]['tau_R'],tau_gas,
                                  Jupiterdata[filtr]['filtname']+' Ray',

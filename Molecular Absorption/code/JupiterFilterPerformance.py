@@ -35,7 +35,7 @@ def JupiterFilterPerformance(TelescopeList=["SCT","VLT"],
     ###########################################################################
     #!!!!NEED A MICRO SERVICE FOR THIS!!!!
     ###########################################################################
-    gravity=22.280 #m/s^2
+    gravity=22.280 #m/s^2  ######!!!!!!Needs to be fixed!!!
     mmolwt=3.85e-27 #kg/molecule
     fCH4=1.81e-3
     Lodschmit=2.687E+25 #m-3
@@ -44,7 +44,7 @@ def JupiterFilterPerformance(TelescopeList=["SCT","VLT"],
     # Get molecular and Jovian data   
     x0,x1,xtks=600.,680.,9
     y0,y1,ytks=0.0,0.7,8
-    Albedo,Continua,CH4,NH3,NH3_Lutz_Owen_1980= \
+    Albedo,Continua,CH4,NH3,NH3_Lutz_Owen_1980,fig_molecules,ax_molecules= \
         gACC.get_albedo_continua_crossections(x0,x1,xtks,y0,y1,ytks,Crossect=True)
 
     # PLOT FILTER TRANSMISSIONS CONVOLVED WITH DISK-INTEGRATED ALBEDO AND CONTINUUM

@@ -60,7 +60,7 @@ def nez_analysis():
     
     ###########################################################################
     # READ IN WINJupos MEASUREMENTS (DATE,LON,LAT) OF DARK PROJECTIONS 
-    # (AND FESTOONS?)
+    # (AND FESTOONS)
     ###########################################################################
     
     #WINJupos measurer PROJections - all locations

@@ -36,8 +36,8 @@ def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     figamfspg,axsamfspg=pl.subplots(2,2,figsize=(8.0,6.0), dpi=150,
                                     sharex=True,sharey=True,facecolor="white")
 
-    x1,x2,y1,y2=-30.,10.,85.,110.
-    axsins=axsavgprof.inset_axes([0.08,0.45,0.45,0.25],xlim=(x1,x2),ylim=(y1,y2))
+    x1,x2,y1,y2=-30.,10.,110,135.
+    axsins=axsavgprof.inset_axes([0.07,0.5,0.45,0.20],xlim=(x1,x2),ylim=(y1,y2))
     axsavgprof.indicate_inset_zoom(axsins,edgecolor="black")
     #ax='None'
     if param=="fNH3" and profile=="Meridional":
@@ -125,13 +125,14 @@ def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     axsavgprof.grid(linewidth=0.2)
     axsavgprof.tick_params(axis='both', which='major', labelsize=8)
     axsins.tick_params(axis='both', which='major', labelsize=8)
+    axsins.set_yticks(np.linspace(110,135,6),)
     
     axsavgprof.annotate("ProfileHalfWidth="+str(ProfileHalfWidth),(0.01,0.01),
                         xycoords='subfigure fraction',size=8)
     axsavgprof.annotate("Smoothing="+str(smooth),(0.01,0.04),
                         xycoords='subfigure fraction',size=8)
     
-    figavgprof.subplots_adjust(left=0.12, bottom=0.12, right=0.98, top=0.92)  
+    figavgprof.subplots_adjust(left=0.12, bottom=0.12, right=0.98, top=0.94)  
     figavgprof.savefig(path+"Profile_"+param+"_"+profile+".png",dpi=300)
 
     ###########################################################################

@@ -296,7 +296,7 @@ def plot_profile_L2(ax1,ax2,ax3,ax4,reference,ProfileHalfWidth=45.,LatPlotLims=[
         OutPro,OutStd,Outamf=AvgPro,AvgStd,Avgamf
 
     ax1.plot(Lats,OutPro,color=clr,linewidth=width,linestyle=style,
-            label=reference+' (Avg. '+str(Num)+')')  
+            label=reference.replace('CMOS','SCT')+' (Avg. '+str(Num)+')')  
     ax1.fill_between(Lats, OutPro-OutStd, OutPro+OutStd,
                     color=clr,alpha=.1)
 
@@ -500,7 +500,9 @@ def plot_profile_L3(ax1,ax2,ax3,ax4,reference,ProfileHalfWidth=45.,LatPlotLims=[
         OutPro,OutStd,Outamf=AvgPro,AvgStd,Avgamf
         
     ax1.plot(Lats,OutPro,color=clr,linewidth=width,linestyle=style,
-            label=reference+' (Avg. '+str(Num)+')')  
+            #label=reference+' (Avg. '+str(Num)+')')  
+            label=reference.replace('CMOS','SCT')+' (Avg. '+str(Num)+')')  
+
     ax1.fill_between(Lats, OutPro-OutStd, OutPro+OutStd,
                     color=clr,alpha=.1)
     ax2.scatter(Outamf,OutPro,s=5,label=reference+' (Avg. '+str(Num)+')')

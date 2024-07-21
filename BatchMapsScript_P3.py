@@ -70,7 +70,7 @@ def BatchMapsScript_P3(reference,Level='plots',imagetype="Map",LonSys='3'):
                 MapJup.Map_Jup_Atm_P3(obskey=dataset,imagetype='Map',
                                            Smoothing=False,LatLims=[45,135],LonRng=45,
                                            CMpref='subobs',LonSys=LonSys,showbands=False,
-                                           coef=[0.0,0.0],subproj='632')
+                                           coef=[0.0,0.0],subproj='')
             if imagetype=='Img':
                 IA.image_array_new(obsdate=dataset,target="Jupiter",
                                      imagetype='Img',contour=True)

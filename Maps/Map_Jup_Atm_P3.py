@@ -33,6 +33,11 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     import copy
 
     target="Jupiter"
+    fNH3low=50
+    fNH3high=150
+    PCldlow=600
+    PCldhigh=1100
+    
     PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM,RGBtime= \
                     RFM.read_fits_map_L2_L3(obskey=obskey,LonSys=LonSys,
                                             imagetype="Map",Level="L3")
@@ -107,7 +112,7 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     
     fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(TestfNH3,LatLims,NH3LonLims,
                                      fNH3PlotCM,LonRng,"jet",
-                                     axs1[0],'%3.2f',cont=False,n=6,vn=50,vx=130)
+                                     axs1[0],'%3.2f',cont=False,n=6,vn=fNH3low,vx=fNH3high)
 
     temp=RL.make_contours_CH4_patch(axs1[0],fNH3_patch_mb,LatLims,NH3LonLims,
                            lvls=tx_fNH3,frmt='%3.0f',clr='k')
@@ -216,7 +221,7 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     Pcloud_patch,vn,vx,tx=PP.plot_patch(TestPCloud,LatLims,NH3LonLims,
                                      PCldPlotCM,LonRng,"jet",
                                      axs2[0],'%3.2f',cont=False,
-                                     cbar_reverse=True,vn=800,vx=1300,n=6)
+                                     cbar_reverse=True,vn=PCldlow,vx=PCldhigh,n=6)
 
     """##########TEST CODE
     hdu = fits.PrimaryHDU((R["CH4"]["PCloud"]).astype(np.float32))
@@ -323,9 +328,9 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     Pcloud_patch,vn,vx,tx=PP.plot_patch(TestPCloud,LatLims,NH3LonLims,
                                      PCldPlotCM,LonRng,"Greys",
                                      axs3[0],'%3.2f',cont=False,
-                                     cbar_reverse=True,vn=800,vx=1300,n=6)
+                                     cbar_reverse=True,vn=PCldlow,vx=PCldhigh,n=6)
     temp=RL.make_contours_CH4_patch(axs3[0],fNH3_patch_mb,LatLims,NH3LonLims,
-                           tx_fNH3,frmt='%3.0f',clr='b')
+                           tx_fNH3,frmt='%3.0f',clr='k')
 
     if coef[0]==0.0:
         correction='_C0'
@@ -341,7 +346,7 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
 
     fnScat=fnNH3.replace('fNH3','Scat')
     BZ=plot_scatter(Pcloud_patch,fNH3_patch_mb,obskey,fNH3PlotCM,
-                 LatLims,axs3[1])
+                 LatLims,axs3[1],PCldlow,PCldhigh,fNH3low,fNH3high)
     axs3[1].tick_params(axis='both', which='major', labelsize=9)
     
     axs3[1].set_title("PCloud versus fNH3",fontsize=10)
@@ -434,10 +439,10 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     Pcloud_patch,vn,vx,tx=PP.plot_patch(TestPCloud,LatLims,NH3LonLims,
                                      PCldPlotCM,LonRng,"Greys",
                                      axs4[0],'%3.2f',cont=False,
-                                     cbar_reverse=True,vn=800,vx=1300,n=6)
+                                     cbar_reverse=True,vn=PCldlow,vx=PCldhigh,n=6)
 
     temp=RL.make_contours_CH4_patch(axs4[0],fNH3_patch_mb,LatLims,NH3LonLims,
-                           tx_fNH3,frmt='%3.0f',clr='b')
+                           tx_fNH3,frmt='%3.0f',clr='k')
 
     """##########TEST CODE
     hdu = fits.PrimaryHDU((R["CH4"]["PCloud"]).astype(np.float32))
@@ -647,7 +652,8 @@ def load_png(file_path):
 
     return flow.astype(np.uint16) 
 
-def plot_scatter(patch1,patch2,obskey,Real_CM2,LatLims,axscor):
+def plot_scatter(patch1,patch2,obskey,Real_CM2,LatLims,axscor,PCldlow,PCldhigh,
+                 fNH3low,fNH3high):
     import pylab as pl
     import numpy as np
     import copy
@@ -692,12 +698,12 @@ def plot_scatter(patch1,patch2,obskey,Real_CM2,LatLims,axscor):
         else:
             axscor.scatter(patch2[BZind[key][1]:BZind[key][0],:],
                            patch1[BZind[key][1]:BZind[key][0],:],
-                           marker="o",s=1.0,
+                           marker="o",s=3.0,
                            alpha=0.8,label=key)
      
     axscor.grid(linewidth=0.2)
-    axscor.set_ylim(800.,1300.)
-    axscor.set_xlim(30.,130)
+    axscor.set_ylim(PCldlow,PCldhigh)
+    axscor.set_xlim(fNH3low,fNH3high)
     axscor.set_ylabel("Effective Cloud-top Pressure (mb)",fontsize=10)
     axscor.invert_yaxis()
     axscor.set_xlabel("Ammonia Mole Fraction (ppm)",fontsize=10)

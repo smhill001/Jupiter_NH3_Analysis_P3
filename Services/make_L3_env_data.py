@@ -39,7 +39,7 @@ def make_L3_env_data(obsdate="20221009UTa",target="Jupiter",
     #gravity=2228.0 #cm/s^2
     gravity=2479.0 #cm/s^2
     mean_mol_wt=3.85e-24 #gm/molecule, which is 2.22 gm/mole
-    fCH4=1.81e-3
+    fCH4=2.04e-3#1.81e-3
     STP=1.01e6  #dyne/cm^2 [(g-cm/s^2)/cm^2]`
     
     ###########################################################################
@@ -164,9 +164,11 @@ def make_L3_env_data(obsdate="20221009UTa",target="Jupiter",
     NH3_Ncol=1000*NH3_tau/K_eff_NH3647
 
     CH4_Cloud_Press=(CH4_Ncol)*amagat*gravity*mean_mol_wt/(fCH4*STP)
+    #CH4_Cloud_Press is computed in units of mb
+    
     #NH3=(NH3_Ncol/1000.)*amagat*gravity*mean_mol_wt/(CH4_Cloud_Press*STP)
     ##!!!! WOW!!! I need to calculate fNH3 the EASY way also and compare!!!
-    fNH3=(1.81e-3)*NH3_Ncol/CH4_Ncol #-> It works 7/20/2023
+    fNH3=(fCH4)*NH3_Ncol/CH4_Ncol #-> It works 7/20/2023
     
     
     from datetime import datetime

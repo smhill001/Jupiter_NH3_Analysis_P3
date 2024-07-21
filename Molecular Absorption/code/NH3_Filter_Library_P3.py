@@ -83,17 +83,42 @@ def tau_gas_versus_P(P,Keff,filtername,axis,gas='CH4'):
     #Results in a 0.96 ratio between the resulting optical depths
 
     amagat=2.69e24 #Lodschmits number?
-    gravity=2228.0
+    #gravity=2228.0
+    gravity=2479.0 #cm/s^2
+    mean_mol_wt=3.85e-24 #gm/molecule, which is 2.22 gm/mole
     mean_mol_wt=3.85e-24
     if gas=='CH4':
-        fCH4=1.81e-3
+        #fCH4=1.81e-3
+        fgas=2.04e-3#1.81e-3
     elif gas=="NH3":
-        fCH4=1.5e-4
+        fgas=3.0e-4
     STP=1.01e6
 
-    kmatm=(P/1.0e5)*STP*fCH4/(amagat*mean_mol_wt*gravity)
+    """
+    From make_L3_env_data.py
+    amagat=2.69e24 #Lodschmits number. (cm-2) This is really km-amagat
+    #gravity=2228.0 #cm/s^2
+    gravity=2479.0 #cm/s^2
+    mean_mol_wt=3.85e-24 #gm/molecule, which is 2.22 gm/mole
+    fCH4=2.04e-3#1.81e-3
+    STP=1.01e6  #dyne/cm^2 [(g-cm/s^2)/cm^2]
+    """
+
+    kmatm=(P/1.0e5)*STP*fgas/(amagat*mean_mol_wt*gravity)
+    """
+    kmatm is computed based on Pressures in Pascals converted to bars;
+        We would get meter atmospheres if we input pressure in mb
+    
+    From make_L3_env_data.py
+    CH4_Ncol=1000*CH4_tau/K_eff_CH4620 units of meter atmospheres
+    NH3_Ncol=1000*NH3_tau/K_eff_NH3647
+
+    CH4_Cloud_Press=(CH4_Ncol)*amagat*gravity*mean_mol_wt/(fCH4*STP)
+    CH4_Cloud_Press is computed in units of mb
+    CH4_Ncol=CH4_Cloud_Press*(fCH4*STP)/(amagat*gravity*mean_mol_wt)
+    """
     tau_gas=kmatm*Keff
-    tau_mend=22.4e4*(P/1.0e5)*fCH4*Keff/(2.22*gravity)
+    tau_mend=22.4e4*(P/1.0e5)*fgas*Keff/(2.22*gravity)
     #print("tau_gas/tau_mend = ",tau_gas/tau_mend)
     trans=np.exp(-2.0*tau_gas)
     Dtrans=np.diff(trans)
@@ -292,7 +317,12 @@ def compute_vertical_transmission_profiles(Jupiterdata,FilterList,CH4,NH3,Pres,
         #Compute optical depth (tau) independently for methane, ammonia, Rayleigh 
         #  scattering, and total gas (CH4+NH3) for each filter as a function of
         #  pressure level.
-            
+        print()
+        print("###############################")            
+        print("filtr,Jupiterdata[filtr]['keff_CH4'],Jupiterdata[filtr]['keff_NH3']=",
+              filtr,Jupiterdata[filtr]['keff_CH4'],Jupiterdata[filtr]['keff_NH3'])
+        print("###############################")            
+        print()
         Jupiterdata[filtr]['tau_CH4']= \
             NFL.tau_gas_versus_P(Pres,Jupiterdata[filtr]['keff_CH4'],
                                  Jupiterdata[filtr]['filtname'],axs_Keff,gas='CH4')

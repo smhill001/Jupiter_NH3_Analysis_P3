@@ -90,10 +90,11 @@ def Profile_L2(band="NH3",profile="Meridional",ProfileHalfWidth=45,
     axsavgprof.tick_params(axis='both', which='major', labelsize=8)
     axsavgprof.set_xlabel(xlabel,fontsize=10)
     axsavgprof.set_ylabel("Equivalent Width (nm)",fontsize=10)
-    axsavgprof.legend(fontsize=6,loc="lower center")
+    axsavgprof.legend(fontsize=8,loc="upper right")
     
     figavgprof.subplots_adjust(left=0.09, right=0.97, top=0.93, bottom=0.11)
     figavgprof.savefig(path+"Profiles/output/Profile_"+band+"_"+profile+"_Absorption.png",dpi=300)
+    figavgprof.savefig(path+"Profiles/output/Profile_"+band+"_"+profile+"_Absorption.pdf",dpi=300)
 
     #FORMAT SUMMARY AIRMASS PLOT
     axsamf.set_title(band+" "+profile+" Absorption Profiles")
@@ -184,7 +185,10 @@ def Profile_L2(band="NH3",profile="Meridional",ProfileHalfWidth=45,
     SCT23={'Lats':LatsSCT23,'Pro':OutProSCT23,'Std':OutStdSCT23,'Amf':OutamfSCT23}
 
     #return(LatsVLT22,OutProVLT22,OutStdVLT22,OutamfVLT22)#,figavgprof,axsavgprof)
+    
     if band=="NH3":
-        return(SCT20,SCT21,SCT22,VLT22,SCT23)
+        return(SCT20,SCT21,SCT22,VLT22,SCT23)#,figavgprof,axsavgprof)
     else:
-        return(SCT22,VLT22,SCT23)
+        return(SCT22,VLT22,SCT23)#,figavgprof,axsavgprof)
+    
+    #return(figavgprof,axsavgprof)

@@ -24,8 +24,10 @@ def read_master_calibration():
                  'SCT-Obs-Final':{'CH4GlobalTrans':0.920,'NH3GlobalTrans':0.972},
                  'VLT-Obs-Final':{'CH4GlobalTrans':0.893,'NH3GlobalTrans':0.962},
                  'VLT-Filter':{'CH4GlobalTrans':0.897,'NH3GlobalTrans':0.964}}
+    #VLT-FILTER transmission values are computed from Photometry Absorption O-P V2.xlsx
+    #  New Analysis 2024 tab and Python references therein
 
-    K_eff={'CH4_620':{'C11':0.427,'VLT':0.454},
-           'NH3_647':{'C11':2.955,'VLT':3.129}}
+    K_eff={'CH4_620':{'C11':0.427,'VLT':0.427},#0.454},
+           'NH3_647':{'C11':2.955,'VLT':2.955}}#3.129}}
     
     return(calibration, K_eff)

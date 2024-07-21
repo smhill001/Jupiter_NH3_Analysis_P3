@@ -95,8 +95,9 @@ shutil.copyfile(pathFITS+fNH3fileI,pathout+"FITS/"+fNH3fileI)
 ###############################################################################
 # FIGURE 3
 ###############################################################################
-fig3,axsfig3=PL2.Profile_L2(band="NH3",profile="Meridional",ProfileHalfWidth=1,
-               LatPlotLims=[45,135],ZonePlotHalfWidth=45,smooth=False)
+fig3,axsfig3=PL2.Profile_L2(band="NH3",profile="Meridional",
+                                              ProfileHalfWidth=1,LatPlotLims=[45,135],
+                                              ZonePlotHalfWidth=45,smooth=False)
 
 fig3.savefig(pathout+'Fig3/Fig3.png',dpi=300)
 
@@ -134,26 +135,26 @@ dx,dy=0,-8
 BRs={155:6,137:10,133:7,120:8}
 N=1
 for BR in BRs:
-    axs1[0].arrow(BR-dx,BRs[BR]-dy,dx,dy,color='C1',width=0.8,length_includes_head=True,
-                  head_starts_at_zero=True,head_width=3,head_length=4)
-    axs1[0].text(BR-dx,BRs[BR]-dy,N,color='C1',fontsize=12,weight='bold',
-                 horizontalalignment='center')
-    axs1[1].arrow(BR-dx,BRs[BR]-dy,dx,dy,color='C1',width=0.8,length_includes_head=True,
-                  head_starts_at_zero=True,head_width=3,head_length=4)
-    axs1[1].text(BR-dx,BRs[BR]-dy,N,color='C1',fontsize=12,weight='bold',
-                 horizontalalignment='center')
-    axs2[0].arrow(BR-dx,BRs[BR]-dy,dx,dy,color='C1',width=0.8,length_includes_head=True,
-                  head_starts_at_zero=True,head_width=3,head_length=4)
-    axs2[0].text(BR-dx,BRs[BR]-dy,N,color='C1',fontsize=12,weight='bold',
-                 horizontalalignment='center')
-    axs2[1].arrow(BR-dx,BRs[BR]-dy,dx,dy,color='C1',width=0.8,length_includes_head=True,
-                  head_starts_at_zero=True,head_width=3,head_length=4)
-    axs2[1].text(BR-dx,BRs[BR]-dy,N,color='C1',fontsize=12,weight='bold',
-                 horizontalalignment='center')
-    axs3[0].arrow(BR-dx,BRs[BR]-dy,dx,dy,color='C1',width=0.8,length_includes_head=True,
-                  head_starts_at_zero=True,head_width=3,head_length=4)
-    axs3[0].text(BR-dx,BRs[BR]-dy,N,color='C1',fontsize=12,weight='bold',
-                 horizontalalignment='center')
+    axs1[0].arrow(BR-dx,BRs[BR]-dy,dx,dy,color='w',width=0.8,length_includes_head=True,
+                  head_starts_at_zero=True,head_width=3,head_length=4,zorder=5)
+    axs1[0].text(BR-dx,BRs[BR]-dy,N,color='w',fontsize=12,weight='bold',
+                 horizontalalignment='center',zorder=5)
+    axs1[1].arrow(BR-dx,BRs[BR]-dy,dx,dy,color='w',width=0.8,length_includes_head=True,
+                  head_starts_at_zero=True,head_width=3,head_length=4,zorder=5)
+    axs1[1].text(BR-dx,BRs[BR]-dy,N,color='w',fontsize=12,weight='bold',
+                 horizontalalignment='center',zorder=5)
+    axs2[0].arrow(BR-dx,BRs[BR]-dy,dx,dy,color='w',width=0.8,length_includes_head=True,
+                  head_starts_at_zero=True,head_width=3,head_length=4,zorder=5)
+    axs2[0].text(BR-dx,BRs[BR]-dy,N,color='w',fontsize=12,weight='bold',
+                 horizontalalignment='center',zorder=5)
+    axs2[1].arrow(BR-dx,BRs[BR]-dy,dx,dy,color='w',width=0.8,length_includes_head=True,
+                  head_starts_at_zero=True,head_width=3,head_length=4,zorder=5)
+    axs2[1].text(BR-dx,BRs[BR]-dy,N,color='w',fontsize=12,weight='bold',
+                 horizontalalignment='center',zorder=5)
+    axs3[0].arrow(BR-dx,BRs[BR]-dy,dx,dy,color='w',width=0.8,length_includes_head=True,
+                  head_starts_at_zero=True,head_width=3,head_length=4,zorder=5)
+    axs3[0].text(BR-dx,BRs[BR]-dy,N,color='w',fontsize=12,weight='bold',
+                 horizontalalignment='center',zorder=5)
     N=N+1
     
 fig1.savefig(pathout+'Fig5/Fig5a.png',dpi=300)

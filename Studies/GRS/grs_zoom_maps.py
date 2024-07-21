@@ -105,7 +105,7 @@ def grs_zoom_maps(year=2022):
     
     fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(MapAvg,LatLims,LonLims,
                                      CM,LonRng,"jet",
-                                     axs1[0],'%3.2f',cont=False,n=6,vn=60,vx=110)
+                                     axs1[0],'%3.2f',cont=False,n=6,vn=80,vx=130)
 
     temp=RL.make_contours_CH4_patch(axs1[0],fNH3_patch_mb,LatLims,LonLims,
                            lvls=tx_fNH3,frmt='%3.0f',clr='k')

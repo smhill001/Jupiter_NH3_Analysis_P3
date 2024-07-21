@@ -457,7 +457,7 @@ def TestContiguousMap(collection="20230815-20230818"):
     for obskey in dataset:
         print("*******obsdate=",obskey)
         PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM2,RGBtime= \
-                        RFM.read_fits_map_L2_L3(obskey=obskey,LonSys='2',
+                        RFM.read_fits_map_L2_L3(obskey=obskey,LonSys='1',
                                                 imagetype="Map",Level="L3")
 
         amfdata=(1.0/sza+1.0/eza)/2.0

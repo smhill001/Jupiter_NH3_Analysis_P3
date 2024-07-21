@@ -155,8 +155,8 @@ def MUSE_Spectrum(date):#,MUSEhdr,MUSEdata,wavelength,filterdata,path):
     MUSECH4Abs=MUSE620Albedo/MUSE620cont
     
     print("")
-    print("NH3 Abs=",MUSENH3Abs)
-    print("CH4 Abs=",MUSECH4Abs)
+    print("NH3 Abs Square Filter=",MUSENH3Abs)
+    print("CH4 Abs Square Filter=",MUSECH4Abs)
 
     ###########################################################################
     # Begin Filter Convolution caluculations of transmission
