@@ -54,6 +54,9 @@ def Profile_L2(band="NH3",profile="Meridional",ProfileHalfWidth=45,
     LatsSCT23,OutProSCT23,OutStdSCT23,OutamfSCT23=PTG.plot_profile_L2(axsavgprof,axsamf,axsspg[1,1],axsamfspg[1,1],"2023 CMOS",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='C3',width=1.0,band=band,smooth=smooth)
+    LatsVLT23,OutProVLT23,OutStdVLT23,OutamfVLT23=PTG.plot_profile_L2(axsavgprof,axsamf,axsspg[1,0],axsamfspg[1,0],"2023 VLTMUSE",ProfileHalfWidth=ProfileHalfWidth,
+                        LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
+                        profile=profile,clr='C4',width=1.0,band=band,smooth=smooth)
     
     if profile=="Meridional":
         for zb in belt:
@@ -183,12 +186,13 @@ def Profile_L2(band="NH3",profile="Meridional",ProfileHalfWidth=45,
     SCT22={'Lats':LatsSCT22,'Pro':OutProSCT22,'Std':OutStdSCT22,'Amf':OutamfSCT22}
     VLT22={'Lats':LatsVLT22,'Pro':OutProVLT22,'Std':OutStdVLT22,'Amf':OutamfVLT22}
     SCT23={'Lats':LatsSCT23,'Pro':OutProSCT23,'Std':OutStdSCT23,'Amf':OutamfSCT23}
+    VLT23={'Lats':LatsVLT23,'Pro':OutProVLT23,'Std':OutStdVLT23,'Amf':OutamfVLT23}
 
     #return(LatsVLT22,OutProVLT22,OutStdVLT22,OutamfVLT22)#,figavgprof,axsavgprof)
     
     if band=="NH3":
-        return(SCT20,SCT21,SCT22,VLT22,SCT23)#,figavgprof,axsavgprof)
+        return(SCT20,SCT21,SCT22,VLT22,SCT23,VLT23)#,figavgprof,axsavgprof)
     else:
-        return(SCT22,VLT22,SCT23)#,figavgprof,axsavgprof)
+        return(SCT22,VLT22,SCT23,VLT23)#,figavgprof,axsavgprof)
     
     #return(figavgprof,axsavgprof)

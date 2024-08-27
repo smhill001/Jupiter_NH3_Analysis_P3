@@ -307,13 +307,31 @@ def get_obs_list():
                                'NH3file':'2023-01-13-0046_2-Jupiter-NoWV-R656G647B632-RGB-WhtBal',
                                'RGBfile':'2023-01-13-0046_0-Jupiter-WV-R685G550B450-RGB-WhtBal-Wavelets'},
 
-                  '20230815UTa':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  '20230812UTa':{'Telescope':'VLT','FL':'5600mm','Camera':'MUSE',
+                                    'Seeing':'N/A','Transparency':'N/A', 
+                               'CH4file':'2023-08-12-0948_2-Jupiter_R656G620B632-RGB-WhtBal-Smth',
+                               'NH3file':'2023-08-12-0948_2-Jupiter_R656G647B632-RGB-WhtBal-Smth',
+                               'RGBfile':'2023-08-12-0948_2-Jupiter_R650G550B450-RGB-WhtBal-WV'},
+    
+                  '20230815UTa':{'Telescope':'VLT','FL':'5600mm','Camera':'MUSE',
+                                    'Seeing':'N/A','Transparency':'N/A', 
+                               'CH4file':'2023-08-15-0734_0-Jupiter_R656G620B632-RGB-Smth-WhtBal',
+                               'NH3file':'2023-08-15-0734_0-Jupiter_R656G647B632-RGB-Smth-WhtBal',
+                               'RGBfile':'2023-08-15-0734_0-Jupiter_R650G550B450-RGB-Smth-WhtBal-WV'},
+    
+                  '20230815UTb':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                     'Seeing':'9/10','Transparency':'9/10', 
                                'CH4file':'2023-08-15-1112_8-Jupiter_R656G620B632-NoWV-RGB-Smth-WhtBal',
                                'NH3file':'2023-08-15-1112_8-Jupiter_R656G647B632-NoWV-RGB-Smth-WhtBal',
                                'RGBfile':'2023-08-15-1129_3-Jupiter_R685G550B450-WV-RGB-WhtBal-ClrSmth-WV'},
     
-                  '20230816UTa':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                  '20230816UTa':{'Telescope':'VLT','FL':'5600mm','Camera':'MUSE',
+                                    'Seeing':'N/A','Transparency':'N/A', 
+                               'CH4file':'2023-08-16-0743_5-Jupiter_R656G620B632-RGB-Smth-WhtBal',
+                               'NH3file':'2023-08-16-0743_5-Jupiter_R656G647B632-RGB-Smth-WhtBal',
+                               'RGBfile':'2023-08-16-0743_5-Jupiter_R650G550B450-RGB-Smth-WhtBal-WV'},
+                  
+                  '20230816UTb':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                     'Seeing':'7/10','Transparency':'7/10', 
                                'CH4file':'2023-08-16-1130_1-Jupiter_R656G620B632-NoWV-RGB-Smth-WhtBal',
                                'NH3file':'2023-08-16-1130_1-Jupiter_R656G647B632-NoWV-RGB-Smth-WhtBal',
@@ -390,6 +408,12 @@ def get_obs_list():
                                'CH4file':'2023-09-22-0629_0-Jupiter_R656G620B632-NoWV-RGB-Smth-WhtBal',
                                'NH3file':'2023-09-22-0629_0-Jupiter_R656G647B632-NoWV-RGB-Smth-WhtBal',
                                'RGBfile':'2023-09-22-0644_8-Jupiter_R685G550B450-WV-RGB-WhtBal-ClrSmth-WV'},
+
+                  '20230923UTa':{'Telescope':'VLT','FL':'5600mm','Camera':'MUSE',
+                                     'Seeing':'N/A','Transparency':'N/A', 
+                               'CH4file':'2023-09-23-0559_2-Jupiter_R656G620B632-RGB-Smth-WhtBal',
+                               'NH3file':'2023-09-23-0559_2-Jupiter_R656G647B632-RGB-Smth-WhtBal',
+                               'RGBfile':'2023-09-23-0559_2-Jupiter_R650G550B450-RGB-Smth-WhtBal-WV'},
 
                   '20230924UTa':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                      'Seeing':'4/10','Transparency':'8/10', 

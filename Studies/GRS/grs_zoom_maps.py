@@ -41,12 +41,15 @@ def grs_zoom_maps(year=2022):
     LonLims=[360-int(CM+LonRng),360-int(CM-LonRng)]
     LatLims=[90,130]
 
+    #coefs=[0.,0.]
+    coefs=[0.65,0.25]
+
     First=True
     for obskey in GRS:
         
         MJP.Map_Jup_Atm_P3(obskey=obskey,imagetype='Map', Smoothing=False,
                             LatLims=[90,130],LonRng=20,CMpref=CM,LonSys=LonSys,
-                            showbands=False,coef=[0.,0.],subproj='GRS')
+                            showbands=False,coef=coefs,subproj='GRS')
 
         PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM,RGBtime= \
                         RFM.read_fits_map_L2_L3(obskey=obskey,LonSys=LonSys,

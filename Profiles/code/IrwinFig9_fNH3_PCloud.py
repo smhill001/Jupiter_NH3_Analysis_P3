@@ -19,9 +19,14 @@ import plot_TEXES_Groups_P3 as PTG
 from astropy.convolution import Box1DKernel
 sys.path.append('./Maps')
 import Profile_L3 as PFL3
+import IrwinLib as IL
 
 prof="Zonal"
+path="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
 
+###############################################################################
+# COMPUTE fNH3 AND PCloud (USUALLY ZONAL) PROFILES ACROSS ALL DATA
+###############################################################################
 SCT22NH3,VLT22NH3,SCT23NH3=PFL3.Profile_L3(param="fNH3",profile=prof,
                                                       ProfileHalfWidth=1, 
                                                       LatPlotLims=[30,150],
@@ -33,116 +38,87 @@ SCT22CH4,VLT22CH4,SCT23CH4=PFL3.Profile_L3(param="PCld",profile=prof,
                                                       ZonePlotHalfWidth=60,
                                                       smooth=False)
 
+###############################################################################
+# VLT22: SET UP PLOTS
+###############################################################################
 figamfVLT22,axsamfVLT22=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white")
-figamfVLT22.suptitle("VLT22 f(NH3) and PCloud")
-axsamfVLT22[0].scatter(VLT22NH3['Amf'],VLT22NH3['Pro'],label="fNH3")
-axsamfVLT22[0].scatter(VLT22CH4['Amf'],VLT22CH4['Pro'],label="PCloud")
-axsamfVLT22[0].scatter(VLT22NH3['Amf'],VLT22NH3['Pro']*10.,label="Scaled fNH3")
-axsamfVLT22[0].scatter(VLT22NH3['Amf'],VLT22NH3['Pro']*VLT22NH3['Amf']**1.0,s=5,label="Corr. fNH3")
-axsamfVLT22[0].scatter(VLT22CH4['Amf'],VLT22CH4['Pro']*VLT22CH4['Amf']**0.3,s=5,label="Corr. PCloud")
+figamfVLT22.suptitle("VLT22 PCloud and fNH3")
 
-axsamfVLT22[0].tick_params(axis='both', which='major', labelsize=8)
-axsamfVLT22[0].set_xlabel("One-Way Airmass Factor",fontsize=10)
-axsamfVLT22[0].set_ylabel("f(NH3) (ppm) and PCloud (mb)",fontsize=10)
-axsamfVLT22[0].legend(fontsize=6,loc="lower center")
-axsamfVLT22[0].set_xlim(1,3)
-axsamfVLT22[0].set_ylim(0.0,1200.0)
-axsamfVLT22[0].set_yticks(np.linspace(0.0,1200.0,7), minor=False)
-axsamfVLT22[0].grid(linewidth=0.2)
-axsamfVLT22[0].legend(loc="best",fontsize=8,ncol=2)
+VLT22NH3param, VLT22NH3param_cov,VLT22NH3R2,VLT22CH4param, VLT22CH4param_cov,VLT22CH4R2,VLT22RatioR2,VLT22fig=\
+    IL.make_fit_plot(VLT22NH3['Amf'],VLT22NH3['Pro'],VLT22CH4['Amf'],
+                     VLT22CH4['Pro'],"L3",figamfVLT22,axsamfVLT22,path)
 
 
-axsamfVLT22[1].scatter(VLT22NH3['Amf'],VLT22CH4['Pro']/VLT22NH3['Pro'],label="PCloud/fNH3")
 
-axsamfVLT22[1].tick_params(axis='both', which='major', labelsize=8)
-axsamfVLT22[1].set_ylabel("Ratio (PCloud/f(NH3)",fontsize=10)
-axsamfVLT22[1].set_xlabel("One-Way Airmass Factor",fontsize=10)
-axsamfVLT22[1].legend(fontsize=6,loc="lower center")
-axsamfVLT22[1].set_xlim(1,3)
-axsamfVLT22[1].set_xticks(np.linspace(1,3,5), minor=False)
-axsamfVLT22[1].set_ylim(0.0,20.0)
-axsamfVLT22[1].set_yticks(np.linspace(0.0,20.0,5), minor=False)
-axsamfVLT22[1].grid(linewidth=0.2)
-axsamfVLT22[0].legend(loc="best",fontsize=8,ncol=2)
-
-figamfVLT22.subplots_adjust(left=0.09, right=0.97, top=0.93, bottom=0.11)
-
-path="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
-figamfVLT22.savefig(path+"Profiles/output/IrwinFig9VLT22fNH3.png",dpi=300)
-
-
+###############################################################################
+###############################################################################
+# SCT22: SET UP PLOTS
+###############################################################################
 figamfSCT22,axsamfSCT22=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white")
-figamfSCT22.suptitle("SCT22 f(NH3) and PCloud")
+figamfSCT22.suptitle("SCT22 PCloud and fNH3")
 
-axsamfSCT22[0].scatter(SCT22NH3['Amf'],SCT22NH3['Pro'],label="fNH3")
-axsamfSCT22[0].scatter(SCT22CH4['Amf'],SCT22CH4['Pro'],label="PCloud")
-axsamfSCT22[0].scatter(SCT22NH3['Amf'],SCT22NH3['Pro']*10,label="Scaled fNH3")
-axsamfSCT22[0].scatter(SCT22NH3['Amf'],SCT22NH3['Pro']*SCT22NH3['Amf']**1.0,s=5,label="Corr. fNH3")
-axsamfSCT22[0].scatter(SCT22CH4['Amf'],SCT22CH4['Pro']*SCT22CH4['Amf']**0.3,s=5,label="Corr. PCloud")
-
-axsamfSCT22[0].tick_params(axis='both', which='major', labelsize=8)
-axsamfSCT22[0].set_xlabel("One-Way Airmass Factor",fontsize=10)
-axsamfSCT22[0].set_ylabel("f(NH3) (ppm) and PCloud (mb)",fontsize=10)
-axsamfSCT22[0].legend(fontsize=6,loc="lower center")
-axsamfSCT22[0].set_xlim(1,3)
-axsamfSCT22[0].set_ylim(0.0,1200.0)
-axsamfSCT22[0].set_yticks(np.linspace(0.0,1200.0,7), minor=False)
-axsamfSCT22[0].grid(linewidth=0.2)
-axsamfSCT22[0].legend(loc="best",fontsize=8,ncol=2)
+SCT22NH3param, SCT22NH3param_cov,SCT22NH3R2,SCT22CH4param, SCT22CH4param_cov,SCT22CH4R2,SCT22RatioR2,SCT22fig=\
+    IL.make_fit_plot(SCT22NH3['Amf'],SCT22NH3['Pro'],SCT22CH4['Amf'],
+                     SCT22CH4['Pro'],"L3",figamfSCT22,axsamfSCT22,path)
 
 
-axsamfSCT22[1].scatter(SCT22NH3['Amf'],SCT22CH4['Pro']/SCT22NH3['Pro'],label="PCloud/fNH3")
 
-axsamfSCT22[1].tick_params(axis='both', which='major', labelsize=8)
-axsamfSCT22[1].set_ylabel("Ratio (PCloud/f(NH3)",fontsize=10)
-axsamfSCT22[1].set_xlabel("One-Way Airmass Factor",fontsize=10)
-axsamfSCT22[1].legend(fontsize=6,loc="lower center")
-axsamfSCT22[1].set_xlim(1,3)
-axsamfSCT22[1].set_xticks(np.linspace(1,3,5), minor=False)
-axsamfSCT22[1].set_ylim(0.0,20.0)
-axsamfSCT22[1].set_yticks(np.linspace(0.0,20.0,5), minor=False)
-axsamfSCT22[1].grid(linewidth=0.2)
-
-figamfSCT22.subplots_adjust(left=0.09, right=0.97, top=0.93, bottom=0.11)
-
-path="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
-figamfSCT22.savefig(path+"Profiles/output/IrwinFig9SCT22fNH3.png",dpi=300)
-
+###############################################################################
+###############################################################################
+# SCT23: SET UP PLOTS
+###############################################################################
 figamfSCT23,axsamfSCT23=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white")
-figamfSCT23.suptitle("SCT22 f(NH3) and PCloud")
+figamfSCT23.suptitle("SCT23 PCloud and fNH3")
 
-axsamfSCT23[0].scatter(SCT23NH3['Amf'],SCT23NH3['Pro'],label="fNH3")
-axsamfSCT23[0].scatter(SCT23CH4['Amf'],SCT23CH4['Pro'],label="PCloud")
-axsamfSCT23[0].scatter(SCT23NH3['Amf'],SCT23NH3['Pro']*10,label="Scaled NH3")
-axsamfSCT23[0].scatter(SCT23NH3['Amf'],SCT23NH3['Pro']*SCT23NH3['Amf']**1.0,s=5,label="Corr. fNH3")
-axsamfSCT23[0].scatter(SCT23CH4['Amf'],SCT23CH4['Pro']*SCT23CH4['Amf']**0.3,s=5,label="Corr. PCloud")
+SCT23NH3param, SCT23NH3param_cov,SCT23NH3R2,SCT23CH4param, SCT23CH4param_cov,SCT23CH4R2,SCT23RatioR2,SCT23fig=\
+    IL.make_fit_plot(SCT23NH3['Amf'],SCT23NH3['Pro'],SCT23CH4['Amf'],
+                     SCT23CH4['Pro'],"L3",figamfSCT23,axsamfSCT23,path)
 
-axsamfSCT23[0].tick_params(axis='both', which='major', labelsize=8)
-axsamfSCT23[0].set_xlabel("One-Way Airmass Factor",fontsize=10)
-axsamfSCT23[0].set_ylabel("f(NH3) (ppm) and PCloud (mb)",fontsize=10)
-axsamfSCT23[0].legend(fontsize=6,loc="lower center")
-axsamfSCT23[0].set_xlim(1,3)
-axsamfSCT23[0].set_ylim(0.0,1200.0)
-axsamfSCT23[0].set_yticks(np.linspace(0.0,1200.0,7), minor=False)
-axsamfSCT23[0].grid(linewidth=0.2)
-axsamfSCT22[0].legend(loc="best",fontsize=8,ncol=2)
+print()
+print("######################################################################")
+print("NH3 ##################################################################")
+print(VLT22NH3param, VLT22NH3param_cov)
+print(VLT22NH3R2)
+print(SCT22NH3param, SCT22NH3param_cov)
+print(SCT22NH3R2)
+print(SCT23NH3param, SCT23NH3param_cov)
+print(SCT23NH3R2)
+print("CH4 ##################################################################")
+print(VLT22CH4param, VLT22CH4param_cov)
+print(VLT22CH4R2)
+print(SCT22CH4param, SCT22CH4param_cov)
+print(SCT22CH4R2)
+print(SCT23CH4param, SCT23CH4param_cov)
+print(SCT23CH4R2)
+print("######################################################################")
+print()
+
+L3fitdata = open(path+'/Profiles/output/L3fitdata.csv', 'w')
+tmp="Observatory,Year,Gas,Constant,ExponentCH4,R2\n"
+L3fitdata.write(tmp)
+
+tmp="VLT,2022,NH3,"+"{:.4f}".format(VLT22NH3param[0])+","+"{:.3f}".format(VLT22NH3param[1])+","+"{:.3f}".format(VLT22NH3R2)+"\n"
+L3fitdata.write(tmp)
+tmp="SCT,2022,NH3,"+"{:.4f}".format(SCT22NH3param[0])+","+"{:.3f}".format(SCT22NH3param[1])+","+"{:.3f}".format(SCT22NH3R2)+"\n"
+L3fitdata.write(tmp)
+tmp="SCT,2023,NH3,"+"{:.4f}".format(SCT23NH3param[0])+","+"{:.3f}".format(SCT23NH3param[1])+","+"{:.3f}".format(SCT23NH3R2)+"\n"
+L3fitdata.write(tmp)
+tmp="VLT,2022,CH4,"+"{:.4f}".format(VLT22CH4param[0])+","+"{:.3f}".format(VLT22CH4param[1])+","+"{:.3f}".format(VLT22CH4R2)+"\n"
+L3fitdata.write(tmp)
+tmp="SCT,2022,CH4,"+"{:.4f}".format(SCT22CH4param[0])+","+"{:.3f}".format(SCT22CH4param[1])+","+"{:.3f}".format(SCT22CH4R2)+"\n"
+L3fitdata.write(tmp)
+tmp="SCT,2023,CH4,"+"{:.4f}".format(SCT23CH4param[0])+","+"{:.3f}".format(SCT23CH4param[1])+","+"{:.3f}".format(SCT23CH4R2)+"\n"
+L3fitdata.write(tmp)
+
+tmp="VLT,2022,CH4/NH3,"+"{:.4f}".format(VLT22CH4param[0]/VLT22NH3param[0])+","+\
+    "{:.3f}".format(VLT22NH3param[1]-VLT22CH4param[1])+","+"{:.3f}".format(VLT22RatioR2)+"\n"
+L3fitdata.write(tmp)
+tmp="SCT,2022,CH4/NH3,"+"{:.4f}".format(SCT22CH4param[0]/SCT22NH3param[0])+","+\
+    "{:.3f}".format(SCT22NH3param[1]-SCT22CH4param[1])+","+"{:.3f}".format(SCT22RatioR2)+"\n"
+L3fitdata.write(tmp)
+tmp="SCT,2023,CH4/NH3,"+"{:.4f}".format(SCT23CH4param[0]/SCT23NH3param[0])+","+\
+    "{:.3f}".format(SCT23NH3param[1]-SCT23CH4param[1])+","+"{:.3f}".format(SCT23RatioR2)+"\n"
+L3fitdata.write(tmp)
 
 
-axsamfSCT23[1].scatter(SCT23NH3['Amf'],SCT23CH4['Pro']/SCT23NH3['Pro'],label="PCloud/fNH3")
-
-axsamfSCT23[1].tick_params(axis='both', which='major', labelsize=8)
-axsamfSCT23[1].set_ylabel("Ratio (PCloud/f(NH3)",fontsize=10)
-axsamfSCT23[1].set_xlabel("One-Way Airmass Factor",fontsize=10)
-axsamfSCT23[1].legend(fontsize=6,loc="lower center")
-axsamfSCT23[1].set_xlim(1,3)
-axsamfSCT23[1].set_xticks(np.linspace(1,3,5), minor=False)
-axsamfSCT23[1].set_ylim(0.0,20.0)
-axsamfSCT23[1].set_yticks(np.linspace(0.0,20.0,5), minor=False)
-axsamfSCT23[1].grid(linewidth=0.2)
-
-figamfSCT23.subplots_adjust(left=0.09, right=0.97, top=0.93, bottom=0.11)
-
-path="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
-figamfSCT23.savefig(path+"Profiles/output/IrwinFig9SCT23fNH3.png",dpi=300)
-
-
+L3fitdata.close()

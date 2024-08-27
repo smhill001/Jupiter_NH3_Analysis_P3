@@ -54,7 +54,8 @@ def get_albedo_continua_crossections(x0,x1,xtks,y0,y1,ytks,
     # Load MUSE albedo data if requested for plotting
     ###########################################################################
     if plotMUSE==True:
-        MUSE_20220730,MUSE_20220919=GMA.get_MUSE_albedos()
+        MUSE_20220730,MUSE_20220919,MUSE_20230812,MUSE_20230815,\
+               MUSE_20230816,MUSE_20230923=GMA.get_MUSE_albedos()
     
     ###########################################################################
     # Compute and load conntinuum models (pretty close to deprecated 4/25/2024)
@@ -91,6 +92,14 @@ def get_albedo_continua_crossections(x0,x1,xtks,y0,y1,ytks,
                              label='MUSE 2022-07-30',linewidth=1.0,color='C1')
         ax_molecules[0].plot(MUSE_20220919[:,0],MUSE_20220919[:,1]*0.66,
                              label='MUSE 2022-09-19',linewidth=1.0,color='C2')
+        ax_molecules[0].plot(MUSE_20230812[:,0],MUSE_20230812[:,1]*0.66,
+                             label='MUSE 2023-08-12',linewidth=1.0,color='C3')
+        ax_molecules[0].plot(MUSE_20230815[:,0],MUSE_20230815[:,1]*0.66,
+                             label='MUSE 2023-08-15',linewidth=1.0,color='C4')
+        ax_molecules[0].plot(MUSE_20230816[:,0],MUSE_20230816[:,1]*0.66,
+                             label='MUSE 2023-08-16',linewidth=1.0,color='C5')
+        ax_molecules[0].plot(MUSE_20230923[:,0],MUSE_20230923[:,1]*0.66,
+                             label='MUSE 2023-09-23',linewidth=1.0,color='C6')
 
     for ModelName in ModList:
         ax_molecules[0].plot(Continua[ModelName]['WaveGrid'],

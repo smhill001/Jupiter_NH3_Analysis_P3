@@ -90,7 +90,7 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
     CH4_CM1=float(PCloudhdr["CM1"])
     CH4_CM2=float(PCloudhdr["CM2"])
     CH4_CM3=float(PCloudhdr["CM3"])
-    
+    print("***********LonSys=",LonSys)
     if LonSys=='1':
         print("LonSys1=",LonSys)
         if imagetype=="Map":
@@ -113,10 +113,12 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
         #Real_CM=NH3_CM1
 
     if LonSys=='2':
+        print("In LonSys==2")
         NH3roll=NH3_CM3-NH3_CM2
         fNH3datar=np.roll(fNH3data,int(NH3roll),axis=1)
         
         CH4roll=CH4_CM3-CH4_CM2
+        print("&&&&&&&&&& CH4roll=",CH4roll)
         PClouddatar=np.roll(PClouddata,int(CH4roll),axis=1)
         
         fNH3szar=np.roll(fNH3sza,int(NH3roll),axis=1)

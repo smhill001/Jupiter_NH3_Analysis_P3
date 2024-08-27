@@ -52,10 +52,22 @@ def MUSE_Spectrum(date):#,MUSEhdr,MUSEdata,wavelength,filterdata,path):
     count=np.nansum(mask[:,:,:],axis=(1,2)) 
     MUSESum=np.nansum(MUSEdata[:,:,:],axis=(1,2))    
     
-    if date=="20220919UT":
+    if date=="20220730UT":
+        kernel_size = 1
+        Gkernel_size=5
+    elif date=="20220919UT":
         kernel_size = 14
         Gkernel_size=1
-    elif date=="20220730UT":
+    if date=="20230812UT":
+        kernel_size = 1
+        Gkernel_size=5
+    if date=="20230815UT":
+        kernel_size = 1
+        Gkernel_size=5
+    if date=="20230816UT":
+        kernel_size = 1
+        Gkernel_size=5
+    if date=="20230923UT":
         kernel_size = 1
         Gkernel_size=5
     kernel = np.ones(kernel_size) / kernel_size

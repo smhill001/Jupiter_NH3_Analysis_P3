@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['Maps\\Map_Jup_Atm_P3.py', '2023-24 Maps\\JALPOmaps.py', 'ESS2024_Figures.py', 'Services\\image_array_new.py', 'RetrievalLibrary.py', 'Profiles\\code\\Profile_L3.py', 'Profiles\\code\\plot_TEXES_Groups_P3.py']
+recent_files = ['Maps\\Map_Jup_Atm_P3.py', 'Maps\\continuousmapscript.py', 'Maps\\TestContiguousMap.py', 'Maps\\read_fits_map_L2_L3.py']
 
 [main]
 version = 0.2.0

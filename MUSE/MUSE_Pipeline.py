@@ -40,7 +40,7 @@ def MUSE_Pipeline(date):
     ###############################################################################
     # Compute spectrum, smoothed spectrum, albedo spectrum, and write filter files
     ###############################################################################
-    temp=MS.MUSE_Spectrum(date,MUSEhdr,MUSEdata,wavelength,filterdata,path)
+    temp=MS.MUSE_Spectrum(date)
 
     ###############################################################################
     # Compute air mass factor as by pixel from emissiong and incidence angles
@@ -106,23 +106,24 @@ def MUSE_Pipeline(date):
                                                             MUSE_convolved[:,i,j],
                                                             Extend=False,Fine=False)
 
-    elif date=="20220730UT":
-        WaveGrid,SignalonGrid=GSU.uniform_wave_grid(wavelength,MUSESpec,Extend=False,Fine=False)        
-    MuseSpecGrid=np.column_stack((WaveGrid,SignalonGrid))
-    print("MuseSpecGrid.shape=",MuseSpecGrid.shape)
+    #elif date=="20220730UT":
+    #    WaveGrid,SignalonGrid=GSU.uniform_wave_grid(wavelength,MUSESpec,Extend=False,Fine=False)        
+    #MuseSpecGrid=np.column_stack((WaveGrid,SignalonGrid))
+    #print("MuseSpecGrid.shape=",MuseSpecGrid.shape)
 
 
     F620_wvs=filterdata["620"]["wvs"]
     F620_idx=[np.argmin(abs(F620_wvs[0]-wavelength)),np.argmin(abs(F620_wvs[1]-wavelength))]
     MUSE620=np.mean(MUSEdata[F620_idx[0]:F620_idx[1],:,:],axis=0)
-    for i in range(0,MUSEhdr1['NAXIS1']):
-        for j in range(0,MUSEhdr1['NAXIS2']):
-            MUSE620_ProductV=GSU.SpectrumMath(FilterTransmission620,MUSE620[:,i,j],"Multiply")
-            MUSE620[i,j]=sum(MUSE620_ProductV[F620_idx[0]:F620_idx[1],1])/ \
-                            sum(FilterTransmission620[F620_idx[0]:F620_idx[1],1])
-
-            MUSE_convolved0[:,i,j] = np.convolve(MUSEdata[:,i,j], kernel, mode='same')
-            MUSE_convolved[:,i,j] = np.convolve(MUSE_convolved0[:,i,j], kernel, mode='same')
+    
+    #for i in range(0,MUSEhdr1['NAXIS1']):
+    #    for j in range(0,MUSEhdr1['NAXIS2']):
+    #        MUSE620_ProductV=GSU.SpectrumMath(FilterTransmission620,MUSE620[:,i,j],"Multiply")
+    #        MUSE620[i,j]=sum(MUSE620_ProductV[F620_idx[0]:F620_idx[1],1])/ \
+    #                        sum(FilterTransmission620[F620_idx[0]:F620_idx[1],1])
+    #
+    #        MUSE_convolved0[:,i,j] = np.convolve(MUSEdata[:,i,j], kernel, mode='same')
+    #        MUSE_convolved[:,i,j] = np.convolve(MUSE_convolved0[:,i,j], kernel, mode='same')
     MUSE620scaled=np.nan_to_num(65535.*MUSE620*100.)
     MUSE620scaled[MUSE620scaled<=0.]=0.0
     MUSE620abs16bit = np.flipud(MUSE620scaled.astype(np.uint16))

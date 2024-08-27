@@ -34,6 +34,22 @@ def ReadMUSE(date):
         MUSEfile='2022-09-19_obs18_proj.fits'
         delta=-0.0
         wavelength=np.linspace(470.+delta,935.13+delta,3722)
+    if date=='20230812UT':
+        MUSEfile='23_08_12_obs45smooth_proj_DATACUBE_FINAL.fits'
+        delta=0
+        wavelength=np.linspace(471.+delta,935.+delta,465)
+    if date=='20230815UT':
+        MUSEfile='23_08_15_obs49smooth_proj_DATACUBE.fits'
+        delta=0
+        wavelength=np.linspace(471.+delta,935.+delta,465)
+    if date=='20230816UT':
+        MUSEfile='23_08_16_obs55_smooth_proj_DATACUBE.fits'
+        delta=0
+        wavelength=np.linspace(471.+delta,935.+delta,465)
+    if date=='20230923UT':
+        MUSEfile='23_09_23_obs90_smooth_proj_DATACUBE.fits'
+        delta=0
+        wavelength=np.linspace(471.+delta,935.+delta,465)
 
         
     MUSEhdulist=fits.open(path+MUSEfile)

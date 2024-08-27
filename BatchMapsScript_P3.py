@@ -66,11 +66,13 @@ def BatchMapsScript_P3(reference,Level='plots',imagetype="Map",LonSys='3'):
         # Execute Processing from L3 to map of NH3, PCloud, and context
         ###################################################################
         if Level=='plots' or Level=='All':
+            #coefs=[0.,0.]
+            coefs=[0.65,0.25]
             if imagetype=="Map":
                 MapJup.Map_Jup_Atm_P3(obskey=dataset,imagetype='Map',
                                            Smoothing=False,LatLims=[45,135],LonRng=45,
                                            CMpref='subobs',LonSys=LonSys,showbands=False,
-                                           coef=[0.0,0.0],subproj='')
+                                           coef=coefs,subproj='Limb Corrected')
             if imagetype=='Img':
                 IA.image_array_new(obsdate=dataset,target="Jupiter",
                                      imagetype='Img',contour=True)

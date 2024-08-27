@@ -35,6 +35,7 @@ projpath="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
 # LOAD JOVIAN DISK-INTEGRATEDALBEDO DATA FROM KARKOSCHKA, 1994 (DATA FROM 1993)
 ###############################################################################
 x0,x1,xtks=600.,680.,9
+#x0,x1,xtks=600.,950.,8
 y0,y1,ytks=0.0,0.7,8
 Albedo,Continua,CH4,NH3,NH3_Lutz_Owen_1980,fig_molecules,ax_molecules=gACC.get_albedo_continua_crossections(x0,x1,xtks,
                                                                     y0,y1,ytks,

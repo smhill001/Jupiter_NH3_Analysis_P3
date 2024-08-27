@@ -1,5 +1,5 @@
 def plot_patch(fullmap,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
-               cont=True,cbar_reverse=False,vn=0.10,vx=0.20,n=6):
+               cont=True,cbarplot=True,cbar_reverse=False,vn=0.10,vx=0.20,n=6):
     """
     Created on Thu Apr 11 18:54:35 2024
     
@@ -26,13 +26,14 @@ def plot_patch(fullmap,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
                            lvls=tx,frmt=frmt,clr='k')
 
     im_ratio = patch.shape[0]/patch.shape[1]
-    cbar = pl.colorbar(show, ticks=tx, 
-               orientation='vertical',cmap='gist_heat',
-               ax=axis,fraction=0.046*im_ratio, pad=0.04)
-    cbar.ax.set_yticklabels(np.around(tx,3))
-    cbar.ax.tick_params(labelsize=6,color="k")#if iSession >1:
-    if cbar_reverse:
-        cbar.ax.invert_yaxis()
+    if cbarplot:
+        cbar = pl.colorbar(show, ticks=tx, 
+                   orientation='vertical',cmap='gist_heat',
+                   ax=axis,fraction=0.046*im_ratio, pad=0.04)
+        cbar.ax.set_yticklabels(np.around(tx,3))
+        cbar.ax.tick_params(labelsize=6,color="k")#if iSession >1:
+        if cbar_reverse:
+            cbar.ax.invert_yaxis()
     #if colorscale=="Greys":
     #    cbar.set_label('Cloud Top Pressure (mb)',fontsize=7)
 
