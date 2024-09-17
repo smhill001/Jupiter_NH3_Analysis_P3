@@ -69,7 +69,7 @@ def nez_analysis():
     PRJlon=[] #System 1 Longitude
     PRJlat=[] #Planetographic Latitude
     
-    fn="DC_PROJ_2022-23_sel.CSV"
+    fn="DC_PROJ_2022-24_sel.CSV"
     with open(path+fn) as csv_file:
         csv_reader = csv.DictReader(csv_file)
         line_count = 0
@@ -209,8 +209,17 @@ def nez_analysis():
     
     #PRJdlon=np.concatenate( PRJdlon, axis=0 )
     print()
-    print("Mean and STD NH3 delta long=",np.mean(NH3dlon),np.std(NH3dlon))
-    print("Mean and STD NH3 delta lat=",np.mean(NH3dlat),np.std(NH3dlat))
+    print("##########################################")
+    print("Mean, STD, and median CH4 delta lat=",np.mean(CH4latSel),np.std(CH4latSel),np.median(CH4latSel),len(CH4latSel))
+    print()
+    print("##########################################")
+    print("Mean, STD, and median NH3 delta long=",np.mean(NH3dlon),np.std(NH3dlon),np.median(NH3dlon),len(NH3dlon))
+    print("Mean, STD, and median NH3 delta lat=",np.mean(NH3dlat),np.std(NH3dlat),np.median(NH3lat),len(NH3dlat))
+    print("len(NH3rec),len(CH4rec)=",len(NH3rec),len(CH4rec))
+    print("##########################################")
+    print()
+    #####!!! ADD MEDIAN POINTS TO PLOT, ADD MEAN AND MEDIAN RELATIVE POSITIONS
+    
     #print(np.mean(PRJdlonsel),np.std(PRJdlonsel))
     #print(np.mean(PRJlatsel),np.std(PRJlatsel))
     ###############################################################################
@@ -252,10 +261,12 @@ def nez_analysis():
                        cmap='gist_heat_r',label="Density")
     #axs1[1].contour(xi, yi, zi.reshape(xi.shape) )
 
-    axs1[1].scatter(np.array([0.0]),np.mean(np.array(CH4latSel)),color='C0',s=50,
-                    alpha=0.8,label="<CH4 Deep Cloud>")
-    axs1[1].scatter(np.mean(np.array(NH3dlon)),np.mean(np.array(NH3lat)),color='C1',s=50,
-                    alpha=0.8,label="<NH3 Enhancement>")
+    axs1[1].scatter(np.array([0.0]),np.mean(np.array(CH4latSel)),marker='o',edgecolors='C0',s=100,
+                    facecolors='none',label="Mean CH4 Deep Cloud",linewidth=2)
+    axs1[1].scatter(np.mean(np.array(NH3dlon)),np.mean(np.array(NH3lat)),marker='o',edgecolors='C1',s=100,
+                    facecolors='none',label="Mean NH3 Enhancement",linewidth=2)
+    axs1[1].scatter(np.median(np.array(NH3dlon)),np.median(np.array(NH3lat)),marker='+',color='C1',s=100,
+                    label="Median NH3 Enhancement",linewidth=2)
     axs1[1].scatter(np.array(NH3dlon),np.array(NH3dlat)+np.mean(np.array(CH4latSel)),
                     color='C1',s=5)
     #axs1[1].scatter(np.array(PRJdlonsel),np.array(PRJlatsel),color='k',s=2)
@@ -266,15 +277,19 @@ def nez_analysis():
     #axs1[1].scatter(np.array(PRJdlonsela),np.array(PRJlatsela),color='k',s=2)
     axs1[1].scatter(np.array(PRJdlon),np.array(PRJlatClose),color='k',s=2)
     #axs1[1].scatter(np.array(PRJlonsel),np.array(PRJlatsel),color='r',s=2)
-    axs1[1].scatter(np.mean(PRJdlonsela),np.mean(PRJlatsela),color='k',s=50,
-                    alpha=0.8,label="<Proj/Fest>")
+    axs1[1].scatter(np.mean(PRJdlonsela),np.mean(PRJlatsela),edgecolors='k',s=100,
+                    facecolors='none',label="Mean NEDF",linewidth=2)
     axs1[1].set_xlim(-45,45)
     axs1[1].invert_xaxis()
     axs1[1].set_ylim(0,10)
     #axs1[1].set_title("Longitude Relative to Closest CH4 Deep Cloud (deg)")
     axs1[1].set_xlabel("Longitude Relative to Closest CH4 Deep Cloud (deg)")
     axs1[1].set_ylabel("PG Latitude (deg)")
-    axs1[1].legend(ncol=1,fontsize=6)
+    axs1[1].legend(ncol=1,fontsize=7)
+    print("##########################################")
+    print("Mean, STD, and median NEDF delta long=",np.mean(PRJdlonsela),np.std(PRJdlonsela),np.median(NH3dlon),len(PRJdlonsela))
+    print("Mean, STD, and median NEDG delta lat=",np.mean(PRJlatsela),np.std(PRJlatsela),np.median(PRJlatsela),len(PRJlatsela))
+    print("##########################################")
 
     print()
     print("np.array(PRJdlon).shape,np.array(PRJlat).shape",

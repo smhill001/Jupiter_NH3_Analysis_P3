@@ -87,7 +87,7 @@ def make_fit_plot(NH3Amf_in,NH3Pro_in,CH4Amf_in,CH4Pro_in,Level,fig,ax,path):
     NH3R2=tempR[0,1]**2
  
     ax[0].plot(NH3Amf,fityNH3,label="Fit R2="+str(NH3R2)[0:4])
-    ax[0].scatter(NH3Amf_in,NH3Pro_in,label="NH3",s=0.5,alpha=0.5)
+    #ax[0].scatter(NH3Amf_in,NH3Pro_in,label="NH3",s=5,alpha=0.5)
     ax[0].scatter(NH3Amf,NH3pro_clip,label="NH3 clip",color='k',s=0.5)
     
     
@@ -104,26 +104,28 @@ def make_fit_plot(NH3Amf_in,NH3Pro_in,CH4Amf_in,CH4Pro_in,Level,fig,ax,path):
         print(NH3pro_clip.shape,NH3med.shape,)
         CH4pro_clip[clipindices]=CH4med[clipindices]
     CH4param, CH4param_cov = curve_fit(power,CH4Amf,CH4pro_clip)
-    fity=power(CH4Amf,CH4param[0],CH4param[1])
-    tempR=np.corrcoef(CH4pro_clip,fity) 
+    fityCH4=power(CH4Amf,CH4param[0],CH4param[1])
+    tempR=np.corrcoef(CH4pro_clip,fityCH4) 
     CH4R2=tempR[0,1]**2
     
-    ax[0].plot(CH4Amf,fity,label="Fit R2="+str(CH4R2)[0:4])
-    ax[0].scatter(CH4Amf_in,CH4Pro_in,label="CH4",s=5,alpha=0.5)
+    ax[0].plot(CH4Amf,fityCH4,label="Fit R2="+str(CH4R2)[0:4])
+    #ax[0].scatter(CH4Amf_in,CH4Pro_in,label="CH4",s=5,alpha=0.5)
     ax[0].scatter(CH4Amf,CH4pro_clip,label="CH4 clip",color='k',s=0.5)
 
     ###############################################################################
     # SCT23: ADJUSTED SCATTER PLOTS OF NH3 and CH4 VERSUS JOVIAN AIRMASS
     ###############################################################################
-    ax[0].scatter(NH3Amf_in,NH3Pro_in*2.6,label="Scaled NH3")
+    #ax[0].scatter(NH3Amf_in,NH3Pro_in*2.6,label="Scaled NH3")
+    #ax[0].scatter(NH3Amf_in,NH3Pro_in*(CH4param[0]/NH3param[0]),label="Scaled NH3")
     #ax[0].scatter(NH3Amf_in,NH3Pro_in*NH3Amf_in**0.93,s=5,label="Corr. NH3")
     ax[0].scatter(NH3Amf,NH3Pro*((fityNH3/NH3param[0])**-1.0),s=5,label="Corr. NH3")
-    ax[0].scatter(CH4Amf_in,CH4Pro_in*CH4Amf_in**0.43,s=5,label="Corr. CH4")
+    #ax[0].scatter(CH4Amf_in,CH4Pro_in*CH4Amf_in**0.43,s=5,label="Corr. CH4")
+    ax[0].scatter(CH4Amf,CH4Pro*((fityCH4/CH4param[0])**-1.0),s=5,label="Corr. NH3")
     
     ax[0].tick_params(axis='both', which='major', labelsize=8)
     ax[0].set_xlabel("One-Way Airmass Factor",fontsize=10)
-    ax[0].set_xlim(1,3)
-    ax[0].set_xticks(np.linspace(1,3,5), minor=False)
+    ax[0].set_xlim(1,2)
+    ax[0].set_xticks(np.linspace(1,2,5), minor=False)
     if Level=="L2":
         ax[0].set_ylim(0.0,2.0)
         ax[0].set_yticks(np.linspace(0.0,2.0,5), minor=False)
@@ -147,7 +149,7 @@ def make_fit_plot(NH3Amf_in,NH3Pro_in,CH4Amf_in,CH4Pro_in,Level,fig,ax,path):
     
     SCT23Rparam, SCT232Rparam_cov = curve_fit(power,RS23Amf,RS23Pro)
     fity=lin(RS23Amf,SCT23Rparam[0],SCT23Rparam[1])
-    ax[1].plot(NH3Amf,fity,label="Fit 1")
+    #ax[1].plot(NH3Amf,fity,label="Fit 1")
     ax[1].scatter(RS23Amf,RS23Pro,label="CH4/NH3")
     ratiofity=power(NH3Amf,CH4param[0],CH4param[1])/power(NH3Amf,NH3param[0],NH3param[1])
        
@@ -158,8 +160,8 @@ def make_fit_plot(NH3Amf_in,NH3Pro_in,CH4Amf_in,CH4Pro_in,Level,fig,ax,path):
         
     ax[1].tick_params(axis='both', which='major', labelsize=8)
     ax[1].set_xlabel("One-Way Airmass Factor",fontsize=10)
-    ax[1].set_xlim(1,3)
-    ax[1].set_xticks(np.linspace(1,3,5), minor=False)
+    ax[1].set_xlim(1,2)
+    ax[1].set_xticks(np.linspace(1,2,5), minor=False)
     if Level=="L2":
         ax[1].set_ylabel("CH4/NH3 Ratio",fontsize=10)
         ax[1].set_ylim(0.0,6.0)

@@ -1,1 +1,1 @@
-CM I = 256.6° CM II = 213.6° CM III = 282.9° Alt. = 37°
+CM I = 241.5° CM II = 198.7° CM III = 267.9° Alt. = 42°

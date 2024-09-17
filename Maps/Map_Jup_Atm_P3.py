@@ -33,8 +33,8 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     import copy
 
     target="Jupiter"
-    fNH3low=50
-    fNH3high=150
+    fNH3low=60
+    fNH3high=160
     PCldlow=600
     PCldhigh=1100
     
