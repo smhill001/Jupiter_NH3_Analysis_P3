@@ -1,4 +1,4 @@
-def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
+def make_l2_abs_data(obsdate="20240925UTa",target="Jupiter",imagetype='Img',
                      mask=True,CH4shift=0.0,NH3shift=0.0):
     """
     Created on Fri Sep 15 07:48:05 2023
@@ -41,7 +41,7 @@ def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
     #  DATA FILES AND METADATA DICTIONARY
     ###########################################################################
     sourcedata=obsdate#+"_"+imagetype
-    sourcefiles=getlist.get_obs_list()
+    sourcefiles=getlist.get_obs_list(planet=target)
     
     if sourcefiles[sourcedata]["Telescope"]=="C11":
         CalModel="SCT-Obs-Final"
@@ -72,7 +72,7 @@ def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
     NH3sec=str(int(str(NH3file[16:17]))*6) #COMPUTE FROM FRACTIONAL WINJUPOS MINUTE
     NH3time=(NH3file[0:10]+"_"+NH3file[11:13]+":"+NH3file[13:15]+":"
              +NH3sec.zfill(2))
-    NH3eph=WJ_ephem.get_WINJupos_ephem(NH3time)
+    NH3eph=WJ_ephem.get_WINJupos_ephem(NH3time,planet=target)
     NH3_CM1=float(NH3eph[0].strip())
     NH3_CM2=float(NH3eph[1].strip())
     NH3_CM3=float(NH3eph[2].strip())
@@ -89,7 +89,7 @@ def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
         CH4sec=str(int(str(CH4file[16:17]))*6) #COMPUTE FROM FRACTIONAL WINJUPOS MINUTE
         CH4time=(CH4file[0:10]+"_"+CH4file[11:13]+":"+CH4file[13:15]+":"
                  +CH4sec.zfill(2))
-        CH4eph=WJ_ephem.get_WINJupos_ephem(CH4time)
+        CH4eph=WJ_ephem.get_WINJupos_ephem(CH4time,planet=target)
         CH4_CM1=float(CH4eph[0].strip())
         CH4_CM2=float(CH4eph[1].strip())
         CH4_CM3=float(CH4eph[2].strip()) 
@@ -167,7 +167,7 @@ def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
             Real_CM3=NH3_CM3
             datetime=NH3time
             file=NH3file
-            fn=file[0:25]+"_"+imagetype+'_L2TNH3'
+            fn=file[0:18]+target+"_"+imagetype+'_L2TNH3'
             Range=[0.90,1.0] #scaled range for PNG file
         elif BUNIT=='CH4 Trans':
             dataarray=CH4data
@@ -178,7 +178,7 @@ def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
             Real_CM3=CH4_CM3
             datetime=CH4time
             file=CH4file
-            fn=file[0:25]+"_"+imagetype+'_L2TCH4'
+            fn=file[0:18]+target+"_"+imagetype+'_L2TCH4'
             Range=[0.8,1.0] #scaled range for PNG file
         elif BUNIT=='Clr Slp':
             dataarray=CLSLdata
@@ -189,7 +189,7 @@ def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
             Real_CM3=NH3_CM3
             datetime=NH3time
             file=NH3file
-            fn=file[0:25]+"_"+imagetype+'_L2CLSL'
+            fn=file[0:18]+target+"_"+imagetype+'_L2CLSL'
             Range=[0.0,100.0] #scaled range for PNG file
 
             
@@ -205,7 +205,7 @@ def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
         hdul[0].header['AUTHOR']='Hill, S. M.'
         hdul[0].header['FILENAME']=fn
         
-        hdul[0].header['OBJECT']='Jupiter'
+        hdul[0].header['OBJECT']=target
         hdul[0].header['TELESCOP']=sourcefiles[sourcedata]['Telescope']
         hdul[0].header['INSTRUME']=sourcefiles[sourcedata]['Camera']
         hdul[0].header['SEEING']=sourcefiles[sourcedata]['Seeing']
@@ -217,8 +217,8 @@ def make_l2_abs_data(obsdate="20221009UTa",target="Jupiter",imagetype='Img',
         hdul[0].header['CTYPE2']=('PG Latitude','deg')
         
         hdul[0].header['CM1']=(Real_CM1,'Sys. 1 Long. Central Meridian')
-        hdul[0].header['CM2']=(Real_CM2,'Sys. 1 Long. Central Meridian')
-        hdul[0].header['CM3']=(Real_CM3,'Sys. 1 Long. Central Meridian')
+        hdul[0].header['CM2']=(Real_CM2,'Sys. 2 Long. Central Meridian')
+        hdul[0].header['CM3']=(Real_CM3,'Sys. 3 Long. Central Meridian')
         hdul[0].header['RANGE0']=(Range[0],'Scaling Range - Black Level')
         hdul[0].header['RANGE1']=(Range[1],'Scaling Range - White Level')
         hdul[0].header['SOURCEFL']=(file,'Source file')

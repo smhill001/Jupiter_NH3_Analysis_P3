@@ -4,9 +4,9 @@ Created on Sun Aug 25 15:04:22 2024
 @author: smhil
 """
 import pylab as pl
-import TestContiguousMap as TCM
+import MakeContiguousMap as MCM
 
-LonSys='2'
+LonSys='1'
 
 maps2022=["20220810-20220812","20220828-20220901","20220904-20220905",
           "20220912-20220913","20220919-20220919","20221009-20221013",
@@ -27,7 +27,7 @@ fig22RGB,axs22RGB=pl.subplots(7,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
                       sharex=True,sharey=True)   
 counter=0
 for mp in maps2022:
-    TCM.TestContiguousMap(axs22NH3[counter],axs22CH4[counter],axs22RGB[counter],collection=mp,LonSys=LonSys)
+    MCM.MakeContiguousMap(axs22NH3[counter],axs22CH4[counter],axs22RGB[counter],collection=mp,LonSys=LonSys)
     #pl.show()
     counter=counter+1
     
@@ -58,12 +58,25 @@ axs23RGB[16].set_xlabel("System "+LonSys+" Longitude (deg)",fontsize=8)
 
 counter=0
 for mp in maps2023:
-    TCM.TestContiguousMap(axs23NH3[counter],axs23CH4[counter],axs23RGB[counter],collection=mp,LonSys=LonSys)
+    lats=MCM.MestContiguousMap(axs23NH3[counter],axs23CH4[counter],axs23RGB[counter],collection=mp,LonSys=LonSys)
     #pl.show()
     counter=counter+1
 
-
+if lats[0]<90:
+    latstr=str(90-lats[0])+"N"
+if lats[0]==90:
+    latstr=str(90-lats[0])
+if lats[0]>90:
+    latstr=str(lats[0]-90)+"S"
+    
+if lats[1]<90:
+    latstr=latstr+"-"+str(90-lats[1])+"N"
+if lats[1]==90:
+    latstr=latstr+"-"+str(90-lats[1])
+if lats[1]>90:
+    latstr=latstr+"-"+str(lats[1]-90)+"S"
+    
 pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/maps/"
-fig23NH3.savefig(pathmapplots+"2022 NH3 Stack Sys"+LonSys+" map.png",dpi=300)
-fig23CH4.savefig(pathmapplots+"2022 CH4 Stack Sys"+LonSys+" map.png",dpi=300)
-fig23RGB.savefig(pathmapplots+"2022 RGB Stack Sys"+LonSys+" map.png",dpi=300)
+fig23NH3.savefig(pathmapplots+"2022 NH3 Stack Sys"+LonSys+" "+latstr+"_map.png",dpi=300)
+fig23CH4.savefig(pathmapplots+"2022 CH4 Stack Sys"+LonSys+" "+latstr+"_map.png",dpi=300)
+fig23RGB.savefig(pathmapplots+"2022 RGB Stack Sys"+LonSys+" "+latstr+"_map.png",dpi=300)

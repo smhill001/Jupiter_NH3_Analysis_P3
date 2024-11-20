@@ -29,6 +29,7 @@ spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/pck/gm
 
 spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/spk/planets/de430.bsp")
 spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/spk/satellites/jup365.bsp")
+spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/spk/satellites/sat453.bsp")
 
 
 body = pm.BodyXY('Jupiter', '2023-10-26T04:21:18', sz=500)

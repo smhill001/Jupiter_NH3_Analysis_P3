@@ -1,7 +1,7 @@
-def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
+def Map_Jup_Atm_P3(obskey="20240925UTa",imagetype='Map',target="Jupiter",
                         Smoothing=False,LatLims=[45,135],LonRng=45,
                         CMpref='subobs',LonSys='2',showbands=False,
-                        coef=[0.,0.],subproj='',figxy=[8.0,4.0]):
+                        coef=[0.,0.],subproj='',figxy=[8.0,4.0],FiveMicron=False):
     """
     Created on Sun Nov  6 16:47:21 2022
     
@@ -10,6 +10,19 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
              the calibration phase. So now I've separated that module into 
              a calibration module, make_L3_env_data.py and this plotting
              module.
+             
+    EXAMPLES:
+        Map_Jup_Atm_P3(obskey="20240925UTa",imagetype='Map',target="Jupiter",
+                                Smoothing=False,LatLims=[45,135],LonRng=45,
+                                CMpref='subobs',LonSys='2',showbands=False,
+                                coef=[0.,0.],subproj='',figxy=[8.0,4.0],
+                                FiveMicron=False)
+        
+        Map_Jup_Atm_P3(obskey="20240730UTa",imagetype='Map',target="Jupiter",
+                                Smoothing=False,LatLims=[45,135],LonRng=45,
+                                CMpref='subobs',LonSys='2',showbands=False,
+                                coef=[0.,0.],subproj='',figxy=[8.0,4.0],
+                                FiveMicron=True)
     
     @author: smhil
     """    
@@ -32,15 +45,21 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     import make_patch_RGB as MPRGB
     import copy
 
-    target="Jupiter"
     fNH3low=60
     fNH3high=160
     PCldlow=600
     PCldhigh=1100
     
-    PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM,RGBtime= \
-                    RFM.read_fits_map_L2_L3(obskey=obskey,LonSys=LonSys,
-                                            imagetype="Map",Level="L3")
+    if (not FiveMicron) or FiveMicron=="png":
+        PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM,RGBtime= \
+                        RFM.read_fits_map_L2_L3(obskey=obskey,LonSys=LonSys,
+                                                imagetype="Map",Level="L3",
+                                                target=target,FiveMicron=FiveMicron)
+    elif FiveMicron=="fits":
+        PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM,RGBtime,micronhdr,microndatar= \
+                        RFM.read_fits_map_L2_L3(obskey=obskey,LonSys=LonSys,
+                                                imagetype="Map",Level="L3",
+                                                target=target,FiveMicron=FiveMicron)
                     
     pathmapplots='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 Plots/'+subproj+'/'
     if not os.path.exists(pathmapplots):
@@ -90,6 +109,13 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     ###########################################################################
     ## Just RGB and Abundance
     ###########################################################################
+    if FiveMicron=="png":
+        ct="gist_heat"
+        context_title=RGBtime[0:10]+" (5 micron)"
+    elif (not FiveMicron) or FiveMicron=="fits":
+        ct="jet"
+        context_title="RGB Context Image"
+    
     fig1,axs1=pl.subplots(1,2,figsize=(figxy[0],figxy[1]), dpi=150, facecolor="white",
                         sharey=True,sharex=True)
     fig1.suptitle(fNH3hdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
@@ -111,7 +137,7 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     TestfNH3=fNH3data*amfdata**coef[0]
     
     fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(TestfNH3,LatLims,NH3LonLims,
-                                     fNH3PlotCM,LonRng,"jet",
+                                     fNH3PlotCM,LonRng,ct,
                                      axs1[0],'%3.2f',cont=False,n=6,vn=fNH3low,vx=fNH3high)
 
     temp=RL.make_contours_CH4_patch(axs1[0],fNH3_patch_mb,LatLims,NH3LonLims,
@@ -157,9 +183,9 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
         #axs1[1].annotate(zb,xy=[np.mean(belt[zb]),51],ha="center")
     #for zb in zone:
         #axs1[1].annotate(zb,xy=[np.mean(zone[zb]),51],ha="center")
-
+    
     axs1[1].tick_params(axis='both', which='major', labelsize=9)
-    axs1[1].set_title("RGB Context Image",fontsize=10)
+    axs1[1].set_title(context_title,fontsize=10)
 
     axs1[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
     axs1[0].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
@@ -184,10 +210,17 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
         correction='_C1'
     print("360-NH3LonLims[0],360-NH3LonLims[1]=",
           360-NH3LonLims[0],360-NH3LonLims[1])
-    fnskeleton=correction+'_Sys'+LonSys+'_N'+\
-                str(90-LatLims[0])+'-S'+str(LatLims[1]-90)+\
-                '_Lon'+str(np.mod(360-NH3LonLims[1],360)).zfill(3)+'-'+\
-                    str(np.mod(360-NH3LonLims[0],360)).zfill(3)+'.png'
+    if FiveMicron:
+        fnskeleton=correction+'_Sys'+LonSys+'_N'+\
+                    str(90-LatLims[0])+'-S'+str(LatLims[1]-90)+\
+                    '_Lon'+str(np.mod(360-NH3LonLims[1],360)).zfill(3)+'-'+\
+                        str(np.mod(360-NH3LonLims[0],360)).zfill(3)+'_5micron.png'
+    else:
+        fnskeleton=correction+'_Sys'+LonSys+'_N'+\
+                    str(90-LatLims[0])+'-S'+str(LatLims[1]-90)+\
+                    '_Lon'+str(np.mod(360-NH3LonLims[1],360)).zfill(3)+'-'+\
+                        str(np.mod(360-NH3LonLims[0],360)).zfill(3)+'.png'
+
     fnNH3=fNH3hdr["FILENAME"][:-5]+fnskeleton
     fig1.savefig(pathmapplots+fnNH3,dpi=300)
     
@@ -218,9 +251,10 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     #                                 axs2[0],'%3.2f',cont=False,
     #                                 cbar_reverse=True,vn=400,vx=900,n=6)
     TestPCloud=PClouddata*amfdata**coef[1]
-    Pcloud_patch,vn,vx,tx=PP.plot_patch(TestPCloud,LatLims,NH3LonLims,
-                                     PCldPlotCM,LonRng,"jet",
+    Pcloud_patch,vn,vx,tx_Pcloud=PP.plot_patch(TestPCloud,LatLims,NH3LonLims,
+                                     PCldPlotCM,LonRng,ct,
                                      axs2[0],'%3.2f',cont=False,
+                                     #cbar_reverse=True,vn=675,vx=1175,n=6)
                                      cbar_reverse=True,vn=PCldlow,vx=PCldhigh,n=6)
 
     """##########TEST CODE
@@ -235,7 +269,7 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     ##########TEST CODE"""
 
     temp=RL.make_contours_CH4_patch(axs2[0],Pcloud_patch,LatLims,NH3LonLims,
-                           lvls=tx,frmt='%3.2f',clr='k')
+                           lvls=tx_Pcloud,frmt='%3.2f',clr='k')
     #temp=RL.make_contours_CH4_patch(axs2[0],fNH3_patch_mb,LatLims,NH3LonLims,
     #                       lvls=tx_fNH3,frmt='%3.0f',clr='r')
     
@@ -249,7 +283,7 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
                        90-LatLims[0]],
                        aspect="equal")
     temp=RL.make_contours_CH4_patch(axs2[1],Pcloud_patch,LatLims,NH3LonLims,
-                           tx,frmt='%3.2f',clr='k')
+                           tx_Pcloud,frmt='%3.2f',clr='k')
     #temp=RL.make_contours_CH4_patch(axs2[1],fNH3_patch_mb,LatLims,NH3LonLims,
     #                       lvls=tx_fNH3,frmt='%3.0f',clr='r')
     box = axs2[1].get_position()
@@ -279,7 +313,7 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
         #axs1[1].annotate(zb,xy=[np.mean(zone[zb]),51],ha="center")
 
     axs2[1].tick_params(axis='both', which='major', labelsize=9)
-    axs2[1].set_title("RGB Context Image",fontsize=10)
+    axs2[1].set_title(context_title,fontsize=10)
 
     axs2[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
     axs2[0].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
@@ -300,7 +334,117 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
     fig2.savefig(pathmapplots+fnPCld,dpi=300)
 
     ###########################################################################
-    ## Compute Scatter Plot
+    ## Just RGB and 5 micron
+    ###########################################################################
+    #!!!!!!!!!! FIX THIS !!!!!!!!!!!!!
+    if FiveMicron=="fits":
+        fig2a,axs2a=pl.subplots(1,2,figsize=(figxy[0],figxy[1]), dpi=150, facecolor="white",
+                            sharey=True,sharex=True)
+        fig2a.suptitle(micronhdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
+                      +str(int(PCldPlotCM))+", Calibration = "+CalModel+
+                      ", Data "+smthtitle,x=0.5,ha='center',color='k')
+    
+        for ix in range(0,1):
+            axs2a[ix].grid(linewidth=0.2)
+            axs2a[ix].ylim=[-45.,45.]
+            axs2a[ix].xlim=[360-NH3LonLims[0],360-NH3LonLims[1]]
+            axs2a[ix].set_xticks(np.linspace(450,0,31), minor=False)
+            xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
+            axs2a[ix].set_xticklabels(xticklabels.astype(int))
+            axs2a[ix].set_yticks(np.linspace(-45,45,7), minor=False)
+            axs2a[ix].tick_params(axis='both', which='major', labelsize=9)
+    
+            axs2a[ix].set_adjustable('box') 
+    
+        #Pcloud_patch,vn,vx,tx=PP.plot_patch(PClouddata,LatLims,NH3LonLims,
+        #                                 PCldPlotCM,LonRng,"jet",
+        #                                 axs2[0],'%3.2f',cont=False,
+        #                                 cbar_reverse=True,vn=400,vx=900,n=6)
+        Testmicron=microndatar*amfdata**coef[1]
+        micron_patch,vn,vx,tx=PP.plot_patch((Testmicron)**0.5,LatLims,NH3LonLims,
+                                         PCldPlotCM,LonRng,"gist_heat",
+                                         axs2a[0],'%3.2f',cont=False,
+                                         #cbar_reverse=True,vn=675,vx=1175,n=6)
+                                         cbar_reverse=False,vn=0,vx=30,n=6)
+    
+        """##########TEST CODE
+        hdu = fits.PrimaryHDU((R["CH4"]["PCloud"]).astype(np.float32))
+        hdul = fits.HDUList([hdu])
+        try:
+            os.remove(R["pathFITS"]+'PCloud.fits')
+        except: 
+            print("file doesn't exist")
+        hdul.writeto(R["pathFITS"]+'PCloud.fits')
+        hdul.close()
+        ##########TEST CODE"""
+    
+        temp=RL.make_contours_CH4_patch(axs2a[0],micron_patch,LatLims,NH3LonLims,
+                               lvls=tx,frmt='%3.2f',clr='k')
+        #temp=RL.make_contours_CH4_patch(axs2[0],fNH3_patch_mb,LatLims,NH3LonLims,
+        #                       lvls=tx_fNH3,frmt='%3.0f',clr='r')
+        
+        axs2a[0].set_title("5um Rad. (arb. units)^0.5",fontsize=10)
+    
+        gamma=1.3
+        RGB4Display=np.power(np.array(RGB_patch).astype(float),gamma)
+        RGB4Display=RGB4Display/RGB4Display.max()
+        show=axs2a[1].imshow(RGB4Display,
+                   extent=[360-NH3LonLims[0],360-NH3LonLims[1],90-LatLims[1],
+                           90-LatLims[0]],
+                           aspect="equal")
+        temp=RL.make_contours_CH4_patch(axs2a[1],micron_patch,LatLims,NH3LonLims,
+                               lvls=tx,frmt='%3.2f',clr='k')
+        #temp=RL.make_contours_CH4_patch(axs2[1],fNH3_patch_mb,LatLims,NH3LonLims,
+        #                       lvls=tx_fNH3,frmt='%3.0f',clr='r')
+        box = axs2a[1].get_position()
+        
+        belt={"SSTB":[-39.6,-36.2],
+              "STB":[-32.4,-27.1],
+              "SEB":[-19.7,-7.2],
+              "NEB":[6.9,17.4],
+              "NTB":[24.2,31.4],
+              "NNTB":[35.4,39.6]}
+        
+        zone={"STZ":[-36.2,-32.4],
+              "STrZ":[-27.1,-19.7],
+              "EZ":[-7.2,6.9],
+              "NTrZ":[17.4,24.2],
+              "NTZ":[31.4,35.4]}
+    
+        if showbands:
+            for zb in belt:
+                #print(zb,belt[zb])
+                axs2a[0].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+                                        color="0.5",alpha=0.2)
+                axs2a[1].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+                                        color="0.8",alpha=0.1)
+            #axs1[1].annotate(zb,xy=[np.mean(belt[zb]),51],ha="center")
+        #for zb in zone:
+            #axs1[1].annotate(zb,xy=[np.mean(zone[zb]),51],ha="center")
+    
+        axs2a[1].tick_params(axis='both', which='major', labelsize=9)
+        axs2a[1].set_title(context_title,fontsize=10)
+    
+        axs2a[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
+        axs2a[0].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
+        axs2a[1].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
+        axs2a[1].grid(linewidth=0.2)
+    
+        fig2a.subplots_adjust(left=0.10, bottom=0.03, right=0.98, top=0.95,
+                    wspace=0.25, hspace=0.05)     
+        axs2a[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
+        
+        if coef[0]==0.0:
+            correction='_C0'
+        else:
+            correction='_C1'
+            
+        fnmicron=micronhdr["FILENAME"][:-5]+fnskeleton
+    
+        fig2a.savefig(pathmapplots+fnmicron,dpi=300)
+
+    ###########################################################################
+    ## Compute Scatter Plot (PCloud vs fNH3)
     ###########################################################################
     fig3,axs3=pl.subplots(1,2,figsize=(figxy[0],figxy[1]), dpi=150, facecolor="white")
     fig3.suptitle(fNH3hdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
@@ -409,220 +553,447 @@ def Map_Jup_Atm_P3(obskey="20221009UTa",imagetype='Map',
                          wspace=0.4)
     fig3.savefig(pathmapplots+fnScat,dpi=300)
 
-    ###########################################################################
-    ## Compute Overlay Plot with RGB
-    ###########################################################################
-    #!!!!!!!!!! FIX THIS !!!!!!!!!!!!!
-    fig4,axs4=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
-                        sharey=True,sharex=True)
-    fig4.suptitle(fNH3hdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
-                  +str(int(PCldPlotCM))+", Calibration = "+CalModel+
-                  ", Data "+smthtitle,x=0.5,ha='center',color='k')
-
-    for ix in range(0,1):
-        axs4[ix].grid(linewidth=0.2)
-        axs4[ix].ylim=[-45.,45.]
-        axs4[ix].xlim=[360-NH3LonLims[0],360-NH3LonLims[1]]
-        axs4[ix].set_xticks(np.linspace(450,0,31), minor=False)
-        xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
-        axs4[ix].set_xticklabels(xticklabels.astype(int))
-        axs4[ix].set_yticks(np.linspace(-45,45,7), minor=False)
-        axs4[ix].tick_params(axis='both', which='major', labelsize=9)
-
-        axs4[ix].set_adjustable('box') 
-
-    #Pcloud_patch,vn,vx,tx=PP.plot_patch(PClouddata,LatLims,NH3LonLims,
-    #                                 PCldPlotCM,LonRng,"jet",
-    #                                 axs4[0],'%3.2f',cont=False,
-    #                                 cbar_reverse=True,vn=400,vx=900,n=6)
-    TestPCloud=PClouddata*amfdata**coef[1]
-    Pcloud_patch,vn,vx,tx=PP.plot_patch(TestPCloud,LatLims,NH3LonLims,
-                                     PCldPlotCM,LonRng,"Greys",
-                                     axs4[0],'%3.2f',cont=False,
-                                     cbar_reverse=True,vn=PCldlow,vx=PCldhigh,n=6)
-
-    temp=RL.make_contours_CH4_patch(axs4[0],fNH3_patch_mb,LatLims,NH3LonLims,
-                           tx_fNH3,frmt='%3.0f',clr='k')
-
-    """##########TEST CODE
-    hdu = fits.PrimaryHDU((R["CH4"]["PCloud"]).astype(np.float32))
-    hdul = fits.HDUList([hdu])
-    try:
-        os.remove(R["pathFITS"]+'PCloud.fits')
-    except: 
-        print("file doesn't exist")
-    hdul.writeto(R["pathFITS"]+'PCloud.fits')
-    hdul.close()
-    ##########TEST CODE"""
-
-    #temp=RL.make_contours_CH4_patch(axs4[0],Pcloud_patch,LatLims,NH3LonLims,
-    #                       lvls=tx,frmt='%3.2f',clr='k')
-    #temp=RL.make_contours_CH4_patch(axs4[0],fNH3_patch_mb,LatLims,NH3LonLims,
-    #                       lvls=tx_fNH3,frmt='%3.0f',clr='r')
+    if FiveMicron=='fits':
+        ###########################################################################
+        ## Compute Scatter Plot (PCloud vs 5um radiance)
+        ###########################################################################
+        fig3a,axs3a=pl.subplots(1,2,figsize=(figxy[0],figxy[1]), dpi=150, facecolor="white")
+        fig3a.suptitle(fNH3hdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
+                      +str(int(PCldPlotCM))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
     
-    axs4[0].set_title("Cloud Top Pressure (mb)",fontsize=10)
+        axs3a[0].grid(linewidth=0.2)
+        axs3a[0].ylim=[-45.,45.]
+        axs3a[0].xlim=[360-NH3LonLims[0],360-NH3LonLims[1]]
+        axs3a[0].set_xticks(np.linspace(450,0,31), minor=False)
+        xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
+        axs3a[0].set_xticklabels(xticklabels.astype(int))
+        axs3a[0].set_yticks(np.linspace(-45,45,7), minor=False)
+        axs3a[0].tick_params(axis='both', which='major', labelsize=9)
+        axs3a[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
+        axs3a[0].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
+        axs3a[0].set_title("PCloud and 5um Rad. (contours)",fontsize=10)
+    
+        axs3a[0].set_adjustable('box') 
+        axs3a[1].set_adjustable('box') 
+    
+        #Pcloud_patch,vn,vx,tx=PP.plot_patch(PClouddata,LatLims,NH3LonLims,
+        #                                 PCldPlotCM,LonRng,"jet",
+        #                                 axs2[0],'%3.2f',cont=False,
+        #                                 cbar_reverse=True,vn=400,vx=900,n=6)
+        micron_patch,vn,vx,tx=PP.plot_patch((Testmicron)**0.5,LatLims,NH3LonLims,
+                                         PCldPlotCM,LonRng,"gist_heat",
+                                         axs3a[0],'%3.2f',cont=False,
+                                         #cbar_reverse=True,vn=675,vx=1175,n=6)
+                                         cbar_reverse=False,vn=0,vx=30,n=6)
+        temp=RL.make_contours_CH4_patch(axs3a[0],Pcloud_patch,LatLims,NH3LonLims,
+                               lvls=tx_Pcloud,frmt='%3.2f',clr='k')
+    
+        if coef[0]==0.0:
+            correction='_C0'
+        else:
+            correction='_C1'
+        
+        #fig2.savefig(pathmapplots+fn,dpi=300)
+        
+        #fnScat=fNH3hdr["FILENAME"][:-12]+'Scat_'+fNH3hdr["FILENAME"][-7:-5]+\
+        #            correction+'_Sys'+LonSys+'_N'+\
+        #            str(90-LatLims[0])+'-S'+str(LatLims[1]-90)+\
+        #            '_Lon'+str(360-NH3LonLims[1]).zfill(3)+'-'+str(360-NH3LonLims[0]).zfill(3)+'.png'
+    
+        fnScat=fnNH3.replace('fNH3','PCldv5um')
+        BZ=plot_scatter(Pcloud_patch,micron_patch,obskey,fNH3PlotCM,
+                     LatLims,axs3a[1],PCldlow,PCldhigh,0,30,FiveMicron=FiveMicron)
+        axs3a[1].tick_params(axis='both', which='major', labelsize=9)
+        
+        axs3a[1].set_title("PCloud versus 5um",fontsize=10)
+    
+        BZind=copy.deepcopy(BZ)   
+        BZkeys=BZ.keys()
+        BZind=copy.deepcopy(BZ)   
+        BZkeys=BZ.keys()
+        #patch1=patch1*1000.
+    
+        #figcor,axscor=pl.subplots(1,1,figsize=(6.0,4.), dpi=150, facecolor="white",
+        #                    sharey=True,sharex=True)          
+    
+        clrind=0
+        for key in BZ.keys():
+            print(key,BZ[key],[90,90]-np.array(BZ[key]),LatLims)
+            BZind[key][0]=1.-((90-BZ[key][0])-LatLims[0])/(LatLims[1]-LatLims[0])
+            BZind[key][1]=1.-((90-BZ[key][1])-LatLims[0])/(LatLims[1]-LatLims[0])
+            print(key,BZind[key])
+            """if BZind[key][0]<0:
+                BZind[key][0]=0
+            if BZind[key][1]<0:
+                BZind[key][1]=0
+            if BZind[key][0]>(LatLims[1]-LatLims[0]):
+                BZind[key][0]=LatLims[1]-LatLims[0]
+            if BZind[key][1]>(LatLims[1]-LatLims[0]):
+                BZind[key][1]=LatLims[1]-LatLims[0]
+            
+            if BZind[key][0]==BZind[key][1]:
+                print("do nothing")"""
+                
+            #print(key,BZ[key],[90,90]-np.array(BZ[key]),LatLims)
+            clr='C'+str(clrind)
+            print(clr)
+            if BZind[key][0]>1.0 or BZind[key][1]<0.0:
+                print("do nothing")
+            else:
+                axs3a[0].axvspan(360-NH3LonLims[0],360-NH3LonLims[0]-1,
+                                ymin=BZind[key][1],ymax=BZind[key][0],alpha=1.0,
+                                color=clr)
+                axs3a[0].axvspan(360-NH3LonLims[1],360-NH3LonLims[1]+1,
+                                ymin=BZind[key][1],ymax=BZind[key][0],alpha=1.0,
+                                color=clr)
+                
+                clrind=clrind+1
+                            #ymin=BZ[key][0],ymax=BZ[key][1],alpha=0.5)
+                #axscor.scatter(patch2[BZind[key][1]:BZind[key][0],:],
+                #               patch1[BZind[key][1]:BZind[key][0],:],
+                #               marker="o",s=1.0,
+                #               alpha=0.8,label=key)
+    
+        
+        #trans = axs3[1].get_yaxis_transform()
+        #ax.annotate('Neonatal', xy=(1, -.1), xycoords=trans, ha="center", va="top")
+        #axs3[1].plot([170,170],[0,15], color="r", transform=trans, clip_on=False)
+    
+        box = axs3a[1].get_position()
+        axs3a[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 0.5, box.height * 1.015])    
+        fig3a.subplots_adjust(left=0.12, right=0.97, top=0.83, bottom=0.18, 
+                             wspace=0.4)
+        fig3a.savefig(pathmapplots+fnScat,dpi=300)
 
-    gamma=1.3
-    RGB4Display=np.power(np.array(RGB_patch).astype(float),gamma)
-    RGB4Display=RGB4Display/RGB4Display.max()
-    show=axs4[1].imshow(RGB4Display,
+        ###########################################################################
+        ## Compute Scatter Plot (fNH3 vs 5um radiance)
+        ###########################################################################
+
+        fig3b,axs3b=pl.subplots(1,2,figsize=(figxy[0],figxy[1]), dpi=150, facecolor="white")
+        fig3b.suptitle(fNH3hdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
+                      +str(int(PCldPlotCM))+", Calibration = "+CalModel+", Data "+smthtitle,x=0.5,ha='center',color='k')
+    
+        axs3b[0].grid(linewidth=0.2)
+        axs3b[0].ylim=[-45.,45.]
+        axs3b[0].xlim=[360-NH3LonLims[0],360-NH3LonLims[1]]
+        axs3b[0].set_xticks(np.linspace(450,0,31), minor=False)
+        xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
+        axs3b[0].set_xticklabels(xticklabels.astype(int))
+        axs3b[0].set_yticks(np.linspace(-45,45,7), minor=False)
+        axs3b[0].tick_params(axis='both', which='major', labelsize=9)
+        axs3b[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
+        axs3b[0].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
+        axs3b[0].set_title("PCloud and 5um Rad. (contours)",fontsize=10)
+    
+        axs3b[0].set_adjustable('box') 
+        axs3b[1].set_adjustable('box') 
+    
+        #Pcloud_patch,vn,vx,tx=PP.plot_patch(PClouddata,LatLims,NH3LonLims,
+        #                                 PCldPlotCM,LonRng,"jet",
+        #                                 axs2[0],'%3.2f',cont=False,
+        #                                 cbar_reverse=True,vn=400,vx=900,n=6)
+        micron_patch,vn,vx,tx=PP.plot_patch((Testmicron)**0.5,LatLims,NH3LonLims,
+                                         PCldPlotCM,LonRng,"gist_heat",
+                                         axs3b[0],'%3.2f',cont=False,
+                                         #cbar_reverse=True,vn=675,vx=1175,n=6)
+                                         cbar_reverse=False,vn=0,vx=30,n=6)
+        temp=RL.make_contours_CH4_patch(axs3b[0],fNH3_patch_mb,LatLims,NH3LonLims,
+                               lvls=tx_fNH3,frmt='%3.2f',clr='k')
+    
+        if coef[0]==0.0:
+            correction='_C0'
+        else:
+            correction='_C1'
+        
+        #fig2.savefig(pathmapplots+fn,dpi=300)
+        
+        #fnScat=fNH3hdr["FILENAME"][:-12]+'Scat_'+fNH3hdr["FILENAME"][-7:-5]+\
+        #            correction+'_Sys'+LonSys+'_N'+\
+        #            str(90-LatLims[0])+'-S'+str(LatLims[1]-90)+\
+        #            '_Lon'+str(360-NH3LonLims[1]).zfill(3)+'-'+str(360-NH3LonLims[0]).zfill(3)+'.png'
+    
+        fnScat=fnNH3.replace('fNH3','fNH3v5um')
+        BZ=plot_scatter(fNH3_patch_mb,micron_patch,obskey,fNH3PlotCM,
+                     LatLims,axs3b[1],fNH3high,fNH3low,0,30,FiveMicron=FiveMicron)
+        axs3b[1].tick_params(axis='both', which='major', labelsize=9)
+        
+        axs3b[1].set_title("PCloud versus 5um",fontsize=10)
+    
+        BZind=copy.deepcopy(BZ)   
+        BZkeys=BZ.keys()
+        BZind=copy.deepcopy(BZ)   
+        BZkeys=BZ.keys()
+        #patch1=patch1*1000.
+    
+        #figcor,axscor=pl.subplots(1,1,figsize=(6.0,4.), dpi=150, facecolor="white",
+        #                    sharey=True,sharex=True)          
+    
+        clrind=0
+        for key in BZ.keys():
+            print(key,BZ[key],[90,90]-np.array(BZ[key]),LatLims)
+            BZind[key][0]=1.-((90-BZ[key][0])-LatLims[0])/(LatLims[1]-LatLims[0])
+            BZind[key][1]=1.-((90-BZ[key][1])-LatLims[0])/(LatLims[1]-LatLims[0])
+            print(key,BZind[key])
+            """if BZind[key][0]<0:
+                BZind[key][0]=0
+            if BZind[key][1]<0:
+                BZind[key][1]=0
+            if BZind[key][0]>(LatLims[1]-LatLims[0]):
+                BZind[key][0]=LatLims[1]-LatLims[0]
+            if BZind[key][1]>(LatLims[1]-LatLims[0]):
+                BZind[key][1]=LatLims[1]-LatLims[0]
+            
+            if BZind[key][0]==BZind[key][1]:
+                print("do nothing")"""
+                
+            #print(key,BZ[key],[90,90]-np.array(BZ[key]),LatLims)
+            clr='C'+str(clrind)
+            print(clr)
+            if BZind[key][0]>1.0 or BZind[key][1]<0.0:
+                print("do nothing")
+            else:
+                axs3b[0].axvspan(360-NH3LonLims[0],360-NH3LonLims[0]-1,
+                                ymin=BZind[key][1],ymax=BZind[key][0],alpha=1.0,
+                                color=clr)
+                axs3b[0].axvspan(360-NH3LonLims[1],360-NH3LonLims[1]+1,
+                                ymin=BZind[key][1],ymax=BZind[key][0],alpha=1.0,
+                                color=clr)
+                
+                clrind=clrind+1
+                            #ymin=BZ[key][0],ymax=BZ[key][1],alpha=0.5)
+                #axscor.scatter(patch2[BZind[key][1]:BZind[key][0],:],
+                #               patch1[BZind[key][1]:BZind[key][0],:],
+                #               marker="o",s=1.0,
+                #               alpha=0.8,label=key)
+    
+        
+        #trans = axs3[1].get_yaxis_transform()
+        #ax.annotate('Neonatal', xy=(1, -.1), xycoords=trans, ha="center", va="top")
+        #axs3[1].plot([170,170],[0,15], color="r", transform=trans, clip_on=False)
+    
+        box = axs3b[1].get_position()
+        axs3b[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 0.5, box.height * 1.015])    
+        fig3b.subplots_adjust(left=0.12, right=0.97, top=0.83, bottom=0.18, 
+                             wspace=0.4)
+        fig3b.savefig(pathmapplots+fnScat,dpi=300)
+
+
+
+
+    if FiveMicron!='fits':
+        ###########################################################################
+        ## Compute Overlay Plot with RGB
+        ###########################################################################
+        #!!!!!!!!!! FIX THIS !!!!!!!!!!!!!
+        fig4,axs4=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
+                            sharey=True,sharex=True)
+        fig4.suptitle(fNH3hdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
+                      +str(int(PCldPlotCM))+", Calibration = "+CalModel+
+                      ", Data "+smthtitle,x=0.5,ha='center',color='k')
+    
+        for ix in range(0,1):
+            axs4[ix].grid(linewidth=0.2)
+            axs4[ix].ylim=[-45.,45.]
+            axs4[ix].xlim=[360-NH3LonLims[0],360-NH3LonLims[1]]
+            axs4[ix].set_xticks(np.linspace(450,0,31), minor=False)
+            xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
+            axs4[ix].set_xticklabels(xticklabels.astype(int))
+            axs4[ix].set_yticks(np.linspace(-45,45,7), minor=False)
+            axs4[ix].tick_params(axis='both', which='major', labelsize=9)
+    
+            axs4[ix].set_adjustable('box') 
+    
+        #Pcloud_patch,vn,vx,tx=PP.plot_patch(PClouddata,LatLims,NH3LonLims,
+        #                                 PCldPlotCM,LonRng,"jet",
+        #                                 axs4[0],'%3.2f',cont=False,
+        #                                 cbar_reverse=True,vn=400,vx=900,n=6)
+        TestPCloud=PClouddata*amfdata**coef[1]
+        Pcloud_patch,vn,vx,tx=PP.plot_patch(TestPCloud,LatLims,NH3LonLims,
+                                         PCldPlotCM,LonRng,"Greys",
+                                         axs4[0],'%3.2f',cont=False,
+                                         cbar_reverse=True,vn=PCldlow,vx=PCldhigh,n=6)
+    
+        temp=RL.make_contours_CH4_patch(axs4[0],fNH3_patch_mb,LatLims,NH3LonLims,
+                               tx_fNH3,frmt='%3.0f',clr='k')
+    
+        """##########TEST CODE
+        hdu = fits.PrimaryHDU((R["CH4"]["PCloud"]).astype(np.float32))
+        hdul = fits.HDUList([hdu])
+        try:
+            os.remove(R["pathFITS"]+'PCloud.fits')
+        except: 
+            print("file doesn't exist")
+        hdul.writeto(R["pathFITS"]+'PCloud.fits')
+        hdul.close()
+        ##########TEST CODE"""
+    
+        #temp=RL.make_contours_CH4_patch(axs4[0],Pcloud_patch,LatLims,NH3LonLims,
+        #                       lvls=tx,frmt='%3.2f',clr='k')
+        #temp=RL.make_contours_CH4_patch(axs4[0],fNH3_patch_mb,LatLims,NH3LonLims,
+        #                       lvls=tx_fNH3,frmt='%3.0f',clr='r')
+        
+        axs4[0].set_title("Cloud Top Pressure (mb)",fontsize=10)
+    
+        gamma=1.3
+        RGB4Display=np.power(np.array(RGB_patch).astype(float),gamma)
+        RGB4Display=RGB4Display/RGB4Display.max()
+        show=axs4[1].imshow(RGB4Display,
+                   extent=[360-NH3LonLims[0],360-NH3LonLims[1],90-LatLims[1],
+                           90-LatLims[0]],
+                           aspect="equal")
+        #temp=RL.make_contours_CH4_patch(axs4[1],Pcloud_patch,LatLims,NH3LonLims,
+        #                       tx,frmt='%3.2f',clr='k')
+        #temp=RL.make_contours_CH4_patch(axs4[1],fNH3_patch_mb,LatLims,NH3LonLims,
+        #                       lvls=tx_fNH3,frmt='%3.0f',clr='r')
+        box = axs4[1].get_position()
+        
+        belt={"SSTB":[-39.6,-36.2],
+              "STB":[-32.4,-27.1],
+              "SEB":[-19.7,-7.2],
+              "NEB":[6.9,17.4],
+              "NTB":[24.2,31.4],
+              "NNTB":[35.4,39.6]}
+        
+        zone={"STZ":[-36.2,-32.4],
+              "STrZ":[-27.1,-19.7],
+              "EZ":[-7.2,6.9],
+              "NTrZ":[17.4,24.2],
+              "NTZ":[31.4,35.4]}
+    
+        if showbands:
+            for zb in belt:
+                #print(zb,belt[zb])
+                axs4[0].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+                                        color="0.5",alpha=0.2)
+                axs4[1].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+                                        color="0.8",alpha=0.1)
+            #axs1[1].annotate(zb,xy=[np.mean(belt[zb]),51],ha="center")
+        #for zb in zone:
+            #axs1[1].annotate(zb,xy=[np.mean(zone[zb]),51],ha="center")
+    
+        axs4[1].tick_params(axis='both', which='major', labelsize=9)
+        axs4[1].set_title(context_title,fontsize=10)
+    
+        axs4[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
+        axs4[0].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
+        axs4[1].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
+        axs4[1].grid(linewidth=0.2)
+    
+        fig4.subplots_adjust(left=0.10, bottom=0.03, right=0.98, top=0.95,
+                    wspace=0.25, hspace=0.05)     
+        axs4[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
+        
+        if coef[0]==0.0:
+            correction='_C0'
+        else:
+            correction='_C1'
+            
+        fnPCld=PCloudhdr["FILENAME"][:-5]+fnskeleton
+    
+        #fig4.savefig(pathmapplots+fnPCld,dpi=300)
+    
+        ###########################################################################
+        ## RGB False Color
+        ###########################################################################
+    
+        sz=Pcloud_patch.shape
+        print(sz)
+        RGBFalse=np.zeros((sz[0],sz[1],3))
+        
+    
+        RGBFalse[:,:,0]=(fNH3_patch_mb/Pcloud_patch)/0.25
+        RGBFalse[:,:,2]=(Pcloud_patch/fNH3_patch_mb)/10.
+        RGBFalse[:,:,1]=RGB4Display[:,:,0]
+        #RGBFalse[:,:,1]=(RGBFalse[:,:,0]+RGBFalse[:,:,2])/2.0
+    
+        #RGBFalse[:,:,0]=fNH3_patch_mb/130.-0.2
+        #RGBFalse[:,:,1]=Pcloud_patch/1000.-0.2
+        #RGBFalse[:,:,1]=RGB4Display[:,:,0]
+        #RGBFalse[:,:,1]=(RGBFalse[:,:,0]+RGBFalse[:,:,2])/2.0
+    
+        fig5,axs5=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
+                            sharey=True,sharex=True)
+        fig5.suptitle(fNH3hdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
+                      +str(int(PCldPlotCM))+", Calibration = "+CalModel+
+                      ", Data "+smthtitle,x=0.5,ha='center',color='k')
+    
+        for ix in range(0,1):
+            axs5[ix].grid(linewidth=0.2)
+            axs5[ix].ylim=[-45.,45.]
+            axs5[ix].xlim=[360-NH3LonLims[0],360-NH3LonLims[1]]
+            axs5[ix].set_xticks(np.linspace(450,0,31), minor=False)
+            xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
+            axs5[ix].set_xticklabels(xticklabels.astype(int))
+            axs5[ix].set_yticks(np.linspace(-45,45,7), minor=False)
+            axs5[ix].tick_params(axis='both', which='major', labelsize=9)
+    
+            axs5[ix].set_adjustable('box') 
+    
+        #axs4.imshow(RGBFalse)
+        show=axs5[0].imshow(RGBFalse,
                extent=[360-NH3LonLims[0],360-NH3LonLims[1],90-LatLims[1],
                        90-LatLims[0]],
                        aspect="equal")
-    #temp=RL.make_contours_CH4_patch(axs4[1],Pcloud_patch,LatLims,NH3LonLims,
-    #                       tx,frmt='%3.2f',clr='k')
-    #temp=RL.make_contours_CH4_patch(axs4[1],fNH3_patch_mb,LatLims,NH3LonLims,
-    #                       lvls=tx_fNH3,frmt='%3.0f',clr='r')
-    box = axs4[1].get_position()
-    
-    belt={"SSTB":[-39.6,-36.2],
-          "STB":[-32.4,-27.1],
-          "SEB":[-19.7,-7.2],
-          "NEB":[6.9,17.4],
-          "NTB":[24.2,31.4],
-          "NNTB":[35.4,39.6]}
-    
-    zone={"STZ":[-36.2,-32.4],
-          "STrZ":[-27.1,-19.7],
-          "EZ":[-7.2,6.9],
-          "NTrZ":[17.4,24.2],
-          "NTZ":[31.4,35.4]}
-
-    if showbands:
-        for zb in belt:
-            #print(zb,belt[zb])
-            axs4[0].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
-                                    color="0.5",alpha=0.2)
-            axs4[1].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
-                                    color="0.8",alpha=0.1)
-        #axs1[1].annotate(zb,xy=[np.mean(belt[zb]),51],ha="center")
-    #for zb in zone:
-        #axs1[1].annotate(zb,xy=[np.mean(zone[zb]),51],ha="center")
-
-    axs4[1].tick_params(axis='both', which='major', labelsize=9)
-    axs4[1].set_title("RGB Context Image",fontsize=10)
-
-    axs4[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
-    axs4[0].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
-    axs4[1].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
-    axs4[1].grid(linewidth=0.2)
-
-    fig4.subplots_adjust(left=0.10, bottom=0.03, right=0.98, top=0.95,
-                wspace=0.25, hspace=0.05)     
-    axs4[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
-    
-    if coef[0]==0.0:
-        correction='_C0'
-    else:
-        correction='_C1'
         
-    fnPCld=PCloudhdr["FILENAME"][:-5]+fnskeleton
-
-    #fig4.savefig(pathmapplots+fnPCld,dpi=300)
-
-    ###########################################################################
-    ## RGB False Color
-    ####################
-    #######################################################
-
-    sz=Pcloud_patch.shape
-    print(sz)
-    RGBFalse=np.zeros((sz[0],sz[1],3))
-    
-
-    RGBFalse[:,:,0]=(fNH3_patch_mb/Pcloud_patch)/0.25
-    RGBFalse[:,:,2]=(Pcloud_patch/fNH3_patch_mb)/10.
-    RGBFalse[:,:,1]=RGB4Display[:,:,0]
-    #RGBFalse[:,:,1]=(RGBFalse[:,:,0]+RGBFalse[:,:,2])/2.0
-
-    #RGBFalse[:,:,0]=fNH3_patch_mb/130.-0.2
-    #RGBFalse[:,:,1]=Pcloud_patch/1000.-0.2
-    #RGBFalse[:,:,1]=RGB4Display[:,:,0]
-    #RGBFalse[:,:,1]=(RGBFalse[:,:,0]+RGBFalse[:,:,2])/2.0
-
-    fig5,axs5=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white",
-                        sharey=True,sharex=True)
-    fig5.suptitle(fNH3hdr["DATE-OBS"].replace("_"," ")+", CM"+LonSys+"="
-                  +str(int(PCldPlotCM))+", Calibration = "+CalModel+
-                  ", Data "+smthtitle,x=0.5,ha='center',color='k')
-
-    for ix in range(0,1):
-        axs5[ix].grid(linewidth=0.2)
-        axs5[ix].ylim=[-45.,45.]
-        axs5[ix].xlim=[360-NH3LonLims[0],360-NH3LonLims[1]]
-        axs5[ix].set_xticks(np.linspace(450,0,31), minor=False)
-        xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
-        axs5[ix].set_xticklabels(xticklabels.astype(int))
-        axs5[ix].set_yticks(np.linspace(-45,45,7), minor=False)
-        axs5[ix].tick_params(axis='both', which='major', labelsize=9)
-
-        axs5[ix].set_adjustable('box') 
-
-    #axs4.imshow(RGBFalse)
-    show=axs5[0].imshow(RGBFalse,
-           extent=[360-NH3LonLims[0],360-NH3LonLims[1],90-LatLims[1],
-                   90-LatLims[0]],
-                   aspect="equal")
-    
-    gamma=1.3
-    RGB4Display=np.power(np.array(RGB_patch).astype(float),gamma)
-    RGB4Display=RGB4Display/RGB4Display.max()
-    show=axs5[1].imshow(RGB4Display,
-               extent=[360-NH3LonLims[0],360-NH3LonLims[1],90-LatLims[1],
-                       90-LatLims[0]],
-                       aspect="equal")
-    #temp=RL.make_contours_CH4_patch(axs4[1],Pcloud_patch,LatLims,NH3LonLims,
-    #                       tx,frmt='%3.2f',clr='k')
-    #temp=RL.make_contours_CH4_patch(axs4[1],fNH3_patch_mb,LatLims,NH3LonLims,
-    #                       lvls=tx_fNH3,frmt='%3.0f',clr='r')
-    box = axs5[1].get_position()
-    
-    belt={"SSTB":[-39.6,-36.2],
-          "STB":[-32.4,-27.1],
-          "SEB":[-19.7,-7.2],
-          "NEB":[6.9,17.4],
-          "NTB":[24.2,31.4],
-          "NNTB":[35.4,39.6]}
-    
-    zone={"STZ":[-36.2,-32.4],
-          "STrZ":[-27.1,-19.7],
-          "EZ":[-7.2,6.9],
-          "NTrZ":[17.4,24.2],
-          "NTZ":[31.4,35.4]}
-
-    if showbands:
-        for zb in belt:
-            #print(zb,belt[zb])
-            axs5[0].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
-                                    color="0.5",alpha=0.2)
-            axs5[1].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
-                                    color="0.8",alpha=0.1)
-        #axs1[1].annotate(zb,xy=[np.mean(belt[zb]),51],ha="center")
-    #for zb in zone:
-        #axs1[1].annotate(zb,xy=[np.mean(zone[zb]),51],ha="center")
-
-    axs5[1].tick_params(axis='both', which='major', labelsize=9)
-    axs5[1].set_title("RGB Context Image",fontsize=10)
-
-    axs5[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
-    axs5[0].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
-    axs5[1].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
-    axs5[1].grid(linewidth=0.2)
-
-    fig5.subplots_adjust(left=0.10, bottom=0.03, right=0.98, top=0.95,
-                wspace=0.25, hspace=0.05)     
-    axs5[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
-    
-    if coef[0]==0.0:
-        correction='_C0'
-    else:
-        correction='_C1'
+        gamma=1.3
+        RGB4Display=np.power(np.array(RGB_patch).astype(float),gamma)
+        RGB4Display=RGB4Display/RGB4Display.max()
+        show=axs5[1].imshow(RGB4Display,
+                   extent=[360-NH3LonLims[0],360-NH3LonLims[1],90-LatLims[1],
+                           90-LatLims[0]],
+                           aspect="equal")
+        #temp=RL.make_contours_CH4_patch(axs4[1],Pcloud_patch,LatLims,NH3LonLims,
+        #                       tx,frmt='%3.2f',clr='k')
+        #temp=RL.make_contours_CH4_patch(axs4[1],fNH3_patch_mb,LatLims,NH3LonLims,
+        #                       lvls=tx_fNH3,frmt='%3.0f',clr='r')
+        box = axs5[1].get_position()
         
-    fnPCld=PCloudhdr["FILENAME"][:-5]+fnskeleton
-
-    #fig5.savefig(pathmapplots+fnPCld,dpi=300) 
+        belt={"SSTB":[-39.6,-36.2],
+              "STB":[-32.4,-27.1],
+              "SEB":[-19.7,-7.2],
+              "NEB":[6.9,17.4],
+              "NTB":[24.2,31.4],
+              "NNTB":[35.4,39.6]}
+        
+        zone={"STZ":[-36.2,-32.4],
+              "STrZ":[-27.1,-19.7],
+              "EZ":[-7.2,6.9],
+              "NTrZ":[17.4,24.2],
+              "NTZ":[31.4,35.4]}
     
-    return(fig1,axs1,fig2,axs2,fig3,axs3)
+        if showbands:
+            for zb in belt:
+                #print(zb,belt[zb])
+                axs5[0].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+                                        color="0.5",alpha=0.2)
+                axs5[1].fill_between([360-NH3LonLims[0],360-NH3LonLims[1]],[belt[zb][0],belt[zb][0]],[belt[zb][1],belt[zb][1]],
+                                        color="0.8",alpha=0.1)
+            #axs1[1].annotate(zb,xy=[np.mean(belt[zb]),51],ha="center")
+        #for zb in zone:
+            #axs1[1].annotate(zb,xy=[np.mean(zone[zb]),51],ha="center")
+    
+        axs5[1].tick_params(axis='both', which='major', labelsize=9)
+        axs5[1].set_title(context_title,fontsize=10)
+    
+        axs5[0].set_ylabel("Planetographic Latitude (deg)",fontsize=10)
+        axs5[0].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
+        axs5[1].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=10)
+        axs5[1].grid(linewidth=0.2)
+    
+        fig5.subplots_adjust(left=0.10, bottom=0.03, right=0.98, top=0.95,
+                    wspace=0.25, hspace=0.05)     
+        axs5[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 1.015, box.height * 1.015])
+        
+        if coef[0]==0.0:
+            correction='_C0'
+        else:
+            correction='_C1'
+            
+        fnPCld=PCloudhdr["FILENAME"][:-5]+fnskeleton
+    
+        #fig5.savefig(pathmapplots+fnPCld,dpi=300) 
+        
+        return(fig1,axs1,fig2,axs2,fig3,axs3)
 
 
 def load_png(file_path):
@@ -653,7 +1024,7 @@ def load_png(file_path):
     return flow.astype(np.uint16) 
 
 def plot_scatter(patch1,patch2,obskey,Real_CM2,LatLims,axscor,PCldlow,PCldhigh,
-                 fNH3low,fNH3high):
+                 fNH3low,fNH3high,FiveMicron=False):
     import pylab as pl
     import numpy as np
     import copy
@@ -706,7 +1077,10 @@ def plot_scatter(patch1,patch2,obskey,Real_CM2,LatLims,axscor,PCldlow,PCldhigh,
     axscor.set_xlim(fNH3low,fNH3high)
     axscor.set_ylabel("Effective Cloud-top Pressure (mb)",fontsize=10)
     axscor.invert_yaxis()
-    axscor.set_xlabel("Ammonia Mole Fraction (ppm)",fontsize=10)
+    if FiveMicron:
+        axscor.set_xlabel("5um Radiance (arb. units)",fontsize=10)
+    else:
+        axscor.set_xlabel("Ammonia Mole Fraction (ppm)",fontsize=10)
     axscor.legend(fontsize=7,ncols=4)
     
     return(BZ)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-def get_WINJupos_ephem(dateobs):
+def get_WINJupos_ephem(dateobs,planet="Jupiter"):
     """
     Created on Fri Sep 15 07:57:17 2023
 
@@ -15,9 +15,9 @@ def get_WINJupos_ephem(dateobs):
     # WRITE *.BAT FILE WITH COMMAND SCRIPT FOR WINJUPOS
     ###########################################################################   
     batfile=open("WINJupos_CM.bat",'w')
-    Line1='cd "\Program Files\WinJUPOS 12.2.6"\r\n'
+    Line1='cd "\Program Files\WinJUPOS 12.3.11"\r\n'
     #Line2='WinJUPOS.x64.exe Jupiter /GetCM:2021-09-05_04:09:00 /GeoLong:-104.9 /GeoLat:39.7 /GetAlt >"c:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\cm.txt"\r\n'
-    Line2='WinJUPOS.x64.exe Jupiter /GetCM:'+dateobs+' /GeoLong:-104.9 /GeoLat:39.7 /GetAlt >"c:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\cm.txt"\r\n'
+    Line2='WinJUPOS.x64.exe '+planet+' /GetCM:'+dateobs+' /GeoLong:-104.9 /GeoLat:39.7 /GetAlt >"c:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\cm.txt"\r\n'
     #batfile.writelines(["Line1\r\n","Line2\r\n"])
     batfile.writelines([Line1,Line2])
     batfile.close()

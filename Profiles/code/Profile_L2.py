@@ -57,6 +57,9 @@ def Profile_L2(band="NH3",profile="Meridional",ProfileHalfWidth=45,
     LatsVLT23,OutProVLT23,OutStdVLT23,OutamfVLT23=PTG.plot_profile_L2(axsavgprof,axsamf,axsspg[1,0],axsamfspg[1,0],"2023 VLTMUSE",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='C4',width=1.0,band=band,smooth=smooth)
+    LatsSCT24,OutProSCT24,OutStdSCT24,OutamfSCT24=PTG.plot_profile_L2(axsavgprof,axsamf,axsspg[1,0],axsamfspg[1,0],"2024 CMOS",ProfileHalfWidth=ProfileHalfWidth,
+                        LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
+                        profile=profile,clr='C5',width=1.0,band=band,smooth=smooth)
     
     if profile=="Meridional":
         for zb in belt:
@@ -150,7 +153,18 @@ def Profile_L2(band="NH3",profile="Meridional",ProfileHalfWidth=45,
     ###########################################################################
     
     figresid,axsresid=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white")
-    axsresid.plot(LatsVLT22,OutProSCT23-OutProSCT22,label='2023 minus 2022')
+    proresid=OutProSCT23-OutProSCT22
+    axsresid.plot(LatsVLT22,proresid,label='2023 SCT minus 2022 SCT')
+    stdresid=np.sqrt(OutStdSCT22**2+OutStdSCT23**2)
+    axsresid.fill_between(LatsSCT22,proresid-stdresid,proresid+stdresid,
+                          color='C0',alpha=.1)
+
+    proresid=OutProSCT24-OutProSCT23
+    axsresid.plot(LatsSCT22,proresid,label='2024 SCT minus 2023 SCT')
+    stdresid=np.sqrt(OutStdSCT23**2+OutStdSCT24**2)
+    axsresid.fill_between(LatsSCT22,proresid-stdresid,proresid+stdresid,
+                          color='C1',alpha=.1)
+
     #axsresid.plot(LatsVLT22,CMOS2021EW[:,1]-OutProSCT22)
     #axsresid.plot(LatsVLT22,CMOS2020EW[:,1]-OutProSCT22)
     if profile=="Meridional":

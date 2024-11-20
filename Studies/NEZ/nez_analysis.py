@@ -9,6 +9,10 @@ def nez_analysis():
              CLASSIC VISIBLE LIGHT DARK FORMATIONS (DARK PROJECTIONS IN
              WINJUPOS). SO A WORKING ASSUMPTION IS THAT THERE IS A ONE-TO-ONE
              CORRESPONDENCE.
+             
+             **** I BELIEVE THAT OVER THE TWO YEARS LEADING UP TO THE 
+                  EZ DISTURBANCE THAT THE NH3 ENHANCEMENTS HAVE BEEN MOVING
+                  SOUTHWARD!!!!!
     """
     
     import csv

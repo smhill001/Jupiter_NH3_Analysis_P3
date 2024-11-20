@@ -1,4 +1,4 @@
-def image_array_new(obsdate="20221009UTa",target="Jupiter",
+def image_array_new(obsdate="20240925UTa",target="Jupiter",
                      imagetype='Img',contour=False):
     """
     Created on Fri Sep 15 07:48:05 2023
@@ -43,7 +43,7 @@ def image_array_new(obsdate="20221009UTa",target="Jupiter",
     #  DATA FILES AND METADATA DICTIONARY
     ###########################################################################
     sourcedata=obsdate#+"_"+imagetype
-    sourcefiles=getlist.get_obs_list()
+    sourcefiles=getlist.get_obs_list(planet=target)
     
     if sourcefiles[sourcedata]["Telescope"]=="C11":
         CalModel="SCT-Obs-Final"
@@ -70,7 +70,7 @@ def image_array_new(obsdate="20221009UTa",target="Jupiter",
     NH3sec=str(int(str(NH3file[16:17]))*6) #COMPUTE FROM FRACTIONAL WINJUPOS MINUTE
     NH3time=(NH3file[0:10]+"_"+NH3file[11:13]+":"+NH3file[13:15]+":"
              +NH3sec.zfill(2))
-    NH3eph=WJ_ephem.get_WINJupos_ephem(NH3time)
+    NH3eph=WJ_ephem.get_WINJupos_ephem(NH3time,planet=target)
     NH3_CM1=float(NH3eph[0].strip())
     NH3_CM2=float(NH3eph[1].strip())
     NH3_CM3=float(NH3eph[2].strip())
@@ -81,7 +81,7 @@ def image_array_new(obsdate="20221009UTa",target="Jupiter",
     CH4sec=str(int(str(CH4file[16:17]))*6) #COMPUTE FROM FRACTIONAL WINJUPOS MINUTE
     CH4time=(CH4file[0:10]+"_"+CH4file[11:13]+":"+CH4file[13:15]+":"
              +CH4sec.zfill(2))
-    CH4eph=WJ_ephem.get_WINJupos_ephem(CH4time)
+    CH4eph=WJ_ephem.get_WINJupos_ephem(CH4time,planet=target)
     CH4_CM1=float(CH4eph[0].strip())
     CH4_CM2=float(CH4eph[1].strip())
     CH4_CM3=float(CH4eph[2].strip()) 
@@ -96,11 +96,11 @@ def image_array_new(obsdate="20221009UTa",target="Jupiter",
     ###########################################################################
     # CH4 Transmission File name and read
     try:    #Set up to allow for parametric studies of different processing paths
-        CH4file=sourcefiles[sourcedata]['CH4file'][0:17]+"-Jupiter_"+imagetype+"_L2TCH4"+\
+        CH4file=sourcefiles[sourcedata]['CH4file'][0:18]+target+"_"+imagetype+"_L2TCH4"+\
                 sourcefiles[sourcedata]['Variation']+".fits"
         variation=sourcefiles[sourcedata]['Variation']
     except:
-        CH4file=sourcefiles[sourcedata]['CH4file'][0:17]+"-Jupiter_"+imagetype+"_L2TCH4.fits"
+        CH4file=sourcefiles[sourcedata]['CH4file'][0:18]+target+"_"+imagetype+"_L2TCH4.fits"
         variation=""
 
     CH4hdulist=fits.open(pathL2+CH4file)
@@ -112,11 +112,11 @@ def image_array_new(obsdate="20221009UTa",target="Jupiter",
     ###########################################################################
     # NH3 Transmission File name and read
     try:    #Set up to allow for parametric studies of different processing paths
-        NH3file=sourcefiles[sourcedata]['NH3file'][0:17]+"-Jupiter_"+imagetype+"_L2TNH3"+\
+        NH3file=sourcefiles[sourcedata]['NH3file'][0:18]+target+"_"+imagetype+"_L2TNH3"+\
                 sourcefiles[sourcedata]['Variation']+".fits"
         variation=sourcefiles[sourcedata]['Variation']
     except:
-        NH3file=sourcefiles[sourcedata]['NH3file'][0:17]+"-Jupiter_"+imagetype+"_L2TNH3.fits"
+        NH3file=sourcefiles[sourcedata]['NH3file'][0:18]+target+"_"+imagetype+"_L2TNH3.fits"
         variation=""
     
     NH3hdulist=fits.open(pathL2+NH3file)
@@ -128,7 +128,7 @@ def image_array_new(obsdate="20221009UTa",target="Jupiter",
     NH3hdulist.close()
     
     PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM,RGBtime= \
-                    RFM.read_fits_map_L2_L3(obskey=obsdate,
+                    RFM.read_fits_map_L2_L3(obskey=obsdate,target=target,
                                             imagetype="Img",Level="L3")
                     
     tx=np.linspace(0,65500.,5,endpoint=True)

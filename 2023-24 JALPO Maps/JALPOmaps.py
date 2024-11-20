@@ -9,7 +9,7 @@ import pylab as pl
 import numpy as np
 from os import listdir
 
-pathRGB="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/2023-24 Maps/"
+pathRGB="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/2023-24 JALPO Maps/"
 
 RGBfiles=listdir(pathRGB)
 
