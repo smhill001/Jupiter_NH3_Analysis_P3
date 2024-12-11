@@ -45,21 +45,22 @@ def Profile_Vertical_Fletcher():
     
     figvertprof,axsvertprof=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="white")
     axsvertprof.plot(dataavg,pressure,label='Ammonia - Fletcher etal. [2020]')
-    axsvertprof.plot(CH4,pressure,label='Methane - citation')
+    axsvertprof.plot(CH4,pressure,label='Methane')
     print(dataavg)
     #Upper Haze
-    axsvertprof.fill_between([1,10000],[0.6,0.6],[0.2,0.2],color='0.9',
-                             linewidth=[0,0],label='Haze')
+    #axsvertprof.fill_between([1,10000],[0.6,0.6],[0.2,0.2],color='0.9',
+    #                         linewidth=[0,0],label='Haze')
     #Sheet Cloud
-    axsvertprof.fill_between([1,10000],[0.65,0.65],[0.67,0.67],color='0.5',
-                             linewidth=[0,0],label='Sheet Cloud')
+    #axsvertprof.fill_between([1,10000],[0.65,0.65],[0.67,0.67],color='0.5',
+    #                         linewidth=[0,0],label='Sheet Cloud')
 
     axsvertprof.set_xscale('log')
     axsvertprof.set_xlim([1,10000.])
     axsvertprof.set_yscale('log')
-    axsvertprof.set_ylim([0.1,1.])
-    axsvertprof.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1f'))
-    axsvertprof.yaxis.set_minor_formatter(ticker.FormatStrFormatter('%1.1f'))
+    axsvertprof.set_ylim([0.01,10.])
+    axsvertprof.tick_params(axis='both', which='both', labelsize=8)
+    axsvertprof.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.2f'))
+    #axsvertprof.yaxis.set_minor_formatter(ticker.FormatStrFormatter('%1.1f'))
     axsvertprof.invert_yaxis()
     
     axsvertprof.set_title('Abundances and Clouds')

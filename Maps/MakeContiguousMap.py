@@ -1,5 +1,5 @@
 def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2',
-                      FiveMicron=False,Five_obskey=''):
+                      FiveMicron=False,Five_obskey='',IRTFdataset='',LonLims=[0,360]):
     """
     Created on Wed Dec 20 21:02:31 2023
 
@@ -58,10 +58,6 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2
     stackPCloud=np.zeros([180,360])
     stackRGB=np.zeros([180,360,3])
     
-    if FiveMicron=='fits':
-        outputFiveMicron=np.zeros([180,360])
-        stackFiveMicron=np.zeros([180,360])
-   
     ###########################################################################
     # Loop over observations in each data set and create 3D cubes
     ###########################################################################
@@ -84,6 +80,7 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2
         
         #lats=[30,150]
         lats=[60,120]
+        lats=[75,95]
         #ll_0=360-lonlims[obskey][0]
         #ll_1=360-lonlims[obskey][1]
         if LonSys=='1':
@@ -141,7 +138,7 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2
 
     #6x6 works for 60N-60Z and 360 long
     #8x5 works for 30N-30S and 360 Long
-    if FiveMicron:
+    if FiveMicron=='png' or FiveMicron=='fits':
         rng=[0,1,2,3]
     else:
         rng=[0,1,2]
@@ -163,24 +160,31 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2
         axs1[ix].set_adjustable('box') 
 
     print("###############")
-    fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(blendfNH3,lats,[0,360],
+    print([360-LonLims[1],360-LonLims[0]])
+    fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(blendfNH3,lats,[360-LonLims[1],360-LonLims[0]],
                                      180,180,"jet",
-                                     axs1[0],'%3.2f',cont=False,n=11,vn=50,vx=150)
+                                     axs1[0],'%3.2f',cont=False,n=11,vn=60,vx=160)
     print("vn,vx,tx_fNH3",vn,vx,tx_fNH3)
     axs1[0].set_title('fNH3 (ppm)',fontsize=10)
 
-    PCld_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(blendPCloud,lats,[0,360],
+    PCld_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(blendPCloud,lats,[360-LonLims[1],360-LonLims[0]],
                                      180,180,"jet",
-                                     axs1[1],'%3.2f',cont=False,n=6,vn=600,vx=1100)
+                                     axs1[1],'%3.2f',cont=False,n=5,vn=600,vx=1000)
     axs1[1].set_title('PCloud (mbar)',fontsize=10)
+    RGBaxs=2
+
+    ###########################################################################
+    # READ 5um png file and display patch. Also can be used for other
+    # scraped png files from JALPO maps.
+    ###########################################################################
     print("FiveMicron",FiveMicron)
-    if FiveMicron:
+    if FiveMicron=='png':
         PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,Five,Five_CM2,Fivetime= \
                         RFM.read_fits_map_L2_L3(obskey=Five_obskey,LonSys=LonSys,
                                                 imagetype="Map",Level="L3",
                                                 FiveMicron=FiveMicron)                        
 
-        Five_patch=MPRGB.make_patch_RGB(Five,lats,[0,360],180,180)
+        Five_patch=MPRGB.make_patch_RGB(Five,lats,[360-LonLims[1],360-LonLims[0]],180,180)
         Five4Display=np.power(np.array(Five_patch).astype(float),1.0)
         Five4Display=Five4Display/Five4Display.max()
         show=axs1[2].imshow(Five4Display,
@@ -188,14 +192,91 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2
                            90-lats[0]],
                            aspect="equal")
         RGBaxs=3
-    else:
-        RGBaxs=2
 
-    RGB_patch=MPRGB.make_patch_RGB(outputRGB,lats,[0,360],180,180)
+    ###########################################################################
+    # Loop over 5um FITS files to create maps
+    ###########################################################################
+    if FiveMicron=='fits':
+        RGBaxs=3
+
+        pathIRTF_FITS="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/5micron/FITS/output/"
+        outputIRTF=np.zeros([180,360])
+        stackIRTF=np.zeros([180,360])
+   
+        print("IRTFdataset=",IRTFdataset)
+        FirstIRTF=True
+        for IRTFfile in IRTFdataset:
+            print("*******obsdate=",IRTFfile)
+            
+            IRTFhdulist=fits.open(pathIRTF_FITS+IRTFfile)
+            IRTFhdulist.info()
+            IRTFhdr=IRTFhdulist[0].header
+            IRTFdata=IRTFhdulist[0].data
+            IRTFhdulist.close()
+            
+            if LonSys=='1':
+                print("LonSys1=",LonSys)
+                IRTFroll=IRTFhdr["CM3"]-IRTFhdr["CM1"]
+                IRTFdatar=np.roll(IRTFdata,int(IRTFroll),axis=1)
+            if LonSys=='2':
+                print("LonSys1=",LonSys)
+                IRTFroll=IRTFhdr["CM3"]-IRTFhdr["CM2"]
+                IRTFdatar=np.roll(IRTFdata,int(IRTFroll),axis=1)
+
+            #lats=[30,150]
+            #lats=[60,120]
+            lats=[75,95]
+            #ll_0=360-lonlims[obskey][0]
+            #ll_1=360-lonlims[obskey][1]
+            if LonSys=='1':
+                ll_0=int(360-(IRTFhdr["CM1"]-70))
+                ll_1=int(360-(IRTFhdr["CM1"]+70))
+            elif LonSys=='2':
+                ll_0=int(360-(IRTFhdr["CM2"]-70))
+                ll_1=int(360-(IRTFhdr["CM2"]+70))
+            
+            #print("***************** ll_0x, ll_1x=",ll_0x,ll_1x)
+            if ll_0>360:
+                ll_0=360
+            if ll_1<0:
+                ll_1=0
+            print("***************** ll_0, ll_1=",ll_0,ll_1)
+            #print("***************** ll_0x, ll_1x=",ll_0x,ll_1x)
+            
+            outputIRTF[lats[0]:lats[1],ll_1:ll_0]= \
+                IRTFdatar[lats[0]:lats[1],ll_1:ll_0]
+                
+            tempIRTF=np.zeros([180,360])
+            tempIRTF[lats[0]:lats[1],ll_1:ll_0]= \
+                IRTFdatar[lats[0]:lats[1],ll_1:ll_0]
+    
+            if First:
+                stackIRTF=tempIRTF
+                stackIRTF=np.reshape(stackIRTF,(180,360,1))
+            else:
+                tempIRTF=np.reshape(tempIRTF,(180,360,1))
+                stackIRTF=np.dstack((stackIRTF,tempIRTF))
+            FirstIRTF=False
+            
+        ###########################################################################
+        # Flatten cubes by taking the mean and ignoring zero values
+        ###########################################################################
+        print(stackIRTF.shape)
+        indzf=np.where(stackIRTF==0)
+        stackIRTF[indzf]=np.nan
+        blendIRTF=np.nanmean(stackIRTF,axis=2)
+        print(blendIRTF.shape)
+
+        IRTF_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(np.log10(blendIRTF),lats,[360-LonLims[1],360-LonLims[0]],
+                                         180,180,"gist_heat",
+                                         axs1[2],'%3.2f',cont=False,n=5,vn=1,vx=3.0)
+
+
+    RGB_patch=MPRGB.make_patch_RGB(outputRGB,lats,[140,340],180,180)
     RGB4Display=np.power(np.array(RGB_patch).astype(float),1.0)
     RGB4Display=RGB4Display/RGB4Display.max()
     show=axs1[RGBaxs].imshow(RGB4Display,
-               extent=[360,0,90-lats[1],
+               extent=[LonLims[1],LonLims[0],90-lats[1],
                        90-lats[0]],
                        aspect="equal")
     #temp=RL.make_contours_CH4_patch(axs1[2],outputfNH3,[30.,150.],[0.,360.],
@@ -216,18 +297,21 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2
                 wspace=0.25, hspace=0.08)     
     axs1[RGBaxs].set_position([box.x0-0.055, box.y0-0.04, box.width * 1.07, box.height * 1.07])
 
-    if FiveMicron:
+    if FiveMicron=='png':
         
-        axs1[2].set_title(Fivetime[0:10]+" (5 micron)",fontsize=8)
+        if FiveMicron=='png':
+            axs1[2].set_title(Fivetime[0:10]+" (5 micron)",fontsize=8)
         axs1[3].set_title("RGB Context Image",fontsize=8)
 
-        fig1.subplots_adjust(left=0.07, bottom=0.06, right=0.94, top=0.92,
-                    wspace=0.25, hspace=0.08)
-        
         box2 = axs1[2].get_position()
         axs1[2].set_position([box2.x0-0.0, box2.y0-0.0, box2.width * 0.95, box2.height * 1.07])
         box3 = axs1[3].get_position()
-        axs1[3].set_position([box3.x0-0.0, box3.y0-0.0, box3.width * 0.95, box3.height * 1.07])
+        axs1[3].set_position([box3.x0-0.01, box3.y0-0.0, box3.width * 1.025, box3.height * 1.07])
+
+
+    if FiveMicron=='fits':
+        box3 = axs1[3].get_position()
+        axs1[3].set_position([box3.x0-0.01, box3.y0-0.0, box3.width * 1.025, box3.height * 1.07])
 
     pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/maps/"
     fig1.savefig(pathmapplots+collection+"Sys"+LonSys+" map.png",dpi=300)

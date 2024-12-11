@@ -1,6 +1,11 @@
 def get_map_collection(collection):
                
-    if collection=="20220810-20220812":
+    if collection=="20220730-20220730":
+        dataset={'20220730UTa'}
+        
+        lonlims={'20220730UTa':[0,75]}
+        
+    elif collection=="20220810-20220812":
         dataset={'20220810UTa',
                  '20220812UTa'}
         

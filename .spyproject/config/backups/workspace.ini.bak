@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['Services\\get_obs_list.py', 'Maps\\Map_Jup_Atm_P3.py', 'Maps\\MakeContiguousMap.py', 'Maps\\get_map_collection.py']
+recent_files = ['Services\\get_obs_list.py', 'Maps\\get_map_collection.py', 'Maps\\MakeContiguousMap.py', 'Maps\\L3_Jup_Map_Plot.py', '5micron\\AGU2024figures.py', 'Services\\make_L2_abs_data.py', 'Services\\make_L3_env_data.py', 'Services\\image_array_new.py', 'Services\\rename_from_registax_batch.py', '..\\..\\..\\Python Play\\Util\\RenameFiles.py']
 
 [main]
 version = 0.2.0

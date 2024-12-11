@@ -16,6 +16,7 @@ def make_patch(Map,LatLims,LonLims,CM2deg,LonRng,pad=True):
     import numpy as np
     patch=np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]:LonLims[1]])
     if CM2deg<LonRng:
+        print("******************  CM2deg<LonRng")
         patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]-1:360]),
                               np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]-360])),axis=1)
     if CM2deg>360-LonRng:

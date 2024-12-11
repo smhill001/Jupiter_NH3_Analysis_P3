@@ -44,13 +44,13 @@ def Convert_5micron_FITS():
             secs=float(Sourcehdr["TIME_OBS"][6:])
             minfrac=str(round(secs/6.))
             secsint=str(round(secs))
-            print("secs",secs)
-            print("minfrac",minfrac)
+            #print("secs",secs)
+            #print("minfrac",minfrac)
         
             fnskeleton="-Jupiter_5micron.fits"
             fnout=Sourcehdr["DATE_OBS"]+"-"+Sourcehdr["TIME_OBS"][0:2]+\
                   Sourcehdr["TIME_OBS"][3:5]+"_"+minfrac+fnskeleton
-            print("fnout",fnout)
+            #print("fnout",fnout)
         
             dateobs=Sourcehdr["DATE_OBS"]+"T"+Sourcehdr["TIME_OBS"][0:6]+secsint.zfill(2)+"Z"
             print("dateobs",dateobs)
@@ -63,7 +63,9 @@ def Convert_5micron_FITS():
             CM2=float(eph[1].strip())
             CM3=float(eph[2].strip())
         
-        
+            LCMIII=Sourcehdr["LCMIII"]
+            
+            
             if Sourcehdr["NAXIS1"]==720:
                 #data=np.resize(Sourcedata,[180,360])
                 #data = Sourcedata.resize((180,360), PIL.Image.ANTIALIAS)
@@ -76,7 +78,7 @@ def Convert_5micron_FITS():
             latpc=np.arange(89.5,-89.6,-1)
             j=pm.Body("Jupiter")
             latpg=j.centric2graphic_lonlat(latpc,latpc)[1]
-            print("latpg",latpg)
+            #print("latpg",latpg)
             #print Wavelength.size,Signal.size
             for long in range(0,360,1):
                 Interp=interpolate.interp1d(latpg,flipdata[:,long],kind='linear', 
@@ -85,7 +87,11 @@ def Convert_5micron_FITS():
                 SignalonGrid=Interp(latpc)
                 Finaldata[:,long]=SignalonGrid
             
-            
+            rollangle=LCMIII-CM3
+            if np.abs(rollangle)>2.0:
+                print("################# rollangle ####",dateobs,rollangle)
+            Finaldata=np.roll(Finaldata,int(rollangle),axis=1)
+
             hdu = fits.PrimaryHDU(Finaldata)
             hdu.header=Sourcehdr
             hdul = fits.HDUList([hdu])

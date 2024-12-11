@@ -1,4 +1,4 @@
-path="C:/Astronomy/Data/2024/10/27UT/"
+#path="C:/Astronomy/Data/2024/10/27UT/"
 
 def rename_from_registax_batch(path):
     import os

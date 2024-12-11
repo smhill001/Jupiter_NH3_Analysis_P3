@@ -1,5 +1,5 @@
 def plot_patch(fullmap,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
-               cont=True,cbarplot=True,cbar_reverse=False,vn=0.10,vx=0.20,n=6):
+               cont=True,cbarplot=True,cbar_title="Test",cbar_reverse=False,vn=0.10,vx=0.20,n=6):
     """
     Created on Thu Apr 11 18:54:35 2024
     
@@ -9,6 +9,7 @@ def plot_patch(fullmap,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
     import pylab as pl
     import RetrievalLibrary as RL
 
+    print("@@@@@@@@@@@@ LatLims, LonLims, CM2, LonRng",LatLims, LonLims, CM2, LonRng)
     patch=RL.make_patch(fullmap,LatLims,LonLims,CM2,LonRng)
     np.nan_to_num(patch, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
     #vn=np.mean(patch)-3.0*np.std(patch)
@@ -32,6 +33,8 @@ def plot_patch(fullmap,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
                    ax=axis,fraction=0.046*im_ratio, pad=0.04)
         cbar.ax.set_yticklabels(np.around(tx,3))
         cbar.ax.tick_params(labelsize=6,color="k")#if iSession >1:
+        cbar.ax.set_ylabel(cbar_title,size=8)#,loc="top")
+        cbar.ax.yaxis.set_label_coords(-0.7, 0.5)
         if cbar_reverse:
             cbar.ax.invert_yaxis()
     #if colorscale=="Greys":
