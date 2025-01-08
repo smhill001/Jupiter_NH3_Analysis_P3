@@ -149,7 +149,7 @@ def Profile_L2(band="NH3",profile="Meridional",ProfileHalfWidth=45,
     figamfspg.savefig(path+"Profiles/output/AMF_scatter_"+band+"_"+profile+".png",dpi=300)
 
     ###########################################################################
-    # Plot change in profile relative to 2022 profile
+    # Plot profile changes over time (residuals)
     ###########################################################################
     
     figresid,axsresid=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white")
@@ -201,12 +201,13 @@ def Profile_L2(band="NH3",profile="Meridional",ProfileHalfWidth=45,
     VLT22={'Lats':LatsVLT22,'Pro':OutProVLT22,'Std':OutStdVLT22,'Amf':OutamfVLT22}
     SCT23={'Lats':LatsSCT23,'Pro':OutProSCT23,'Std':OutStdSCT23,'Amf':OutamfSCT23}
     VLT23={'Lats':LatsVLT23,'Pro':OutProVLT23,'Std':OutStdVLT23,'Amf':OutamfVLT23}
+    SCT24={'Lats':LatsSCT24,'Pro':OutProSCT24,'Std':OutStdSCT24,'Amf':OutamfSCT24}
 
     #return(LatsVLT22,OutProVLT22,OutStdVLT22,OutamfVLT22)#,figavgprof,axsavgprof)
     
     if band=="NH3":
-        return(SCT20,SCT21,SCT22,VLT22,SCT23,VLT23)#,figavgprof,axsavgprof)
+        return(SCT20,SCT21,SCT22,VLT22,SCT23,VLT23,SCT24)#,figavgprof,axsavgprof)
     else:
-        return(SCT22,VLT22,SCT23,VLT23)#,figavgprof,axsavgprof)
+        return(SCT22,VLT22,SCT23,VLT23,SCT24)#,figavgprof,axsavgprof)
     
     #return(figavgprof,axsavgprof)

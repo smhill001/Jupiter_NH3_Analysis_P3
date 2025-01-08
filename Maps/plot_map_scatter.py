@@ -12,6 +12,9 @@ def plot_map_scatter(patch1,patch2,Real_CM2,LatLims,axscor,PCldlow,PCldhigh,
     import copy
     
     #print("000000000: ",patch1.shape,patch2.shape)
+    ###########################################################################
+    # SET BELT AND ZONE BOUNDARIES
+    ###########################################################################
     BZ={"SSTB":[-39.6,-36.2],
           "STZ":[-36.2,-32.4],
           "STB":[-32.4,-27.1],
@@ -27,10 +30,10 @@ def plot_map_scatter(patch1,patch2,Real_CM2,LatLims,axscor,PCldlow,PCldhigh,
 
     BZind=copy.deepcopy(BZ)   
     BZkeys=BZ.keys()
-    #patch1=patch1*1000.
 
-    #figcor,axscor=pl.subplots(1,1,figsize=(6.0,4.), dpi=150, facecolor="white",
-    #                    sharey=True,sharex=True)          
+    ###########################################################################
+    # LOOP OVER BELTS AND PLOT SCATTER IN APPROPRIATE COLOR
+    ###########################################################################
 
     for key in BZ.keys():
         #print(key,BZ[key],[90,90]-np.array(BZ[key]),LatLims)
@@ -54,6 +57,9 @@ def plot_map_scatter(patch1,patch2,Real_CM2,LatLims,axscor,PCldlow,PCldhigh,
                            patch1[BZind[key][1]:BZind[key][0],:],
                            marker="o",s=3.0,
                            alpha=0.8,label=key)
+            mean1=np.mean(patch1[BZind[key][1]:BZind[key][0],:])
+            mean2=np.mean(patch2[BZind[key][1]:BZind[key][0],:])
+            print("mean1,mean2",mean1,mean2)
      
     axscor.grid(linewidth=0.2)
     axscor.set_ylim(PCldlow,PCldhigh)

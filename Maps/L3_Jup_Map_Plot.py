@@ -1,7 +1,8 @@
 def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
                         Smoothing=False,LatLims=[45,135],LonRng=45,
                         CMpref='subobs',LonSys='2',showbands=False,
-                        coef=[0.,0.],subproj='',figxy=[8.0,4.0],FiveMicron=False):
+                        coef=[0.,0.],subproj='',figxy=[8.0,4.0],FiveMicron=False,
+                        ROI=False):
     """
     Created on Sun Nov  6 16:47:21 2022
     
@@ -123,7 +124,9 @@ def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
                                                        showbands,FiveMicron,figxy,
                                                        "jet",pathmapplots,Level='L3',
                                                        suptitle="Ammonia Mole Fraction",
-                                                       cbar_title="Ammonia Mole Fraction (ppm)")
+                                                       cbar_title="Ammonia Mole Fraction (ppm)",
+                                                       ROI=ROI)
+    
 
     ###########################################################################
     ## Just RGB and Cloud Pressure
@@ -137,7 +140,8 @@ def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
                                                         "jet",pathmapplots,Level='L3',
                                                         suptitle="Cloud Top Pressure",
                                                         cbar_rev=True,
-                                                        cbar_title="Cloud Top Pressure (mb)")
+                                                        cbar_title="Cloud Top Pressure (mb)",
+                                                        ROI=ROI)
 
     ###########################################################################
     ## Just RGB and 5 micron
@@ -155,14 +159,15 @@ def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
 
    
     ###########################################################################
-    ## Compute Scatter Plot (PCloud vs fNH3)
+    ## Compute Band or ROI Scatter Plot (PCloud vs fNH3)
     ###########################################################################
-    mas.map_and_scatter(fNH3_patch_mb,PCld_patch,PClddata,fNH3hdr,LonSys,
-                        LatLims,NH3LonLims,LonRng,PCldPlotCM,fnNH3,
-                        coef[0],tx_fNH3,fNH3low,fNH3high,PCldlow,PCldhigh,
-                        figxy,"gray_r",pathmapplots,"PCloud & fNH3 (contours)",
-                        "PCloud vs fNH3",Level='L3',cbar_rev=True,cbar_title="Cloud-top Pressure (mb)",
-                        axis_inv=True)
+    dateobs,roilabel,mean1,stdv1,mean2,stdv2=\
+        mas.map_and_scatter(fNH3_patch_mb,PCld_patch,PClddata,fNH3hdr,LonSys,
+        LatLims,NH3LonLims,LonRng,PCldPlotCM,fnNH3,
+        coef[0],tx_fNH3,fNH3low,fNH3high,PCldlow,PCldhigh,
+        figxy,"gray_r",pathmapplots,"PCloud & fNH3 (contours)",
+        "PCloud vs fNH3",Level='L3',cbar_rev=True,cbar_title="Cloud-top Pressure (mb)",
+        axis_inv=True,ROI=ROI)
     
     ###########################################################################
     ## Compute Scatter Plot (PCloud vs 5um radiance)
@@ -188,6 +193,7 @@ def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
                         axis_inv=True,cbar_title="Log10(5um radiance)")
    
     #return(fig1,axs1,fig2,axs2,fig3,axs3)
+    return(dateobs,roilabel,mean1,stdv1,mean2,stdv2)
 
 
 def load_png(file_path):

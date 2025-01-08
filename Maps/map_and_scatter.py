@@ -10,7 +10,7 @@ def map_and_scatter(patchx,patchy,mapydata,mapyhdr,LonSys,
                     coef,txin,xlow,xhigh,ylow,yhigh,figxy,
                     ct,pathout,Ltitle,Rtitle,Level='L3',FiveMicron=False,
                     cbar_rev=False,swap_xy=False,axis_inv=False,cbar_title="Test",
-                    suptitle="Test"):
+                    suptitle="Test",ROI=False):
     import sys
     drive='c:'
     sys.path.append(drive+'/Astronomy/Python Play')
@@ -30,6 +30,7 @@ def map_and_scatter(patchx,patchy,mapydata,mapyhdr,LonSys,
     import make_patch_RGB as MPRGB
     import copy
     import plot_map_scatter as pms
+    import plot_roi_scatter as prs
 
     ###########################################################################
     ## Compute Scatter Plot (PCloud vs fNH3)
@@ -76,14 +77,25 @@ def map_and_scatter(patchx,patchy,mapydata,mapyhdr,LonSys,
     elif Level=='L3':
         fnout=fnout.replace('fNH3',Rtitle)
     print(patchx.shape,patchy.shape)
-    if swap_xy:
+    
+    if swap_xy and not ROI:
         BZ=pms.plot_map_scatter(patchx,patchy,PlotCM,
                  LatLims,axs3[1],xlow,xhigh,ylow,yhigh,FiveMicron,axis_inv=axis_inv)
-    else:     
+    if not swap_xy and not ROI:     
         BZ=pms.plot_map_scatter(patchy,patchx,PlotCM,
                  LatLims,axs3[1],ylow,yhigh,xlow,xhigh,FiveMicron,axis_inv=axis_inv)
+        
+    if swap_xy and ROI:
+        print("Calling ROI")
+        roilabel,mean1,stdv1,mean2,stdv2=prs.plot_roi_scatter(patchx,patchy,PlotCM,
+                 LatLims,LonLims,axs3[1],xlow,xhigh,ylow,yhigh,FiveMicron,axis_inv=axis_inv,ROI=ROI)
+    if not swap_xy and ROI:    
+        print("Calling ROI")
+        roilabel,mean1,stdv1,mean2,stdv2=prs.plot_roi_scatter(patchy,patchx,PlotCM,
+                 LatLims,LonLims,axs3[1],ylow,yhigh,xlow,xhigh,FiveMicron,axis_inv=axis_inv,ROI=ROI)
+        
+        
     axs3[1].tick_params(axis='both', which='major', labelsize=9)
-    
     axs3[1].set_title(Rtitle,fontsize=10)
     
     if "PCloud" in Rtitle and "5um" in Rtitle:
@@ -99,51 +111,53 @@ def map_and_scatter(patchx,patchy,mapydata,mapyhdr,LonSys,
         axs3[1].set_ylabel("Ammonia Opacity",fontsize=10)        
         axs3[1].set_xlabel("5um Radiance (Log10(arb. units)",fontsize=10)        
         
-
-
-    BZind=copy.deepcopy(BZ)   
-    BZkeys=BZ.keys()
-    BZind=copy.deepcopy(BZ)   
-    BZkeys=BZ.keys()
-    #patch1=patch1*1000.
-
-    #figcor,axscor=pl.subplots(1,1,figsize=(6.0,4.), dpi=150, facecolor="white",
-    #                    sharey=True,sharex=True)          
-
-    clrind=0
-    for key in BZ.keys():
-        print(key,BZ[key],[90,90]-np.array(BZ[key]),LatLims)
-        BZind[key][0]=1.-((90-BZ[key][0])-LatLims[0])/(LatLims[1]-LatLims[0])
-        BZind[key][1]=1.-((90-BZ[key][1])-LatLims[0])/(LatLims[1]-LatLims[0])
-        print(key,BZind[key])
-            
-        #print(key,BZ[key],[90,90]-np.array(BZ[key]),LatLims)
-        clr='C'+str(clrind)
-        print(clr)
-        if BZind[key][0]>1.0 or BZind[key][1]<0.0:
-            print("do nothing")
-        else:
-            axs3[0].axvspan(360-LonLims[0],360-LonLims[0]-1,
-                            ymin=BZind[key][1],ymax=BZind[key][0],alpha=1.0,
-                            color=clr)
-            axs3[0].axvspan(360-LonLims[1],360-LonLims[1]+1,
-                            ymin=BZind[key][1],ymax=BZind[key][0],alpha=1.0,
-                            color=clr)
-            
-            clrind=clrind+1
-                        #ymin=BZ[key][0],ymax=BZ[key][1],alpha=0.5)
-            #axscor.scatter(patch2[BZind[key][1]:BZind[key][0],:],
-            #               patch1[BZind[key][1]:BZind[key][0],:],
-            #               marker="o",s=1.0,
-            #               alpha=0.8,label=key)
-
+    if ROI:
+        for R in ROI:
+            axs3[0].plot(np.array([ROI[R][2]+ROI[R][3],ROI[R][2]-ROI[R][3],
+                          ROI[R][2]-ROI[R][3],ROI[R][2]+ROI[R][3],
+                          ROI[R][2]+ROI[R][3]]),
+                          90.-np.array([ROI[R][0],ROI[R][0],ROI[R][1],
+                          ROI[R][1],ROI[R][0]]))
+    else:
+        BZind=copy.deepcopy(BZ)   
+        BZkeys=BZ.keys()
+        BZind=copy.deepcopy(BZ)   
+        BZkeys=BZ.keys()
+        #patch1=patch1*1000.
     
-    #trans = axs3[1].get_yaxis_transform()
-    #ax.annotate('Neonatal', xy=(1, -.1), xycoords=trans, ha="center", va="top")
-    #axs3[1].plot([170,170],[0,15], color="r", transform=trans, clip_on=False)
+        #figcor,axscor=pl.subplots(1,1,figsize=(6.0,4.), dpi=150, facecolor="white",
+        #                    sharey=True,sharex=True)          
+    
+        clrind=0
+        for key in BZ.keys():
+            #print(key,BZ[key],[90,90]-np.array(BZ[key]),LatLims)
+            #######################################################################
+            # Compute the axis fraction and plot vertical bars using axvspan
+            BZind[key][0]=1.-((90-BZ[key][0])-LatLims[0])/(LatLims[1]-LatLims[0])
+            BZind[key][1]=1.-((90-BZ[key][1])-LatLims[0])/(LatLims[1]-LatLims[0])
+            #print(key,BZind[key])
+                
+            #print(key,BZ[key],[90,90]-np.array(BZ[key]),LatLims)
+            clr='C'+str(clrind)
+            #print(clr)
+            if BZind[key][0]>1.0 or BZind[key][1]<0.0:
+                print("do nothing")
+            else:
+                axs3[0].axvspan(360-LonLims[0],360-LonLims[0]-1,
+                                ymin=BZind[key][1],ymax=BZind[key][0],alpha=1.0,
+                                color=clr)
+                axs3[0].axvspan(360-LonLims[1],360-LonLims[1]+1,
+                                ymin=BZind[key][1],ymax=BZind[key][0],alpha=1.0,
+                                color=clr)
+                
+                clrind=clrind+1
 
     box = axs3[1].get_position()
     axs3[1].set_position([box.x0+0.03, box.y0-0.01, box.width * 0.5, box.height * 1.015])    
     fig3.subplots_adjust(left=0.12, right=0.97, top=0.83, bottom=0.18, 
                          wspace=0.4)
     fig3.savefig(pathout+fnout,dpi=300)
+    
+    dateobs=mapyhdr["DATE-OBS"]
+
+    return(dateobs,roilabel,mean1,stdv1,mean2,stdv2)

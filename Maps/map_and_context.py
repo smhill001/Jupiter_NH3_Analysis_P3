@@ -7,7 +7,8 @@ Created on Wed Nov 20 07:06:19 2024
 
 def map_and_context(mapdata,maphdr,RGB,RGBtime,LonSys,LatLims,LonLims,LonRng,PlotCM,
                     amfdata,coef,low,high,showbands,FiveMicron,figxy,ct,pathout,
-                    Level='L3',suptitle="Test",cbar_rev=False,cbar_title="Test"):
+                    Level='L3',suptitle="Test",cbar_rev=False,cbar_title="Test",
+                    ROI=False):
     import sys
     drive='c:'
     sys.path.append(drive+'/Astronomy/Python Play')
@@ -57,7 +58,7 @@ def map_and_context(mapdata,maphdr,RGB,RGBtime,LonSys,LatLims,LonLims,LonRng,Plo
     
     temp=RL.make_contours_CH4_patch(axs1[0],fNH3_patch_mb,LatLims,LonLims,
                            lvls=tx_fNH3,frmt='%3.0f',clr='k')
-    
+        
     if maphdr["TELESCOP"]=="NASA IRTF":
         axs1[0].set_title("IRTF 5um Radiance (Log10(arb. units))",fontsize=10)
     else:
@@ -81,6 +82,16 @@ def map_and_context(mapdata,maphdr,RGB,RGBtime,LonSys,LatLims,LonLims,LonRng,Plo
                        aspect="equal")
     temp=RL.make_contours_CH4_patch(axs1[1],fNH3_patch_mb,LatLims,LonLims,
                            tx_fNH3,frmt='%3.0f',clr='k')
+
+    if ROI:
+        for R in ROI:
+            for iax in range(0,2):
+                axs1[iax].plot(np.array([ROI[R][2]+ROI[R][3],ROI[R][2]-ROI[R][3],
+                              ROI[R][2]-ROI[R][3],ROI[R][2]+ROI[R][3],
+                              ROI[R][2]+ROI[R][3]]),
+                              90.-np.array([ROI[R][0],ROI[R][0],ROI[R][1],
+                              ROI[R][1],ROI[R][0]]))
+
     box = axs1[1].get_position()
     
     belt={"SSTB":[-39.6,-36.2],

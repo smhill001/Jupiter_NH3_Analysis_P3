@@ -197,7 +197,8 @@ def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     SCT22={'Lats':LatsSCT22,'Pro':OutProSCT22,'Std':OutStdSCT22,'Amf':OutamfSCT22}
     VLT22={'Lats':LatsVLT22,'Pro':OutProVLT22,'Std':OutStdVLT22,'Amf':OutamfVLT22}
     SCT23={'Lats':LatsSCT23,'Pro':OutProSCT23,'Std':OutStdSCT23,'Amf':OutamfSCT23}
+    SCT24={'Lats':LatsSCT24,'Pro':OutProSCT24,'Std':OutStdSCT24,'Amf':OutamfSCT24}
 
     #return(figavgprof,axsavgprof)
    
-    return(SCT22,VLT22,SCT23)
+    return(SCT22,VLT22,SCT23,SCT24)#,figavgprof,axsavgprof)

@@ -1,5 +1,7 @@
 def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2',
-                      FiveMicron=False,Five_obskey='',IRTFdataset='',LonLims=[0,360]):
+                      FiveMicron=False,Five_obskey='',IRTFdataset='',
+                      lats=[60,120],LonLims=[0,360],figsz=[8.0,6.0],ROI=False,
+                      variance=False,proj='maps'):
     """
     Created on Wed Dec 20 21:02:31 2023
 
@@ -79,8 +81,8 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2
         print("**********TestfNH3.shape=",TestfNH3.shape)
         
         #lats=[30,150]
-        lats=[60,120]
-        lats=[75,95]
+        #lats=[60,120]
+        #lats=[75,95]
         #ll_0=360-lonlims[obskey][0]
         #ll_1=360-lonlims[obskey][1]
         if LonSys=='1':
@@ -126,14 +128,20 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2
         
     ###########################################################################
     # Flatten cubes by taking the mean and ignoring zero values
+    #!!!  ADD VARIANCE BELOW!!!
+    #!!!  WRITE FITS FILES OF MEAN AND STANDARD DEVIATIONS OF FULL MAPS!!!!
     ###########################################################################
     print(stackfNH3.shape)
     indzf=np.where(stackfNH3==0)
     stackfNH3[indzf]=np.nan
     blendfNH3=np.nanmean(stackfNH3,axis=2)
+    stdvfNH3=np.nanstd(stackfNH3,axis=2)
+    
     indzP=np.where(stackPCloud==0)
     stackPCloud[indzP]=np.nan
     blendPCloud=np.nanmean(stackPCloud,axis=2)
+    stdvPCloud=np.nanstd(stackPCloud,axis=2)
+
     print(blendfNH3.shape)
 
     #6x6 works for 60N-60Z and 360 long
@@ -142,10 +150,10 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2
         rng=[0,1,2,3]
     else:
         rng=[0,1,2]
-    fig1,axs1=pl.subplots(rng[-1]+1,1,figsize=(8.0,6), dpi=150, facecolor="white",
+    fig1,axs1=pl.subplots(rng[-1]+1,1,figsize=(figsz[0],figsz[1]), dpi=150, facecolor="white",
                           sharex=True,sharey=True)
-    fig1.suptitle(collection)
-
+    fig1.suptitle(collection+"\n Average")
+    
     for ix in rng:
         axs1[ix].grid(linewidth=0.2)
         axs1[ix].ylim=[-30.,30.]
@@ -156,22 +164,56 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2
         axs1[ix].set_yticks(np.linspace(-30,30,7), minor=False)
         axs1[ix].tick_params(axis='both', which='major', labelsize=7)
         axs1[ix].set_ylabel("PG Latitude (deg)")
-
         axs1[ix].set_adjustable('box') 
 
     print("###############")
     print([360-LonLims[1],360-LonLims[0]])
     fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(blendfNH3,lats,[360-LonLims[1],360-LonLims[0]],
                                      180,180,"jet",
-                                     axs1[0],'%3.2f',cont=False,n=11,vn=60,vx=160)
+                                     axs1[0],'%3.2f',cont=False,n=11,vn=60,vx=160,
+                                     cbar_title="")
     print("vn,vx,tx_fNH3",vn,vx,tx_fNH3)
     axs1[0].set_title('fNH3 (ppm)',fontsize=10)
 
     PCld_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(blendPCloud,lats,[360-LonLims[1],360-LonLims[0]],
                                      180,180,"jet",
-                                     axs1[1],'%3.2f',cont=False,n=5,vn=600,vx=1000)
+                                     axs1[1],'%3.2f',cont=False,n=5,vn=600,vx=1000,
+                                     cbar_title="")
     axs1[1].set_title('PCloud (mbar)',fontsize=10)
     RGBaxs=2
+
+    ###########################################################################
+    if variance:
+        fig2,axs2=pl.subplots(rng[-1]+1,1,figsize=(figsz[0],figsz[1]), dpi=150, facecolor="white",
+                              sharex=True,sharey=True)
+        fig2.suptitle(collection+"\n Standard Deviation")
+        
+        for ix in rng:
+            axs2[ix].grid(linewidth=0.2)
+            axs2[ix].ylim=[-30.,30.]
+            axs2[ix].xlim=[0.,360.]
+            axs2[ix].set_xticks(np.linspace(450.,0.,31), minor=False)
+            xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
+            axs2[ix].set_xticklabels(xticklabels.astype(int))
+            axs2[ix].set_yticks(np.linspace(-30,30,7), minor=False)
+            axs2[ix].tick_params(axis='both', which='major', labelsize=7)
+            axs2[ix].set_ylabel("PG Latitude (deg)")
+            axs2[ix].set_adjustable('box') 
+    
+        print("###############")
+        print([360-LonLims[1],360-LonLims[0]])
+        fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(stdvfNH3,lats,[360-LonLims[1],360-LonLims[0]],
+                                         180,180,"jet",
+                                         axs2[0],'%3.2f',cont=False,n=11,vn=0,vx=20,
+                                         cbar_title="")
+        print("vn,vx,tx_fNH3",vn,vx,tx_fNH3)
+        axs2[0].set_title('fNH3 (ppm)',fontsize=10)
+    
+        PCld_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(stdvPCloud,lats,[360-LonLims[1],360-LonLims[0]],
+                                         180,180,"jet",
+                                         axs2[1],'%3.2f',cont=False,n=5,vn=0,vx=50,
+                                         cbar_title="")
+        axs2[1].set_title('PCloud (mbar)',fontsize=10)
 
     ###########################################################################
     # READ 5um png file and display patch. Also can be used for other
@@ -225,7 +267,7 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2
 
             #lats=[30,150]
             #lats=[60,120]
-            lats=[75,95]
+            #lats=[75,95]
             #ll_0=360-lonlims[obskey][0]
             #ll_1=360-lonlims[obskey][1]
             if LonSys=='1':
@@ -270,32 +312,57 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2
         IRTF_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(np.log10(blendIRTF),lats,[360-LonLims[1],360-LonLims[0]],
                                          180,180,"gist_heat",
                                          axs1[2],'%3.2f',cont=False,n=5,vn=1,vx=3.0)
+        
+    ###########################################################################
+    # Done with IRTF branch, now, finally, do the RGB context image
+    ###########################################################################
 
-
-    RGB_patch=MPRGB.make_patch_RGB(outputRGB,lats,[140,340],180,180)
+    print("########################",np.max(outputRGB))
+    RGB_patch=MPRGB.make_patch_RGB(outputRGB,lats,[360-LonLims[1],360-LonLims[0]],180,180)
     RGB4Display=np.power(np.array(RGB_patch).astype(float),1.0)
-    RGB4Display=RGB4Display/RGB4Display.max()
+    print("##################",RGB4Display.max())
+    #RGB4Display=RGB4Display/RGB4Display.max()
     show=axs1[RGBaxs].imshow(RGB4Display,
                extent=[LonLims[1],LonLims[0],90-lats[1],
                        90-lats[0]],
                        aspect="equal")
+    axs1[RGBaxs].set_title('RGB Context',fontsize=10)
+
+    if variance:
+        show=axs2[RGBaxs].imshow(RGB4Display,
+                   extent=[LonLims[1],LonLims[0],90-lats[1],
+                           90-lats[0]],
+                           aspect="equal")
+        axs2[RGBaxs].set_title('RGB Context',fontsize=10)
+
     #temp=RL.make_contours_CH4_patch(axs1[2],outputfNH3,[30.,150.],[0.,360.],
     #                       tx_fNH3,frmt='%3.0f',clr='k')
     axs1[RGBaxs].tick_params(axis='both', which='major', labelsize=7)
     axs1[RGBaxs].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=9)
     axs1[RGBaxs].set_ylabel("PG Latitude (deg)")
 
-    box = axs1[RGBaxs].get_position()
+    box1 = axs1[RGBaxs].get_position()
+    box2 = axs2[RGBaxs].get_position()
     
     #works for 6x6 and 60N-60S and 360 long
-    fig1.subplots_adjust(left=0.10, bottom=0.05, right=0.90, top=0.93,
-                wspace=0.25, hspace=0.05)     
-    axs1[RGBaxs].set_position([box.x0-0.075, box.y0-0.04, box.width * 1.11, box.height * 1.11])
+    #fig1.subplots_adjust(left=0.10, bottom=0.05, right=0.90, top=0.93,
+    #            wspace=0.25, hspace=0.05)     
+    #axs1[RGBaxs].set_position([box.x0-0.075, box.y0-0.04, box.width * 1.11, box.height * 1.11])
 
     #works for 8x5 and 30N-30S and 360 long
-    fig1.subplots_adjust(left=0.07, bottom=0.06, right=0.94, top=0.92,
-                wspace=0.25, hspace=0.08)     
-    axs1[RGBaxs].set_position([box.x0-0.055, box.y0-0.04, box.width * 1.07, box.height * 1.07])
+    #fig1.subplots_adjust(left=0.07, bottom=0.06, right=0.94, top=0.92,
+    #            wspace=0.25, hspace=0.08)     
+    #axs1[RGBaxs].set_position([box.x0-0.055, box.y0-0.04, box.width * 1.07, box.height * 1.07])
+
+    #works for 3x6 and square aspect ratio
+    fig1.subplots_adjust(left=0.0, bottom=0.10, right=0.82, top=0.88,
+                wspace=0.0, hspace=0.2)     
+    axs1[RGBaxs].set_position([box1.x0+0.0, box1.y0-0.02, box1.width * 1.02, box1.height * 1.02])
+
+    fig2.subplots_adjust(left=0.0, bottom=0.10, right=0.82, top=0.88,
+                wspace=0.0, hspace=0.2)     
+    axs2[RGBaxs].set_position([box1.x0+0.0, box1.y0-0.02, box1.width * 1.02, box1.height * 1.02])
+
 
     if FiveMicron=='png':
         
@@ -313,8 +380,27 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2
         box3 = axs1[3].get_position()
         axs1[3].set_position([box3.x0-0.01, box3.y0-0.0, box3.width * 1.025, box3.height * 1.07])
 
-    pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/maps/"
-    fig1.savefig(pathmapplots+collection+"Sys"+LonSys+" map.png",dpi=300)
+    if ROI:
+        for R in ROI:
+            for iax in range(0,3):
+                axs1[iax].plot(np.array([ROI[R][2]+ROI[R][3],ROI[R][2]-ROI[R][3],
+                              ROI[R][2]-ROI[R][3],ROI[R][2]+ROI[R][3],
+                              ROI[R][2]+ROI[R][3]]),
+                              90.-np.array([ROI[R][0],ROI[R][0],ROI[R][1],
+                              ROI[R][1],ROI[R][0]]))
+    if variance and ROI:
+        for R in ROI:
+            for iax in range(0,3):
+                axs2[iax].plot(np.array([ROI[R][2]+ROI[R][3],ROI[R][2]-ROI[R][3],
+                              ROI[R][2]-ROI[R][3],ROI[R][2]+ROI[R][3],
+                              ROI[R][2]+ROI[R][3]]),
+                              90.-np.array([ROI[R][0],ROI[R][0],ROI[R][1],
+                              ROI[R][1],ROI[R][0]]))
+
+
+    pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/"+proj+"/"
+    fig1.savefig(pathmapplots+collection+" Mean Sys"+LonSys+" map.png",dpi=300)
+    fig2.savefig(pathmapplots+collection+" Stdv Sys"+LonSys+" map.png",dpi=300)
     
     
     ###########################################################################
@@ -322,7 +408,7 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2
     ###########################################################################
     if axNH3!=False:
         #lats=[100,120]
-        lats=[80,100]
+        #lats=[80,100]
         fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(blendfNH3,lats,[0,360],
                                          180,180,"jet",
                                          axNH3,'%3.2f',cbarplot=False,cont=False,n=11,vn=50,vx=150)
@@ -352,4 +438,5 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20230815-20230818",LonSys='2
         axRGB.yaxis.set_label_coords(-0.05,0.15)
         axRGB.tick_params('x', labelsize=8)
 
-    return(lats)
+    return(lats,blendPCloud,blendfNH3,outputRGB)
+    #return(fig1,axs1)
