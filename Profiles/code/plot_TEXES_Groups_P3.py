@@ -174,7 +174,7 @@ def plot_profile_L2(ax1,ax2,ax3,ax4,reference,ProfileHalfWidth=45.,LatPlotLims=[
     ###########################################################################
     sourcefiles=GOL.get_obs_list()
     DataSets=GBL.get_batch_lists()
-    pth="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/"
+    pth="C:/Astronomy/Projects/SAS 2021 Ammonia/Data/L2 FITS/"
 
     ###########################################################################
     # Set linear fit for conversion of transmission to equivalent width
@@ -375,7 +375,7 @@ def plot_profile_L3(ax1,ax2,ax3,ax4,reference,ProfileHalfWidth=45.,LatPlotLims=[
     ###########################################################################
     sourcefiles=GOL.get_obs_list()
     DataSets=GBL.get_batch_lists()
-    pth="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/"
+    pth="C:/Astronomy/Projects/SAS 2021 Ammonia/Data/L3 FITS/"
 
     if param=="PCld":
         paramkey='CH4file'
@@ -461,10 +461,10 @@ def plot_profile_L3(ax1,ax2,ax3,ax4,reference,ProfileHalfWidth=45.,LatPlotLims=[
         ax4.set_xlabel("Longitude from CM (deg)",fontsize=10)
 
     if param=="PCld":
-        ax3.set_ylim(0,1100)
+        ax3.set_ylim(1200,2200)
         ax3.set_ylabel("Effective Cloud-Top Pressure (mb)",fontsize=10)
         ax3.invert_yaxis()
-        ax4.set_ylim(0,1100)
+        ax4.set_ylim(1200,2200)
         ax4.set_ylabel("Effective Cloud-Top Pressure (mb)",fontsize=10)
         ax4.invert_yaxis()
     elif param=="fNH3":
@@ -504,7 +504,7 @@ def plot_profile_L3(ax1,ax2,ax3,ax4,reference,ProfileHalfWidth=45.,LatPlotLims=[
             label=reference.replace('CMOS','SCT')+' (Avg. '+str(Num)+')')  
 
     ax1.fill_between(Lats, OutPro-OutStd, OutPro+OutStd,
-                    color=clr,alpha=.1)
+                    color=clr,alpha=.05)
     ax2.scatter(Outamf,OutPro,s=5,label=reference+' (Avg. '+str(Num)+')')
 
 

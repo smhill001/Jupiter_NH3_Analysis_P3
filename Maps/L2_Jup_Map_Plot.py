@@ -65,7 +65,7 @@ def L2_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
                                                 imagetype="Map",Level="L2",
                                                 target=target,FiveMicron=FiveMicron)
                     
-    pathmapplots='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 Plots/'+subproj+'/'
+    pathmapplots='C:/Astronomy/Projects/SAS 2021 Ammonia/Data/L3 Plots/'+subproj+'/'
     if not os.path.exists(pathmapplots):
         os.makedirs(pathmapplots)
     ###########################################################################

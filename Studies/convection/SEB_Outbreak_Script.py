@@ -1,4 +1,4 @@
-def SEB_Outbreak_Script(collection="20241129-20241129"):
+def SEB_Outbreak_Script(collection="20241129-20241129 SEB OB",ctbls=["terrain_r","Blues"]):
 
     import sys
     drive='c:'
@@ -18,6 +18,21 @@ def SEB_Outbreak_Script(collection="20241129-20241129"):
     import get_map_collection as gmc
     import MakeContiguousMap as MCM
     
+    if ctbls[0]=="jet":
+        fNH3low=60
+        fNH3high=160
+        PCldlow=1200
+        PCldhigh=2000
+    if ctbls[0]=="terrain_r":
+        fNH3low=60
+        fNH3high=160
+        PCldlow=1600
+        PCldhigh=2200
+        
+    micronlow=0.5
+    micronhigh=3.5
+
+    
     obslist,dummy=gmc.get_map_collection(collection)
     
     if collection=="20241115-20241115":
@@ -28,26 +43,43 @@ def SEB_Outbreak_Script(collection="20241129-20241129"):
              "SEB Ref2":[100,108,311,2.0],
              "STrZ Ref":[111,115,323.0,3.0]}     
         obslist=["20241115UTa","20241115UTb","20241115UTc","20241115UTd","20241115UTe"]
+        CM=[322]
 
-    if collection=="20241129-20241129":
+    if collection=="20241129-20241129 SEB OB":
         ROI={"CORE":[102,105,323.0,2.0],
              "NE Plume":[98,101,320.0,2.0],
              "SW Plume":[104,107,329.0,2.0],
              "SEB Ref1":[102,104,334,2.0],
              "SEB Ref2":[100,108,311,2.0],
              "STrZ Ref":[111,115,323.0,3.0]}
-        obslist=["20241129UTv","20241129UTw","20241129UTx","20241129UTy","20241129UTz"]
+        obslist=["20241129UTg","20241129UTh","20241129UTi",
+                 "20241129UTj","20241129UTk","20241129UTl","20241129UTm"]
+        CM=[322]
+    
+    if collection=="20241202-20241202 SEB OB":
+        ROI={"CORE":[102,105,326.0,2.0],
+             "NE Plume":[101,104,318.0,2.0],
+             "SW Plume":[106,109,333.0,2.0],
+             "SEB Ref1":[102,104,336,2.0],
+             "SEB Ref2":[100,108,312,2.0],
+             "STrZ Ref":[111,115,326.0,3.0]}
+        obslist=["20241202UTc","20241202UTd","20241202UTe","20241202UTf",
+                 "20241202UTg","20241202UTh"]
+        CM=[325]
     
     tempfNH3=np.zeros([180,360])
     tempPCloud=np.zeros([180,360])
     
     First=True
+    coefs=[0.75,0.45]
+    #coefs=[0.0,0.0]
     for o in obslist:
         dateobs,roilabel,mean1,stdv1,mean2,stdv2=\
             L3JMP.L3_Jup_Map_Plot(obskey=o,imagetype='Map',target="Jupiter",
                         Smoothing=False,LatLims=[90,120],LonRng=15,CMpref=323,
-                        LonSys='2',showbands=False,coef=[0.75,0.45],
-                        subproj='convection',figxy=[8.0,4.0],FiveMicron=False,ROI=ROI)
+                        LonSys='2',showbands=False,coef=coefs,
+                        subproj='convection',figxy=[8.0,4.0],FiveMicron=False,ROI=ROI,
+                        ctbls=["terrain_r","Blues"])
             
         print("*********",dateobs,roilabel,mean1,stdv1,mean2,stdv2)
         if First:
@@ -156,22 +188,22 @@ def SEB_Outbreak_Script(collection="20241129-20241129"):
     
     
     axs[0].grid(linewidth=0.2)
-    axs[0].set_ylim(600,1100)
+    axs[0].set_ylim(PCldlow,PCldhigh)
     #axs[0].set_xlim(0,5)
     axs[0].invert_yaxis()
     
     axs[1].grid(linewidth=0.2)
-    axs[1].set_ylim(60,160)
+    axs[1].set_ylim(fNH3low,fNH3high)
     #axs[1].set_xlim(0,5)
     
     axs1[0].grid(linewidth=0.2)
-    axs1[0].set_ylim(600,1100)
-    axs1[0].set_xlim(60,160)
+    axs1[0].set_ylim(PCldlow,PCldhigh)
+    axs1[0].set_xlim(fNH3low,fNH3high)
     axs1[0].invert_yaxis()
     
     axs1[1].grid(linewidth=0.2)
-    axs1[1].set_ylim(600,1100)
-    axs1[1].set_xlim(60,160)
+    axs1[1].set_ylim(PCldlow,PCldhigh)
+    axs1[1].set_xlim(fNH3low,fNH3high)
     axs1[1].invert_yaxis()
     
     #box = axs3[1].get_position()
@@ -189,5 +221,6 @@ def SEB_Outbreak_Script(collection="20241129-20241129"):
     ###############################################################################
     
     MCM.MakeContiguousMap(False,False,False,collection=collection,LonSys='2',
-                          FiveMicron=False,lats=[90,120],LonLims=[307,337],
-                          figsz=[3.0,6.0],ROI=ROI,variance=True,proj="convection")
+                          FiveMicron=False,lats=[90,120],LonLims=[CM[0]-15,CM[0]+15],
+                          figsz=[3.0,6.0],ROI=ROI,variance=True,proj="convection",
+                          ctbls=["terrain_r","Blues"])

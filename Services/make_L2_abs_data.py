@@ -140,7 +140,7 @@ def make_l2_abs_data(obsdate="20240925UTa",target="Jupiter",imagetype='Img',
    ###########################################################################
     # SET UP FILE PATH AND NAMES
     ###########################################################################
-    pathout='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/'
+    pathout='C:/Astronomy/Projects/SAS 2021 Ammonia/Data/L2 FITS/'
     #fn=NH3file[0:26]+'L2CLSL'+imagetype
     #print("fn=",fn)
     """try:

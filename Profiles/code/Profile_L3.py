@@ -28,7 +28,7 @@ def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     
     path="/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Profiles/output/"
        
-    figavgprof,axsavgprof=pl.subplots(1,1,figsize=(6.0,6.0), dpi=150, facecolor="white")
+    figavgprof,axsavgprof=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white")
     figspg,axsspg=pl.subplots(2,2,figsize=(8.0,6.0), dpi=150,
                                     sharex=True,sharey=True,facecolor="white")
 
@@ -38,17 +38,17 @@ def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
    
     LatsSCT22,OutProSCT22,OutStdSCT22,OutamfSCT22=PTG.plot_profile_L3(axsavgprof,axsamf,axsspg[0,0],axsamfspg[0,0],Batch0,ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
-                        profile=profile,clr='k',width=1.5,param=param,smooth=smooth)
+                        profile=profile,clr='k',width=1.,param=param,smooth=smooth)
     LatsVLT22,OutProVLT22,OutStdVLT22,OutamfVLT22=PTG.plot_profile_L3(axsavgprof,axsamf,axsspg[0,1],axsamfspg[0,1],"2022 VLTMUSE",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
-                        profile=profile,clr='k',width=1.5,param=param,smooth=smooth,
+                        profile=profile,clr='k',width=0.5,param=param,smooth=smooth,
                         style='dashed')
-    LatsSCT23,OutProSCT23,OutStdSCT23,OutamfSCT23=PTG.plot_profile_L3(axsavgprof,axsamf,axsspg[1,0],axsamfspg[1,1],Batch1,ProfileHalfWidth=ProfileHalfWidth,
+    LatsSCT23,OutProSCT23,OutStdSCT23,OutamfSCT23=PTG.plot_profile_L3(axsavgprof,axsamf,axsspg[1,0],axsamfspg[1,0],Batch1,ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
-                        profile=profile,clr='r',width=1.5,param=param,smooth=smooth)
-    LatsSCT24,OutProSCT24,OutStdSCT24,OutamfSCT24=PTG.plot_profile_L3(axsavgprof,axsamf,axsspg[1,0],axsamfspg[1,1],"2024 CMOS",ProfileHalfWidth=ProfileHalfWidth,
+                        profile=profile,clr='C0',width=2.5,param=param,smooth=smooth)
+    LatsSCT24,OutProSCT24,OutStdSCT24,OutamfSCT24=PTG.plot_profile_L3(axsavgprof,axsamf,axsspg[1,1],axsamfspg[1,1],"2024 CMOS",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
-                        profile=profile,clr='C3',width=1.5,param=param,smooth=smooth)
+                        profile=profile,clr='C1',width=2.5,param=param,smooth=smooth)
     if inset==True and param=="fNH3" and profile=="Meridional":
         plevel=0.752910
         PTG.plot_TEXES_Groups(axsavgprof,clr='C2',prs=plevel,mult=1.0e6)
@@ -93,33 +93,33 @@ def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
 
     if param=="PCld":
         axsavgprof.set_title("Effective Cloud-Top Pressure Profiles")
-        axsavgprof.set_ylim(0.,1200.)
+        axsavgprof.set_ylim(1200.,2200.)
         axsavgprof.set_ylabel("Effective Cloud-Top Pressure (mb)",fontsize=10)
         axsamf.set_title("Effective Cloud-Top Pressure Profiles")
-        axsamf.set_ylim(0.,1200.)
+        axsamf.set_ylim(1200.,2200.)
         axsamf.set_ylabel("Effective Cloud-Top Pressure (mb)",fontsize=10)
         #axsavgprof.set_yticks(np.linspace(400,1100,8), minor=False)
-        yb=1090
-        yz=1040
+        yb=2180
+        yz=2140
         axsavgprof.invert_yaxis()
         axsamf.invert_yaxis()
     elif param=="fNH3":
         axsavgprof.set_title("Column-Integrated Ammonia Abundance Profiles")
-        axsavgprof.set_ylim(0.,300.)
+        axsavgprof.set_ylim(0.,200.)
         axsavgprof.set_ylabel("Column-Integrated Ammonia Abundance (ppm)",fontsize=10)
-        axsavgprof.set_yticks(np.linspace(0,300,7), minor=False)
+        axsavgprof.set_yticks(np.linspace(0,200.,9), minor=False)
         axsamf.set_title("Column-Integrated Ammonia Abundance Profiles")
-        axsamf.set_ylim(0.,300.)
+        axsamf.set_ylim(0.,200.)
         axsamf.set_ylabel("Column-Integrated Ammonia Abundance (ppm)",fontsize=10)
-        axsamf.set_yticks(np.linspace(0,300,7), minor=False)
-        yb=1
-        yz=10
+        axsamf.set_yticks(np.linspace(0,200,9), minor=False)
+        yb=2
+        yz=15
         
     if profile=="Meridional":
         for zb in belt:
             print(zb,belt[zb])
             axsavgprof.fill_between([belt[zb][0],belt[zb][1]],np.array([0.,0.]),
-                                    np.array([2000.,2000.]),color="0.5",alpha=0.2)
+                                    np.array([5000.,5000.]),color="0.5",alpha=0.2)
             axsavgprof.annotate(zb,xy=[np.mean(belt[zb]),yb],ha="center")
         for zb in zone:
             axsavgprof.annotate(zb,xy=[np.mean(zone[zb]),yz],ha="center")
@@ -143,13 +143,13 @@ def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     
     figresid,axsresid=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white")
     proresid=OutProSCT23-OutProSCT22
-    axsresid.plot(LatsVLT22,proresid,label=Batch1+' - '+Batch0)
+    axsresid.plot(LatsVLT22,proresid,label="2023 SCT minus 2022 SCT",linewidth=2.5)
     stdresid=np.sqrt(OutStdSCT22**2+OutStdSCT23**2)
     axsresid.fill_between(LatsVLT22,proresid-stdresid,proresid+stdresid,
                           color='C0',alpha=.1)
     
     proresid=OutProSCT24-OutProSCT23
-    axsresid.plot(LatsSCT23,proresid,label="2024 CMOS minus 2023 CMOS")
+    axsresid.plot(LatsSCT23,proresid,label="2024 SCT minus 2023 SCT",linewidth=2.5)
     stdresid=np.sqrt(OutStdSCT23**2+OutStdSCT24**2)
     axsresid.fill_between(LatsSCT23,proresid-stdresid,proresid+stdresid,
                           color='C1',alpha=.1)
@@ -167,12 +167,12 @@ def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
 
     if param=="PCld":
         axsresid.set_title("Change in Cloud Top Pressure")
-        axsresid.set_ylim(-100.,100.)
+        axsresid.set_ylim(-250.,250.)
         axsresid.set_ylabel("Effective Cloud Top Pressure (mb)",fontsize=10)
-        axsresid.set_yticks(np.linspace(-100,100,11), minor=False)
+        axsresid.set_yticks(np.linspace(-250,250,11), minor=False)
         axsresid.invert_yaxis()
-        yb=99
-        yz=89
+        yb=245
+        yz=225
         annotate_sign=1
     elif param=="fNH3":
         axsresid.set_title("Change in Ammonia Abundance")
@@ -185,8 +185,8 @@ def Profile_L3(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     if profile=="Meridional":
         for zb in belt:
             print(zb,belt[zb])
-            axsresid.fill_between([belt[zb][0],belt[zb][1]],np.array([-2000.,-2000.]),
-                                    np.array([2000.,2000.]),color="0.5",alpha=0.2)
+            axsresid.fill_between([belt[zb][0],belt[zb][1]],np.array([-5000.,-5000.]),
+                                    np.array([5000.,5000.]),color="0.5",alpha=0.2)
             axsresid.annotate(zb,xy=[np.mean(belt[zb]),yb],ha="center")
         for zb in zone:
             axsresid.annotate(zb,xy=[np.mean(zone[zb]),yz],ha="center")

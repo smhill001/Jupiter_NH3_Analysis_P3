@@ -60,11 +60,11 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
     if Level=="L2":
         CH4suffix="-"+target+"_"+imagetype+"_L2TCH4"
         NH3suffix="-"+target+"_"+imagetype+"_L2TNH3"
-        pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/'
+        pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Data/L2 FITS/'
     elif Level=="L3":
         CH4suffix="-"+target+"_"+imagetype+"_L3PCld_S0"
         NH3suffix="-"+target+"_"+imagetype+"_L3fNH3_S0"
-        pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/'
+        pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Data/L3 FITS/'
     #!!! I think this may be where the option for reading a 5um FITS files should be
 
     # try-except logic for when variation files existed. Hasn't been run 

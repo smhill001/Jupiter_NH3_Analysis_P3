@@ -31,13 +31,17 @@ def make_L3_env_data(obsdate="20240925UTa",target="Jupiter",
     sys.path.append('./Services')
     import get_obs_list as getlist
     import get_WINJupos_ephem as WJ_ephem
+    import gravity as g
 
     ###########################################################################
     #  SET NECESSARY CONSTANTS
     ###########################################################################
     amagat=2.69e24 #Lodschmits number. (cm-2) This is really km-amagat
     #gravity=2228.0 #cm/s^2
-    gravity=2479.0 #cm/s^2
+    if imagetype=="Img":
+        gravity=2479.0 #cm/s^2
+    elif imagetype=="Map":
+        gravity=g.gravity()
     mean_mol_wt=3.85e-24 #gm/molecule, which is 2.22 gm/mole
     fCH4=2.04e-3#1.81e-3
     STP=1.01e6  #dyne/cm^2 [(g-cm/s^2)/cm^2]`
@@ -55,8 +59,8 @@ def make_L3_env_data(obsdate="20240925UTa",target="Jupiter",
     # OPEN AND READ DATA FILES (FITS MAPS of NH3 and CH4 Transmission)
     ###########################################################################   
     pathRGB='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+obsdate[0:10]+'/'
-    pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/'
-    pathout='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/'
+    pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Data/L2 FITS/'
+    pathout='C:/Astronomy/Projects/SAS 2021 Ammonia/Data/L3 FITS/'
 
     ###########################################################################
     # CH4 Transmission File name and read
@@ -215,8 +219,9 @@ def make_L3_env_data(obsdate="20240925UTa",target="Jupiter",
             fn=file[0:18]+target+"_"+imagetype+'_L3fNH3'
             Range=[0.,200] #scaled range for PNG file
         elif BUNIT=='Cloud-top Press':
-            dataarray=CH4_Cloud_Press/4.
-            hdu = fits.PrimaryHDU((CH4_Cloud_Press/4.).astype(np.float32))
+            eta=2.
+            dataarray=CH4_Cloud_Press/eta
+            hdu = fits.PrimaryHDU((CH4_Cloud_Press/eta).astype(np.float32))
             comment="mb"
             Real_CM1=CH4_CM1
             Real_CM2=CH4_CM2
@@ -249,7 +254,7 @@ def make_L3_env_data(obsdate="20240925UTa",target="Jupiter",
         hdul[0].header['TRANSPAR']=sourcefiles[sourcedata]['Transparency']
         hdul[0].header['BUNIT']=(BUNIT,comment)
         hdul[0].header['CALIBRA']=(CalModel,'Disk-Integrated Cal Ref')
-        hdul[0].header['VERSION']=('TBD','TBD')
+        hdul[0].header['VERSION']=('1.2','Lat. Dep. Gravity; eta=2 (not 4)')
         hdul[0].header['CTYPE1']=('Sys. 3 Longitude','deg')
         hdul[0].header['CTYPE2']=('PG Latitude','deg')
         

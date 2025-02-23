@@ -12,7 +12,7 @@ def BatchMapsScript_P3(reference,Level='plots',imagetype="Map",LonSys='3'):
     import make_L2_abs_data as make_L2
     import make_L3_env_data as make_L3
     import get_batch_lists as GBL
-    import Map_Jup_Atm_P3 as MapJup
+    import L3_Jup_Map_Plot as L3M
     import time
     import image_array_new as IA
 
@@ -69,7 +69,7 @@ def BatchMapsScript_P3(reference,Level='plots',imagetype="Map",LonSys='3'):
             #coefs=[0.,0.]
             coefs=[0.65,0.25]
             if imagetype=="Map":
-                MapJup.Map_Jup_Atm_P3(obskey=dataset,imagetype='Map',
+                L3M.L3_Jup_Map_Plot(obskey=dataset,imagetype='Map',
                                            Smoothing=False,LatLims=[45,135],LonRng=45,
                                            CMpref='subobs',LonSys=LonSys,showbands=False,
                                            coef=coefs,subproj='Limb Corrected')

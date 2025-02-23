@@ -19,8 +19,8 @@ def Profile_L3_script(figxy=[6.0,6.0],bands=["STrZ","SEB","SEZ","NEZ","NEB","NTr
 
     fNH3low=60
     fNH3high=140
-    PCldlow=700
-    PCldhigh=1000
+    PCldlow=1400
+    PCldhigh=2000
     micronlow=0.5
     micronhigh=3.5
 
@@ -29,14 +29,14 @@ def Profile_L3_script(figxy=[6.0,6.0],bands=["STrZ","SEB","SEZ","NEZ","NEB","NTr
                                                        ProfileHalfWidth=1,
                                                        LatPlotLims=[45,135],
                                                        ZonePlotHalfWidth=60,
-                                                       smooth=False)
+                                                       smooth=False,inset=False)
     
     NH3SCT22,NH3VLT22,NH3SCT23,NH3SCT24=PL3.Profile_L3(param="fNH3",
                                                        profile="Meridional",
                                                        ProfileHalfWidth=1,
                                                        LatPlotLims=[45,135],
                                                        ZonePlotHalfWidth=60,
-                                                       smooth=False)
+                                                       smooth=False,inset=False)
     
     fig3,axs3=pl.subplots(1,1,figsize=(figxy[0],figxy[1]), dpi=150, facecolor="white")
     fig3.suptitle("Cloud-Top Pressure vs Ammonia Abundance: 2022-2024",
@@ -55,13 +55,13 @@ def Profile_L3_script(figxy=[6.0,6.0],bands=["STrZ","SEB","SEZ","NEZ","NEB","NTr
                      fNH3low,fNH3high,False,bands,colors,marker='s',Level="L3",
                      leg=False,axis_inv=True)
     
-    axs3.scatter(62,710,marker='o',c='k',s=50)
-    axs3.scatter(62,720,marker='^',c='k',s=50)
-    axs3.scatter(62,730,marker='s',c='k',s=50)
+    axs3.scatter(62,1410,marker='o',c='k',s=50)
+    axs3.scatter(62,1440,marker='^',c='k',s=50)
+    axs3.scatter(62,1470,marker='s',c='k',s=50)
     
-    axs3.annotate('2022',xy=(65,710), xycoords='data',xytext=(64,710),fontsize=9,verticalalignment='center_baseline')
-    axs3.annotate('2023',xy=(65,720), xycoords='data',xytext=(64,720),fontsize=9,verticalalignment='center_baseline')
-    axs3.annotate('2024',xy=(65,730), xycoords='data',xytext=(64,730),fontsize=9,verticalalignment='center_baseline')
+    axs3.annotate('2022',xy=(65,1410), xycoords='data',xytext=(64,1410),fontsize=9,verticalalignment='center_baseline')
+    axs3.annotate('2023',xy=(65,1440), xycoords='data',xytext=(64,1440),fontsize=9,verticalalignment='center_baseline')
+    axs3.annotate('2024',xy=(65,1470), xycoords='data',xytext=(64,1470),fontsize=9,verticalalignment='center_baseline')
     path="/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Profiles/output/"
 
 

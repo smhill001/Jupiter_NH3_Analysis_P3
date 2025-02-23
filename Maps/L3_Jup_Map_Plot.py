@@ -2,7 +2,7 @@ def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
                         Smoothing=False,LatLims=[45,135],LonRng=45,
                         CMpref='subobs',LonSys='2',showbands=False,
                         coef=[0.,0.],subproj='',figxy=[8.0,4.0],FiveMicron=False,
-                        ROI=False):
+                        ROI=False,ctbls=["terrain_r","Blues"]):
     """
     Created on Sun Nov  6 16:47:21 2022
     
@@ -48,13 +48,20 @@ def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
     import map_and_context as mac
     import map_and_scatter as mas
 
-    fNH3low=60
-    fNH3high=160
-    PCldlow=600
-    PCldhigh=1100
+    if ctbls[0]=="jet":
+        fNH3low=60
+        fNH3high=160
+        PCldlow=1200
+        PCldhigh=2000
+    if ctbls[0]=="terrain_r":
+        fNH3low=60
+        fNH3high=160
+        PCldlow=1600
+        PCldhigh=2200
+        
     micronlow=0.5
     micronhigh=3.5
-    
+
     if (not FiveMicron) or FiveMicron=="png":
         PCldhdr,PClddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM,RGBtime= \
                         RFM.read_fits_map_L2_L3(obskey=obskey,LonSys=LonSys,
@@ -66,7 +73,7 @@ def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
                                                 imagetype="Map",Level="L3",
                                                 target=target,FiveMicron=FiveMicron)
                     
-    pathmapplots='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 Plots/'+subproj+'/'
+    pathmapplots='C:/Astronomy/Projects/SAS 2021 Ammonia/Data/L3 Plots/'+subproj+'/'
     if not os.path.exists(pathmapplots):
         os.makedirs(pathmapplots)
     ###########################################################################
@@ -122,7 +129,7 @@ def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
                                                        LonRng,fNH3PlotCM,
                                                        amfdata,coef[0],fNH3low,fNH3high,
                                                        showbands,FiveMicron,figxy,
-                                                       "jet",pathmapplots,Level='L3',
+                                                       ctbls[0],pathmapplots,Level='L3',
                                                        suptitle="Ammonia Mole Fraction",
                                                        cbar_title="Ammonia Mole Fraction (ppm)",
                                                        ROI=ROI)
@@ -137,7 +144,7 @@ def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
                                                         LonRng,PCldPlotCM,
                                                         amfdata,coef[1],PCldlow,PCldhigh,
                                                         showbands,FiveMicron,figxy,
-                                                        "jet",pathmapplots,Level='L3',
+                                                        ctbls[1],pathmapplots,Level='L3',
                                                         suptitle="Cloud Top Pressure",
                                                         cbar_rev=True,
                                                         cbar_title="Cloud Top Pressure (mb)",

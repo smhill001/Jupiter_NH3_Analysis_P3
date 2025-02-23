@@ -14,6 +14,8 @@ def make_patch(Map,LatLims,LonLims,CM2deg,LonRng,pad=True):
              shows the left boundary at zero, which is of course, also 360.
     """
     import numpy as np
+    print("**************")
+    print(LatLims[0],LatLims[1],LonLims[0],LonLims[1])
     patch=np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]:LonLims[1]])
     if CM2deg<LonRng:
         print("******************  CM2deg<LonRng")

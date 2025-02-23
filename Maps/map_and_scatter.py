@@ -160,4 +160,6 @@ def map_and_scatter(patchx,patchy,mapydata,mapyhdr,LonSys,
     
     dateobs=mapyhdr["DATE-OBS"]
 
+    if not ROI:
+        roilabel,mean1,stdv1,mean2,stdv2=False,False,False,False,False
     return(dateobs,roilabel,mean1,stdv1,mean2,stdv2)

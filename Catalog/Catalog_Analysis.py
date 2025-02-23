@@ -104,7 +104,7 @@ def Catalog_Analysis(writecsv=False,writejson=False,plothist=False):
         axs[2].step(bincenters, histCM3)
         axs[2].set_title("System 3 Longitude")
         axs[2].set_xlabel("Longitude (deg)")       
-        fig.suptitle("Distribution of Observations 2022-23")
+        fig.suptitle("Distribution of Observations 2022-25")
         
         filename="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Catalog/Catalog_Hist.png"
         fig.savefig(filename,dpi=300)

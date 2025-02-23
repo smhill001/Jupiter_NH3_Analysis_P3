@@ -90,8 +90,8 @@ def image_array_new(obsdate="20240925UTa",target="Jupiter",
     # OPEN AND READ DATA FILES (FITS MAPS of NH3 and CH4 Transmission)
     ###########################################################################   
     pathRGB='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+obsdate[0:10]+'/'
-    pathL2='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L2 FITS/'
-    pathL3='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/L3 FITS/'
+    pathL2='C:/Astronomy/Projects/SAS 2021 Ammonia/Data/L2 FITS/'
+    pathL3='C:/Astronomy/Projects/SAS 2021 Ammonia/Data/L3 FITS/'
 
     ###########################################################################
     # CH4 Transmission File name and read
@@ -260,7 +260,7 @@ def image_array_new(obsdate="20240925UTa",target="Jupiter",
     cbar.ax.set_yticklabels(np.around(txlb,3))
     cbar.ax.tick_params(labelsize=6,colors='1.0')
     
-    pathout='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/Img Plots Diagnostic/'
+    pathout='C:/Astronomy/Projects/SAS 2021 Ammonia/Data/Img Plots Diagnostic/'
 
     fnout=obsdate
     #imwrite(pathout+fnout+'.png', scl_arr)#.astype(np.uint16))
