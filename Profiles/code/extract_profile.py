@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 def extract_profile(pth,filename,LonCtr='CM',ProfileHalfWidth=45.,
-                    profile="Meridional"):
+                    profile="Meridional",colat=90):
     """
     Created on Mon Jul 31 19:54:53 2023
     
@@ -54,7 +54,7 @@ def extract_profile(pth,filename,LonCtr='CM',ProfileHalfWidth=45.,
     
     if profile=="Zonal":
         LonLims=[360-int(CM3+180),360-int(CM3-180)]
-        LatLims=[90-ProfileHalfWidth,90+ProfileHalfWidth]
+        LatLims=[colat-ProfileHalfWidth,colat+ProfileHalfWidth]
         patch=RL.make_patch(mapdata,LatLims,LonLims,CM3,180,pad=True)
         print("LonLims=",LonLims)
         print("patch.shape=",patch.shape)
@@ -69,4 +69,4 @@ def extract_profile(pth,filename,LonCtr='CM',ProfileHalfWidth=45.,
 
     print("AvgProfile.shape,Coords.shape=",AvgProf.shape,Coords.shape)
 
-    return(Coords,AvgProf,StdProf,CM3,amfAvgProf)
+    return(Coords,AvgProf,StdProf,CM3,amfAvgProf,patch,amfpatch)

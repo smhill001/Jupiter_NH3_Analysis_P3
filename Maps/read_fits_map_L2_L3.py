@@ -125,7 +125,7 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
 
 
     if LonSys=='1':
-        print("LonSys1=",LonSys)
+        #print("LonSys1=",LonSys)
         if imagetype=="Map":
             RGBroll=RGB_CM2-RGB_CM1
             RGB=np.roll(RGB,int(RGBroll),axis=1)
@@ -134,6 +134,7 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
         fNH3datar=np.roll(fNH3data,int(NH3roll),axis=1)
         
         CH4roll=CH4_CM3-CH4_CM1
+        #print("CH4roll=",CH4roll)
         PClouddatar=np.roll(PClouddata,int(CH4roll),axis=1)
         
         if FiveMicron=="fits":
@@ -150,12 +151,12 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
         #Real_CM=NH3_CM1
 
     if LonSys=='2':
-        print("In LonSys==2")
+        #print("In LonSys==2")
         NH3roll=NH3_CM3-NH3_CM2
         fNH3datar=np.roll(fNH3data,int(NH3roll),axis=1)
         
         CH4roll=CH4_CM3-CH4_CM2
-        print("&&&&&&&&&& CH4roll=",CH4roll)
+        #print("&&&&&&&&&& CH4roll=",CH4roll)
         PClouddatar=np.roll(PClouddata,int(CH4roll),axis=1)
 
         if FiveMicron=="fits":
@@ -194,6 +195,7 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
     #axsamf[2].imshow(fNH3eza,vmin=-5.0,vmax=5.0)
     
     if FiveMicron==False or FiveMicron=="png":
+        print(PClouddatar.shape)
         return(PCloudhdr,PClouddatar,
                fNH3hdr,fNH3datar,
                fNH3szar,fNH3ezar,

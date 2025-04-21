@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['Services\\get_obs_list.py', 'Maps\\get_map_collection.py', 'Maps\\L3_Jup_Map_Plot.py', 'Services\\pipe_one_obs.py', 'Maps\\MakeContiguousMap.py', 'Maps\\continuousmapscript.py']
+recent_files = ['Services\\get_obs_list.py', 'Maps\\get_map_collection.py', 'Services\\get_batch_lists.py', 'Services\\pipe_one_obs.py', 'Maps\\MakeContiguousMap.py', 'Services\\wind_in_all_systems.py', 'Maps\\find_extrema.py', 'Maps\\continuousmapscript.py', 'Studies\\NEZ\\NEDF_ROI_Script.py']
 
 [main]
 version = 0.2.0

@@ -1,6 +1,22 @@
 def Profile_L2_script(figxy=[6.0,6.0],bands=["STrZ","SEB","SEZ","NEZ","NEB","NTrZ"],
                       colors=["C0","C1","C2","C3","C4","C5"]):
+    """
+    
 
+    Parameters
+    ----------
+    figxy : TYPE, optional
+        DESCRIPTION. The default is [6.0,6.0].
+    bands : TYPE, optional
+        DESCRIPTION. The default is ["STrZ","SEB","SEZ","NEZ","NEB","NTrZ"].
+    colors : TYPE, optional
+        DESCRIPTION. The default is ["C0","C1","C2","C3","C4","C5"].
+
+    Returns
+    -------
+    None.
+
+    """
     import sys
     drive='c:'
     sys.path.append(drive+'/Astronomy/Python Play')

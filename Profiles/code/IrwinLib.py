@@ -107,7 +107,7 @@ def make_fit_plot(NH3Amf_in,NH3Pro_in,CH4Amf_in,CH4Pro_in,Level,fig,ax,path):
     fityCH4=power(CH4Amf,CH4param[0],CH4param[1])
     tempR=np.corrcoef(CH4pro_clip,fityCH4) 
     CH4R2=tempR[0,1]**2
-    
+
     ax[0].plot(CH4Amf,fityCH4,label="Fit R2="+str(CH4R2)[0:4])
     #ax[0].scatter(CH4Amf_in,CH4Pro_in,label="CH4",s=5,alpha=0.5)
     ax[0].scatter(CH4Amf,CH4pro_clip,label="CH4 clip",color='k',s=0.5)
@@ -131,9 +131,10 @@ def make_fit_plot(NH3Amf_in,NH3Pro_in,CH4Amf_in,CH4Pro_in,Level,fig,ax,path):
         ax[0].set_yticks(np.linspace(0.0,2.0,5), minor=False)
         ax[0].set_ylabel("Equivalent Width (nm)",fontsize=10)
     if Level=="L3":
-        ax[0].set_ylim(0.0,1200.0)
-        ax[0].set_yticks(np.linspace(0.0,1200,7), minor=False)
-        ax[0].set_ylabel("PCloud (mb) and fNH3 (ppm)",fontsize=10)
+        ax[0].set_ylim(0.0,2400.0)
+        ax[0].set_yticks(np.linspace(0.0,2400,7), minor=False)
+        ax[0].set_ylabel("PCloud (mb) & fNH3 (ppm)",fontsize=10)
+      
     ax[0].grid(linewidth=0.2)
     ax[0].legend(loc="best",fontsize=7,ncol=3)
     
@@ -168,7 +169,7 @@ def make_fit_plot(NH3Amf_in,NH3Pro_in,CH4Amf_in,CH4Pro_in,Level,fig,ax,path):
         ax[1].set_yticks(np.linspace(0.0,6.0,7), minor=False)
     if Level=="L3":
         ax[1].set_ylabel("PCld/fNH3 Ratio",fontsize=10)
-        ax[1].set_ylim(0.0,12.0)
+        ax[1].set_ylim(0.0,24.0)
         ax[1].set_yticks(np.linspace(0.0,12.0,7), minor=False)
     ax[1].grid(linewidth=0.2)
     ax[1].legend(loc="best",fontsize=7,ncol=1)

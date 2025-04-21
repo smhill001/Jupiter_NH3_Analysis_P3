@@ -24,15 +24,15 @@ path="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
 ###############################################################################
 # COMPUTE NH3 AND CH4 ABSORPTION (USUALLY ZONAL) PROFILES ACROSS ALL DATA
 ###############################################################################
-SCT20NH3,SCT21NH3,SCT22NH3,VLT22NH3,SCT23NH3,VLT23NH3=PFL2.Profile_L2(band="NH3",profile=prof,
-                                                      ProfileHalfWidth=1, 
+SCT20NH3,SCT21NH3,SCT22NH3,VLT22NH3,SCT23NH3,VLT23NH3,SCT24NH3=PFL2.Profile_L2(band="NH3",profile=prof,
+                                                      ProfileHalfWidth=2, 
                                                       LatPlotLims=[30,150],
-                                                      ZonePlotHalfWidth=90,
+                                                      ZonePlotHalfWidth=60,
                                                       smooth=False)
-SCT22CH4,VLT22CH4,SCT23CH4,VLT23CH4=PFL2.Profile_L2(band="CH4",profile=prof,
-                                                      ProfileHalfWidth=1,
+SCT22CH4,VLT22CH4,SCT23CH4,VLT23CH4,SCT24CH4=PFL2.Profile_L2(band="CH4",profile=prof,
+                                                      ProfileHalfWidth=2,
                                                       LatPlotLims=[30,150],
-                                                      ZonePlotHalfWidth=90,
+                                                      ZonePlotHalfWidth=60,
                                                       smooth=False)
 
 ###############################################################################
@@ -74,6 +74,29 @@ SCT23NH3param, SCT23NH3param_cov,SCT23NH3R2,SCT23CH4param, SCT23CH4param_cov,SCT
                      SCT23CH4['Pro'],"L2",figamfSCT23,axsamfSCT23,path)
 SCT23fig.savefig(path+"Profiles/output/IrwinFig9SCT23.png",dpi=300)
 
+###############################################################################
+###############################################################################
+# VLT23: SET UP PLOTS
+###############################################################################
+figamfVLT23,axsamfVLT23=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white")
+figamfVLT23.suptitle("VLT23 Absorption")
+
+VLT23NH3param, VLT23NH3param_cov,VLT23NH3R2,VLT23CH4param, VLT23CH4param_cov,VLT23CH4R2,VLT23RatioR2,VLT23fig=\
+    IL.make_fit_plot(VLT23NH3['Amf'],VLT23NH3['Pro'],VLT23CH4['Amf'],
+                     VLT23CH4['Pro'],"L2",figamfVLT23,axsamfVLT23,path)
+VLT23fig.savefig(path+"Profiles/output/IrwinFig9VLT23.png",dpi=300)
+
+###############################################################################
+# SCT24: SET UP PLOTS
+###############################################################################
+figamfSCT24,axsamfSCT24=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white")
+figamfSCT24.suptitle("SCT24 Absorption")
+
+SCT24NH3param, SCT24NH3param_cov,SCT24NH3R2,SCT24CH4param, SCT24CH4param_cov,SCT24CH4R2,SCT24RatioR2,SCT24fig=\
+    IL.make_fit_plot(SCT24NH3['Amf'],SCT24NH3['Pro'],SCT24CH4['Amf'],
+                     SCT24CH4['Pro'],"L2",figamfSCT24,axsamfSCT24,path)
+SCT24fig.savefig(path+"Profiles/output/IrwinFig9SCT24.png",dpi=300)
+
 
 print()
 print("######################################################################")
@@ -101,25 +124,40 @@ L2fitdata.write(tmp)
 
 tmp="VLT,2022,NH3,"+"{:.4f}".format(VLT22NH3param[0])+","+"{:.3f}".format(VLT22NH3param[1])+","+"{:.3f}".format(VLT22NH3R2)+"\n"
 L2fitdata.write(tmp)
+tmp="VLT,2023,NH3,"+"{:.4f}".format(VLT23NH3param[0])+","+"{:.3f}".format(VLT23NH3param[1])+","+"{:.3f}".format(VLT23NH3R2)+"\n"
+L2fitdata.write(tmp)
+tmp="VLT,2022,CH4,"+"{:.4f}".format(VLT22CH4param[0])+","+"{:.3f}".format(VLT22CH4param[1])+","+"{:.3f}".format(VLT22CH4R2)+"\n"
+L2fitdata.write(tmp)
+tmp="VLT,2023,CH4,"+"{:.4f}".format(VLT23CH4param[0])+","+"{:.3f}".format(VLT23CH4param[1])+","+"{:.3f}".format(VLT23CH4R2)+"\n"
+L2fitdata.write(tmp)
+tmp="VLT,2022,CH4/NH3,"+"{:.4f}".format(VLT22CH4param[0]/VLT22NH3param[0])+","+\
+    "{:.3f}".format(VLT22NH3param[1]-VLT22CH4param[1])+","+"{:.3f}".format(VLT22RatioR2)+"\n"
+L2fitdata.write(tmp)
+tmp="VLT,2023,CH4/NH3,"+"{:.4f}".format(VLT23CH4param[0]/VLT23NH3param[0])+","+\
+    "{:.3f}".format(VLT23NH3param[1]-VLT23CH4param[1])+","+"{:.3f}".format(VLT23RatioR2)+"\n"
+L2fitdata.write(tmp)
+
 tmp="SCT,2022,NH3,"+"{:.4f}".format(SCT22NH3param[0])+","+"{:.3f}".format(SCT22NH3param[1])+","+"{:.3f}".format(SCT22NH3R2)+"\n"
 L2fitdata.write(tmp)
 tmp="SCT,2023,NH3,"+"{:.4f}".format(SCT23NH3param[0])+","+"{:.3f}".format(SCT23NH3param[1])+","+"{:.3f}".format(SCT23NH3R2)+"\n"
 L2fitdata.write(tmp)
-tmp="VLT,2022,CH4,"+"{:.4f}".format(VLT22CH4param[0])+","+"{:.3f}".format(VLT22CH4param[1])+","+"{:.3f}".format(VLT22CH4R2)+"\n"
+tmp="SCT,2024,NH3,"+"{:.4f}".format(SCT24NH3param[0])+","+"{:.3f}".format(SCT24NH3param[1])+","+"{:.3f}".format(SCT24NH3R2)+"\n"
 L2fitdata.write(tmp)
 tmp="SCT,2022,CH4,"+"{:.4f}".format(SCT22CH4param[0])+","+"{:.3f}".format(SCT22CH4param[1])+","+"{:.3f}".format(SCT22CH4R2)+"\n"
 L2fitdata.write(tmp)
 tmp="SCT,2023,CH4,"+"{:.4f}".format(SCT23CH4param[0])+","+"{:.3f}".format(SCT23CH4param[1])+","+"{:.3f}".format(SCT23CH4R2)+"\n"
 L2fitdata.write(tmp)
-
-tmp="VLT,2022,CH4/NH3,"+"{:.4f}".format(VLT22CH4param[0]/VLT22NH3param[0])+","+\
-    "{:.3f}".format(VLT22NH3param[1]-VLT22CH4param[1])+","+"{:.3f}".format(VLT22RatioR2)+"\n"
+tmp="SCT,2024,CH4,"+"{:.4f}".format(SCT24CH4param[0])+","+"{:.3f}".format(SCT24CH4param[1])+","+"{:.3f}".format(SCT24CH4R2)+"\n"
 L2fitdata.write(tmp)
+
 tmp="SCT,2022,CH4/NH3,"+"{:.4f}".format(SCT22CH4param[0]/SCT22NH3param[0])+","+\
     "{:.3f}".format(SCT22NH3param[1]-SCT22CH4param[1])+","+"{:.3f}".format(SCT22RatioR2)+"\n"
 L2fitdata.write(tmp)
 tmp="SCT,2023,CH4/NH3,"+"{:.4f}".format(SCT23CH4param[0]/SCT23NH3param[0])+","+\
     "{:.3f}".format(SCT23NH3param[1]-SCT23CH4param[1])+","+"{:.3f}".format(SCT23RatioR2)+"\n"
+L2fitdata.write(tmp)
+tmp="SCT,2024,CH4/NH3,"+"{:.4f}".format(SCT24CH4param[0]/SCT24NH3param[0])+","+\
+    "{:.3f}".format(SCT24NH3param[1]-SCT24CH4param[1])+","+"{:.3f}".format(SCT24RatioR2)+"\n"
 L2fitdata.write(tmp)
 
 

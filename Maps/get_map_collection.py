@@ -811,6 +811,122 @@ def get_map_collection(collection):
         
         lonlims={'20241129UTg':[292,352]}
 
+    elif collection=="20241231-20241231":
+        dataset={'20241231UTa',
+                 '20241231UTb',
+                 #'20241231UTc',  #Bad Gradient and some striping
+                 '20241231UTd'}
+        
+        lonlims={'20241129UTg':[292,352]}
+
+    elif collection=="20250106-20250106":
+        dataset={#'20250106UTa', #Gradient issue
+                 #'20250106UTb', #some gradient, and maybe an artifact over GRS (at least in IGB)
+                 '20250106UTc',
+                 '20250106UTd',
+                 '20250106UTe', #FF artifact?
+                 '20250106UTf', 
+                 '20250106UTg', #some gradient
+                 '20250106UTh',
+                 '20250106UTi', #a little offset time with the NH3 images, but seems okay
+                 '20250106UTj'}#, #FF artifacts (2x)
+                 #'20250106UTk',
+                 #'20250106UTl',
+                 #'20250106UTm',
+                 #'20250106UTn',
+                 #'20250106UTo',
+                 #'20250106UTp',
+                 #'20250106UTq',
+                 #'20250106UTr',
+                 #'20250106UTs',
+                 #'20250106UTt'}
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTh':[292,352],
+                 '20241129UTi':[292,352],
+                 '20241129UTj':[292,352],
+                 '20241129UTk':[292,352]}
+
+    elif collection=="20250117-20250117":
+        dataset={#'20250117UTa',
+                 '20250117UTb',
+                 '20250117UTc',
+                 '20250117UTd',
+                 '20250117UTe',
+                 '20250117UTf',
+                 '20250117UTg',
+                 '20250117UTh',
+                 '20250117UTi',
+                 '20250117UTj',
+                 '20250117UTk',
+                 #'20250117UTl',
+                 '20250117UTm',
+                 '20250117UTn',
+                 '20250117UTo',
+                 '20250117UTp',
+                 '20250117UTq',
+                 '20250117UTr',
+                 '20250117UTs',
+                 '20250117UTt'}
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTh':[292,352],
+                 '20241129UTi':[292,352],
+                 '20241129UTj':[292,352],
+                 '20241129UTk':[292,352]}
+
+    elif collection=="20250127-20250127":
+        dataset={'20250127UTa',
+                 '20250127UTb',
+                 '20250127UTc',
+                 '20250127UTd',
+                 '20250127UTe',
+                 '20250127UTf',
+                 '20250127UTg',
+                 '20250127UTh',
+                 '20250127UTi',
+                 '20250127UTj',
+                 '20250127UTk', #bad alignment?
+                 '20250127UTl',
+                 '20250127UTm', #bad alignement
+                 '20250127UTn',
+                 '20250127UTo',  #Looks like really bad alignment
+                 '20250127UTp'}
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTh':[292,352],
+                 '20241129UTi':[292,352],
+                 '20241129UTj':[292,352],
+                 '20241129UTk':[292,352]}
+
+    elif collection=="20250128-20250128":
+        dataset={'20250128UTa',
+                 '20250128UTb',
+                 '20250128UTc',
+                 '20250128UTd',
+                 '20250128UTe',
+                 '20250128UTf',
+                 '20250128UTg',
+                 '20250128UTh',
+                 '20250128UTi',
+                 '20250128UTj',
+                 '20250128UTk',
+                 '20250128UTl',
+                 '20250128UTm',
+                 '20250128UTn',
+                 '20250128UTo',
+                 '20250128UTp',
+                 '20250128UTq',
+                 #'20250128UTr',
+                 '20250128UTrFltBkg',
+                 '20250128UTs'}
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTh':[292,352],
+                 '20241129UTi':[292,352],
+                 '20241129UTj':[292,352],
+                 '20241129UTk':[292,352]}
+
     elif collection=="20250129-20250129":
         dataset={#'20250129UTa',
                  '20250129UTb',
@@ -838,7 +954,24 @@ def get_map_collection(collection):
                  '20241129UTj':[292,352],
                  '20241129UTk':[292,352]}
 
+    elif collection=="20250302-20250302":
+        dataset={'20250302UTa',
+                 '20250302UTb',
+                 #'20250302UTc',# #very poor focus
+                 '20250302UTd',
+                 '20250302UTe',
+                 '20250302UTf',
+                 '20250302UTg',
+                 '20250302UTh',# #very strong NH3 gradient
+                 '20250302UTi'}
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTh':[292,352],
+                 '20241129UTi':[292,352],
+                 '20241129UTj':[292,352],
+                 '20241129UTk':[292,352]}
 
 
+    print("collection=",collection)
 
     return(dataset,lonlims)

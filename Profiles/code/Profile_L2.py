@@ -27,11 +27,11 @@ def Profile_L2(band="NH3",profile="Meridional",ProfileHalfWidth=45,
     path="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
        
     figavgprof,axsavgprof=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white")
-    figspg,axsspg=pl.subplots(2,3,figsize=(12.0,6.0), dpi=150,
+    figspg,axsspg=pl.subplots(3,3,figsize=(8.0,6.0), dpi=150,
                                     sharex=True,sharey=True,facecolor="white")
     #figavgprof.suptitle=("Test")
     figamf,axsamf=pl.subplots(1,1,figsize=(6.0,4.0), dpi=150, facecolor="white")
-    figamfspg,axsamfspg=pl.subplots(2,3,figsize=(12.0,6.0), dpi=150,
+    figamfspg,axsamfspg=pl.subplots(3,3,figsize=(8.0,6.0), dpi=150,
                                     sharex=True,sharey=True,facecolor="white")
 
     if band=="NH3" and profile=="Meridional":
@@ -48,16 +48,16 @@ def Profile_L2(band="NH3",profile="Meridional",ProfileHalfWidth=45,
     LatsSCT22,OutProSCT22,OutStdSCT22,OutamfSCT22=PTG.plot_profile_L2(axsavgprof,axsamf,axsspg[0,2],axsamfspg[0,2],"2022 CMOS",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='k',width=1.5,band=band,smooth=smooth)
-    LatsVLT22,OutProVLT22,OutStdVLT22,OutamfVLT22=PTG.plot_profile_L2(axsavgprof,axsamf,axsspg[1,0],axsamfspg[1,0],"2022 VLTMUSE",ProfileHalfWidth=ProfileHalfWidth,
+    LatsVLT22,OutProVLT22,OutStdVLT22,OutamfVLT22=PTG.plot_profile_L2(axsavgprof,axsamf,axsspg[2,0],axsamfspg[2,0],"2022 VLTMUSE",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='k',width=1.5,band=band,style='dashed',smooth=smooth)
-    LatsSCT23,OutProSCT23,OutStdSCT23,OutamfSCT23=PTG.plot_profile_L2(axsavgprof,axsamf,axsspg[1,1],axsamfspg[1,1],"2023 CMOS",ProfileHalfWidth=ProfileHalfWidth,
+    LatsSCT23,OutProSCT23,OutStdSCT23,OutamfSCT23=PTG.plot_profile_L2(axsavgprof,axsamf,axsspg[1,0],axsamfspg[1,0],"2023 CMOS",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='C3',width=1.0,band=band,smooth=smooth)
-    LatsVLT23,OutProVLT23,OutStdVLT23,OutamfVLT23=PTG.plot_profile_L2(axsavgprof,axsamf,axsspg[1,0],axsamfspg[1,0],"2023 VLTMUSE",ProfileHalfWidth=ProfileHalfWidth,
+    LatsVLT23,OutProVLT23,OutStdVLT23,OutamfVLT23=PTG.plot_profile_L2(axsavgprof,axsamf,axsspg[2,1],axsamfspg[2,1],"2023 VLTMUSE",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='C4',width=1.0,band=band,smooth=smooth)
-    LatsSCT24,OutProSCT24,OutStdSCT24,OutamfSCT24=PTG.plot_profile_L2(axsavgprof,axsamf,axsspg[1,0],axsamfspg[1,0],"2024 CMOS",ProfileHalfWidth=ProfileHalfWidth,
+    LatsSCT24,OutProSCT24,OutStdSCT24,OutamfSCT24=PTG.plot_profile_L2(axsavgprof,axsamf,axsspg[1,1],axsamfspg[1,1],"2024 CMOS",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='C5',width=1.0,band=band,smooth=smooth)
     

@@ -27,12 +27,12 @@ path="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
 ###############################################################################
 # COMPUTE fNH3 AND PCloud (USUALLY ZONAL) PROFILES ACROSS ALL DATA
 ###############################################################################
-SCT22NH3,VLT22NH3,SCT23NH3=PFL3.Profile_L3(param="fNH3",profile=prof,
+SCT22NH3,VLT22NH3,SCT23NH3,SCT24NH3=PFL3.Profile_L3(param="fNH3",profile=prof,
                                                       ProfileHalfWidth=1, 
                                                       LatPlotLims=[30,150],
                                                       ZonePlotHalfWidth=60,
                                                       smooth=False)
-SCT22CH4,VLT22CH4,SCT23CH4=PFL3.Profile_L3(param="PCld",profile=prof,
+SCT22CH4,VLT22CH4,SCT23CH4,SCT24CH4=PFL3.Profile_L3(param="PCld",profile=prof,
                                                       ProfileHalfWidth=1,
                                                       LatPlotLims=[30,150],
                                                       ZonePlotHalfWidth=60,
@@ -73,6 +73,17 @@ figamfSCT23.suptitle("SCT23 PCloud and fNH3")
 SCT23NH3param, SCT23NH3param_cov,SCT23NH3R2,SCT23CH4param, SCT23CH4param_cov,SCT23CH4R2,SCT23RatioR2,SCT23fig=\
     IL.make_fit_plot(SCT23NH3['Amf'],SCT23NH3['Pro'],SCT23CH4['Amf'],
                      SCT23CH4['Pro'],"L3",figamfSCT23,axsamfSCT23,path)
+
+###############################################################################
+###############################################################################
+# SCT24: SET UP PLOTS
+###############################################################################
+figamfSCT24,axsamfSCT24=pl.subplots(1,2,figsize=(8.0,4.0), dpi=150, facecolor="white")
+figamfSCT24.suptitle("SCT24 PCloud and fNH3")
+
+SCT24NH3param, SCT24NH3param_cov,SCT24NH3R2,SCT24CH4param, SCT24CH4param_cov,SCT24CH4R2,SCT24RatioR2,SCT24fig=\
+    IL.make_fit_plot(SCT24NH3['Amf'],SCT24NH3['Pro'],SCT24CH4['Amf'],
+                     SCT24CH4['Pro'],"L3",figamfSCT24,axsamfSCT24,path)
 
 print()
 print("######################################################################")

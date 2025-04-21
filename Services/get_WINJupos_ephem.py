@@ -26,7 +26,7 @@ def get_WINJupos_ephem(dateobs,planet="Jupiter"):
     ###########################################################################
     commands = "WINJupos_CM.bat"  
     shell.ShellExecuteEx(lpFile='cmd.exe', lpParameters='/c '+commands)
-    time.sleep(0.5)
+    time.sleep(1.0)
     ephemfile=open("C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/cm.txt",'r')
     Lines=ephemfile.readlines()
     ephemfile.close()

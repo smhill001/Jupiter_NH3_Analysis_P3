@@ -1,4 +1,5 @@
-def NEDF__ROI_Script(collection="20230827-20240301 NEDF",dateformat="%b:%d",ctbls=["terrain_r","Blues"]):
+def NEDF__ROI_Script(collection="20230827-20240301 NEDF",dateformat="%b:%d",
+                     ctbls=["terrain_r","Blues"],close=False):
 
     import sys
     drive='c:'
@@ -154,7 +155,7 @@ def NEDF__ROI_Script(collection="20230827-20240301 NEDF",dateformat="%b:%d",ctbl
     for o in obslist:
         dateobs,roilabel,mean1,stdv1,mean2,stdv2=\
             L3JMP.L3_Jup_Map_Plot(obskey=o,imagetype='Map',target="Jupiter",
-                        Smoothing=False,LatLims=[75,105],LonRng=25,CMpref=CM[0],
+                        Smoothing=False,LatLims=[75,105],LonRng=20,CMpref=CM[0],
                         LonSys='1',showbands=False,coef=coefs,
                         subproj='NEZ',figxy=[8.0,4.0],FiveMicron=False,ROI=ROI,
                         ctbls=ctbls)
@@ -179,6 +180,9 @@ def NEDF__ROI_Script(collection="20230827-20240301 NEDF",dateformat="%b:%d",ctbl
     ###############################################################################
     #
     ###############################################################################
+    if close:
+        pl.close('all')
+
     fig,axs=pl.subplots(1,2,figsize=(8,4), dpi=150, facecolor="white")
     #fig3.suptitle(suptitle,x=0.5,ha='center',color='k')
     fig.suptitle(collection+" ROIs vs Time",x=0.5,ha='center',color='k')
@@ -293,11 +297,16 @@ def NEDF__ROI_Script(collection="20230827-20240301 NEDF",dateformat="%b:%d",ctbl
     fig.savefig(pathout+collection+" ROI Time Series",dpi=300)
     fig1.savefig(pathout+collection+" ROI Scatter",dpi=300)
 
-    
     ###############################################################################
     #!!DO BLENDED MAP SEPARATELY USING MAKECONTIGUOUSMAP.PY
     ###############################################################################
-    
+    print()
+    print("##################")
+    print("collection,[int(CM[0]-45),int(CM[0]+45)]=",collection,[int(CM[0]-45),int(CM[0]+45)])
+    print("##################")
+    print()
+
     MCM.MakeContiguousMap(False,False,False,collection=collection,LonSys='1',
                           FiveMicron=False,lats=[75,105],LonLims=[int(CM[0]-20),int(CM[0]+20)],
-                          figsz=[3.0,6.0],ROI=ROI,variance=True,proj="NEZ",ctbls=['terrain_r','Blues'])
+                          figsz=[3.0,6.0],ROI=ROI,variance=False,localmax=True,
+                          proj="NEZ",ctbls=['terrain_r','Blues'])
