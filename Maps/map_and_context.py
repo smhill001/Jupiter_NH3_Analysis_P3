@@ -1,14 +1,66 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Nov 20 07:06:19 2024
-
-@author: smhil
-"""
-
 def map_and_context(mapdata,maphdr,RGB,RGBtime,LonSys,LatLims,LonLims,LonRng,PlotCM,
                     amfdata,coef,low,high,showbands,FiveMicron,figxy,ct,pathout,
                     Level='L3',suptitle="Test",cbar_rev=False,cbar_title="Test",
                     ROI=False):
+    """
+    PURPOSE:    To create a pair of plots, the right one representing a mapped
+                data set, e.g., ammonia abundance or cloud pressure, and the 
+                right one showing an RGB or IGB context image.
+
+    Parameters
+    ----------
+    mapdata : TYPE
+        DESCRIPTION.
+    maphdr : TYPE
+        DESCRIPTION.
+    RGB : TYPE
+        DESCRIPTION.
+    RGBtime : TYPE
+        DESCRIPTION.
+    LonSys : TYPE
+        DESCRIPTION.
+    LatLims : TYPE
+        DESCRIPTION.
+    LonLims : TYPE
+        DESCRIPTION.
+    LonRng : TYPE
+        DESCRIPTION.
+    PlotCM : TYPE
+        DESCRIPTION.
+    amfdata : TYPE
+        DESCRIPTION.
+    coef : TYPE
+        DESCRIPTION.
+    low : TYPE
+        DESCRIPTION.
+    high : TYPE
+        DESCRIPTION.
+    showbands : TYPE
+        DESCRIPTION.
+    FiveMicron : TYPE
+        DESCRIPTION.
+    figxy : TYPE
+        DESCRIPTION.
+    ct : TYPE
+        DESCRIPTION.
+    pathout : TYPE
+        DESCRIPTION.
+    Level : TYPE, optional
+        DESCRIPTION. The default is 'L3'.
+    suptitle : TYPE, optional
+        DESCRIPTION. The default is "Test".
+    cbar_rev : TYPE, optional
+        DESCRIPTION. The default is False.
+    cbar_title : TYPE, optional
+        DESCRIPTION. The default is "Test".
+    ROI : TYPE, optional
+        DESCRIPTION. The default is False.
+
+    Returns
+    -------
+    None.
+
+    """
     import sys
     drive='c:'
     sys.path.append(drive+'/Astronomy/Python Play')

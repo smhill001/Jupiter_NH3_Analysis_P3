@@ -1,12 +1,42 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Nov 21 07:19:56 2024
-
-@author: smhil
-"""
-
 def plot_map_scatter(patch1,patch2,Real_CM2,LatLims,axscor,PCldlow,PCldhigh,
-                 fNH3low,fNH3high,FiveMicron,axis_inv=False):
+                 fNH3low,fNH3high,FiveMicron,axis_inv=False,Bands=False):
+    """
+    PURPOSE:    Takes two map patches and makes a scatter plot
+    CALLS:      n/a
+    CALLED BY:  map_and_scatter
+
+    Parameters
+    ----------
+    patch1 : TYPE
+        DESCRIPTION.
+    patch2 : TYPE
+        DESCRIPTION.
+    Real_CM2 : TYPE
+        DESCRIPTION.
+    LatLims : TYPE
+        DESCRIPTION.
+    axscor : TYPE
+        DESCRIPTION.
+    PCldlow : TYPE
+        DESCRIPTION.
+    PCldhigh : TYPE
+        DESCRIPTION.
+    fNH3low : TYPE
+        DESCRIPTION.
+    fNH3high : TYPE
+        DESCRIPTION.
+    FiveMicron : TYPE
+        DESCRIPTION.
+    axis_inv : TYPE, optional
+        DESCRIPTION. The default is False.
+    Bands : TYPE, optional
+        DESCRIPTION. The default is False.
+
+    Returns
+    -------
+    None.
+
+    """
     import pylab as pl
     import numpy as np
     import copy
@@ -34,6 +64,11 @@ def plot_map_scatter(patch1,patch2,Real_CM2,LatLims,axscor,PCldlow,PCldhigh,
     ###########################################################################
     # LOOP OVER BELTS AND PLOT SCATTER IN APPROPRIATE COLOR
     ###########################################################################
+    mean1=[]
+    stdv1=[]
+    mean2=[]
+    stdv2=[]
+    keylabel=[]
 
     for key in BZ.keys():
         #print(key,BZ[key],[90,90]-np.array(BZ[key]),LatLims)
@@ -57,8 +92,12 @@ def plot_map_scatter(patch1,patch2,Real_CM2,LatLims,axscor,PCldlow,PCldhigh,
                            patch1[BZind[key][1]:BZind[key][0],:],
                            marker="o",s=3.0,
                            alpha=0.8,label=key)
-            mean1=np.mean(patch1[BZind[key][1]:BZind[key][0],:])
-            mean2=np.mean(patch2[BZind[key][1]:BZind[key][0],:])
+            mean1.append(np.mean(patch1[BZind[key][1]:BZind[key][0],:]))
+            mean2.append(np.mean(patch2[BZind[key][1]:BZind[key][0],:]))
+            stdv1.append(np.std(patch1[BZind[key][1]:BZind[key][0],:]))
+            stdv2.append(np.std(patch2[BZind[key][1]:BZind[key][0],:]))
+            keylabel.append(key)
+
             print("mean1,mean2",mean1,mean2)
      
     axscor.grid(linewidth=0.2)
@@ -74,5 +113,5 @@ def plot_map_scatter(patch1,patch2,Real_CM2,LatLims,axscor,PCldlow,PCldhigh,
                     
     axscor.legend(fontsize=7,ncols=4)
     
-    return(BZ)
+    return(keylabel,mean1,stdv1,mean2,stdv2,BZ)
   

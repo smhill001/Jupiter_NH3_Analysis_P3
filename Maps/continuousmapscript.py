@@ -1,4 +1,4 @@
-def continousmapscript(year='all',LonSys='1',lats=[75,105],LonLims=[0,360],
+def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,360],
                        localmax=False,variance=False):
     """
     Created on Sun Aug 25 15:04:22 2024
@@ -21,11 +21,35 @@ def continousmapscript(year='all',LonSys='1',lats=[75,105],LonLims=[0,360],
               "20231128-20231129","20231206-20231207","20231217-20231218",
               "20231229-20231229","20240129-20240202","20240229-20240301"]
     
-    maps2024=["20241006-20241010","20241027-20241027","20241105-20241105","20241115-20241115",
-              "20241118-20241118","20241128-20241129","20241202-20241203",
-              "20241205-20241205","20250117-20250117","20250127-20250127",
+    maps2024=["20241006-20241010","20241027-20241027","20241105-20241105",
+              "20241115-20241115","20241118-20241118","20241128-20241129",
+              "20241202-20241203","20241205-20241205",#"20241231-20241231",
+              "20250106-20250106","20250117-20250117","20250127-20250127",
               "20250128-20250128","20250129-20250129","20250302-20250302"]
     
+    maps2024GRS=["20241006-20241010","20241027-20241027","20241105-20241105",
+              "20241115-20241115","20241118-20241118","20241128-20241129",
+              "20241202-20241203","20241205-20241205",#"20241231-20241231",
+              "20250106-20250106","20250117-20250117","20250127-20250127",
+              #"20250128-20250128",
+              "20250129-20250129","20250302-20250302"]
+    
+    maps2024SEBOutbreak=["20241105-20241105",
+              "20241115-20241115","20241118-20241118","20241128-20241129",
+              "20241202-20241203","20241205-20241205",#"20241231-20241231",
+              "20250106-20250106","20250117-20250117",#"20250127-20250127",
+              "20250128-20250128","20250129-20250129"]#,"20250302-20250302"]
+    
+    maps2024NTBOutbreak=[
+              "20250106-20250106","20250117-20250117","20250127-20250127",
+              "20250128-20250128","20250129-20250129","20250302-20250302"]
+    
+    maps2024NEZ=["20241105-20241105",
+              "20241115-20241115","20241118-20241118","20241128-20241128","20241129-20241129",
+              "20241202-20241202","20241203-20241203","20241205-20241205",
+              "20250106-20250106","20250117-20250117","20250127-20250127",
+              "20250128-20250128","20250129-20250129","20250302-20250302"]
+
     pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/maps/"
     
     if int(lats[0])<90:
@@ -42,95 +66,64 @@ def continousmapscript(year='all',LonSys='1',lats=[75,105],LonLims=[0,360],
     if int(lats[1])>90:
         latstr=latstr+"-"+str(lats[1]-90)+"S"
         
-    lonstr="Lon"+str(LonLims[0])+"-"+str(LonLims[1])
-    ###############################################################################
-    # 2022
-    ###############################################################################
-    if year=='all' or year==2022:
-        fig22NH3,axs22NH3=pl.subplots(7,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
-                              sharex=True,sharey=True)   
-        fig22CH4,axs22CH4=pl.subplots(7,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
-                              sharex=True,sharey=True)   
-        fig22RGB,axs22RGB=pl.subplots(7,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
-                              sharex=True,sharey=True)   
-        counter=0
-        for mp in maps2022:
-            MCM.MakeContiguousMap(axs22NH3[counter],axs22CH4[counter],axs22RGB[counter],
-                                  collection=mp,LonSys=LonSys,lats=lats,LonLims=LonLims,
-                                  localmax=localmax,variance=variance)
-            #pl.show()
-            counter=counter+1
-    
-        fig22NH3.savefig(pathmapplots+"2022 NH3 Stack Sys"+LonSys+" "+latstr+"_map.png",dpi=300)
-        fig22CH4.savefig(pathmapplots+"2022 CH4 Stack Sys"+LonSys+" "+latstr+"_map.png",dpi=300)
-        fig22RGB.savefig(pathmapplots+"2022 RGB Stack Sys"+LonSys+" "+latstr+"_map.png",dpi=300)
-    
-    ###############################################################################
+    lonstr=str(LonLims[0])+"-"+str(LonLims[1])
+   ###############################################################################
     # 2023
     ############################################################################### 
-    if year=='all' or year==2023:  
-        fig23NH3,axs23NH3=pl.subplots(17,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
+    for collection in collections:
+        if collection=='2022':
+            maps=maps2022
+        if collection=='2023':
+            maps=maps2023
+        if collection=='2024':
+            maps=maps2024
+        if collection=='2024 SEB Outbreak':
+            maps=maps2024SEBOutbreak
+        if collection=='2024 NTB Outbreak':
+            maps=maps2024NTBOutbreak
+        if collection=='2024 GRS':
+            maps=maps2024GRS
+        if collection=='2024 NEZ':
+            maps=maps2024NEZ
+            
+        nrows=len(maps)
+        fig23NH3,axs23NH3=pl.subplots(nrows,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
                               sharex=True,sharey=True)   
         fig23NH3.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.94,
                     wspace=0.25, hspace=0.08)     
         fig23NH3.suptitle("Ammonia Abundance (ppm)")
-        axs23NH3[16].set_xlabel("System "+LonSys+" Longitude (deg)",fontsize=8)
+        axs23NH3[nrows-1].set_xlabel("System "+LonSys+" Longitude (deg)",fontsize=8)        
         
-        
-        
-        fig23CH4,axs23CH4=pl.subplots(17,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
+        fig23CH4,axs23CH4=pl.subplots(nrows,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
                               sharex=True,sharey=True)   
         fig23CH4.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.94,
                     wspace=0.25, hspace=0.08)     
         fig23CH4.suptitle("Effective Cloud-Top Pressure (mb)")
-        axs23CH4[16].set_xlabel("System "+LonSys+" Longitude (deg)",fontsize=8)
+        axs23CH4[nrows-1].set_xlabel("System "+LonSys+" Longitude (deg)",fontsize=8)
         
-        
-        fig23RGB,axs23RGB=pl.subplots(17,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
+        fig23RGB,axs23RGB=pl.subplots(nrows,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
                               sharex=True,sharey=True)   
         fig23RGB.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.94,
                     wspace=0.25, hspace=0.08)     
         fig23RGB.suptitle("Visual Context")
-        axs23RGB[16].set_xlabel("System "+LonSys+" Longitude (deg)",fontsize=8)
+        axs23RGB[nrows-1].set_xlabel("System "+LonSys+" Longitude (deg)",fontsize=8)
     
     
         counter=0
-        for mp in maps2023:
+        for mp in maps:
             MCM.MakeContiguousMap(axs23NH3[counter],axs23CH4[counter],axs23RGB[counter],
                                                                        collection=mp,
                                                                        LonSys=LonSys,
                                                                        lats=lats,
                                                                        LonLims=LonLims,
-                                                                       localmax=localmax,variance=variance)
+                                                                       localmax=localmax,
+                                                                       variance=variance)
             #pl.show()
             counter=counter+1
     
-        fig23NH3.savefig(pathmapplots+"2023 NH3 Stack Sys"+LonSys+" "+latstr+"_map.png",dpi=300)
-        fig23CH4.savefig(pathmapplots+"2023 CH4 Stack Sys"+LonSys+" "+latstr+"_map.png",dpi=300)
-        fig23RGB.savefig(pathmapplots+"2023 RGB Stack Sys"+LonSys+" "+latstr+"_map.png",dpi=300)
+        fig23NH3.savefig(pathmapplots+collection+" NH3 Stack Sys"+LonSys+" "+lonstr+" "+latstr+"_map.png",dpi=300)
+        fig23CH4.savefig(pathmapplots+collection+" CH4 Stack Sys"+LonSys+" "+lonstr+" "+latstr+"_map.png",dpi=300)
+        fig23RGB.savefig(pathmapplots+collection+" RGB Stack Sys"+LonSys+" "+lonstr+" "+latstr+"_map.png",dpi=300)
     
-    ###############################################################################
-    # 2024
-    ###############################################################################
-    if year=='all' or year==2024:
-        fig24NH3,axs24NH3=pl.subplots(13,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
-                              sharex=True,sharey=True)   
-        fig24CH4,axs24CH4=pl.subplots(13,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
-                              sharex=True,sharey=True)   
-        fig24RGB,axs24RGB=pl.subplots(13,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
-                              sharex=True,sharey=True)   
-        counter=0
-        print("################ In continuousmapscript 2024")
-        for mp in maps2024:
-            MCM.MakeContiguousMap(axs24NH3[counter],axs24CH4[counter],axs24RGB[counter],
-                                  collection=mp,LonSys=LonSys,lats=lats,LonLims=LonLims,
-                                  localmax=localmax,variance=variance)
-            #pl.show()
-            counter=counter+1
-    
-        fig24NH3.savefig(pathmapplots+"2024 NH3 Stack Sys"+LonSys+" "+latstr+" "+lonstr+"_map.png",dpi=300)
-        fig24CH4.savefig(pathmapplots+"2024 CH4 Stack Sys"+LonSys+" "+latstr+" "+lonstr+"_map.png",dpi=300)
-        fig24RGB.savefig(pathmapplots+"2024 RGB Stack Sys"+LonSys+" "+latstr+" "+lonstr+"_map.png",dpi=300)
-
     elapsed=time.time()-ts
     print("elapsed time=",elapsed)

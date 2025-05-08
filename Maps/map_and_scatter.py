@@ -1,16 +1,83 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Nov 21 06:50:51 2024
-
-@author: smhil
-"""
-
 def map_and_scatter(patchx,patchy,mapydata,mapyhdr,LonSys,
                     LatLims,LonLims,LonRng,PlotCM,fnout,
                     coef,txin,xlow,xhigh,ylow,yhigh,figxy,
                     ct,pathout,Ltitle,Rtitle,Level='L3',FiveMicron=False,
                     cbar_rev=False,swap_xy=False,axis_inv=False,cbar_title="Test",
-                    suptitle="Test",ROI=False):
+                    suptitle="Test",ROI=False,amfpatch=False):
+    """
+    PURPOSE:    Makes a pair of plots, the left one is a patch map of one data
+                set overlayed by another patch map data set. The right plot is
+                a scatter plot of the two patch maps.
+                
+    CALLS:      plot_map_scatter
+                plot_roi_scatter
+
+    Parameters
+    ----------
+    patchx : TYPE
+        DESCRIPTION.
+    patchy : TYPE
+        DESCRIPTION.
+    mapydata : TYPE
+        DESCRIPTION.
+    mapyhdr : TYPE
+        DESCRIPTION.
+    LonSys : TYPE
+        DESCRIPTION.
+    LatLims : TYPE
+        DESCRIPTION.
+    LonLims : TYPE
+        DESCRIPTION.
+    LonRng : TYPE
+        DESCRIPTION.
+    PlotCM : TYPE
+        DESCRIPTION.
+    fnout : TYPE
+        DESCRIPTION.
+    coef : TYPE
+        DESCRIPTION.
+    txin : TYPE
+        DESCRIPTION.
+    xlow : TYPE
+        DESCRIPTION.
+    xhigh : TYPE
+        DESCRIPTION.
+    ylow : TYPE
+        DESCRIPTION.
+    yhigh : TYPE
+        DESCRIPTION.
+    figxy : TYPE
+        DESCRIPTION.
+    ct : TYPE
+        DESCRIPTION.
+    pathout : TYPE
+        DESCRIPTION.
+    Ltitle : TYPE
+        DESCRIPTION.
+    Rtitle : TYPE
+        DESCRIPTION.
+    Level : TYPE, optional
+        DESCRIPTION. The default is 'L3'.
+    FiveMicron : TYPE, optional
+        DESCRIPTION. The default is False.
+    cbar_rev : TYPE, optional
+        DESCRIPTION. The default is False.
+    swap_xy : TYPE, optional
+        DESCRIPTION. The default is False.
+    axis_inv : TYPE, optional
+        DESCRIPTION. The default is False.
+    cbar_title : TYPE, optional
+        DESCRIPTION. The default is "Test".
+    suptitle : TYPE, optional
+        DESCRIPTION. The default is "Test".
+    ROI : TYPE, optional
+        DESCRIPTION. The default is False.
+
+    Returns
+    -------
+    None.
+
+    """
     import sys
     drive='c:'
     sys.path.append(drive+'/Astronomy/Python Play')
@@ -18,16 +85,11 @@ def map_and_scatter(patchx,patchy,mapydata,mapyhdr,LonSys,
     sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Spectroscopy')
     sys.path.append('./Services')
 
-    import os
     import pylab as pl
     import numpy as np
-    from imageio import imwrite
-    from astropy.io import fits
     import RetrievalLibrary as RL
     sys.path.append('./Maps')
-    import read_fits_map_L2_L3 as RFM
     import plot_patch as PP
-    import make_patch_RGB as MPRGB
     import copy
     import plot_map_scatter as pms
     import plot_roi_scatter as prs
@@ -79,20 +141,22 @@ def map_and_scatter(patchx,patchy,mapydata,mapyhdr,LonSys,
     print(patchx.shape,patchy.shape)
     
     if swap_xy and not ROI:
-        BZ=pms.plot_map_scatter(patchx,patchy,PlotCM,
+        roilabel,mean1,stdv1,mean2,stdv2,BZ=pms.plot_map_scatter(patchx,patchy,PlotCM,
                  LatLims,axs3[1],xlow,xhigh,ylow,yhigh,FiveMicron,axis_inv=axis_inv)
     if not swap_xy and not ROI:     
-        BZ=pms.plot_map_scatter(patchy,patchx,PlotCM,
+        roilabel,mean1,stdv1,mean2,stdv2,BZ=pms.plot_map_scatter(patchy,patchx,PlotCM,
                  LatLims,axs3[1],ylow,yhigh,xlow,xhigh,FiveMicron,axis_inv=axis_inv)
         
     if swap_xy and ROI:
         print("Calling ROI")
         roilabel,mean1,stdv1,mean2,stdv2=prs.plot_roi_scatter(patchx,patchy,PlotCM,
-                 LatLims,LonLims,axs3[1],xlow,xhigh,ylow,yhigh,FiveMicron,axis_inv=axis_inv,ROI=ROI)
+                 LatLims,LonLims,axs3[1],xlow,xhigh,ylow,yhigh,FiveMicron,
+                 axis_inv=axis_inv,ROI=ROI,amfpatch=amfpatch)
     if not swap_xy and ROI:    
         print("Calling ROI")
-        roilabel,mean1,stdv1,mean2,stdv2=prs.plot_roi_scatter(patchy,patchx,PlotCM,
-                 LatLims,LonLims,axs3[1],ylow,yhigh,xlow,xhigh,FiveMicron,axis_inv=axis_inv,ROI=ROI)
+        roilabel,mean1,stdv1,mean2,stdv2,meanamf=prs.plot_roi_scatter(patchy,patchx,PlotCM,
+                 LatLims,LonLims,axs3[1],ylow,yhigh,xlow,xhigh,FiveMicron,
+                 axis_inv=axis_inv,ROI=ROI,amfpatch=amfpatch)
         
         
     axs3[1].tick_params(axis='both', which='major', labelsize=9)
@@ -160,6 +224,4 @@ def map_and_scatter(patchx,patchy,mapydata,mapyhdr,LonSys,
     
     dateobs=mapyhdr["DATE-OBS"]
 
-    if not ROI:
-        roilabel,mean1,stdv1,mean2,stdv2=False,False,False,False,False
-    return(dateobs,roilabel,mean1,stdv1,mean2,stdv2)
+    return(dateobs,roilabel,mean1,stdv1,mean2,stdv2,meanamf)

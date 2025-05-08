@@ -1,4 +1,5 @@
-def SEB_Outbreak_Script(collection="20241129-20241129 SEB OB",ctbls=["terrain_r","Blues"]):
+def SEB_Outbreak_Script(collection="20241129-20241129 SEB OB",
+                        ctbls=["terrain_r","Blues"],localmax=False,close=False):
 
     import sys
     drive='c:'
@@ -74,7 +75,7 @@ def SEB_Outbreak_Script(collection="20241129-20241129 SEB OB",ctbls=["terrain_r"
     coefs=[0.75,0.45]
     #coefs=[0.0,0.0]
     for o in obslist:
-        dateobs,roilabel,mean1,stdv1,mean2,stdv2=\
+        dateobs,roilabel,mean1,stdv1,mean2,stdv2,dummy=\
             L3JMP.L3_Jup_Map_Plot(obskey=o,imagetype='Map',target="Jupiter",
                         Smoothing=False,LatLims=[90,120],LonRng=15,CMpref=323,
                         LonSys='2',showbands=False,coef=coefs,
@@ -98,6 +99,9 @@ def SEB_Outbreak_Script(collection="20241129-20241129 SEB OB",ctbls=["terrain_r"
             stdv2arr.append(stdv2)
         First=False
             
+    if close:
+        pl.close('all')
+
     ###############################################################################
     #
     ###############################################################################
@@ -223,4 +227,4 @@ def SEB_Outbreak_Script(collection="20241129-20241129 SEB OB",ctbls=["terrain_r"
     MCM.MakeContiguousMap(False,False,False,collection=collection,LonSys='2',
                           FiveMicron=False,lats=[90,120],LonLims=[CM[0]-15,CM[0]+15],
                           figsz=[3.0,6.0],ROI=ROI,variance=True,proj="convection",
-                          ctbls=["terrain_r","Blues"])
+                          ctbls=["terrain_r","Blues"],localmax=localmax)

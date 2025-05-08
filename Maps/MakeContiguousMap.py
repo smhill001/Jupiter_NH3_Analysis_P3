@@ -1,7 +1,8 @@
 def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2',
                       FiveMicron=False,Five_obskey='',IRTFdataset='',
                       lats=[75,105],LonLims=[0,360],figsz=[6.0,6.0],ROI=False,
-                      variance=False,localmax=False,proj='maps',ctbls=['terrain_r','Blues']):
+                      variance=False,localmax=False,proj='maps',ctbls=['terrain_r','Blues'],
+                      cont=False):
     """
     Created on Wed Dec 20 21:02:31 2023
 
@@ -54,32 +55,35 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
     from astropy.io import ascii
     from copy import deepcopy
     import find_extrema as fx
+    import RetrievalLibrary as RL
     
     from astropy.time import Time
     
-    print("################################## LonLims=",LonLims)
+    #print("################################## LonLims=",LonLims)
     ###########################################################################
     # Set up default ranges for clouds and ammonia. (If generalized for L2 data
     # will need to add EW ranges for NH3 and CH4). This code could be
     # simplified if I retire the "jet" color table.
     ctbl_settings = {
-                    "jet": (60, 160, 1200, 2000),
-                    "terrain_r": (70, 140, 1400, 2000)
+                    "jet": (70, 140, 1200, 2000),
+                    "terrain_r": (60, 160, 1600, 2200)
                 }
                 
     if ctbls[0] in ctbl_settings:
         fNH3low, fNH3high, PCldlow, PCldhigh = ctbl_settings[ctbls[0]]
 
-    print(lats)
+    #print(lats)
     ###########################################################################
     # Determine figure size (inches) based on aspect ratio of data set
     aspectratio=(LonLims[1]-LonLims[0])/(lats[1]-lats[0])
     aspect_ratio_map = {
                         1:     [3.0, 6.0],
                         4/3.:  [3.5, 6.0],
+                        2:     [4.5, 6.0],
                         3:     [6.0, 6.0],
                         4:     [7.05, 6.0],
                         6:     [8.5, 5.0],
+                        9:     [10, 4.5],
                         12:    [12.0, 4.0]
                         }
     figsz = aspect_ratio_map[aspectratio]
@@ -111,7 +115,7 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
         PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM2,RGBtime= \
                         RFM.read_fits_map_L2_L3(obskey=obskey,LonSys=LonSys,
                                                 imagetype="Map",Level="L3")  
-        print("PClouddata.shape",PClouddata.shape)
+        #print("PClouddata.shape",PClouddata.shape)
 
         amfdata=(1.0/sza+1.0/eza)/2.0
         #TestfNH3=fNH3data*amfdata**0.65
@@ -331,7 +335,7 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
     print([360-LonLims[1],360-LonLims[0]])
     fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(blendweightfNH3,lats,[360-LonLims[1],360-LonLims[0]],
                                      180,180,ctbls[0],
-                                     axs1[0],'%3.2f',cont=False,n=11,
+                                     axs1[0],'%3.2f',cont=cont,n=6,
                                      vn=fNH3low,
                                      vx=fNH3high,
                                      cbar_title="")
@@ -349,9 +353,9 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
     axs1[0].plot(x,y,'k',clip_on=False)
 
 
-    PCld_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(blendweightPCloud,lats,[360-LonLims[1],360-LonLims[0]],
+    PCld_patch_mb,vn,vx,tx_PCld=PP.plot_patch(blendweightPCloud,lats,[360-LonLims[1],360-LonLims[0]],
                                      180,180,ctbls[1],
-                                     axs1[1],'%3.2f',cont=False,n=5,
+                                     axs1[1],'%3.2f',cont=cont,n=5,
                                      vn=PCldlow,
                                      vx=PCldhigh,
                                      cbar_title="",cbar_reverse=True)
@@ -419,7 +423,7 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
         print("vn,vx,tx_fNH3",vn,vx,tx_fNH3)
         axs2[0].set_title('fNH3 (fractional '+r'$\sigma$'+')',fontsize=10)
     
-        PCld_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(fracPCloud,lats,[360-LonLims[1],360-LonLims[0]],
+        PCld_patch_mb,vn,vx,tx_PCld=PP.plot_patch(fracPCloud,lats,[360-LonLims[1],360-LonLims[0]],
                                          180,180,"jet",
                                          axs2[1],'%3.2f',cont=False,n=6,vn=0,vx=0.25,
                                          cbar_title="")
@@ -532,6 +536,13 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
                extent=[LonLims[1],LonLims[0],90-lats[1],
                        90-lats[0]],
                        aspect="equal")
+    
+    temp=RL.make_contours_CH4_patch(axs1[RGBaxs],fNH3_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
+                                    tx_fNH3[-2:], frmt='%3.0f', clr='k')
+    temp=RL.make_contours_CH4_patch(axs1[RGBaxs],PCld_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
+                                    tx_PCld[:2], frmt='%3.0f', clr='r')
+
+    
     axs1[RGBaxs].set_title('RGB Context',fontsize=10)
     ###########################################################################
 
@@ -568,6 +579,9 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
     if aspectratio==4./3.:
         fig1.subplots_adjust(left=0.20, bottom=0.07, right=0.825, top=0.86,
                     wspace=0.0, hspace=0.2)     
+    if aspectratio==2:
+        fig1.subplots_adjust(left=0.20, bottom=0.07, right=0.825, top=0.86,
+                    wspace=0.0, hspace=0.2)     
     if aspectratio==3:
         fig1.subplots_adjust(left=0.095, bottom=0.07, right=0.90, top=0.88,
                     wspace=0.25, hspace=0.2)     
@@ -577,6 +591,9 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
     if aspectratio==6:
         fig1.subplots_adjust(left=0.04, bottom=0.08, right=0.94, top=0.865,
                     wspace=0.0, hspace=0.2)     
+    if aspectratio==9:
+        fig1.subplots_adjust(left=0.04, bottom=0.10, right=0.94, top=0.865,
+                    wspace=0.0, hspace=0.395)     
     if aspectratio==12:
         fig1.subplots_adjust(left=0.035, bottom=0.1, right=0.935, top=0.84,
                     wspace=0.0, hspace=0.3)     
@@ -588,6 +605,9 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
         if aspectratio==4./3.:
             fig2.subplots_adjust(left=0.20, bottom=0.07, right=0.825, top=0.86,
                         wspace=0.0, hspace=0.2)     
+        if aspectratio==2:
+            fig2.subplots_adjust(left=0.20, bottom=0.07, right=0.825, top=0.86,
+                        wspace=0.0, hspace=0.2)     
         if aspectratio==3:
             fig2.subplots_adjust(left=0.095, bottom=0.07, right=0.90, top=0.88,
                         wspace=0.25, hspace=0.2)     
@@ -597,6 +617,9 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
         if aspectratio==6:
             fig2.subplots_adjust(left=0.04, bottom=0.08, right=0.94, top=0.865,
                         wspace=0.0, hspace=0.2)     
+        if aspectratio==9:
+            fig2.subplots_adjust(left=0.04, bottom=0.10, right=0.94, top=0.865,
+                        wspace=0.0, hspace=0.395)     
         if aspectratio==12:
             fig2.subplots_adjust(left=0.035, bottom=0.1, right=0.935, top=0.84,
                         wspace=0.0, hspace=0.3)     
@@ -620,12 +643,22 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
 
     if ROI:
         for R in ROI:
+            print("###################### R=",R)
+            clr='C0'
+            if "NH3" in R:
+                clr='k'
+            if "Plume" in R:
+                clr='r'
+            if "NEDF" in R:
+                clr='y'
+            if "NEB ref" in R:
+                clr='brown'
             for iax in range(0,3):
                 axs1[iax].plot(np.array([ROI[R][2]+ROI[R][3],ROI[R][2]-ROI[R][3],
                               ROI[R][2]-ROI[R][3],ROI[R][2]+ROI[R][3],
                               ROI[R][2]+ROI[R][3]]),
                               90.-np.array([ROI[R][0],ROI[R][0],ROI[R][1],
-                              ROI[R][1],ROI[R][0]]))
+                              ROI[R][1],ROI[R][0]]),color=clr)
     if variance and ROI:
         for R in ROI:
             for iax in range(0,3):
@@ -635,16 +668,10 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
                               90.-np.array([ROI[R][0],ROI[R][0],ROI[R][1],
                               ROI[R][1],ROI[R][0]]))
 
-    pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/"+proj+"/"  
-
-    fig1.savefig(pathmapplots+collection+" Mean Sys"+LonSys+" map.png",dpi=300)
-    
-    if variance:
-        fig2.savefig(pathmapplots+collection+" Stdv Sys"+LonSys+" map.png",dpi=300)
-
     ###########################################################################
     # WRITE LOCAL MAX AND MINS TO FILE
     ###########################################################################
+    pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/"+proj+"/"  
     if localmax:
         print("IN LOCAL MAX")
         ###########################################################################
@@ -659,6 +686,7 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
         print("################# results['NH3']['maxima']=",results['NH3']['maxima'])
         print("@@@@@@@@@@@@@@@@@ xyfnh3max[:,1],xyfnh3max[:,0]=",xyfnh3max[:,1],xyfnh3max[:,0])
         # Export to CSV and Plot
+
         fx.export_extrema_to_csv(results, filename_prefix=pathmapplots+collection+" Mean Sys"+LonSys+" extrema")
 
         #filename="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/LocalMax.csv"
@@ -678,39 +706,20 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
         fx.plot_extrema_on_axisa(axs1[1], results, data_type='PCloud', extrema_type='maxima', text_color='y',fontsize=10)
         fx.plot_extrema_on_axisa(axs1[1], results, data_type='RGB', extrema_type='minima', text_color='C1',fontsize=8)
         fx.plot_extrema_on_axisa(axs1[1], results, data_type='RGB', extrema_type='maxima', text_color='C0',fontsize=8)
-        fx.plot_extrema_on_axisa(axs1[2], results, data_type='NH3', extrema_type='minima', text_color='k',fontsize=8)
+        #fx.plot_extrema_on_axisa(axs1[2], results, data_type='NH3', extrema_type='minima', text_color='k',fontsize=8)
         fx.plot_extrema_on_axisa(axs1[2], results, data_type='NH3', extrema_type='maxima', text_color='w',fontsize=8)
         fx.plot_extrema_on_axisa(axs1[2], results, data_type='PCloud', extrema_type='minima', text_color='b',fontsize=8)
         fx.plot_extrema_on_axisa(axs1[2], results, data_type='PCloud', extrema_type='maxima', text_color='y',fontsize=8)
-        fx.plot_extrema_on_axisa(axs1[2], results, data_type='RGB', extrema_type='minima', text_color='C1',fontsize=10)
-        fx.plot_extrema_on_axisa(axs1[2], results, data_type='RGB', extrema_type='maxima', text_color='C0',fontsize=10)
-        """
-        fx.plot_extrema_on_axis(axs1[0], results, data_type='NH3', extrema_type='minima', symbol_color='k',s=30,linewidth=1.0)
-        fx.plot_extrema_on_axis(axs1[0], results, data_type='NH3', extrema_type='maxima', symbol_color='w',s=30,linewidth=1.0)
-        fx.plot_extrema_on_axis(axs1[0], results, data_type='PCloud', extrema_type='minima', symbol_color='b',s=15,linewidth=0.5)
-        fx.plot_extrema_on_axis(axs1[0], results, data_type='PCloud', extrema_type='maxima', symbol_color='y',s=15,linewidth=0.5)
-        fx.plot_extrema_on_axis(axs1[0], results, data_type='RGB', extrema_type='minima', symbol_color='C1',s=15,linewidth=0.5)
-        fx.plot_extrema_on_axis(axs1[0], results, data_type='RGB', extrema_type='maxima', symbol_color='C0',s=15,linewidth=0.5)
-        fx.plot_extrema_on_axisa(axs1[1], results, data_type='NH3', extrema_type='minima', text_color='k',fontsize=8)
-        fx.plot_extrema_on_axisa(axs1[1], results, data_type='NH3', extrema_type='maxima', text_color='w',fontsize=8)
-        fx.plot_extrema_on_axis(axs1[1], results, data_type='PCloud', extrema_type='minima', symbol_color='b',s=30,linewidth=1.0)
-        fx.plot_extrema_on_axis(axs1[1], results, data_type='PCloud', extrema_type='maxima', symbol_color='y',s=30,linewidth=1.0)
-        fx.plot_extrema_on_axis(axs1[1], results, data_type='RGB', extrema_type='minima', symbol_color='C1',s=15,linewidth=0.5)
-        fx.plot_extrema_on_axis(axs1[1], results, data_type='RGB', extrema_type='maxima', symbol_color='C0',s=15,linewidth=0.5)
-        fx.plot_extrema_on_axis(axs1[2], results, data_type='NH3', extrema_type='minima', symbol_color='k',s=15,linewidth=0.5)
-        fx.plot_extrema_on_axis(axs1[2], results, data_type='NH3', extrema_type='maxima', symbol_color='w',s=15,linewidth=0.5)
-        fx.plot_extrema_on_axis(axs1[2], results, data_type='PCloud', extrema_type='minima', symbol_color='b',s=15,linewidth=0.5)
-        fx.plot_extrema_on_axis(axs1[2], results, data_type='PCloud', extrema_type='maxima', symbol_color='y',s=15,linewidth=0.5)
-        fx.plot_extrema_on_axis(axs1[2], results, data_type='RGB', extrema_type='minima', symbol_color='C1',s=30,linewidth=1.0)
-        fx.plot_extrema_on_axis(axs1[2], results, data_type='RGB', extrema_type='maxima', symbol_color='C0',s=30,linewidth=1.0)
-        """
-        print("xyfnh3max")
+        #fx.plot_extrema_on_axisa(axs1[2], results, data_type='RGB', extrema_type='minima', text_color='C1',fontsize=10)
+        #fx.plot_extrema_on_axisa(axs1[2], results, data_type='RGB', extrema_type='maxima', text_color='C0',fontsize=10)
+
+        #print("xyfnh3max")
         count=1
         for i in xyfnh3maxsort:
             templat,templon=xyfnh3max[i,0],xyfnh3max[i,1]
             tempy,tempx=90-templat,LonLims[1]-templon
-            print("templat,templon,tempy,tempx,blendweightTime[tempy,tempx]=",
-                  templat,templon,tempy,tempx,blendweightTime[tempy,tempx])
+            #print("templat,templon,tempy,tempx,blendweightTime[tempy,tempx]=",
+            #      templat,templon,tempy,tempx,blendweightTime[tempy,tempx])
             try:
                 temptime=Time(blendweightTime[tempy,tempx],format='jd')
                 temptime.format='fits'
@@ -719,15 +728,15 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
             except:
                 temptime="N/A"
                 tempJD=0.0
-            print("xyfnh3max",collection,count,temptime,tempJD,templat,templon,xyfnh3maxPcldvalues[i],xyfnh3maxvalues[i])
+            #print("xyfnh3max",collection,count,temptime,tempJD,templat,templon,xyfnh3maxPcldvalues[i],xyfnh3maxvalues[i])
             t.add_row(("xyfnh3max",collection,count,str(temptime),str(tempJD),templat,templon,xyfnh3maxPcldvalues[i],xyfnh3maxvalues[i]))
             count=count+1
-        print("xyfnh3min")
+        #print("xyfnh3min")
         count=1
         for i in xyfnh3minsort:
             templat,templon=xyfnh3min[i,0],xyfnh3min[i,1]
             tempy,tempx=90-templat,LonLims[1]-templon
-            print(tempy,tempx,blendweightTime[tempy,tempx])
+            #print(tempy,tempx,blendweightTime[tempy,tempx])
             try:
                 temptime=Time(blendweightTime[tempy,tempx],format='jd')
                 temptime.format='fits'
@@ -736,10 +745,10 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
             except:
                 temptime="N/A"
                 tempJD=0.0
-            print("xyfnh3min",collection,count,temptime,tempJD,templat,templon,xyfnh3minPcldvalues[i],xyfnh3minvalues[i])
+            #print("xyfnh3min",collection,count,temptime,tempJD,templat,templon,xyfnh3minPcldvalues[i],xyfnh3minvalues[i])
             t.add_row(("xyfnh3min",collection,count,str(temptime),str(tempJD),templat,templon,xyfnh3minPcldvalues[i],xyfnh3minvalues[i]))
             count=count+1
-        print("xyPcldmax")
+        #print("xyPcldmax")
         count=1
         for i in xyPcldmaxsort:
             templat,templon=xyPcldmax[i,0],xyPcldmax[i,1]
@@ -752,10 +761,10 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
             except:
                 temptime="N/A"
                 tempJD=0.0
-            print("xyPcldmax",collection,count,temptime,tempJD,templat,templon,xyPcldmaxvalues[i],xyPcldmaxfNH3values[i])
+            #print("xyPcldmax",collection,count,temptime,tempJD,templat,templon,xyPcldmaxvalues[i],xyPcldmaxfNH3values[i])
             t.add_row(("xyPcldmax",collection,count,str(temptime),str(tempJD),templat,templon,xyPcldmaxvalues[i],xyPcldmaxfNH3values[i]))
             count=count+1
-        print("xyPcldmin")
+        #print("xyPcldmin")
         count=1
         for i in xyPcldminsort:
             templat,templon=xyPcldmin[i,0],xyPcldmin[i,1]
@@ -768,12 +777,19 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
             except:
                 temptime="N/A"
                 tempJD=0.0
-            print("xyPcldmin",collection,count,temptime,tempJD,templat,templon,xyPcldminvalues[i],xyPcldminfNH3values[i])
+            #print("xyPcldmin",collection,count,temptime,tempJD,templat,templon,xyPcldminvalues[i],xyPcldminfNH3values[i])
             t.add_row(("xyPcldmin",collection,count,str(temptime),str(tempJD),templat,templon,xyPcldminvalues[i],xyPcldminfNH3values[i]))
             count=count+1
 
+
         ascii.write(t,pathmapplots+collection+" Mean Sys"+LonSys+" maxmin.csv",format='basic',overwrite=True,delimiter=',')
-        
+    
+    fig1.savefig(pathmapplots+collection+" Mean Sys"+LonSys+" map.png",dpi=300)
+    
+    if variance:
+        fig2.savefig(pathmapplots+collection+" Stdv Sys"+LonSys+" map.png",dpi=300)
+
+
     ###########################################################################
     # Create Stack Plot subplots on the axes objects passed into the procedure
     ###########################################################################
@@ -796,7 +812,7 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
                                          n=5,vn=PCldlow,vx=PCldhigh)
         axCH4.set_ylabel(collection,rotation='horizontal',fontsize=6)
         axCH4.set_ylabel(collection.replace('-','\n'),rotation='horizontal',fontsize=6)
-        axCH4.yaxis.set_label_coords(-0.05,0.15)
+        axCH4.yaxis.set_label_coords(-0.10,0.15)
         axCH4.tick_params('y', labelleft=False)
         axCH4.tick_params('x', labelsize=8)
            
@@ -809,7 +825,7 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
                            aspect="equal")
         axRGB.set_ylabel(collection.replace('-','\n'),rotation='horizontal',fontsize=6)
         axRGB.tick_params('y', labelleft=False)
-        axRGB.yaxis.set_label_coords(-0.05,0.15)
+        axRGB.yaxis.set_label_coords(-0.10,0.15)
         axRGB.tick_params('x', labelsize=8)
 
         if localmax:

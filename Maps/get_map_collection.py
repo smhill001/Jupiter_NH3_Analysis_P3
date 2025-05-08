@@ -829,17 +829,17 @@ def get_map_collection(collection):
                  '20250106UTg', #some gradient
                  '20250106UTh',
                  '20250106UTi', #a little offset time with the NH3 images, but seems okay
-                 '20250106UTj'}#, #FF artifacts (2x)
-                 #'20250106UTk',
-                 #'20250106UTl',
-                 #'20250106UTm',
-                 #'20250106UTn',
-                 #'20250106UTo',
-                 #'20250106UTp',
-                 #'20250106UTq',
-                 #'20250106UTr',
-                 #'20250106UTs',
-                 #'20250106UTt'}
+                 '20250106UTj', #FF artifacts (2x)
+                 '20250106UTk',
+                 '20250106UTl', #FF artifacts (4x?)
+                 '20250106UTm',
+                 '20250106UTn', #Only a single Ha image
+                 '20250106UTo',
+                 '20250106UTp', #Gradient issues
+                 '20250106UTq', #Very sharp! - great views of SEB outbreak
+                 '20250106UTr', #Very sharp! - great views of SEB outbreak
+                 '20250106UTs', #Very sharp - great views of SEB outbreak; FF artifacts in NEB
+                 '20250106UTt'}
         
         lonlims={'20241129UTg':[292,352],
                  '20241129UTh':[292,352],
@@ -971,6 +971,146 @@ def get_map_collection(collection):
                  '20241129UTj':[292,352],
                  '20241129UTk':[292,352]}
 
+    elif collection=="20241105-20241105 NEDF A":
+        dataset={'20241105UTa',
+                 '20241105UTb',
+                 '20241105UTc',
+                 '20241105UTd',
+                 '20241105UTe'}#,
+                 #'20241105UTf'}#,
+                 #'20241105UTg',
+                 #'20241105UTh',
+                 #'20241105UTi',
+                 #'20241105UTj'}
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTh':[292,352],
+                 '20241129UTi':[292,352],
+                 '20241129UTj':[292,352],
+                 '20241129UTk':[292,352]}
+        
+    elif collection=="20241118-20241118 NEDF A":
+        dataset={#'20241118UTa',
+                 #'20241118UTb',
+                 #'20241118UTc',
+                 #'20241118UTd',
+                 #'20241118UTe',
+                 #'20241118UTf',
+                 #'20241118UTg',
+                 #'20241118UTh',
+                 #'20241118UTi',
+                 #'20241118UTj',
+                 '20241118UTk',
+                 '20241118UTl',
+                 '20241118UTm',
+                 '20241118UTn',
+                 '20241118UTo',
+                 '20241118UTp'}
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTh':[292,352],
+                 '20241129UTi':[292,352],
+                 '20241129UTj':[292,352],
+                 '20241129UTk':[292,352]}
+
+    elif collection=="20241128-20241128 NEDF A":
+        dataset={'20241128UTa',
+                 '20241128UTb',
+                 '20241128UTc',
+                 '20241128UTd',
+                 '20241128UTe',
+                 '20241128UTf'}#,
+                 #'20241128UTg',
+                 #'20241128UTh',
+                 #'20241128UTi',
+                 #'20241128UTj',
+                 #'20241128UTk',
+                 #'20241128UTl',
+                 #'20241128UTm',
+                 #'20241128UTn',
+                 #'20241128UTo'}
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTh':[292,352],
+                 '20241129UTi':[292,352],
+                 '20241129UTj':[292,352],
+                 '20241129UTk':[292,352]}
+
+    elif collection=="20241203-20241203 NEDF A":
+        dataset={'20241203UTa',
+                 '20241203UTb',
+                 '20241203UTc',
+                 '20241203UTd',
+                 '20241203UTe',
+                 '20241203UTf'}#,
+                 #'20241203UTg',
+                 #'20241203UTh',
+                 #'20241203UTi',
+                 #'20241203UTj',
+                 #'20241203UTk',
+                 #'20241203UTl',
+                 #'20241203UTm',
+                 #'20241203UTn',
+                 #'20241203UTo',
+                 #'20241203UTp'}
+
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTh':[292,352],
+                 '20241129UTi':[292,352],
+                 '20241129UTj':[292,352],
+                 '20241129UTk':[292,352]}
+
+    elif collection=="20241205-20241205 NEDF A":
+        dataset={#'20241205UTa',
+                 #'20241205UTb',
+                 '20241205UTc',
+                 '20241205UTd',
+                 '20241205UTe',
+                 '20241205UTf',
+                 '20241205UTg'}#,
+                 #'20241205UTh'}#,
+                 #'20241205UTi'}#,
+                 #'20241205UTj',
+                 #'20241205UTk',
+                 #'20241205UTl',
+                 #'20241205UTm',
+                 #'20241205UTn',
+                 #'20241205UTo',
+                 #'20241205UTp'}
+
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTh':[292,352],
+                 '20241129UTi':[292,352],
+                 '20241129UTj':[292,352],
+                 '20241129UTk':[292,352]}
+        
+    elif collection=="20250106-20250106 NEDF CD":
+        dataset={#'20250106UTa', #Gradient issue
+                 #'20250106UTb', #some gradient, and maybe an artifact over GRS (at least in IGB)
+                 #'20250106UTc',
+                 #'20250106UTd',
+                 #'20250106UTe', #FF artifact?
+                 #'20250106UTf', 
+                 #'20250106UTg', #some gradient
+                 #'20250106UTh',
+                 #'20250106UTi', #a little offset time with the NH3 images, but seems okay
+                 #'20250106UTj', #FF artifacts (2x)
+                 #'20250106UTk',
+                 #'20250106UTl', #FF artifacts (4x?)
+                 #'20250106UTm',
+                 #'20250106UTn', #Only a single Ha image
+                 #'20250106UTo',
+                 #'20250106UTp', #Gradient issues
+                 '20250106UTq', #Very sharp! - great views of SEB outbreak
+                 '20250106UTr', #Very sharp! - great views of SEB outbreak
+                 '20250106UTs'}#, #Very sharp - great views of SEB outbreak; FF artifacts in NEB
+                 #'20250106UTt'}
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTh':[292,352],
+                 '20241129UTi':[292,352],
+                 '20241129UTj':[292,352],
+                 '20241129UTk':[292,352]}
 
     print("collection=",collection)
 

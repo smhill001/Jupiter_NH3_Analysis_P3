@@ -119,6 +119,7 @@ def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
     else: 
         smthtitle="Unsmoothed"
     CalModel=fNH3hdr['CALIBRA']
+    amfpatch=RL.make_patch(amfdata,LatLims,NH3LonLims,fNH3PlotCM,LonRng,pad=True)
 
     ###########################################################################
     ## Just RGB and Abundance
@@ -168,13 +169,13 @@ def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
     ###########################################################################
     ## Compute Band or ROI Scatter Plot (PCloud vs fNH3)
     ###########################################################################
-    dateobs,roilabel,mean1,stdv1,mean2,stdv2=\
+    dateobs,roilabel,mean1,stdv1,mean2,stdv2,meanamf=\
         mas.map_and_scatter(fNH3_patch_mb,PCld_patch,PClddata,fNH3hdr,LonSys,
         LatLims,NH3LonLims,LonRng,PCldPlotCM,fnNH3,
         coef[0],tx_fNH3,fNH3low,fNH3high,PCldlow,PCldhigh,
         figxy,"gray_r",pathmapplots,"PCloud & fNH3 (contours)",
         "PCloud vs fNH3",Level='L3',cbar_rev=True,cbar_title="Cloud-top Pressure (mb)",
-        axis_inv=True,ROI=ROI)
+        axis_inv=True,ROI=ROI,amfpatch=amfpatch)
     
     ###########################################################################
     ## Compute Scatter Plot (PCloud vs 5um radiance)
@@ -200,7 +201,7 @@ def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
                         axis_inv=True,cbar_title="Log10(5um radiance)")
    
     #return(fig1,axs1,fig2,axs2,fig3,axs3)
-    return(dateobs,roilabel,mean1,stdv1,mean2,stdv2)
+    return(dateobs,roilabel,mean1,stdv1,mean2,stdv2,meanamf)
 
 
 def load_png(file_path):
