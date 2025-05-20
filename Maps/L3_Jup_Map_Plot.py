@@ -1,4 +1,4 @@
-def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
+def L3_Jup_Map_Plot(obskey="20250106UTf",imagetype='Map',target="Jupiter",
                         Smoothing=False,LatLims=[45,135],LonRng=45,
                         CMpref='subobs',LonSys='2',showbands=False,
                         coef=[0.,0.],subproj='',figxy=[8.0,4.0],FiveMicron=False,
@@ -35,16 +35,11 @@ def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
     sys.path.append('./Services')
 
     import os
-    import pylab as pl
     import numpy as np
-    from imageio import imwrite
     from astropy.io import fits
-    import RetrievalLibrary as RL
     sys.path.append('./Maps')
     import read_fits_map_L2_L3 as RFM
-    import plot_patch as PP
-    import make_patch_RGB as MPRGB
-    import copy
+    import make_patch as MP
     import map_and_context as mac
     import map_and_scatter as mas
 
@@ -119,7 +114,7 @@ def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
     else: 
         smthtitle="Unsmoothed"
     CalModel=fNH3hdr['CALIBRA']
-    amfpatch=RL.make_patch(amfdata,LatLims,NH3LonLims,fNH3PlotCM,LonRng,pad=True)
+    amfpatch=MP.make_patch(amfdata,LatLims,NH3LonLims,fNH3PlotCM,LonRng,pad=True)
 
     ###########################################################################
     ## Just RGB and Abundance
@@ -173,7 +168,7 @@ def L3_Jup_Map_Plot(obskey="20240925UTa",imagetype='Map',target="Jupiter",
         mas.map_and_scatter(fNH3_patch_mb,PCld_patch,PClddata,fNH3hdr,LonSys,
         LatLims,NH3LonLims,LonRng,PCldPlotCM,fnNH3,
         coef[0],tx_fNH3,fNH3low,fNH3high,PCldlow,PCldhigh,
-        figxy,"gray_r",pathmapplots,"PCloud & fNH3 (contours)",
+        figxy,"Blues",pathmapplots,"PCloud & fNH3 (contours)",
         "PCloud vs fNH3",Level='L3',cbar_rev=True,cbar_title="Cloud-top Pressure (mb)",
         axis_inv=True,ROI=ROI,amfpatch=amfpatch)
     

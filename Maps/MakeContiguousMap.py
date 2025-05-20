@@ -1,4 +1,4 @@
-def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2',
+def MakeContiguousMap(axNH3,axCH4,axRGB,obskeys,collection="20220904-20220905",LonSys='2',
                       FiveMicron=False,Five_obskey='',IRTFdataset='',
                       lats=[75,105],LonLims=[0,360],figsz=[6.0,6.0],ROI=False,
                       variance=False,localmax=False,proj='maps',ctbls=['terrain_r','Blues'],
@@ -46,18 +46,18 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
     from astropy.io import fits
     import scipy.ndimage as ndi
     sys.path.append('./Maps')
-    import read_fits_map_L2_L3 as RFM
-    import plot_patch as PP
-    import make_patch_RGB as MPRGB
-    import get_map_collection as gmc
     from skimage.feature import peak_local_max
     from astropy.table import Table
     from astropy.io import ascii
     from copy import deepcopy
-    import find_extrema as fx
-    import RetrievalLibrary as RL
-    
     from astropy.time import Time
+
+    import read_fits_map_L2_L3 as RFM
+    import plot_patch as PP
+    import make_patch_RGB as MPRGB
+    import find_extrema as fx
+    import plot_contours_on_patch as PC
+    import make_patch as MP
     
     #print("################################## LonLims=",LonLims)
     ###########################################################################
@@ -88,7 +88,6 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
                         }
     figsz = aspect_ratio_map[aspectratio]
     
-    dataset,lonlims=gmc.get_map_collection(collection)
     ###########################################################################
     # Establish empty arrays for contiguous maps
     ###########################################################################
@@ -108,9 +107,9 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
     ###########################################################################
     # Loop over observations in each data set and create 3D cubes
     ###########################################################################
-    print("dataset=",dataset)
+    print("obskeys=",obskeys)
     First=True
-    for obskey in dataset:
+    for obskey in obskeys:
         print("*******obsdate in MakeContiguousMap=",obskey)
         PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM2,RGBtime= \
                         RFM.read_fits_map_L2_L3(obskey=obskey,LonSys=LonSys,
@@ -333,7 +332,9 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
 
     print("###############")
     print([360-LonLims[1],360-LonLims[0]])
-    fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(blendweightfNH3,lats,[360-LonLims[1],360-LonLims[0]],
+    fNH3_patch_mb=MP.make_patch(blendweightfNH3,lats,[360-LonLims[1],360-LonLims[0]],
+                                     180,180)
+    fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(fNH3_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
                                      180,180,ctbls[0],
                                      axs1[0],'%3.2f',cont=cont,n=6,
                                      vn=fNH3low,
@@ -353,7 +354,9 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
     axs1[0].plot(x,y,'k',clip_on=False)
 
 
-    PCld_patch_mb,vn,vx,tx_PCld=PP.plot_patch(blendweightPCloud,lats,[360-LonLims[1],360-LonLims[0]],
+    PCld_patch_mb=MP.make_patch(blendweightPCloud,lats,[360-LonLims[1],360-LonLims[0]],
+                                     180,180)
+    PCld_patch_mb,vn,vx,tx_PCld=PP.plot_patch(PCld_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
                                      180,180,ctbls[1],
                                      axs1[1],'%3.2f',cont=cont,n=5,
                                      vn=PCldlow,
@@ -537,9 +540,9 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
                        90-lats[0]],
                        aspect="equal")
     
-    temp=RL.make_contours_CH4_patch(axs1[RGBaxs],fNH3_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
+    temp=PC.plot_contours_on_patch(axs1[RGBaxs],fNH3_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
                                     tx_fNH3[-2:], frmt='%3.0f', clr='k')
-    temp=RL.make_contours_CH4_patch(axs1[RGBaxs],PCld_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
+    temp=PC.plot_contours_on_patch(axs1[RGBaxs],PCld_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
                                     tx_PCld[:2], frmt='%3.0f', clr='r')
 
     
@@ -644,6 +647,7 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
     if ROI:
         for R in ROI:
             print("###################### R=",R)
+            ##!!!! This color section was custom created for the NEZ ROIs 
             clr='C0'
             if "NH3" in R:
                 clr='k'
@@ -789,14 +793,15 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
     if variance:
         fig2.savefig(pathmapplots+collection+" Stdv Sys"+LonSys+" map.png",dpi=300)
 
-
     ###########################################################################
     # Create Stack Plot subplots on the axes objects passed into the procedure
     ###########################################################################
     if axNH3!=False:
         #lats=[100,120]
         #lats=[80,100]
-        fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(blendweightfNH3,lats,[360-LonLims[1],360-LonLims[0]],
+        fNH3_patch_mb=MP.make_patch(blendweightfNH3,lats,[360-LonLims[1],360-LonLims[0]],
+                                    180,180)
+        fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(fNH3_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
                                          180,180,ctbls[0],
                                          axNH3,'%3.2f',cbarplot=False,cont=False,n=11,
                                          vn=fNH3low,
@@ -806,7 +811,10 @@ def MakeContiguousMap(axNH3,axCH4,axRGB,collection="20241129-20241129",LonSys='2
         axNH3.tick_params('y', labelleft=False)
         axNH3.tick_params('x', labelsize=8)
 
-        PCld_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(blendweightPCloud,lats,[360-LonLims[1],360-LonLims[0]],
+
+        PCld_patch_mb=MP.make_patch(blendweightPCloud,lats,[360-LonLims[1],360-LonLims[0]],
+                                    180,180)
+        PCld_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(PCld_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
                                          180,180,ctbls[1],
                                          axCH4,'%3.2f',cbarplot=False,cont=False,
                                          n=5,vn=PCldlow,vx=PCldhigh)

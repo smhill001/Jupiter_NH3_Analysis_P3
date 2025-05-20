@@ -19,17 +19,14 @@ def ROI_Script(collection="20241202-20241202 NEDF 340",dateformat="%b:%d",
     from datetime import datetime
 
     import L3_Jup_Map_Plot as L3JMP
-    import get_map_collection as gmc
     import MakeContiguousMap as MCM
     import NEDF_ROI_collections as NRC
 
     ###########################################################################
     # GRAB OBSERVATIONS (KEY) LISTS AND THEN SET ROI BOUNDARIES  AND CM
     # SEQUENCE IF NEEDED TO TRACK A DRIFING TARGET (SYS I)
-    ###########################################################################
-    obslist,dummy=gmc.get_map_collection(collection)
-    
-    ROI,obslist,CM=NRC.NEDF_ROI_collections(collection=collection)
+    ###########################################################################   
+    ROI,obskeys,CM=NRC.NEDF_ROI_collections(collection=collection)
    
     ###########################################################################
     # SET MIN AND MAX VALUES FOR PLOT AXES AND COLOR BARS
@@ -63,7 +60,7 @@ def ROI_Script(collection="20241202-20241202 NEDF 340",dateformat="%b:%d",
     ###########################################################################
     First=True
 
-    for o in obslist:
+    for o in obskeys:
         dateobs,roilabel,mean1,stdv1,mean2,stdv2,meanamf=\
             L3JMP.L3_Jup_Map_Plot(obskey=o,imagetype='Map',target="Jupiter",
                         Smoothing=False,LatLims=LatLims,LonRng=LonRng,CMpref=CM[0],
@@ -247,7 +244,7 @@ def ROI_Script(collection="20241202-20241202 NEDF 340",dateformat="%b:%d",
     print("##################")
     print()
 
-    MCM.MakeContiguousMap(False,False,False,collection=collection,LonSys=LonSys,
+    MCM.MakeContiguousMap(False,False,False,obskeys,collection=collection,LonSys=LonSys,
                           FiveMicron=False,lats=LatLims,LonLims=[int(CM[0]-LonRng),int(CM[0]+LonRng)],
                           figsz=[3.0,6.0],ROI=ROI,variance=False,localmax=localmax,
                           proj="NEZ",ctbls=['terrain_r','Blues'])

@@ -68,17 +68,13 @@ def map_and_context(mapdata,maphdr,RGB,RGBtime,LonSys,LatLims,LonLims,LonRng,Plo
     sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Spectroscopy')
     sys.path.append('./Services')
 
-    import os
     import pylab as pl
     import numpy as np
-    from imageio import imwrite
-    from astropy.io import fits
-    import RetrievalLibrary as RL
     sys.path.append('./Maps')
-    import read_fits_map_L2_L3 as RFM
     import plot_patch as PP
     import make_patch_RGB as MPRGB
-    import copy
+    import make_patch as MP
+    import plot_contours_on_patch as PC
 
     ###########################################################################
     ## Just RGB and Abundance
@@ -102,14 +98,15 @@ def map_and_context(mapdata,maphdr,RGB,RGBtime,LonSys,LatLims,LonLims,LonRng,Plo
 
         axs1[ix].set_adjustable('box') 
 
-    TestfNH3=mapdata*amfdata**coef
-    fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(TestfNH3,LatLims,LonLims,
+    mapdata2=mapdata*amfdata**coef
+    data_patch=MP.make_patch(mapdata2,LatLims,LonLims,PlotCM,LonRng)
+    data_patch,vn,vx,tx=PP.plot_patch(data_patch,LatLims,LonLims,
                                      PlotCM,LonRng,ct,axs1[0],'%3.2f',
                                      cont=False,n=6,vn=low,vx=high,
                                      cbar_title=cbar_title,cbar_reverse=cbar_rev)
     
-    temp=RL.make_contours_CH4_patch(axs1[0],fNH3_patch_mb,LatLims,LonLims,
-                           lvls=tx_fNH3,frmt='%3.0f',clr='k')
+    temp=PC.plot_contours_on_patch(axs1[0],data_patch,LatLims,LonLims,
+                           lvls=tx,frmt='%3.0f',clr='k')
         
     if maphdr["TELESCOP"]=="NASA IRTF":
         axs1[0].set_title("IRTF 5um Radiance (Log10(arb. units))",fontsize=10)
@@ -132,8 +129,8 @@ def map_and_context(mapdata,maphdr,RGB,RGBtime,LonSys,LatLims,LonLims,LonRng,Plo
                extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
                        90-LatLims[0]],
                        aspect="equal")
-    temp=RL.make_contours_CH4_patch(axs1[1],fNH3_patch_mb,LatLims,LonLims,
-                           tx_fNH3,frmt='%3.0f',clr='k')
+    temp=PC.plot_contours_on_patch(axs1[1],data_patch,LatLims,LonLims,
+                           tx,frmt='%3.0f',clr='k')
 
     if ROI:
         for R in ROI:
@@ -207,4 +204,4 @@ def map_and_context(mapdata,maphdr,RGB,RGBtime,LonSys,LatLims,LonLims,LonRng,Plo
         
     fig1.savefig(pathout+fnout,dpi=300)
     
-    return(fNH3_patch_mb,TestfNH3,tx_fNH3,fnout)
+    return(data_patch,mapdata2,tx,fnout)

@@ -1,4 +1,4 @@
-def plot_patch(fullmap,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
+def plot_patch(patch,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
                cont=True,cbarplot=True,cbar_title="Test",cbar_reverse=False,vn=0.10,vx=0.20,n=6):
     """
     Created on Thu Apr 11 18:54:35 2024
@@ -7,24 +7,21 @@ def plot_patch(fullmap,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
     """    
     import numpy as np
     import pylab as pl
-    import RetrievalLibrary as RL
+    #import make_patch as MP
+    import plot_contours_on_patch as PC
 
     print("@@@@@@@@@@@@ LatLims, LonLims, CM2, LonRng",LatLims, LonLims, CM2, LonRng)
-    patch=RL.make_patch(fullmap,LatLims,LonLims,CM2,LonRng)
+    #patch=MP.make_patch(fullmap,LatLims,LonLims,CM2,LonRng)
     np.nan_to_num(patch, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
-    #vn=np.mean(patch)-3.0*np.std(patch)
-    #vx=np.mean(patch)+3.0*np.std(patch)
     tx=np.linspace(vn,vx,n,endpoint=True)
-    
-    #print(np.mean(patch),vn,vx)
 
     show=axis.imshow(patch, colorscale, origin='upper',vmin=vn,vmax=vx,  
                extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
                        90-LatLims[0]],
                        aspect="equal")
-    if cont:
-        temp=RL.make_contours_CH4_patch(axis,patch,LatLims,LonLims,
-                           lvls=tx,frmt=frmt,clr='k')
+    #if cont:
+    #    temp=PC.plot_contours_on_patch(axis,patch,LatLims,LonLims,
+    #                       lvls=tx,frmt=frmt,clr='k')
 
     im_ratio = patch.shape[0]/patch.shape[1]
     if cbarplot:

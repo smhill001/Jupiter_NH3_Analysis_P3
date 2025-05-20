@@ -8,6 +8,10 @@ def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,
     import pylab as pl
     import MakeContiguousMap as MCM
     import time
+    import NEDF_ROI_collections as NRC
+    import get_map_collection as gmc
+
+
     ts=time.time()
 
     maps2022=["20220810-20220812","20220828-20220901","20220904-20220905",
@@ -111,7 +115,15 @@ def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,
     
         counter=0
         for mp in maps:
+            #if len(collection)>4:
+            #    ROI,obslist,CM=NRC.NEDF_ROI_collections(collection=mp)
+            #else:
+            #    obslist,dummy=gmc.get_map_collection(mp)
+            obslist,dummy=gmc.get_map_collection(mp)
+
+
             MCM.MakeContiguousMap(axs23NH3[counter],axs23CH4[counter],axs23RGB[counter],
+                                                                       obslist,
                                                                        collection=mp,
                                                                        LonSys=LonSys,
                                                                        lats=lats,
