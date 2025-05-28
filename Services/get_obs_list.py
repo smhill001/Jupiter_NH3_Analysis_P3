@@ -1133,6 +1133,20 @@ def get_obs_list(planet="Jupiter",subsetkeys='all'):
                                'CH4file':'2024-11-05-0919_8-Jupiter_R656G620B632-RGB-WhtBal',
                                'NH3file':'2024-11-05-0919_8-Jupiter_R656G647B632-RGB-WhtBal',
                                'RGBfile':'2024-11-05-0930_3-Jupiter_R685G550B450-RGB-WhtBal-WV-artifact'},
+
+                  #############################################################
+                  # 20241111                                         20241111 #
+                  #############################################################
+                  
+                  '20241111UTa':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2024-11-11-0453_1-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2024-11-11-0453_1-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2024-11-11-0503_6-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+
+                  #############################################################
+                  # 20241115                                         20241115 #
+                  #############################################################
                   
                   '20241115UTa':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                      'Seeing':'9/10','Transparency':'8/10', 
@@ -1876,7 +1890,83 @@ def get_obs_list(planet="Jupiter",subsetkeys='all'):
                                'NH3file':'2025-01-06-0714_0-Jupiter_R656G647B632-RGB-WhtBal', #FF Artifact in NEB maybe?
                                'RGBfile':'2025-01-06-0724_5-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
                                   
-              
+                  #############################################################
+                  # 20250116                                         20250116 #
+                  #############################################################
+                  
+                  '20250116UTa':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0038_0-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-01-16-0038_7-Jupiter_R656G647B632-RGB-WhtBal',  #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0053_6-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'}, #Blurry
+                  
+                  '20250116UTb':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0104_0-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-01-16-0104_0-Jupiter_R656G647B632-RGB-WhtBal',  #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0114_5-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'}, #Blurry
+                  
+                  '20250116UTc':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0124_9-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-01-16-0124_9-Jupiter_R656G647B632-RGB-WhtBal',  #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0135_4-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'}, #Blurry
+                  
+                  '20250116UTd':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0145_8-Jupiter_R656G620B632-RGB-WhtBal',  #Bad Gradient
+                               'NH3file':'2025-01-16-0145_8-Jupiter_R656G647B632-RGB-WhtBal',  #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0156_3-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20250116UTe':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0206_7-Jupiter_R656G620B632-RGB-WhtBal',  
+                               'NH3file':'2025-01-16-0206_7-Jupiter_R656G647B632-RGB-WhtBal',  #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0217_2-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20250116UTf':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0227_6-Jupiter_R632G620B632-RGB-WhtBal',  
+                               'NH3file':'2025-01-16-0227_6-Jupiter_R632G647B632-RGB-WhtBal',  #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0238_1-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20250116UTg':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0248_5-Jupiter_R656G620B632-RGB-WhtBal',  
+                               'NH3file':'2025-01-16-0248_5-Jupiter_R656G647B632-RGB-WhtBal',  #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0259_0-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20250116UTh':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0311_2-Jupiter_R656G620B632-RGB-WhtBal', #VERY SHARP! Looks like a refocus here  
+                               'NH3file':'2025-01-16-0311_2-Jupiter_R656G647B632-RGB-WhtBal',  
+                               'RGBfile':'2025-01-16-0321_7-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20250116UTi':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0332_1-Jupiter_R656G620B632-RGB-WhtBal', #VERY SHARP! Looks like a refocus here  
+                               'NH3file':'2025-01-16-0332_1-Jupiter_R656G647B632-RGB-WhtBal', #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0342_6-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20250116UTj':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0354_5-Jupiter_R656G620B632-RGB-WhtBal', #VERY SHARP! Looks like a refocus here  
+                               'NH3file':'2025-01-16-0354_5-Jupiter_R656G647B632-RGB-WhtBal', #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0404_9-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20250116UTk':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0415_3-Jupiter_R656G620B632-RGB-WhtBal', #VERY SHARP! Looks like a refocus here  
+                               'NH3file':'2025-01-16-0415_4-Jupiter_R656G647B632-RGB-WhtBal', #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0425_8-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20250116UTl':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0448_4-Jupiter_R656G620B632-RGB-WhtBal', #VERY SHARP! Looks like a refocus here  
+                               'NH3file':'2025-01-16-0448_4-Jupiter_R656G647B632-RGB-WhtBal', #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0458_9-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  
                   #############################################################
                   # 20250117                                         20250117 #
                   #############################################################

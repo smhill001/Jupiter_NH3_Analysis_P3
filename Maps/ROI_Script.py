@@ -1,7 +1,7 @@
 def ROI_Script(collection="20241202-20241202 NEDF 340",dateformat="%b:%d",
                      ctbls=["terrain_r","Blues"],
                      LatLims=[75,105],LonRng=20,LonSys='1',close=False,coefs=[0.75,0.45],
-                     localmax=False):
+                     localmax=False,writecatalog=False):
 
     import sys
     drive='c:'
@@ -26,7 +26,7 @@ def ROI_Script(collection="20241202-20241202 NEDF 340",dateformat="%b:%d",
     # GRAB OBSERVATIONS (KEY) LISTS AND THEN SET ROI BOUNDARIES  AND CM
     # SEQUENCE IF NEEDED TO TRACK A DRIFING TARGET (SYS I)
     ###########################################################################   
-    ROI,obskeys,CM=NRC.NEDF_ROI_collections(collection=collection)
+    ROI,obskeys,CM=NRC.NEDF_ROI_collections(collection=collection,writecatalog=writecatalog)
    
     ###########################################################################
     # SET MIN AND MAX VALUES FOR PLOT AXES AND COLOR BARS
