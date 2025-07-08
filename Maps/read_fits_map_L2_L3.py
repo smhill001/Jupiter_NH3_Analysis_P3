@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
                         target="Jupiter",LonSys='3',Smoothing=False,
-                        FiveMicron=False):
+                        FiveMicron=False,LimbCorrection=False):
     """
     Created on Mon Nov 20 08:42:28 2023
     Called by: Map_Jup_Atm_2022_P3, currently only for L3 data to plot
                maps of fNH3 and PCld
+               
+    Updated 7/6/2025 by SMH to incorporate empirical limb correction (just for L3 for now)
     
     @author: smhil
     """
@@ -193,6 +195,12 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
     #axsamf[0].imshow(fNH3data)
     #axsamf[1].imshow(np.flipud(amfdata),vmin=-5.0,vmax=5.0)
     #axsamf[2].imshow(fNH3eza,vmin=-5.0,vmax=5.0)
+    
+    if LimbCorrection:
+        amfdata=(1.0/fNH3szar+1.0/fNH3ezar)/2.0
+        fNH3datar=fNH3datar*(amfdata**0.55)
+        PClouddatar=PClouddatar*amfdata**0.25
+
     
     if FiveMicron==False or FiveMicron=="png":
         print(PClouddatar.shape)

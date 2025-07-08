@@ -1966,6 +1966,60 @@ def get_obs_list(planet="Jupiter",subsetkeys='all'):
                                'NH3file':'2025-01-16-0448_4-Jupiter_R656G647B632-RGB-WhtBal', #FF Artifacts 2x
                                'RGBfile':'2025-01-16-0458_9-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
                   
+                  '20250116UTm':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0509_3-Jupiter_R656G620B632-RGB-WhtBal', #VERY SHARP! Looks like a refocus here  
+                               'NH3file':'2025-01-16-0509_3-Jupiter_R656G647B632-RGB-WhtBal', #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0519_8-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20250116UTn':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0530_2-Jupiter_R656G620B632-RGB-WhtBal', #VERY SHARP! Looks like a refocus here  
+                               'NH3file':'2025-01-16-0530_2-Jupiter_R656G647B632-RGB-WhtBal', #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0540_7-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20250116UTo':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0551_2-Jupiter_R656G620B632-RGB-WhtBal', #VERY SHARP! Looks like a refocus here  
+                               'NH3file':'2025-01-16-0551_1-Jupiter_R656G647B632-RGB-WhtBal', #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0601_6-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20250116UTp':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0612_0-Jupiter_R656G620B632-RGB-WhtBal', 
+                               'NH3file':'2025-01-16-0612_1-Jupiter_R656G647B632-RGB-WhtBal', #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0622_5-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20250116UTq':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0633_0-Jupiter_R656G620B632-RGB-WhtBal', 
+                               'NH3file':'2025-01-16-0633_0-Jupiter_R656G647B632-RGB-WhtBal', #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0643_4-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20250116UTr':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0653_9-Jupiter_R656G620B632-RGB-WhtBal', 
+                               'NH3file':'2025-01-16-0653_9-Jupiter_R656G647B632-RGB-WhtBal', #FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0704_4-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20250116UTs':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0714_8-Jupiter_R656G620B632-RGB-WhtBal', #Gradient
+                               'NH3file':'2025-01-16-0714_8-Jupiter_R656G647B632-RGB-WhtBal', #Strong Gradient, FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0725_3-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20250116UTt':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0735_7-Jupiter_R656G620B632-RGB-WhtBal', #Gradient
+                               'NH3file':'2025-01-16-0735_7-Jupiter_R656G647B632-RGB-WhtBal', #Strong Gradient, FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0746_2-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20250116UTu':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-01-16-0756_6-Jupiter_R656G620B632-RGB-WhtBal', #Gradient
+                               'NH3file':'2025-01-16-0756_6-Jupiter_R656G647B632-RGB-WhtBal', #Strong Gradient, FF Artifacts 2x
+                               'RGBfile':'2025-01-16-0807_1-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
                   
                   #############################################################
                   # 20250117                                         20250117 #
@@ -2076,13 +2130,13 @@ def get_obs_list(planet="Jupiter",subsetkeys='all'):
                   '20250117UTr':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                      'Seeing':'9/10','Transparency':'8/10', 
                                'CH4file':'2025-01-17-0700_2-Jupiter_R656G620B632-RGB-WhtBal',
-                               'NH3file':'2025-01-17-0700_2-Jupiter_R656G647B632-RGB-WhtBal', #Single H-alpha
+                               'NH3file':'2025-01-17-0700_2-Jupiter_R656G647B632-RGB-WhtBal', #Gradient #Single H-alpha
                                'RGBfile':'2025-01-17-0710_7-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
                   
                   '20250117UTs':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
                                      'Seeing':'9/10','Transparency':'8/10', 
                                'CH4file':'2025-01-17-0721_1-Jupiter_R656G620B632-RGB-WhtBal',
-                               'NH3file':'2025-01-17-0721_1-Jupiter_R656G647B632-RGB-WhtBal', #Single H-alpha
+                               'NH3file':'2025-01-17-0721_1-Jupiter_R656G647B632-RGB-WhtBal', #Gradient #Single H-alpha
                                'RGBfile':'2025-01-17-0731_6-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
                   
                   '20250117UTt':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',

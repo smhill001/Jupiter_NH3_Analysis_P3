@@ -93,20 +93,26 @@ def process_extrema(data_arrays: dict, mean_time_array, lats, lon_lims, min_dist
     return results
 
 
-def export_extrema_to_csv(results, filename_prefix):
-    for label, extrema_types in results.items():
-        for extrema_type, data in extrema_types.items():
-            filename = f"{filename_prefix}_{label}_{extrema_type}.csv"
-            with open(filename, mode='w', newline='') as file:
-                writer = csv.writer(file)
-                header = [
-                    "Index", "Time_FITS", "Time_JD", "Pixel_Row", "Pixel_Col",
-                    "Latitude", "Longitude"
-                ] + [f"Value_{k}" for k in data['values'].keys()]
-                writer.writerow(header)
+
+def export_extrema_to_csv(results, output_filename):
+    with open(output_filename, mode='w', newline='') as file:
+        writer = None
+
+        for label, extrema_types in results.items():
+            for extrema_type, data in extrema_types.items():
+                # Compose the header once
+                if writer is None:
+                    header = [
+                        "Label", "Extrema_Type", "Index", "Time_FITS", "Time_JD",
+                        "Pixel_Row", "Pixel_Col", "Latitude", "Longitude"
+                    ] + [f"Value_{k}" for k in data['values'].keys()]
+                    writer = csv.writer(file)
+                    writer.writerow(header)
 
                 for i in range(len(data['coords'])):
                     row = [
+                        label,
+                        extrema_type,
                         i,
                         data['times']['fits'][i],
                         data['times']['jd'][i],
@@ -116,6 +122,7 @@ def export_extrema_to_csv(results, filename_prefix):
                         data['coords'][i][1]
                     ] + [data['values'][k][i] for k in data['values'].keys()]
                     writer.writerow(row)
+
 
 import matplotlib.pyplot as plt
 

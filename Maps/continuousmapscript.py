@@ -1,5 +1,5 @@
 def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,360],
-                       localmax=False,variance=False):
+                       localmax=False,variance=False,ctbls=['terrain_r','Blues']):
     """
     Created on Sun Aug 25 15:04:22 2024
     
@@ -8,9 +8,7 @@ def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,
     import pylab as pl
     import MakeContiguousMap as MCM
     import time
-    import NEDF_ROI_collections as NRC
     import get_map_collection as gmc
-
 
     ts=time.time()
 
@@ -49,9 +47,15 @@ def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,
               "20250128-20250128","20250129-20250129","20250302-20250302"]
     
     maps2024NEZ=["20241105-20241105",
+              "20241115-20241115","20241118-20241118","20241128-20241129",
+              "20241202-20241203","20241205-20241205",
+              "20250106-20250106","20250116-20250117","20250127-20250128",
+              "20250128-20250129","20250302-20250302"]
+
+    maps2024NEZG=["20241105-20241105",
               "20241115-20241115","20241118-20241118","20241128-20241128","20241129-20241129",
               "20241202-20241202","20241203-20241203","20241205-20241205",
-              "20250106-20250106","20250117-20250117","20250127-20250127",
+              "20250106-20250106","20250116-20250116","20250117-20250117","20250127-20250127",
               "20250128-20250128","20250129-20250129","20250302-20250302"]
 
     pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/maps/"
@@ -89,23 +93,42 @@ def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,
             maps=maps2024GRS
         if collection=='2024 NEZ':
             maps=maps2024NEZ
-            
+        if collection=='2024 NEZ Granular':
+            maps=maps2024NEZG
+        
+        xfig=6.0
+        yfig=6.0
+        
+        aspectratio=(LonLims[1]-LonLims[0])/(lats[1]-lats[0])
+        aspect_ratio_map = {
+                            1:     [3.0, 6.0],
+                            4/3.:  [3.5, 6.0],
+                            2:     [4.5, 6.0],
+                            3:     [3.0], #e.g. 120x360
+                            4:     [7.05, 6.0],
+                            6:     [8.5, 5.0],
+                            9:     [10, 4.5],
+                            12:    [1.0] #e.g. 30x360
+                            }
+        yfactor = aspect_ratio_map[aspectratio]
+      
+        
         nrows=len(maps)
-        fig23NH3,axs23NH3=pl.subplots(nrows,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
+        fig23NH3,axs23NH3=pl.subplots(nrows,1,figsize=(xfig,yfig*yfactor[0]), dpi=150, facecolor="white",
                               sharex=True,sharey=True)   
         fig23NH3.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.94,
                     wspace=0.25, hspace=0.08)     
         fig23NH3.suptitle("Ammonia Abundance (ppm)")
         axs23NH3[nrows-1].set_xlabel("System "+LonSys+" Longitude (deg)",fontsize=8)        
         
-        fig23CH4,axs23CH4=pl.subplots(nrows,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
+        fig23CH4,axs23CH4=pl.subplots(nrows,1,figsize=(xfig,yfig*yfactor[0]), dpi=150, facecolor="white",
                               sharex=True,sharey=True)   
         fig23CH4.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.94,
                     wspace=0.25, hspace=0.08)     
         fig23CH4.suptitle("Effective Cloud-Top Pressure (mb)")
         axs23CH4[nrows-1].set_xlabel("System "+LonSys+" Longitude (deg)",fontsize=8)
         
-        fig23RGB,axs23RGB=pl.subplots(nrows,1,figsize=(6.0,6.0), dpi=150, facecolor="white",
+        fig23RGB,axs23RGB=pl.subplots(nrows,1,figsize=(xfig,yfig*yfactor[0]), dpi=150, facecolor="white",
                               sharex=True,sharey=True)   
         fig23RGB.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.94,
                     wspace=0.25, hspace=0.08)     
@@ -114,6 +137,7 @@ def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,
     
     
         counter=0
+        cb=False
         for mp in maps:
             #if len(collection)>4:
             #    ROI,obslist,CM=NRC.NEDF_ROI_collections(collection=mp)
@@ -122,20 +146,21 @@ def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,
             obslist,dummy=gmc.get_map_collection(mp)
 
 
-            MCM.MakeContiguousMap(axs23NH3[counter],axs23CH4[counter],axs23RGB[counter],
-                                                                       obslist,
-                                                                       collection=mp,
-                                                                       LonSys=LonSys,
-                                                                       lats=lats,
-                                                                       LonLims=LonLims,
-                                                                       localmax=localmax,
-                                                                       variance=variance)
+            MCM.MakeContiguousMap(collection=mp,obskeys=obslist,LonSys=LonSys,lats=lats,
+                                  LonLims=LonLims,localmax=localmax,
+                                  variance=variance,ctbls=ctbls,cb=cb,
+                                  axNH3=axs23NH3[counter],
+                                  axCH4=axs23CH4[counter],
+                                  axRGB=axs23RGB[counter],
+                                  LimbCorrection=True,
+                                  lonhalfwidth=45,boxcar=9)
             #pl.show()
             counter=counter+1
+            cb=False
     
-        fig23NH3.savefig(pathmapplots+collection+" NH3 Stack Sys"+LonSys+" "+lonstr+" "+latstr+"_map.png",dpi=300)
-        fig23CH4.savefig(pathmapplots+collection+" CH4 Stack Sys"+LonSys+" "+lonstr+" "+latstr+"_map.png",dpi=300)
-        fig23RGB.savefig(pathmapplots+collection+" RGB Stack Sys"+LonSys+" "+lonstr+" "+latstr+"_map.png",dpi=300)
+        fig23NH3.savefig(pathmapplots+collection+" NH3 Stack Sys"+LonSys+" "+lonstr+" "+latstr+" map.png",dpi=300)
+        fig23CH4.savefig(pathmapplots+collection+" CH4 Stack Sys"+LonSys+" "+lonstr+" "+latstr+" map.png",dpi=300)
+        fig23RGB.savefig(pathmapplots+collection+" RGB Stack Sys"+LonSys+" "+lonstr+" "+latstr+" map.png",dpi=300)
     
     elapsed=time.time()-ts
     print("elapsed time=",elapsed)

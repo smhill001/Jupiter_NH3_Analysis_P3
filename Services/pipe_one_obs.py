@@ -40,7 +40,8 @@ def pipe_one_obs(obskeys,target="Jupiter",close=False):
         L3P.L3_Jup_Map_Plot(obskey=obskey,imagetype='Map',target=target,
                         Smoothing=False,LatLims=[45,135],LonRng=45,CMpref='subobs',
                         LonSys='2',showbands=False,coef=[0.,0.],subproj='',
-                        figxy=[8.0,4.0],FiveMicron=False,ROI=False)
+                        figxy=[8.0,4.0],FiveMicron=False,ROI=False,
+                        ctbls=["terrain_r","Blues"])
         if close:
             pl.close('all')
         
