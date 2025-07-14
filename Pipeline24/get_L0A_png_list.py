@@ -36,28 +36,28 @@ def get_L0A_png_list(obskey,planet="Saturn"):
     science=["656HIA","632OI","620CH4","647NH3"]
     fn_bases=CF.video_metadata_list(path+obskey+".csv") #read the metadata
     fn_bases.load_records()
-    print(fn_bases.VideoFile)
+    #print(fn_bases.VideoFile)
     
     fn_L0A_temp=[]
     #for k in range(0,fn_bases.nrecords-1):
     #    fn_base=fn_bases.VideoFile[k].split('.')[0]
     #    print(fn_base)
     for filtr in RGB:
-        print(filtr)
-        print(WV)
+        #print(filtr)
+        #print(WV)
         ftemp=[i for i in WV if filtr in i]
         fn_L0A_temp.extend(ftemp)
     for filtr in science:
-        print(filtr)
-        print(aligned)
+        #print(filtr)
+        #print(aligned)
         ftemp=[i for i in aligned if filtr in i]
         fn_L0A_temp.extend(ftemp)
-    print("################### L0A list")
-    for i in fn_L0A_temp:
-        print(i)
-    print("###################")
+    #print("################### L0A list")
+    #for i in fn_L0A_temp:
+        #print(i)
+    #print("###################")
     fn_L0A_list=[]
-    print(fn_bases.VideoFile)
+    #print(fn_bases.VideoFile)
     for fnbase in fn_bases.VideoFile:
         ftemp=[i for i in fn_L0A_temp if fnbase.split('.')[0] in i]
         fn_L0A_list.extend(ftemp)
@@ -66,5 +66,5 @@ def get_L0A_png_list(obskey,planet="Saturn"):
     #! specific observation (obskey) by comparing with that list. This is
     #! crucial when there is more than one observation contained in a folder.
     
-    print(path,fn_L0A_list)
+    #print(path,fn_L0A_list)
     return(path,fn_L0A_list)

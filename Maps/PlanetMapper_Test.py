@@ -32,7 +32,7 @@ spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/spk/sa
 spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/spk/satellites/sat453.bsp")
 
 
-body = pm.BodyXY('Jupiter', '2023-10-26T04:21:18', sz=500)
+body = pm.BodyXY('Jupiter', '2025-03-02 04:59:00', sz=500)
 y=body.set_disc_params(x0=250, y0=250, r0=200)
 x=body.get_backplane_map('INCIDENCE')
 

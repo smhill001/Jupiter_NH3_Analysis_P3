@@ -643,27 +643,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
 
         output_filename=pathmapplots+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" extrema.csv"
         fx.export_extrema_to_csv(results, output_filename)
-
-        fx.plot_extrema_on_axisa(axs1[0], results, data_type='NH3', extrema_type='minima', text_color='k',fontsize=10)
-        fx.plot_extrema_on_axisa(axs1[0], results, data_type='NH3', extrema_type='maxima', text_color='w',fontsize=10)
-        fx.plot_extrema_on_axisa(axs1[0], results, data_type='PCloud', extrema_type='minima', text_color='b',fontsize=8)
-        fx.plot_extrema_on_axisa(axs1[0], results, data_type='PCloud', extrema_type='maxima', text_color='y',fontsize=8)
-        fx.plot_extrema_on_axisa(axs1[0], results, data_type='RGB', extrema_type='minima', text_color='C1',fontsize=8)
-        fx.plot_extrema_on_axisa(axs1[0], results, data_type='RGB', extrema_type='maxima', text_color='C0',fontsize=8)
-        fx.plot_extrema_on_axisa(axs1[1], results, data_type='NH3', extrema_type='minima', text_color='k',fontsize=8)
-        fx.plot_extrema_on_axisa(axs1[1], results, data_type='NH3', extrema_type='maxima', text_color='w',fontsize=8)
-        fx.plot_extrema_on_axisa(axs1[1], results, data_type='PCloud', extrema_type='minima', text_color='b',fontsize=10)
-        fx.plot_extrema_on_axisa(axs1[1], results, data_type='PCloud', extrema_type='maxima', text_color='y',fontsize=10)
-        fx.plot_extrema_on_axisa(axs1[1], results, data_type='RGB', extrema_type='minima', text_color='C1',fontsize=8)
-        fx.plot_extrema_on_axisa(axs1[1], results, data_type='RGB', extrema_type='maxima', text_color='C0',fontsize=8)
-        #fx.plot_extrema_on_axisa(axs1[2], results, data_type='NH3', extrema_type='minima', text_color='k',fontsize=8)
-        fx.plot_extrema_on_axisa(axs1[2], results, data_type='NH3', extrema_type='maxima', text_color='w',fontsize=8)
-        fx.plot_extrema_on_axisa(axs1[2], results, data_type='PCloud', extrema_type='minima', text_color='b',fontsize=8)
-        fx.plot_extrema_on_axisa(axs1[2], results, data_type='PCloud', extrema_type='maxima', text_color='y',fontsize=8)
-        #fx.plot_extrema_on_axisa(axs1[2], results, data_type='RGB', extrema_type='minima', text_color='C1',fontsize=10)
-        #fx.plot_extrema_on_axisa(axs1[2], results, data_type='RGB', extrema_type='maxima', text_color='C0',fontsize=10)
-
-        #print("xyfnh3max")
+        fx.extrema_overplot_all(results,axes = {'axNH3': axs1[0], 'axCH4': axs1[1], 'axRGB': axs1[2]})
 
     fig1.savefig(pathmapplots+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" map.png",dpi=300)
     
@@ -714,6 +694,8 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
         axRGB.tick_params('x', labelsize=8)
 
         if localmax:
+            fx.extrema_overplot_all(results,axes = {'axNH3': axNH3, 'axCH4': axCH4, 'axRGB': axRGB})
+            """
             fx.plot_extrema_on_axis(axNH3, results, data_type='NH3', extrema_type='minima', symbol_color='k',s=30,linewidth=1.0)
             fx.plot_extrema_on_axis(axNH3, results, data_type='NH3', extrema_type='maxima', symbol_color='w',s=30,linewidth=1.0)
             fx.plot_extrema_on_axis(axNH3, results, data_type='PCloud', extrema_type='minima', symbol_color='b',s=15,linewidth=0.5)
@@ -732,7 +714,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
             fx.plot_extrema_on_axis(axRGB, results, data_type='PCloud', extrema_type='maxima', symbol_color='y',s=15,linewidth=0.5)
             fx.plot_extrema_on_axis(axRGB, results, data_type='RGB', extrema_type='minima', symbol_color='C1',s=30,linewidth=1.0)
             fx.plot_extrema_on_axis(axRGB, results, data_type='RGB', extrema_type='maxima', symbol_color='C0',s=30,linewidth=1.0)
-
+            """
     print(aspectratio)
     #print("####### xy=",xyfnh3,xyPcldmax,xyPcldmin)
     return(lats,blendweightPCloud,blendweightfNH3,blendRGBweight)

@@ -213,3 +213,51 @@ def plot_extrema_on_axisa(ax, extrema_dict, data_type, extrema_type, text_color=
 
     #ax.set_xlabel("Longitude")
     #ax.set_ylabel("Latitude")
+
+def extrema_overplot_all(results,axes = {'axNH3': False, 'axCH4': False, 'axRGB': False}):
+    # Define the plotting parameters for each (data_type, extrema_type)
+    plot_specs = {
+        ('NH3', 'minima'): {'color': 'k', 's': 8, 'lw': 1.0},
+        ('NH3', 'maxima'): {'color': 'w', 's': 8, 'lw': 1.0},
+        ('PCloud', 'minima'): {'color': 'b', 's': 8, 'lw': 0.5},
+        ('PCloud', 'maxima'): {'color': 'y', 's': 8, 'lw': 0.5},
+        ('RGB', 'minima'): {'color': 'C1', 's': 8, 'lw': 0.5},
+        ('RGB', 'maxima'): {'color': 'C0', 's': 8, 'lw': 0.5},
+    }
+    
+    # Adjust sizes/linewidths by axis if needed
+    axis_adjustments = {
+        'axNH3': {
+            ('NH3', 'minima'): {'s': 10, 'lw': 0.5},
+            ('NH3', 'maxima'): {'s': 10, 'lw': 0.5},
+        },
+        'axCH4': {
+            ('PCloud', 'minima'): {'s': 10, 'lw': 1.0},
+            ('PCloud', 'maxima'): {'s': 10, 'lw': 1.0},
+        },
+        'axRGB': {
+            ('NH3', 'minima'): {'s': 0, 'lw': 0.5},
+            ('RGB', 'minima'): {'s': 0, 'lw': 1.0},
+            ('RGB', 'maxima'): {'s': 0, 'lw': 1.0},
+        }
+    }
+    
+    # Loop through axes and plot
+    
+    
+    for ax_name, ax in axes.items():
+        for (data_type, extrema_type), base_spec in plot_specs.items():
+            spec = base_spec.copy()
+            # Override with axis-specific adjustments if available
+            overrides = axis_adjustments.get(ax_name, {}).get((data_type, extrema_type))
+            if overrides:
+                spec.update(overrides)
+    
+            plot_extrema_on_axisa(
+                ax, results,
+                data_type=data_type,
+                extrema_type=extrema_type,
+                text_color=spec['color'],
+                fontsize=spec['s']#,
+                #linewidth=spec['lw']
+            )

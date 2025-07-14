@@ -1,4 +1,5 @@
-def Profile_L3_script(figxy=[6.0,6.0],bands=["STrZ","SEB","SEZ","NEZ","NEB","NTrZ"],
+def Profile_L3_script(figxy=[6.0,6.0],LatPlotLims=[45,135],ZonePlotHalfWidth=60,
+                      bands=["STrZ","SEB","SEZ","NEZ","NEB","NTrZ"],
                       colors=["C0","C1","C2","C3","C4","C5"]):
     """
     PURPOSE:    Compute changes over time in meridional profiles, plotted on
@@ -42,15 +43,15 @@ def Profile_L3_script(figxy=[6.0,6.0],bands=["STrZ","SEB","SEZ","NEZ","NEB","NTr
     CH4SCT22,CH4VLT22,CH4SCT23,CH4SCT24=PL3M.Profile_L3_multi(param="PCld",
                                                        profile="Meridional",
                                                        ProfileHalfWidth=2,
-                                                       LatPlotLims=[45,135],
-                                                       ZonePlotHalfWidth=60,
+                                                       LatPlotLims=LatPlotLims,
+                                                       ZonePlotHalfWidth=ZonePlotHalfWidth,
                                                        smooth=False,inset=False)
     
     NH3SCT22,NH3VLT22,NH3SCT23,NH3SCT24=PL3M.Profile_L3_multi(param="fNH3",
                                                        profile="Meridional",
                                                        ProfileHalfWidth=2,
-                                                       LatPlotLims=[45,135],
-                                                       ZonePlotHalfWidth=60,
+                                                       LatPlotLims=LatPlotLims,
+                                                       ZonePlotHalfWidth=ZonePlotHalfWidth,
                                                        smooth=False,inset=False)
     
     fig3,axs3=pl.subplots(1,1,figsize=(figxy[0],figxy[1]), dpi=150, facecolor="white")

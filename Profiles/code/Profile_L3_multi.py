@@ -83,8 +83,7 @@ def Profile_L3_multi(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
                         profile=profile,clr='k',width=1.,param=param,smooth=smooth)
             
     axsavgprof.plot(LatsSCT22,OutProSCT22,color='k',linewidth=1.,linestyle='solid',
-            #label=reference+' (Avg. '+str(Num)+')')  
-            label='SCT 2022 (Avg. ')#+str(Num)+')')  
+            label='SCT 2022 (Avg. '+str(NumS22)+')')  
 
     axsavgprof.fill_between(LatsSCT22, OutProSCT22-OutStdSCT22, OutProSCT22+OutStdSCT22,
                     color='k',alpha=.05)
@@ -98,8 +97,7 @@ def Profile_L3_multi(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
                         style='dashed')
 
     axsavgprof.plot(LatsVLT22,OutProVLT22,color='k',linewidth=0.5,linestyle='dashed',
-            #label=reference+' (Avg. '+str(Num)+')')  
-            label='VLT 2022 (Avg. ')#+str(Num)+')')  
+            label='VLT 2022 (Avg. '+str(NumV22)+')')  
 
     axsavgprof.fill_between(LatsVLT22, OutProVLT22-OutStdVLT22, OutProVLT22+OutStdVLT22,
                     color='k',alpha=.05)
@@ -112,8 +110,7 @@ def Profile_L3_multi(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
                         profile=profile,clr='C0',width=2.5,param=param,smooth=smooth)
 
     axsavgprof.plot(LatsSCT23,OutProSCT23,color='C0',linewidth=2.5,linestyle='solid',
-            #label=reference+' (Avg. '+str(Num)+')')  
-            label='SCT 2023 (Avg. ')#+str(Num)+')')  
+            label='SCT 2023 (Avg. '+str(NumS23)+')')  
 
     axsavgprof.fill_between(LatsSCT23, OutProSCT23-OutStdSCT23, OutProSCT23+OutStdSCT23,
                     color='C0',alpha=.05)
@@ -126,8 +123,7 @@ def Profile_L3_multi(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
                         profile=profile,clr='C1',width=2.5,param=param,smooth=smooth)
 
     axsavgprof.plot(LatsSCT24,OutProSCT24,color='C1',linewidth=2.5,linestyle='solid',
-            #label=reference+' (Avg. '+str(Num)+')')  
-            label='SCT 2024 (Avg. ')#+str(Num)+')')  
+            label='SCT 2024 (Avg. '+str(NumS24)+')')  
 
     axsavgprof.fill_between(LatsSCT24, OutProSCT24-OutStdSCT24, OutProSCT24+OutStdSCT24,
                     color='C1',alpha=.05)

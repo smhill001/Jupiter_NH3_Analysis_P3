@@ -42,7 +42,7 @@ def gui_fitter(dataset,planet='Saturn'):
                 params=observation.get_disc_params()
                 #print("######### params2=",params)
                 
-                print("1##########observation.backplanes=",observation.backplanes)
+                print("1##########observation.backplanes=",list(observation.backplanes.keys()))
                 
                 del observation.backplanes['DOPPLER']
                 del observation.backplanes['LON-CENTRIC']
@@ -61,11 +61,11 @@ def gui_fitter(dataset,planet='Saturn'):
                 del observation.backplanes['AZIMUTH']
                 del observation.backplanes['PHASE']
                 del observation.backplanes['LIMB-LAT-GRAPHIC']
-                print()
-                print("2##########observation.backplanes=",observation.backplanes)
+                print("******************")
+                print("2##########observation.backplanes=",observation.backplanes.keys())
 
                 
-                observation.save_observation(path+fn+".fits")
+                observation.save_observation(path+fn.replace("png","fits"))
             
                 # Run some custom setup
                 #observation.add_other_bodies_of_interest('Io', 'Europa', 'Ganymede', 'Callisto')
