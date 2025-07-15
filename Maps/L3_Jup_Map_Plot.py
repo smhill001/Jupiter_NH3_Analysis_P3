@@ -196,7 +196,11 @@ def L3_Jup_Map_Plot(obskey="20250106UTf",imagetype='Map',target="Jupiter",
                         axis_inv=True,cbar_title="Log10(5um radiance)")
    
     #return(fig1,axs1,fig2,axs2,fig3,axs3)
-    return(dateobs,roilabel,mean1,stdv1,mean2,stdv2,meanamf)
+    ROIout={obskey:{'dateobs':dateobs,'roilabel':roilabel,'mean1':mean1,'stdv1':stdv1,
+            'mean2':mean2,'stdv2':stdv2,'meanamf':meanamf}}
+    print("############### ROIout= ",ROIout)
+    return(ROIout)
+    #return(dateobs,roilabel,mean1,stdv1,mean2,stdv2,meanamf)
 
 
 def load_png(file_path):

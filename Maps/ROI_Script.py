@@ -1,3 +1,66 @@
+import csv
+
+def flatten_json_agg_to_csv(data, csv_output_path):
+    """
+    Flatten a nested JSON-like Python dictionary of ROI stats and write to CSV.
+
+    Parameters:
+        data (dict): Dictionary containing the structured ROI data.
+        csv_output_path (str): Path to the output CSV file.
+    """
+    with open(csv_output_path, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+
+        # Write header
+        header = ['obs_id', 'dateobs', 'roilabel', 'mean1', 'stdv1', 'mean2', 'stdv2', 'meanamf']
+        writer.writerow(header)
+
+        for obs_id, entry in data.items():
+            dateobs = entry['dateobs']
+            roilabels = entry['roilabel']
+            mean1 = entry['mean1']
+            stdv1 = entry['stdv1']
+            mean2 = entry['mean2']
+            stdv2 = entry['stdv2']
+            meanamf = entry['meanamf']
+
+            for i in range(len(roilabels)):
+                writer.writerow([
+                    obs_id,
+                    dateobs,
+                    roilabels[i],
+                    mean1[i],
+                    stdv1[i],
+                    mean2[i],
+                    stdv2[i],
+                    meanamf[i]
+                ])
+                
+def flatten_json_mean_to_csv(data, csv_output_path):
+    """
+    Flatten a nested JSON-like Python dictionary of ROI stats and write to CSV.
+
+    Parameters:
+        data (dict): Dictionary containing the structured ROI data.
+        csv_output_path (str): Path to the output CSV file.
+    """
+    with open(csv_output_path, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        # Write header
+        writer.writerow(["ROI Label", "Mean1", "Stdv1", "Mean2", "Stdv2", "Mean AMF"])
+        
+        for roi, values in data.items():
+            # Excel-safe label
+            safe_label = roi
+            writer.writerow([
+                safe_label,
+                values.get("meanmean1", ""),
+                values.get("stdvstdv1", ""),
+                values.get("meanmean2", ""),
+                values.get("stdvstdv2", ""),
+                values.get("mamfmamf", "")
+            ])
+
 def ROI_Script(collection="20241202-20241202 NEDF 340",dateformat="%b:%d",
                      ctbls=["terrain_r","Blues"],
                      LatLims=[75,105],LonRng=20,LonSys='1',close=False,coefs=[0.75,0.45],
@@ -17,6 +80,7 @@ def ROI_Script(collection="20241202-20241202 NEDF 340",dateformat="%b:%d",
     import numpy as np
     import matplotlib.dates as mdates
     from datetime import datetime
+    import json
 
     import L3_Jup_Map_Plot as L3JMP
     import MakeContiguousMap as MCM
@@ -59,60 +123,64 @@ def ROI_Script(collection="20241202-20241202 NEDF 340",dateformat="%b:%d",
     # !!!!AND VET THEM
     ###########################################################################
     First=True
-
+    ROIaggdict={}
     for o in obskeys:
-        dateobs,roilabel,mean1,stdv1,mean2,stdv2,meanamf=\
+        #dateobs,roilabel,mean1,stdv1,mean2,stdv2,meanamf=\
+        ROIdict=\
             L3JMP.L3_Jup_Map_Plot(obskey=o,imagetype='Map',target="Jupiter",
                         Smoothing=False,LatLims=LatLims,LonRng=LonRng,CMpref=CM[0],
                         LonSys=LonSys,showbands=False,coef=coefs,
                         subproj='NEZ',figxy=[8.0,4.0],FiveMicron=False,ROI=ROI,
                         ctbls=ctbls)
             
-        print("*********",dateobs,roilabel,mean1,stdv1,mean2,stdv2)
-        if First:
-            datearr=[dateobs]
-            roilabelarr=[roilabel]
-            mean1arr=[mean1]
-            stdv1arr=[stdv1]
-            mean2arr=[mean2]
-            stdv2arr=[stdv2]
-            meanamfarr=[meanamf]
-        else:
-            datearr.append(dateobs)
-            roilabelarr.append(roilabel)
-            mean1arr.append(mean1)
-            stdv1arr.append(stdv1)
-            mean2arr.append(mean2)
-            stdv2arr.append(stdv2)
-            meanamfarr.append(meanamf)
-        First=False
+        ROIaggdict.update(ROIdict)
             
     if close:
         pl.close('all')
-
+        
+    pathout='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/NEZ/'
+    with open(pathout+collection+" ROI aggregated.json", 'w') as fp:
+        json.dump(ROIaggdict, fp)
+    flatten_json_agg_to_csv(ROIaggdict, pathout+collection+" ROI aggregated.csv")
     ###########################################################################
     # CONVERT DATA TO NUMPY ARRAYS FOR PLOTTING
     ###########################################################################
-    for k in range(0,len(datearr)):    
-        datearr[k]=datetime.strptime(datearr[k], '%Y-%m-%dT%H:%M:%SZ')
-    datearray=np.array(datearr)
-    
-    mean1array=np.array(mean1arr)
-    mean2array=np.array(mean2arr)
-    meanamfarray=np.array(meanamfarr)
-    stdv1array=np.array(stdv1arr)
-    stdv2array=np.array(stdv2arr)
-    roilabelarray=np.array(roilabelarr)
 
+    for o in obskeys: 
+        ROIaggdict[o]['dateobs']=datetime.strptime(ROIaggdict[o]['dateobs'],'%Y-%m-%dT%H:%M:%SZ')
+    datearraydt=np.array([ROIaggdict[o]['dateobs'] for o in ROIaggdict])
+    
+    mean1array = np.array([ROIaggdict[o]['mean1'] for o in ROIaggdict])
+    mean2array = np.array([ROIaggdict[o]['mean2'] for o in ROIaggdict])
+    stdv1array = np.array([ROIaggdict[o]['stdv1'] for o in ROIaggdict])
+    stdv2array = np.array([ROIaggdict[o]['stdv2'] for o in ROIaggdict])
+    meanamfarray = np.array([ROIaggdict[o]['meanamf'] for o in ROIaggdict])
+    roilabelarray = np.array([ROIaggdict[o]['roilabel'] for o in ROIaggdict])
+    
     meanmean1=np.mean(mean1array,axis=0)
     stdvstdv1=np.std(mean1array,axis=0)
     meanmean2=np.mean(mean2array,axis=0)
     stdvstdv2=np.std(mean2array,axis=0)
+    mamfmamf=np.mean(meanamfarray,axis=0)
+    print("meanamfarray=",meanamfarray)
+    print("------------------ mamfmamf=",mamfmamf)
     
+    ROImean={}
+    for i in range(0,len(ROIaggdict[obskeys[0]]['roilabel'])-1):
+        print(i)
+        print(ROIaggdict[obskeys[0]]['roilabel'][i])
+        roilabel=ROIaggdict[obskeys[0]]['roilabel'][i]
+        ROImean.update({roilabel:{'meanmean1':meanmean1[i],
+                        'stdvstdv1':stdvstdv1[i],'meanmean2':meanmean2[i],
+                        'stdvstdv2':stdvstdv2[i],'mamfmamf':mamfmamf[i]}})
+
+    with open(pathout+collection+" ROI mean.json", 'w') as fp:
+        json.dump(ROImean, fp)
+    flatten_json_mean_to_csv(ROImean, pathout+collection+" ROI mean.csv")
+
     ###########################################################################
     # SET UP PLOTS FOR TIMELINE AND SCATTER
     ###########################################################################
-    pathout='C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/NEZ/'
 
     figtime,axstime=pl.subplots(1,2,figsize=(8,4), dpi=150, facecolor="white")
     figtime.suptitle(collection+" ROIs vs Time",x=0.5,ha='center',color='k')
@@ -124,7 +192,7 @@ def ROI_Script(collection="20241202-20241202 NEDF 340",dateformat="%b:%d",
     ###########################################################################
     # PLOT DATA
     for i in range(0,mean1array.shape[1]):
-        date_sort = datearray.argsort()
+        date_sort = datearraydt.argsort()
         amf_sort = meanamfarray[:,i].argsort()
         lbl_sort = roilabelarray[:,i].argsort()
         
@@ -138,11 +206,10 @@ def ROI_Script(collection="20241202-20241202 NEDF 340",dateformat="%b:%d",
         if "NEB ref" in roilabelarray[0,i]:
             clr='brown'
 
-        
-        axstime[0].errorbar(datearray[date_sort],mean1array[date_sort,i],yerr=stdv1array[date_sort,i],
+        axstime[0].errorbar(datearraydt[date_sort],mean1array[date_sort,i],yerr=stdv1array[date_sort,i],
                             label=roilabelarray[0,i],
                         capsize=3.0,elinewidth=0.5,capthick=0.5,color=clr)
-        axstime[1].errorbar(datearray[date_sort],mean2array[date_sort,i],yerr=stdv2array[date_sort,i],
+        axstime[1].errorbar(datearraydt[date_sort],mean2array[date_sort,i],yerr=stdv2array[date_sort,i],
                             label=roilabelarray[0,i],
                         capsize=3.0,elinewidth=0.5,capthick=0.5,color=clr)
 
@@ -244,7 +311,11 @@ def ROI_Script(collection="20241202-20241202 NEDF 340",dateformat="%b:%d",
     print("##################")
     print()
 
-    MCM.MakeContiguousMap(False,False,False,obskeys,collection=collection,LonSys=LonSys,
+    MCM.MakeContiguousMap(collection=collection,obskeys=obskeys,LonSys=LonSys,
                           FiveMicron=False,lats=LatLims,LonLims=[int(CM[0]-LonRng),int(CM[0]+LonRng)],
                           figsz=[3.0,6.0],ROI=ROI,variance=False,localmax=localmax,
-                          proj="NEZ",ctbls=['terrain_r','Blues'])
+                          proj="NEZ",ctbls=['terrain_r','Blues'],
+                          cont=False,bare_maps=False,cb=False,
+                          axNH3=False,axCH4=False,axRGB=False,LimbCorrection=True,
+                          lonhalfwidth=45,boxcar=9)
+    

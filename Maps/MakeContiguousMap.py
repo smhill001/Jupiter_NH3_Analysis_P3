@@ -478,14 +478,6 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
         temp=make_bare_map(blendweightPCloud,ctbls[1],PCldlow,PCldhigh,pathmapplots,collection,LonSys)
         temp=make_bare_map(RGB4Display,ctbls[0],PCldlow,PCldhigh,pathmapplots,collection,LonSys)
 
-        #figpngRGB,axspngRGB=pl.subplots(1,figsize=(2.4,1.2), dpi=150, facecolor="black")
-        #axspngRGB = figpngRGB.add_axes([0, 0, 1, 1],facecolor='black')
-        #axspngRGB.imshow(RGB4Display)
-        #axspngRGB.axis('off')
-        #figpngRGB.patch.set_facecolor('black')
-        #figpngRGB.savefig(pathmapplots+collection+" RGB Mean Sys"+LonSys+" map.png",dpi=150)
-        #pl.show()
-
     ###########################################################################
 
     if variance:
@@ -507,13 +499,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
         axs2[RGBaxs].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=9)
         axs2[RGBaxs].set_ylabel("PG Latitude (deg)")
         box2 = axs2[RGBaxs].get_position()
-    """
-    if localmax:
-        axs1[RGBaxs].scatter(xyfnh3max[:,1],xyfnh3max[:,0],color='r',marker='+')
-        axs1[RGBaxs].scatter(xyfnh3min[:,1],xyfnh3min[:,0],color='r',marker='_')
-        axs1[RGBaxs].scatter(xyPcldmax[:,1],xyPcldmax[:,0],color='yellow',marker='+')
-        axs1[RGBaxs].scatter(xyPcldmin[:,1],xyPcldmin[:,0],color='yellow',marker='_')
-    """
+
     #Aspect Ratio Customization
     if aspectratio==1:
         fig1.subplots_adjust(left=0.21, bottom=0.07, right=0.79, top=0.88,
@@ -695,26 +681,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
 
         if localmax:
             fx.extrema_overplot_all(results,axes = {'axNH3': axNH3, 'axCH4': axCH4, 'axRGB': axRGB})
-            """
-            fx.plot_extrema_on_axis(axNH3, results, data_type='NH3', extrema_type='minima', symbol_color='k',s=30,linewidth=1.0)
-            fx.plot_extrema_on_axis(axNH3, results, data_type='NH3', extrema_type='maxima', symbol_color='w',s=30,linewidth=1.0)
-            fx.plot_extrema_on_axis(axNH3, results, data_type='PCloud', extrema_type='minima', symbol_color='b',s=15,linewidth=0.5)
-            fx.plot_extrema_on_axis(axNH3, results, data_type='PCloud', extrema_type='maxima', symbol_color='y',s=15,linewidth=0.5)
-            fx.plot_extrema_on_axis(axNH3, results, data_type='RGB', extrema_type='minima', symbol_color='C1',s=15,linewidth=0.5)
-            fx.plot_extrema_on_axis(axNH3, results, data_type='RGB', extrema_type='maxima', symbol_color='C0',s=15,linewidth=0.5)
-            fx.plot_extrema_on_axis(axCH4, results, data_type='NH3', extrema_type='minima', symbol_color='k',s=15,linewidth=0.5)
-            fx.plot_extrema_on_axis(axCH4, results, data_type='NH3', extrema_type='maxima', symbol_color='w',s=15,linewidth=0.5)
-            fx.plot_extrema_on_axis(axCH4, results, data_type='PCloud', extrema_type='minima', symbol_color='b',s=30,linewidth=1.0)
-            fx.plot_extrema_on_axis(axCH4, results, data_type='PCloud', extrema_type='maxima', symbol_color='y',s=30,linewidth=1.0)
-            fx.plot_extrema_on_axis(axCH4, results, data_type='RGB', extrema_type='minima', symbol_color='C1',s=15,linewidth=0.5)
-            fx.plot_extrema_on_axis(axCH4, results, data_type='RGB', extrema_type='maxima', symbol_color='C0',s=15,linewidth=0.5)
-            fx.plot_extrema_on_axis(axRGB, results, data_type='NH3', extrema_type='minima', symbol_color='k',s=15,linewidth=0.5)
-            fx.plot_extrema_on_axis(axRGB, results, data_type='NH3', extrema_type='maxima', symbol_color='w',s=15,linewidth=0.5)
-            fx.plot_extrema_on_axis(axRGB, results, data_type='PCloud', extrema_type='minima', symbol_color='b',s=15,linewidth=0.5)
-            fx.plot_extrema_on_axis(axRGB, results, data_type='PCloud', extrema_type='maxima', symbol_color='y',s=15,linewidth=0.5)
-            fx.plot_extrema_on_axis(axRGB, results, data_type='RGB', extrema_type='minima', symbol_color='C1',s=30,linewidth=1.0)
-            fx.plot_extrema_on_axis(axRGB, results, data_type='RGB', extrema_type='maxima', symbol_color='C0',s=30,linewidth=1.0)
-            """
+
     print(aspectratio)
     #print("####### xy=",xyfnh3,xyPcldmax,xyPcldmin)
     return(lats,blendweightPCloud,blendweightfNH3,blendRGBweight)
