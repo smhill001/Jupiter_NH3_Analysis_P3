@@ -168,7 +168,7 @@ def L3_Jup_Map_Plot(obskey="20250106UTf",imagetype='Map',target="Jupiter",
         mas.map_and_scatter(fNH3_patch_mb,PCld_patch,PClddata,fNH3hdr,LonSys,
         LatLims,NH3LonLims,LonRng,PCldPlotCM,fnNH3,
         coef[0],tx_fNH3,fNH3low,fNH3high,PCldlow,PCldhigh,
-        figxy,"Blues",pathmapplots,"PCloud & fNH3 (contours)",
+        figxy,ctbls[0],pathmapplots,"PCloud & fNH3 (contours)",
         "PCloud vs fNH3",Level='L3',cbar_rev=True,cbar_title="Cloud-top Pressure (mb)",
         axis_inv=True,ROI=ROI,amfpatch=amfpatch)
     

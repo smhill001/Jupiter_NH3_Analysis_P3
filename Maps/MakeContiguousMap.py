@@ -75,10 +75,6 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
     from astropy.io import fits
     import scipy.ndimage as ndi
     sys.path.append('./Maps')
-    from skimage.feature import peak_local_max
-    from astropy.table import Table
-    from astropy.io import ascii
-    from copy import deepcopy
     from astropy.time import Time
 
     import read_fits_map_L2_L3 as RFM
@@ -337,7 +333,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
         
         for ix in rng:
             axs2[ix].grid(linewidth=0.2)
-            axs2[ix].ylim=[-30.,30.]
+            axs2[ix].ylim=[-90.,90.]
             axs2[ix].xlim=[0.,360.]
             axs2[ix].set_xticks(np.linspace(450.,0.,31), minor=False)
             xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
@@ -349,14 +345,20 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
     
         print("###############")
         print([360-LonLims[1],360-LonLims[0]])
-        fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(fracfNH3,lats,[360-LonLims[1],360-LonLims[0]],
+        fracfNH3_patch_mb=MP.make_patch(fracfNH3,lats,[360-LonLims[1],360-LonLims[0]],
+                                         180,180)
+
+        fracfNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(fracfNH3_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
                                          180,180,"jet",
                                          axs2[0],'%3.2f',cont=False,n=6,vn=0,vx=0.5,
                                          cbar_title="")
         print("vn,vx,tx_fNH3",vn,vx,tx_fNH3)
         axs2[0].set_title('fNH3 (fractional '+r'$\sigma$'+')',fontsize=10)
     
-        PCld_patch_mb,vn,vx,tx_PCld=PP.plot_patch(fracPCloud,lats,[360-LonLims[1],360-LonLims[0]],
+        fracPCld_patch_mb=MP.make_patch(fracPCloud,lats,[360-LonLims[1],360-LonLims[0]],
+                                        180,180)
+
+        fracPCld_patch_mb,vn,vx,tx_PCld=PP.plot_patch(fracPCld_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
                                          180,180,"jet",
                                          axs2[1],'%3.2f',cont=False,n=6,vn=0,vx=0.25,
                                          cbar_title="")

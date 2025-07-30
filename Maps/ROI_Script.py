@@ -205,6 +205,10 @@ def ROI_Script(collection="20241202-20241202 NEDF 340",dateformat="%b:%d",
             clr='y'
         if "NEB ref" in roilabelarray[0,i]:
             clr='brown'
+        if "SED" in roilabelarray[0,i]:
+            clr='C1'
+        if "HS" in roilabelarray[0,i]:
+            clr='C2'
 
         axstime[0].errorbar(datearraydt[date_sort],mean1array[date_sort,i],yerr=stdv1array[date_sort,i],
                             label=roilabelarray[0,i],
@@ -313,8 +317,8 @@ def ROI_Script(collection="20241202-20241202 NEDF 340",dateformat="%b:%d",
 
     MCM.MakeContiguousMap(collection=collection,obskeys=obskeys,LonSys=LonSys,
                           FiveMicron=False,lats=LatLims,LonLims=[int(CM[0]-LonRng),int(CM[0]+LonRng)],
-                          figsz=[3.0,6.0],ROI=ROI,variance=False,localmax=localmax,
-                          proj="NEZ",ctbls=['terrain_r','Blues'],
+                          figsz=[3.0,6.0],ROI=ROI,variance=True,localmax=localmax,
+                          proj="NEZ",ctbls=['terrain_r','gist_heat'],
                           cont=False,bare_maps=False,cb=False,
                           axNH3=False,axCH4=False,axRGB=False,LimbCorrection=True,
                           lonhalfwidth=45,boxcar=9)
