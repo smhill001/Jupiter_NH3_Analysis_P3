@@ -81,9 +81,14 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
     import plot_patch as PP
     import make_patch_RGB as MPRGB
     import find_extrema as fx
+    import find_blob as fb
     import plot_contours_on_patch as PC
     import make_patch as MP
     import get_map_collection as gmc
+    from skimage.measure import label, regionprops
+    from skimage.io import imread, imshow
+    
+    
 
     
     pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/"+proj+"/"  
@@ -96,7 +101,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
     # simplified if I retire the "jet" color table.
     ctbl_settings = {
                     "jet": (70, 140, 1200, 2000),
-                    "terrain_r": (60, 160, 1200, 2200)
+                    "terrain_r": (60, 160, 1600, 2200)
                 }
                 
     if ctbls[0] in ctbl_settings:
@@ -270,6 +275,10 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
                           sharex=True,sharey=True)
     fig1.suptitle(collection+"\n Average")
     
+    figblob,axsblob=pl.subplots(rng[-1]+1,1,figsize=(figsz[0],figsz[1]), dpi=150, facecolor="white",
+                          sharex=True,sharey=True)
+    figblob.suptitle(collection+"\n Objects")
+
     for ix in rng:
         axs1[ix].grid(linewidth=0.2)
         axs1[ix].ylim=[-90.,90.]
@@ -468,6 +477,10 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
                        aspect="equal")
     
     if cont:
+        temp=PC.plot_contours_on_patch(axs1[0],fNH3_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
+                                        tx_fNH3, frmt='%3.0f', clr='k')
+        temp=PC.plot_contours_on_patch(axs1[1],PCld_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
+                                        tx_PCld, frmt='%3.0f', clr='r')
         temp=PC.plot_contours_on_patch(axs1[RGBaxs],fNH3_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
                                         tx_fNH3[-2:], frmt='%3.0f', clr='k')
         temp=PC.plot_contours_on_patch(axs1[RGBaxs],PCld_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
@@ -503,31 +516,19 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
         box2 = axs2[RGBaxs].get_position()
 
     #Aspect Ratio Customization
-    if aspectratio==1:
-        fig1.subplots_adjust(left=0.21, bottom=0.07, right=0.79, top=0.88,
-                    wspace=0.0, hspace=0.2)     
-    if aspectratio==4./3.:
-        fig1.subplots_adjust(left=0.20, bottom=0.07, right=0.825, top=0.86,
-                    wspace=0.0, hspace=0.2)     
-    if aspectratio==2:
-        fig1.subplots_adjust(left=0.20, bottom=0.07, right=0.825, top=0.86,
-                    wspace=0.0, hspace=0.2)     
-    if aspectratio==3:
-        fig1.subplots_adjust(left=0.095, bottom=0.07, right=0.90, top=0.88,
-                    wspace=0.25, hspace=0.2)     
-    if aspectratio==4:
-        fig1.subplots_adjust(left=0.035, bottom=0.07, right=0.94, top=0.88,
-                    wspace=0.25, hspace=0.2)     
-    if aspectratio==6:
-        fig1.subplots_adjust(left=0.04, bottom=0.08, right=0.94, top=0.865,
-                    wspace=0.0, hspace=0.2)     
-    if aspectratio==9:
-        fig1.subplots_adjust(left=0.04, bottom=0.10, right=0.94, top=0.865,
-                    wspace=0.0, hspace=0.395)     
-    if aspectratio==12:
-        fig1.subplots_adjust(left=0.035, bottom=0.1, right=0.935, top=0.84,
-                    wspace=0.0, hspace=0.3)     
-    
+    adjust_params = {
+    1:     {'left': 0.21,  'bottom': 0.07, 'right': 0.79,  'top': 0.88,  'wspace': 0.0,  'hspace': 0.2},
+    4/3.:  {'left': 0.20,  'bottom': 0.07, 'right': 0.825, 'top': 0.86,  'wspace': 0.0,  'hspace': 0.2},
+    2:     {'left': 0.20,  'bottom': 0.07, 'right': 0.825, 'top': 0.86,  'wspace': 0.0,  'hspace': 0.2},
+    3:     {'left': 0.095, 'bottom': 0.07, 'right': 0.90,  'top': 0.88,  'wspace': 0.25, 'hspace': 0.2},
+    4:     {'left': 0.035, 'bottom': 0.07, 'right': 0.94,  'top': 0.88,  'wspace': 0.25, 'hspace': 0.2},
+    6:     {'left': 0.04,  'bottom': 0.08, 'right': 0.94,  'top': 0.865, 'wspace': 0.0,  'hspace': 0.2},
+    9:     {'left': 0.04,  'bottom': 0.10, 'right': 0.94,  'top': 0.865, 'wspace': 0.0,  'hspace': 0.395},
+    12:    {'left': 0.035, 'bottom': 0.1,  'right': 0.935, 'top': 0.84,  'wspace': 0.0,  'hspace': 0.3}
+            }
+    if aspectratio in adjust_params:
+        fig1.subplots_adjust(**adjust_params[aspectratio])     
+
     if variance:
         if aspectratio==1:
             fig2.subplots_adjust(left=0.21, bottom=0.07, right=0.79, top=0.88,
@@ -622,7 +623,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
         print("IN LOCAL MAX")
         ###########################################################################
         # Call the function
-        results = fx.process_extrema({
+        results_extrema = fx.process_extrema({
             "NH3": fNH3_patch_mb,
             "PCloud": PCld_patch_mb,
             #"RGB": np.mean(RGB_patch,axis=2)
@@ -630,11 +631,88 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
         }, blendweightTime, lats, LonLims)
 
         output_filename=pathmapplots+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" extrema.csv"
-        fx.export_extrema_to_csv(results, output_filename)
-        fx.extrema_overplot_all(results,axes = {'axNH3': axs1[0], 'axCH4': axs1[1], 'axRGB': axs1[2]})
+        fx.export_extrema_to_csv(results_extrema, output_filename)
+        fx.extrema_overplot_all(results_extrema,axes = {'axNH3': axs1[0], 'axCH4': axs1[1], 'axRGB': axs1[2]})
 
     fig1.savefig(pathmapplots+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" map.png",dpi=300)
     
+    ###########################################################################
+    # Find 'blob' regions
+    ###########################################################################
+
+    results_blob = fx.process_extrema({
+        "NH3": fNH3_patch_mb,
+        "PCloud": PCld_patch_mb,
+        #"RGB": np.mean(RGB_patch,axis=2)
+        "RGB":RGB_patch[:,:,0]
+    }, blendweightTime, lats, LonLims)
+
+
+    fNH3_mask, labeled_fNH3, props_fNH3= \
+        fb.process_blob(fNH3_patch_mb, PCld_patch_mb, lats, LonLims, threshold_abs=135, mode='max')
+    
+    Plum_mask, labeled_Plum, props_Plum= \
+        fb.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, threshold_abs=1750, mode='min')
+    
+    NEDF_mask, labeled_NEDF, props_NEDF= \
+        fb.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, threshold_abs=2000, mode='max')
+    
+    #fNH3_mask,labeled_fNH3,props_fNH3,props_Pcld_on_fNH3=fb.find_blob(fNH3_patch_mb, fNH3_patch_mb, threshold_abs=140., mode='max')
+    
+    #axsblob[0].imshow(labeled_fNH3,cmap='tab10')
+    axsblob[0].imshow(labeled_fNH3,cmap='tab10')
+    axsblob[1].imshow(labeled_Plum,cmap='tab10')
+    axsblob[2].imshow(labeled_NEDF,cmap='tab10')
+    
+    for i in range(0,len(props_fNH3)):
+        print(i,str(props_fNH3[i].keys()),props_fNH3[i]["label"])
+        axsblob[0].annotate(props_fNH3[i]["label"],(props_fNH3[i]["centroid"][1],props_fNH3[i]["centroid"][0]),
+                            xytext=(props_fNH3[i]["centroid"][1],props_fNH3[i]["centroid"][0]),
+                            xycoords='data')
+    for i in range(0,len(props_Plum)):
+        print(i,str(props_Plum[i].keys()),props_Plum[i]["label"])
+        axsblob[1].annotate(props_Plum[i]["label"],(props_Plum[i]["centroid"][1],props_Plum[i]["centroid"][0]),
+                            xytext=(props_Plum[i]["centroid"][1],props_Plum[i]["centroid"][0]),
+                            xycoords='data')
+    for i in range(0,len(props_NEDF)):
+        print(i,str(props_NEDF[i].keys()),props_NEDF[i]["label"])
+        axsblob[2].annotate(props_NEDF[i]["label"],(props_NEDF[i]["centroid"][1],props_NEDF[i]["centroid"][0]),
+                            xytext=(props_NEDF[i]["centroid"][1],props_NEDF[i]["centroid"][0]),
+                            xycoords='data')
+        #print(str(props_data_sorted[i].label),(props_data_sorted[i].centroid[1],props_data_sorted[i].centroid[0]))
+    axsblob[2].imshow(fNH3_mask,cmap='tab10')
+    fb.export_regions_to_csv(props_fNH3, pathmapplots+collection+" fNH3.csv")
+    fb.export_regions_to_csv(props_Plum, pathmapplots+collection+" Plum.csv")
+    fb.export_regions_to_csv(props_NEDF, pathmapplots+collection+" NEDF.csv")
+    
+    
+    
+    fb.plot_regions_on_axis(axs1[2], labeled_fNH3, props_fNH3,lon_lims=LonLims,lats=lats,
+                 plot_contours=False, plot_masks=True,plot_labels=True,contour_color='C0')
+    fb.plot_regions_on_axis(axs1[2], labeled_Plum, props_Plum,lon_lims=LonLims,lats=lats,
+                 plot_contours=False, plot_masks=True,plot_labels=True, contour_color='white')
+    fb.plot_regions_on_axis(axs1[2], labeled_NEDF, props_NEDF,lon_lims=LonLims,lats=lats,
+                 plot_contours=False, plot_masks=True,plot_labels=True, contour_color='black')
+
+    """
+    NEDF_mask,labeled_NEDF,props_NEDF=fb.find_blob(PCld_patch_mb, PCld_patch_mb, threshold_abs=2000., mode='max')
+    axsblob[1].imshow(labeled_NEDF,cmap='tab10')
+    for i in range(0,len(props_NEDF)):
+        axsblob[1].annotate(props_NEDF[i].label,(props_NEDF[i].centroid[1],props_NEDF[i].centroid[0]),
+                            xytext=(props_NEDF[i].centroid[1],props_NEDF[i].centroid[0]),
+                            xycoords='data')
+    print(str(props_NEDF[i].label),(props_NEDF[i].centroid[1],props_NEDF[i].centroid[0]))
+        
+    Plum_mask,labeled_Plum,props_Plum=fb.find_blob(PCld_patch_mb, PCld_patch_mb, threshold_abs=1700., mode='min')
+    axsblob[2].imshow(labeled_Plum,cmap='tab10')
+    for i in range(0,len(props_Plum)):
+        axsblob[2].annotate(props_Plum[i].label,(props_Plum[i].centroid[1],props_Plum[i].centroid[0]),
+                            xytext=(props_Plum[i].centroid[1],props_Plum[i].centroid[0]),
+                            xycoords='data')
+    print(str(props_Plum[i].label),(props_Plum[i].centroid[1],props_Plum[i].centroid[0]))
+    """    
+
+
     if variance:
         fig2.savefig(pathmapplots+collection+" Stdv Sys"+LonSys+" map.png",dpi=300)
 
@@ -682,9 +760,9 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
         axRGB.tick_params('x', labelsize=8)
 
         if localmax:
-            fx.extrema_overplot_all(results,axes = {'axNH3': axNH3, 'axCH4': axCH4, 'axRGB': axRGB})
+            fx.extrema_overplot_all(results_extrema,axes = {'axNH3': axNH3, 'axCH4': axCH4, 'axRGB': axRGB})
 
-    print(aspectratio)
+    #print(aspectratio)
     #print("####### xy=",xyfnh3,xyPcldmax,xyPcldmin)
     return(lats,blendweightPCloud,blendweightfNH3,blendRGBweight)
     #return(fig1,axs1)
