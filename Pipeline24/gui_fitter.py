@@ -22,6 +22,7 @@ def gui_fitter(dataset,planet='Saturn'):
     #for k in range(0,fn_bases.nrecords-1):
     #    fn_base=fn_bases.VideoFile[k].split('.')[0]
     #    print(fn_base)
+    First=True
     for filtr in RGB:
         print(filtr)
         for fn in file_list:
@@ -31,15 +32,13 @@ def gui_fitter(dataset,planet='Saturn'):
                 # Running from Python allows you to customise SPICE settings like the aberration correction
                 observation = planetmapper.Observation(path+fn,target=planet,utc=time)
                 
-                observation.set_plate_scale_arcsec(0.11141)
-                params=observation.get_disc_params()
-                #print("######### params1=",params)
+                #observation.set_plate_scale_arcsec(0.11141)
 
                 #observation.get_disc_params(246.6,377.5)
-                observation.set_x0(246.6)
-                observation.set_y0(377.5)
+                #observation.set_x0(246.6)
+                #observation.set_y0(377.5)
                 
-                params=observation.get_disc_params()
+                #params=observation.get_disc_params()
                 #print("######### params2=",params)
                 
                 print("1##########observation.backplanes=",list(observation.backplanes.keys()))
@@ -61,11 +60,15 @@ def gui_fitter(dataset,planet='Saturn'):
                 del observation.backplanes['AZIMUTH']
                 del observation.backplanes['PHASE']
                 del observation.backplanes['LIMB-LAT-GRAPHIC']
+                del observation.backplanes['ANGULAR-X']
+                del observation.backplanes['ANGULAR-Y']
+                del observation.backplanes['PIXEL-X']
+                del observation.backplanes['PIXEL-Y']
+                del observation.backplanes['DISTANCE']
                 print("******************")
                 print("2##########observation.backplanes=",observation.backplanes.keys())
-
                 
-                observation.save_observation(path+fn.replace("png","fits"))
+                #observation.save_observation(path+fn.replace("png","fits"))
             
                 # Run some custom setup
                 #observation.add_other_bodies_of_interest('Io', 'Europa', 'Ganymede', 'Callisto')
@@ -74,8 +77,19 @@ def gui_fitter(dataset,planet='Saturn'):
             
                 # Run the GUI to fit the observation interactively
                 # This will open a GUI window every loop
-                #coords = observation.run_gui()
-            
+                if First:
+                    coords = observation.run_gui()
+                    #print("coords",coords)
+                    params=observation.get_disc_params()
+                    print("######### params1=",params)
+                else:
+                    observation.set_disc_params(params[0],params[1],params[2],params[3])
+
+                #observation.set_coords(coords)
+                observation.save_observation(path+fn.replace(".png",".fits"))
+                observation.save_mapped_observation(path+fn.replace(".png","map.fits"))
+                First=False
+
                 # More custom code can go here to use the fitted observation...
                 # for example, we can print some values for the last click location
                 #if coords:
@@ -89,8 +103,35 @@ def gui_fitter(dataset,planet='Saturn'):
                 print(time)
                 # Running from Python allows you to customise SPICE settings like the aberration correction
                 observation = planetmapper.Observation(path+fn,target=planet,utc=time)
+                del observation.backplanes['DOPPLER']
+                del observation.backplanes['LON-CENTRIC']
+                del observation.backplanes['LAT-CENTRIC']
+                del observation.backplanes['RA']
+                del observation.backplanes['DEC']
+                del observation.backplanes['KM-X']
+                del observation.backplanes['KM-Y']
+                del observation.backplanes['RING-RADIUS']
+                del observation.backplanes['RING-LON-GRAPHIC']
+                del observation.backplanes['RING-DISTANCE']
+                del observation.backplanes['LIMB-LON-GRAPHIC']
+                del observation.backplanes['LIMB-DISTANCE']
+                del observation.backplanes['RADIAL-VELOCITY']
+                del observation.backplanes['LOCAL-SOLAR-TIME']
+                del observation.backplanes['AZIMUTH']
+                del observation.backplanes['PHASE']
+                del observation.backplanes['LIMB-LAT-GRAPHIC']
+                del observation.backplanes['ANGULAR-X']
+                del observation.backplanes['ANGULAR-Y']
+                del observation.backplanes['PIXEL-X']
+                del observation.backplanes['PIXEL-Y']
+                del observation.backplanes['DISTANCE']
+
+                observation.set_disc_params(params[0],params[1],params[2],params[3])
+                observation.save_observation(path+fn.replace(".png",".fits"))
+                observation.save_mapped_observation(path+fn.replace(".png","map.fits"))
+
                 
-                observation.set_plate_scale_arcsec(0.22282)
+                #observation.set_plate_scale_arcsec(0.22282)
     
             
                 # Run some custom setup

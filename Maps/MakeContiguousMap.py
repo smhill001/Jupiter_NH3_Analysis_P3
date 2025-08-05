@@ -25,7 +25,8 @@ def make_bare_map(blendweight,ctbl,low,high,pathmapplots,collection,LonSys):
 def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
                       FiveMicron=False,Five_obskey='',IRTFdataset='',
                       lats=[75,105],LonLims=[0,360],figsz=[6.0,6.0],ROI=False,
-                      variance=False,localmax=False,proj='maps',ctbls=['terrain_r','Blues'],
+                      variance=False,localmax=False,segment=False,
+                      proj='maps',ctbls=['terrain_r','Blues'],
                       cont=False,bare_maps=False,cb=False,
                       axNH3=False,axCH4=False,axRGB=False,LimbCorrection=True,
                       lonhalfwidth=45,boxcar=9):
@@ -275,10 +276,6 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
                           sharex=True,sharey=True)
     fig1.suptitle(collection+"\n Average")
     
-    figblob,axsblob=pl.subplots(rng[-1]+1,1,figsize=(figsz[0],figsz[1]), dpi=150, facecolor="white",
-                          sharex=True,sharey=True)
-    figblob.suptitle(collection+"\n Objects")
-
     for ix in rng:
         axs1[ix].grid(linewidth=0.2)
         axs1[ix].ylim=[-90.,90.]
@@ -533,31 +530,8 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
         fig1.subplots_adjust(**adjust_params[aspectratio])     
 
     if variance:
-        if aspectratio==1:
-            fig2.subplots_adjust(left=0.21, bottom=0.07, right=0.79, top=0.88,
-                        wspace=0.0, hspace=0.2)     
-        if aspectratio==4./3.:
-            fig2.subplots_adjust(left=0.20, bottom=0.07, right=0.825, top=0.86,
-                        wspace=0.0, hspace=0.2)     
-        if aspectratio==2:
-            fig2.subplots_adjust(left=0.20, bottom=0.07, right=0.825, top=0.86,
-                        wspace=0.0, hspace=0.2)     
-        if aspectratio==3:
-            fig2.subplots_adjust(left=0.095, bottom=0.07, right=0.90, top=0.88,
-                        wspace=0.25, hspace=0.2)     
-        if aspectratio==4:
-            fig2.subplots_adjust(left=0.035, bottom=0.07, right=0.94, top=0.88,
-                        wspace=0.25, hspace=0.2)     
-        if aspectratio==6:
-            fig2.subplots_adjust(left=0.04, bottom=0.08, right=0.94, top=0.865,
-                        wspace=0.0, hspace=0.2)     
-        if aspectratio==9:
-            fig2.subplots_adjust(left=0.04, bottom=0.10, right=0.94, top=0.865,
-                        wspace=0.0, hspace=0.395)     
-        if aspectratio==12:
-            fig2.subplots_adjust(left=0.035, bottom=0.1, right=0.935, top=0.84,
-                        wspace=0.0, hspace=0.3)     
-
+        if aspectratio in adjust_params:
+            fig2.subplots_adjust(**adjust_params[aspectratio])     
 
     if FiveMicron=='png':
         
@@ -637,75 +611,58 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
         fx.export_extrema_to_csv(results_extrema, output_filename)
         fx.extrema_overplot_all(results_extrema,axes = {'axNH3': axs1[0], 'axCH4': axs1[1], 'axRGB': axs1[2]})
 
-    fig1.savefig(pathmapplots+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" map.png",dpi=300)
     
     ###########################################################################
     # Find 'blob' regions
     ###########################################################################
-
-    fNH3_mask, labeled_fNH3, props_fNH3= \
-        fb.process_blob(fNH3_patch_mb, PCld_patch_mb, lats, LonLims, timearray=blendweightTime_patch,threshold_abs=135, mode='max')
-    
-    Plum_mask, labeled_Plum, props_Plum= \
-        fb.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, timearray=blendweightTime_patch, threshold_abs=1750, mode='min')
-    
-    NEDF_mask, labeled_NEDF, props_NEDF= \
-        fb.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, timearray=blendweightTime_patch, threshold_abs=2000, mode='max')
-    
-    #fNH3_mask,labeled_fNH3,props_fNH3,props_Pcld_on_fNH3=fb.find_blob(fNH3_patch_mb, fNH3_patch_mb, threshold_abs=140., mode='max')
-    
-    #axsblob[0].imshow(labeled_fNH3,cmap='tab10')
-    axsblob[0].imshow(labeled_fNH3,cmap='tab10')
-    axsblob[1].imshow(labeled_Plum,cmap='tab10')
-    axsblob[2].imshow(labeled_NEDF,cmap='tab10')
-    
-    for i in range(0,len(props_fNH3)):
-        #print(i,str(props_fNH3[i].keys()),props_fNH3[i]["label"],props_fNH3[i]["times"])
-        axsblob[0].annotate(props_fNH3[i]["label"],(props_fNH3[i]["centroid"][1],props_fNH3[i]["centroid"][0]),
-                            xytext=(props_fNH3[i]["centroid"][1],props_fNH3[i]["centroid"][0]),
-                            xycoords='data')
-    for i in range(0,len(props_Plum)):
-        #print(i,str(props_Plum[i].keys()),props_Plum[i]["label"],props_Plum[i]["times"])
-        axsblob[1].annotate(props_Plum[i]["label"],(props_Plum[i]["centroid"][1],props_Plum[i]["centroid"][0]),
-                            xytext=(props_Plum[i]["centroid"][1],props_Plum[i]["centroid"][0]),
-                            xycoords='data')
-    for i in range(0,len(props_NEDF)):
-        #print(i,str(props_NEDF[i].keys()),props_NEDF[i]["label"],props_NEDF[i]["times"])
-        axsblob[2].annotate(props_NEDF[i]["label"],(props_NEDF[i]["centroid"][1],props_NEDF[i]["centroid"][0]),
-                            xytext=(props_NEDF[i]["centroid"][1],props_NEDF[i]["centroid"][0]),
-                            xycoords='data')
-    axsblob[2].imshow(fNH3_mask,cmap='tab10')
-    fb.export_regions_to_csv(props_fNH3, pathmapplots+collection+" fNH3.csv")
-    fb.export_regions_to_csv(props_Plum, pathmapplots+collection+" Plum.csv")
-    fb.export_regions_to_csv(props_NEDF, pathmapplots+collection+" NEDF.csv")
-    
-    
-    
-    fb.plot_regions_on_axis(axs1[2], labeled_fNH3, props_fNH3,lon_lims=LonLims,lats=lats,
-                 plot_contours=False, plot_masks=True,plot_labels=True,contour_color='C0')
-    fb.plot_regions_on_axis(axs1[2], labeled_Plum, props_Plum,lon_lims=LonLims,lats=lats,
-                 plot_contours=False, plot_masks=True,plot_labels=True, contour_color='white')
-    fb.plot_regions_on_axis(axs1[2], labeled_NEDF, props_NEDF,lon_lims=LonLims,lats=lats,
-                 plot_contours=False, plot_masks=True,plot_labels=True, contour_color='black')
-
-    """
-    NEDF_mask,labeled_NEDF,props_NEDF=fb.find_blob(PCld_patch_mb, PCld_patch_mb, threshold_abs=2000., mode='max')
-    axsblob[1].imshow(labeled_NEDF,cmap='tab10')
-    for i in range(0,len(props_NEDF)):
-        axsblob[1].annotate(props_NEDF[i].label,(props_NEDF[i].centroid[1],props_NEDF[i].centroid[0]),
-                            xytext=(props_NEDF[i].centroid[1],props_NEDF[i].centroid[0]),
-                            xycoords='data')
-    print(str(props_NEDF[i].label),(props_NEDF[i].centroid[1],props_NEDF[i].centroid[0]))
+    if segment:
+        fNH3_mask, labeled_fNH3, props_fNH3= \
+            fb.process_blob(fNH3_patch_mb, PCld_patch_mb, lats, LonLims, timearray=blendweightTime_patch,threshold_abs=135, mode='max')
         
-    Plum_mask,labeled_Plum,props_Plum=fb.find_blob(PCld_patch_mb, PCld_patch_mb, threshold_abs=1700., mode='min')
-    axsblob[2].imshow(labeled_Plum,cmap='tab10')
-    for i in range(0,len(props_Plum)):
-        axsblob[2].annotate(props_Plum[i].label,(props_Plum[i].centroid[1],props_Plum[i].centroid[0]),
-                            xytext=(props_Plum[i].centroid[1],props_Plum[i].centroid[0]),
-                            xycoords='data')
-    print(str(props_Plum[i].label),(props_Plum[i].centroid[1],props_Plum[i].centroid[0]))
-    """    
+        Plum_mask, labeled_Plum, props_Plum= \
+            fb.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, timearray=blendweightTime_patch, threshold_abs=1750, mode='min')
+        
+        NEDF_mask, labeled_NEDF, props_NEDF= \
+            fb.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, timearray=blendweightTime_patch, threshold_abs=2000, mode='max')
+        
+        fb.export_regions_to_csv(props_fNH3, pathmapplots+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" blobs"+" fNH3.csv")
+        fb.export_regions_to_csv(props_Plum, pathmapplots+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" blobs"+" Plum.csv")
+        fb.export_regions_to_csv(props_NEDF, pathmapplots+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" blobs"+" NEDF.csv")
+        
+        fb.plot_regions_on_axis(axs1[2], labeled_fNH3, props_fNH3,lon_lims=LonLims,lats=lats,
+                     plot_contours=False, plot_masks=True,plot_labels=True,contour_color='C0')
+        fb.plot_regions_on_axis(axs1[2], labeled_Plum, props_Plum,lon_lims=LonLims,lats=lats,
+                     plot_contours=False, plot_masks=True,plot_labels=True, contour_color='white')
+        fb.plot_regions_on_axis(axs1[2], labeled_NEDF, props_NEDF,lon_lims=LonLims,lats=lats,
+                     plot_contours=False, plot_masks=True,plot_labels=True, contour_color='black')
 
+        """
+        figblob,axsblob=pl.subplots(rng[-1]+1,1,figsize=(figsz[0],figsz[1]), dpi=150, facecolor="white",
+                              sharex=True,sharey=True)
+        figblob.suptitle(collection+"\n Objects")
+    
+        axsblob[0].imshow(labeled_fNH3,cmap='tab10')
+        axsblob[1].imshow(labeled_Plum,cmap='tab10')
+        axsblob[2].imshow(labeled_NEDF,cmap='tab10')
+        axsblob[2].imshow(fNH3_mask,cmap='tab10')
+        
+        for i in range(0,len(props_fNH3)):
+            #print(i,str(props_fNH3[i].keys()),props_fNH3[i]["label"],props_fNH3[i]["times"])
+            axsblob[0].annotate(props_fNH3[i]["label"],(props_fNH3[i]["centroid"][1],props_fNH3[i]["centroid"][0]),
+                                xytext=(props_fNH3[i]["centroid"][1],props_fNH3[i]["centroid"][0]),
+                                xycoords='data')
+        for i in range(0,len(props_Plum)):
+            #print(i,str(props_Plum[i].keys()),props_Plum[i]["label"],props_Plum[i]["times"])
+            axsblob[1].annotate(props_Plum[i]["label"],(props_Plum[i]["centroid"][1],props_Plum[i]["centroid"][0]),
+                                xytext=(props_Plum[i]["centroid"][1],props_Plum[i]["centroid"][0]),
+                                xycoords='data')
+        for i in range(0,len(props_NEDF)):
+            #print(i,str(props_NEDF[i].keys()),props_NEDF[i]["label"],props_NEDF[i]["times"])
+            axsblob[2].annotate(props_NEDF[i]["label"],(props_NEDF[i]["centroid"][1],props_NEDF[i]["centroid"][0]),
+                                xytext=(props_NEDF[i]["centroid"][1],props_NEDF[i]["centroid"][0]),
+                                xycoords='data')
+        """
+    fig1.savefig(pathmapplots+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" map.png",dpi=300)
 
     if variance:
         fig2.savefig(pathmapplots+collection+" Stdv Sys"+LonSys+" map.png",dpi=300)
@@ -755,6 +712,15 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
 
         if localmax:
             fx.extrema_overplot_all(results_extrema,axes = {'axNH3': axNH3, 'axCH4': axCH4, 'axRGB': axRGB})
+
+        if segment:
+            fb.plot_regions_on_axis(axRGB, labeled_fNH3, props_fNH3,lon_lims=LonLims,lats=lats,
+                         plot_contours=False, plot_masks=True,plot_labels=False,contour_color='C0')
+            fb.plot_regions_on_axis(axRGB, labeled_Plum, props_Plum,lon_lims=LonLims,lats=lats,
+                         plot_contours=False, plot_masks=True,plot_labels=False, contour_color='white')
+            fb.plot_regions_on_axis(axRGB, labeled_NEDF, props_NEDF,lon_lims=LonLims,lats=lats,
+                         plot_contours=False, plot_masks=True,plot_labels=False, contour_color='black')
+
 
     #print(aspectratio)
     #print("####### xy=",xyfnh3,xyPcldmax,xyPcldmin)

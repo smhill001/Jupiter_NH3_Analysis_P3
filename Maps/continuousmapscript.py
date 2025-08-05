@@ -1,5 +1,5 @@
 def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,360],
-                       localmax=False,variance=False,ctbls=['terrain_r','Blues']):
+                       localmax=False,segment=False,variance=False,ctbls=['terrain_r','Blues']):
     """
     Created on Sun Aug 25 15:04:22 2024
     
@@ -151,7 +151,7 @@ def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,
 
 
             MCM.MakeContiguousMap(collection=mp,obskeys=obslist,LonSys=LonSys,lats=lats,
-                                  LonLims=LonLims,localmax=localmax,
+                                  LonLims=LonLims,localmax=localmax,segment=segment,
                                   variance=variance,ctbls=ctbls,cb=cb,
                                   axNH3=axs23NH3[counter],
                                   axCH4=axs23CH4[counter],

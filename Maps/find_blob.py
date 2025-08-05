@@ -132,8 +132,8 @@ def process_blob(image_to_segment, intensity_image, lats, lon_lims, timearray=No
             row, col = int(round(r)), int(round(c))
             fits_time, jd_time = convert_one_time(row, col, timearray)
 
-            print("###########",row, col)
-            print("###########",fits_time, jd_time)
+            #print("###########",row, col)
+            #print("###########",fits_time, jd_time)
             try:
                 #jd_value = timearray[wy, wx]
                 #time_obj = Time(jd_value, format='jd')
@@ -196,20 +196,20 @@ def export_regions_to_csv(merged_props_sorted, filepath):
     # Define desired fields (skip std + duplicates, fix centroid keys, add weighted centroids)
     fields = [
         'label',
+        'jd_time',
+        'fits_time',
         'area',
         'eccentricity',
-        'seg_intensity_max',
-        'seg_intensity_mean',
-        'seg_intensity_min',
-        'intensity_max',
-        'intensity_mean',
-        'intensity_min',
         'centroid_lat',
         'centroid_lon',
         'weighted_centroid_lat_seg',
         'weighted_centroid_lon_seg',
-        'jd_time',
-        'fits_time'
+        'seg_intensity_mean',
+        'seg_intensity_min',
+        'seg_intensity_max',
+        'intensity_mean',
+        'intensity_min',
+        'intensity_max'
     ]
 
     # Open CSV file and write header + rows
@@ -331,102 +331,3 @@ def plot_regions_on_axis(
                     bbox=dict(boxstyle='round,pad=0.2', fc=contour_color, ec='none', alpha=0.5),
                     zorder=4
                 )
-
-
-
-def plot_extrema_on_axisa(ax, extrema_dict, data_type, extrema_type, text_color='red',fontsize=8):
-    """
-    Annotate extrema points on a matplotlib axis with custom text characters.
-
-    Parameters:
-    - ax : matplotlib.axes.Axes
-        The axis to plot annotations on.
-    - extrema_dict : dict
-        Output from find_extrema function.
-    - data_type : str
-        'fNH3', 'PCld', or 'RGB' (or others as added).
-    - extrema_type : str
-        'max' or 'min'.
-    - text_color : str
-        Color of text annotations.
-    """
-
-    if data_type not in extrema_dict:
-        raise ValueError(f"Data type '{data_type}' not found in extrema dictionary.")
-    if extrema_type not in ['maxima', 'minima']:
-        raise ValueError("extrema_type must be 'maxima' or 'minima'.")
-
-    label_map = {
-        ('NH3', 'maxima'): 'N',
-        ('NH3', 'minima'): 'D',
-        ('PCloud', 'maxima'): 'L',
-        ('PCloud', 'minima'): 'H',
-        ('RGB',  'maxima'): 'P',
-        ('RGB',  'minima'): '5'
-    }
-
-    marker_label = label_map.get((data_type, extrema_type), '?')
-    extrema_data = extrema_dict[data_type][extrema_type]
-    coords = extrema_data['coords']
-
-    if coords is None or len(coords) == 0:
-        print(f"No {extrema_type} coordinates to plot for {data_type}.")
-        return
-
-    #lats, lons = zip(*coords)
-
-    for lat, lon in coords:
-        ax.text(lon, lat, marker_label, color=text_color, 
-                horizontalalignment='center', verticalalignment='center', 
-                fontsize=fontsize)
-
-    #ax.set_xlabel("Longitude")
-    #ax.set_ylabel("Latitude")
-
-def extrema_overplot_all(results,axes = {'axNH3': False, 'axCH4': False, 'axRGB': False}):
-    # Define the plotting parameters for each (data_type, extrema_type)
-    plot_specs = {
-        ('NH3', 'minima'): {'color': 'k', 's': 8, 'lw': 1.0},
-        ('NH3', 'maxima'): {'color': 'w', 's': 8, 'lw': 1.0},
-        ('PCloud', 'minima'): {'color': 'b', 's': 8, 'lw': 0.5},
-        ('PCloud', 'maxima'): {'color': 'y', 's': 8, 'lw': 0.5},
-        ('RGB', 'minima'): {'color': 'C1', 's': 8, 'lw': 0.5},
-        ('RGB', 'maxima'): {'color': 'C0', 's': 8, 'lw': 0.5},
-    }
-    
-    # Adjust sizes/linewidths by axis if needed
-    axis_adjustments = {
-        'axNH3': {
-            ('NH3', 'minima'): {'s': 10, 'lw': 0.5},
-            ('NH3', 'maxima'): {'s': 10, 'lw': 0.5},
-        },
-        'axCH4': {
-            ('PCloud', 'minima'): {'s': 10, 'lw': 1.0},
-            ('PCloud', 'maxima'): {'s': 10, 'lw': 1.0},
-        },
-        'axRGB': {
-            ('NH3', 'minima'): {'s': 0, 'lw': 0.5},
-            ('RGB', 'minima'): {'s': 0, 'lw': 1.0},
-            ('RGB', 'maxima'): {'s': 0, 'lw': 1.0},
-        }
-    }
-    
-    # Loop through axes and plot
-    
-    
-    for ax_name, ax in axes.items():
-        for (data_type, extrema_type), base_spec in plot_specs.items():
-            spec = base_spec.copy()
-            # Override with axis-specific adjustments if available
-            overrides = axis_adjustments.get(ax_name, {}).get((data_type, extrema_type))
-            if overrides:
-                spec.update(overrides)
-    
-            plot_extrema_on_axisa(
-                ax, results,
-                data_type=data_type,
-                extrema_type=extrema_type,
-                text_color=spec['color'],
-                fontsize=spec['s']#,
-                #linewidth=spec['lw']
-            )
