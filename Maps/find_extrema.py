@@ -14,7 +14,7 @@ import csv
 def convert_time(row_inds, col_inds, mean_time_array):
     fits_times = []
     jd_times = []
-    print("%%%%%%%%%%row_inds, col_inds=",row_inds, col_inds)
+    #print("%%%%%%%%%%row_inds, col_inds=",row_inds, col_inds)
     #print("mean_time_array[row_inds[0], col_inds[0]]=",mean_time_array[row_inds[0], col_inds[0]])
     for row, col in zip(row_inds, col_inds):
         try:
@@ -73,8 +73,8 @@ def process_extrema(data_arrays: dict, mean_time_array, lats, lon_lims, min_dist
             ###!!!!!!! mean-time array to the proper patch or simply to 
             ###!!!!!!! a 1D longitude array. The "15" below should not be a
             ###!!!!!!! fixed value!
-            templat,templon=15-coords_sorted[:, 0],coords_sorted[:, 1]
-            row_inds, col_inds=90-templat,coords_sorted[:, 1]
+            #templat,templon=15-coords_sorted[:, 0],coords_sorted[:, 1]
+            #row_inds, col_inds=90-templat,coords_sorted[:, 1]
 
             fits_times, jd_times = convert_time(row_inds, col_inds, mean_time_array)
 

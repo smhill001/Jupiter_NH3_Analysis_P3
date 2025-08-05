@@ -325,6 +325,9 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
                                      cbar_title="",cbar_reverse=True)
     axs1[1].set_title('PCloud (mbar)',fontsize=10)
     
+    blendweightTime_patch=MP.make_patch(blendweightTime,lats,[360-LonLims[1],360-LonLims[0]],
+                                     180,180)
+
     RGBaxs=2
 
     ###########################################################################
@@ -628,7 +631,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
             "PCloud": PCld_patch_mb,
             #"RGB": np.mean(RGB_patch,axis=2)
             "RGB":RGB_patch[:,:,0]
-        }, blendweightTime, lats, LonLims)
+        }, blendweightTime_patch, lats, LonLims)
 
         output_filename=pathmapplots+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" extrema.csv"
         fx.export_extrema_to_csv(results_extrema, output_filename)
@@ -640,22 +643,14 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
     # Find 'blob' regions
     ###########################################################################
 
-    results_blob = fx.process_extrema({
-        "NH3": fNH3_patch_mb,
-        "PCloud": PCld_patch_mb,
-        #"RGB": np.mean(RGB_patch,axis=2)
-        "RGB":RGB_patch[:,:,0]
-    }, blendweightTime, lats, LonLims)
-
-
     fNH3_mask, labeled_fNH3, props_fNH3= \
-        fb.process_blob(fNH3_patch_mb, PCld_patch_mb, lats, LonLims, threshold_abs=135, mode='max')
+        fb.process_blob(fNH3_patch_mb, PCld_patch_mb, lats, LonLims, timearray=blendweightTime_patch,threshold_abs=135, mode='max')
     
     Plum_mask, labeled_Plum, props_Plum= \
-        fb.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, threshold_abs=1750, mode='min')
+        fb.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, timearray=blendweightTime_patch, threshold_abs=1750, mode='min')
     
     NEDF_mask, labeled_NEDF, props_NEDF= \
-        fb.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, threshold_abs=2000, mode='max')
+        fb.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, timearray=blendweightTime_patch, threshold_abs=2000, mode='max')
     
     #fNH3_mask,labeled_fNH3,props_fNH3,props_Pcld_on_fNH3=fb.find_blob(fNH3_patch_mb, fNH3_patch_mb, threshold_abs=140., mode='max')
     
@@ -665,21 +660,20 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
     axsblob[2].imshow(labeled_NEDF,cmap='tab10')
     
     for i in range(0,len(props_fNH3)):
-        print(i,str(props_fNH3[i].keys()),props_fNH3[i]["label"])
+        #print(i,str(props_fNH3[i].keys()),props_fNH3[i]["label"],props_fNH3[i]["times"])
         axsblob[0].annotate(props_fNH3[i]["label"],(props_fNH3[i]["centroid"][1],props_fNH3[i]["centroid"][0]),
                             xytext=(props_fNH3[i]["centroid"][1],props_fNH3[i]["centroid"][0]),
                             xycoords='data')
     for i in range(0,len(props_Plum)):
-        print(i,str(props_Plum[i].keys()),props_Plum[i]["label"])
+        #print(i,str(props_Plum[i].keys()),props_Plum[i]["label"],props_Plum[i]["times"])
         axsblob[1].annotate(props_Plum[i]["label"],(props_Plum[i]["centroid"][1],props_Plum[i]["centroid"][0]),
                             xytext=(props_Plum[i]["centroid"][1],props_Plum[i]["centroid"][0]),
                             xycoords='data')
     for i in range(0,len(props_NEDF)):
-        print(i,str(props_NEDF[i].keys()),props_NEDF[i]["label"])
+        #print(i,str(props_NEDF[i].keys()),props_NEDF[i]["label"],props_NEDF[i]["times"])
         axsblob[2].annotate(props_NEDF[i]["label"],(props_NEDF[i]["centroid"][1],props_NEDF[i]["centroid"][0]),
                             xytext=(props_NEDF[i]["centroid"][1],props_NEDF[i]["centroid"][0]),
                             xycoords='data')
-        #print(str(props_data_sorted[i].label),(props_data_sorted[i].centroid[1],props_data_sorted[i].centroid[0]))
     axsblob[2].imshow(fNH3_mask,cmap='tab10')
     fb.export_regions_to_csv(props_fNH3, pathmapplots+collection+" fNH3.csv")
     fb.export_regions_to_csv(props_Plum, pathmapplots+collection+" Plum.csv")

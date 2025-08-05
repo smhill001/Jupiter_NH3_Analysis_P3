@@ -11,24 +11,21 @@ from copy import deepcopy
 import csv
 
 
-def convert_time(row_inds, col_inds, mean_time_array):
-    fits_times = []
-    jd_times = []
-    print("%%%%%%%%%%row_inds, col_inds=",row_inds, col_inds)
-    #print("mean_time_array[row_inds[0], col_inds[0]]=",mean_time_array[row_inds[0], col_inds[0]])
-    for row, col in zip(row_inds, col_inds):
-        try:
-            #print("mean_time_array[row, col]=",mean_time_array[row, col],row,col)
-            #temptime = Time(mean_time_array[row, col], format='jd')
-            temptime = Time(mean_time_array[row, col], format='jd')
-            fits_times.append(temptime.fits)
-            tempJD = deepcopy(temptime)
-            tempJD.format = 'jd'
-            jd_times.append(tempJD.value)
-        except:
-            fits_times.append("N/A")
-            jd_times.append(0.0)
-    return fits_times, jd_times
+def convert_one_time(row, col, mean_time_array):
+    #print("%%%%%%%%%%row_inds, col_inds=",row, col)
+    #print("mean_time_array[row_inds[0], col_inds[0]]=",Time(mean_time_array[row, col], format='jd'))
+    try:
+        #print("mean_time_array[row, col]=",mean_time_array[row, col],row,col)
+        #temptime = Time(mean_time_array[row, col], format='jd')
+        temptime = Time(mean_time_array[row, col], format='jd')
+        fits_time=temptime.fits
+        tempJD = deepcopy(temptime)
+        tempJD.format = 'jd'
+        jd_time=tempJD.value
+    except:
+        fits_time='N/A'
+        jd_time=0.0
+    return fits_time, jd_time
 
 
 def find_blob(image_to_segment, intensity_image,threshold_abs=None, mode='max'):
@@ -55,7 +52,7 @@ def find_blob(image_to_segment, intensity_image,threshold_abs=None, mode='max'):
     return blob_mask,labeled_image,props_data,props_intensity
 
 
-def process_blob(image_to_segment, intensity_image, lats, lon_lims, threshold_abs=None, mode='max'):
+def process_blob(image_to_segment, intensity_image, lats, lon_lims, timearray=None, threshold_abs=None, mode='max'):
     """
     Segments blobs, converts coordinates to lat/lon, merges regionprops from both images,
     sorts by longitude, and relabels regions accordingly.
@@ -117,6 +114,43 @@ def process_blob(image_to_segment, intensity_image, lats, lon_lims, threshold_ab
             coords_latlon = [rowcol_to_latlon(r, c) for r, c in region_data.coords]
             props_by_label[region_data.label]['coords'] = region_data.coords
             props_by_label[region_data.label]['coords_latlon'] = coords_latlon
+            
+        # Times from timearray
+        if timearray is not None:
+            # Time info
+            #row_inds = coords_sorted[:, 0]
+            #col_inds = coords_sorted[:, 1]
+            ###!!!!!!! Need to get these coords sorted out and maybe trim the
+            ###!!!!!!! mean-time array to the proper patch or simply to 
+            ###!!!!!!! a 1D longitude array. The "15" below should not be a
+            ###!!!!!!! fixed value!
+            #templat,templon=15-coords_sorted[:, 0],coords_sorted[:, 1]
+            #row_inds, col_inds=90-templat,coords_sorted[:, 1]
+
+
+            r, c = region_data.weighted_centroid
+            row, col = int(round(r)), int(round(c))
+            fits_time, jd_time = convert_one_time(row, col, timearray)
+
+            print("###########",row, col)
+            print("###########",fits_time, jd_time)
+            try:
+                #jd_value = timearray[wy, wx]
+                #time_obj = Time(jd_value, format='jd')
+                #fits_time = time_obj.to_value('isot', subfmt='date_hms')
+                props_by_label[region_data.label]['times'] = {
+                    'jd_time': jd_time,
+                    'fits_time': fits_time
+                }
+            except Exception as e:
+                props_by_label[region_data.label]['times'] = {
+                    'jd_time': None,
+                    'fits_time': None,
+                    'error': str(e)
+                }
+
+        #merged_props.append(record)
+
 
     # Step 3: Add intensity image properties
     for region_int in props_intensity:
@@ -173,7 +207,9 @@ def export_regions_to_csv(merged_props_sorted, filepath):
         'centroid_lat',
         'centroid_lon',
         'weighted_centroid_lat_seg',
-        'weighted_centroid_lon_seg'
+        'weighted_centroid_lon_seg',
+        'jd_time',
+        'fits_time'
     ]
 
     # Open CSV file and write header + rows
@@ -204,6 +240,12 @@ def export_regions_to_csv(merged_props_sorted, filepath):
             if 'centroid_latlon' in region:
                 row['centroid_lat'] = region['centroid_latlon'][0]
                 row['centroid_lon'] = region['centroid_latlon'][1]
+
+            if 'jd_time' in region['times']:
+                row['jd_time'] = region['times']['jd_time']
+            if 'fits_time' in region['times']:
+                row['fits_time'] = region['times']['fits_time']
+
 
             writer.writerow(row)
 
