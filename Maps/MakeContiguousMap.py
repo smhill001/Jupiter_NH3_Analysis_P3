@@ -628,7 +628,8 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
         fb.export_regions_to_csv(props_fNH3, pathmapplots+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" blobs"+" fNH3.csv")
         fb.export_regions_to_csv(props_Plum, pathmapplots+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" blobs"+" Plum.csv")
         fb.export_regions_to_csv(props_NEDF, pathmapplots+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" blobs"+" NEDF.csv")
-        
+        print("$$$$$$$$$$$$$$$$$$$$$$$$$",lats,LonLims)
+
         fb.plot_regions_on_axis(axs1[2], labeled_fNH3, props_fNH3,lon_lims=LonLims,lats=lats,
                      plot_contours=False, plot_masks=True,plot_labels=True,contour_color='C0')
         fb.plot_regions_on_axis(axs1[2], labeled_Plum, props_Plum,lon_lims=LonLims,lats=lats,
@@ -724,5 +725,11 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
 
     #print(aspectratio)
     #print("####### xy=",xyfnh3,xyPcldmax,xyPcldmin)
-    return(lats,blendweightPCloud,blendweightfNH3,blendRGBweight)
+    if segment:
+        return(lats,blendweightPCloud,blendweightfNH3,blendRGBweight,
+               labeled_fNH3, props_fNH3, 
+                labeled_Plum, props_Plum, 
+                labeled_NEDF, props_NEDF)
+    else:
+        return(lats,blendweightPCloud,blendweightfNH3,blendRGBweight)
     #return(fig1,axs1)
