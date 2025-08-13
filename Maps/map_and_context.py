@@ -121,7 +121,8 @@ def map_and_context(mapdata,maphdr,RGB,RGBtime,LonSys,LatLims,LonLims,LonRng,Plo
     gamma=1.3
 
     #Logic in RGB_patch depends on LonLims and CM being consistent
-    RGB_patch=MPRGB.make_patch_RGB(RGB,LatLims,LonLims,PlotCM,LonRng)
+    #RGB_patch=MPRGB.make_patch_RGB(RGB,LatLims,LonLims,PlotCM,LonRng)
+    RGB_patch=MP.make_patch(RGB,LatLims,LonLims,PlotCM,LonRng)
     
     RGB4Display=np.power(np.array(RGB_patch).astype(float),gamma)
     RGB4Display=RGB4Display/RGB4Display.max()

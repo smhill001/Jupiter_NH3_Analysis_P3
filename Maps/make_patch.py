@@ -1,11 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue May 13 08:24:10 2025
-
-@author: smhil
-"""
-
-def make_patch(Map,LatLims,LonLims,CM2deg,LonRng,pad=True):
+def make_patch(Map,LatLims,LonLims,CM,LonRng,pad=True):
     """
     Purpose: 
         Make a map patch and handle the case where the data overlap
@@ -13,18 +6,23 @@ def make_patch(Map,LatLims,LonLims,CM2deg,LonRng,pad=True):
         conventions that with the left boundary at 360 ascending from
         the right boundary at 0. In WinJUPOS, the actual map setting
         shows the left boundary at zero, which is of course, also 360.
+        
+    Updates:
+        2025-08-13: Accommodated full map sizes other than 180x360 to
+                    facilitate use of Hubble data (1800x3600). Tested 
+                    also on [1800,3600,3] HST *.TIF data and worked fine.
+                    Can probably replace "make_patch_RGB.py"
     
     Parameters
     ----------
-    Map : NUMPY ARRAY [180,360]
+    Map : NUMPY ARRAY [nx180,nx360,<1>]
         DESCRIPTION.
     LatLims : NUMPY ARRAY [2]
-        DESCRIPTION. Colatitudes of patch boundary. 
-        !!! Need details of convention.
+        DESCRIPTION. Colatitudes of patch boundary in degrees. 
     LonLims : NUMPY ARRAY [2]
         DESCRIPTION. Initial and final longitudes of patch boundary. 
         !!! Need details of convention. (colongitudes?)
-    CM2deg : TYPE
+    CM : TYPE
         DESCRIPTION. Central Meridian to center patch on
     LonRng : TYPE
         DESCRIPTION.
@@ -36,21 +34,24 @@ def make_patch(Map,LatLims,LonLims,CM2deg,LonRng,pad=True):
     -------
     patch : TYPE
         DESCRIPTION.
-
     """
-    import numpy as np
-    #print("**************")
-    #print(LatLims[0],LatLims[1],LonLims[0],LonLims[1])
-    patch=np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]:LonLims[1]])
-    if CM2deg<LonRng:
-        #print("******************  CM2deg<LonRng")
-        patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]-1:360]),
-                              np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]-360])),axis=1)
-    if CM2deg>360-LonRng:
-        patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],360+LonLims[0]:360]),
-                              np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]])),axis=1)
-    #if pad:
-    #    patch_pad=np.pad(patch,5,mode='reflect')
-    #print("####################### Patch shape",patch.shape)
 
-    return patch
+    import numpy as np
+    
+    scale=int(Map.shape[0]/180)
+    lon_max=360*scale
+    LatLims=LatLims*scale
+    LonRng=LonRng*scale
+    CM=CM*scale
+    LonLims=LonLims*scale
+    
+    patch=np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]:LonLims[1]])
+    if CM<LonRng:
+        print("******************  CM2deg<LonRng")
+        patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]-1:lon_max]),
+                              np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]-lon_max])),axis=1)
+    if CM>lon_max-LonRng:
+        patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],lon_max+LonLims[0]:lon_max]),
+                              np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]])),axis=1)
+
+    return patch    

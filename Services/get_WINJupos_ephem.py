@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-
-
 def get_WINJupos_ephem(dateobs,planet="Jupiter"):
     """
+    DEPRECATED 8/13/2025
     Created on Fri Sep 15 07:57:17 2023
 
     @author: smhil

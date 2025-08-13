@@ -23,7 +23,8 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
     sys.path.append('./Services')
     import get_obs_list as getlist
 
-    import get_WINJupos_ephem as WJ_ephem
+    #import get_WINJupos_ephem as WJ_ephem
+    import get_spice_ephem as sp_ephem
     import numpy as np
 
     sourcedata=obskey#+"_"+imagetype
@@ -52,7 +53,7 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
         RGB=imread(pathRGB+RGBfile)
         RGBsec=str(int(str(RGBfile[16:17]))*6)
         RGBtime=(RGBfile[0:10]+"_"+RGBfile[11:13]+":"+RGBfile[13:15]+":"+RGBsec.zfill(2))
-        eph=WJ_ephem.get_WINJupos_ephem(RGBtime,planet=target)
+        eph=sp_ephem.get_spice_ephem(RGBtime,planet=target)
         #time.sleep(5)
         RGB_CM1=float(eph[0].strip())
         RGB_CM2=float(eph[1].strip())

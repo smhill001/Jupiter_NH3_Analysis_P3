@@ -24,6 +24,7 @@ pm.base.prevent_kernel_loading()
 spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/lsk/naif0012.tls.pc")
 spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/pck/earth_200101_990825_predict.bpc")
 spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/pck/pck00011.tpc")
+spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/pck/pck00010.tpc")
 spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/pck/gm_de440.tpc")
 spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/pck/gm_de431.tpc")
 
@@ -39,11 +40,10 @@ x=body.get_backplane_map('INCIDENCE')
 print("body.subpoint_lon=",body.subpoint_lon)
 print("body.subpoint_lat=",body.subpoint_lat)
 
-fig,axs=pl.subplots(figsize=(8.0,4.0), dpi=150, facecolor="white")
-axs.imshow(x)
-fn=path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Maps/PlanetmapperTest.png"
-fig.savefig(fn,dpi=300)
-#J=pm.Observation(path+fn, target='JUPITER')
+#fig,axs=pl.subplots(figsize=(8.0,4.0), dpi=150, facecolor="white")
+#axs.imshow(x)
+#fn=path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Maps/PlanetmapperTest.png"
+#fig.savefig(fn,dpi=300)
 
 #gui = pm.gui.GUI(J)
 """

@@ -32,7 +32,7 @@ def make_l2_abs_data(obsdate="20240925UTa",target="Jupiter",imagetype='Img',
     from astropy.io import fits
     import get_obs_list as getlist
     import load_png as LP
-    import get_WINJupos_ephem as WJ_ephem
+    import get_spice_ephem as sp_ephem
     import read_master_calibration as RMC
     import make_sza_eza_planes as za
     import pylab as pl
@@ -72,7 +72,7 @@ def make_l2_abs_data(obsdate="20240925UTa",target="Jupiter",imagetype='Img',
     NH3sec=str(int(str(NH3file[16:17]))*6) #COMPUTE FROM FRACTIONAL WINJUPOS MINUTE
     NH3time=(NH3file[0:10]+"_"+NH3file[11:13]+":"+NH3file[13:15]+":"
              +NH3sec.zfill(2))
-    NH3eph=WJ_ephem.get_WINJupos_ephem(NH3time,planet=target)
+    NH3eph=sp_ephem.get_spice_ephem(NH3time,planet=target)
     NH3_CM1=float(NH3eph[0].strip())
     NH3_CM2=float(NH3eph[1].strip())
     NH3_CM3=float(NH3eph[2].strip())
@@ -89,7 +89,7 @@ def make_l2_abs_data(obsdate="20240925UTa",target="Jupiter",imagetype='Img',
         CH4sec=str(int(str(CH4file[16:17]))*6) #COMPUTE FROM FRACTIONAL WINJUPOS MINUTE
         CH4time=(CH4file[0:10]+"_"+CH4file[11:13]+":"+CH4file[13:15]+":"
                  +CH4sec.zfill(2))
-        CH4eph=WJ_ephem.get_WINJupos_ephem(CH4time,planet=target)
+        CH4eph=sp_ephem.get_spice_ephem(CH4time,planet=target)
         CH4_CM1=float(CH4eph[0].strip())
         CH4_CM2=float(CH4eph[1].strip())
         CH4_CM3=float(CH4eph[2].strip()) 

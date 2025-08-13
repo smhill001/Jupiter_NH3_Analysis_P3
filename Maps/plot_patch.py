@@ -1,17 +1,47 @@
-def plot_patch(patch,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
-               cont=True,cbarplot=True,cbar_title="Test",cbar_reverse=False,vn=0.10,vx=0.20,n=6):
+def plot_patch(patch,LatLims,LonLims,CM2,LonRng,colorscale,axis,
+               cbarplot=True,cbar_title="Test",cbar_reverse=False,vn=0.10,vx=0.20,n=6):
     """
-    Created on Thu Apr 11 18:54:35 2024
-    
-    @author: smhil
-    """    
+    Purpose:
+        To plot a map patch with appropriate latitude and longitude scales,
+        and, optionally, a color bar
+
+    Parameters
+    ----------
+    patch : TYPE
+        DESCRIPTION.
+    LatLims : TYPE
+        DESCRIPTION.
+    LonLims : TYPE
+        DESCRIPTION.
+    CM2 : TYPE
+        DESCRIPTION.
+    LonRng : TYPE
+        DESCRIPTION.
+    colorscale : TYPE
+        DESCRIPTION.
+    axis : TYPE
+        DESCRIPTION.
+    cbarplot : TYPE, optional
+        DESCRIPTION. The default is True.
+    cbar_title : TYPE, optional
+        DESCRIPTION. The default is "Test".
+    cbar_reverse : TYPE, optional
+        DESCRIPTION. The default is False.
+    vn : TYPE, optional
+        DESCRIPTION. The default is 0.10.
+    vx : TYPE, optional
+        DESCRIPTION. The default is 0.20.
+    n : TYPE, optional
+        DESCRIPTION. The default is 6.
+
+    Returns
+    -------
+    None.
+
+    """
     import numpy as np
     import pylab as pl
-    #import make_patch as MP
-    import plot_contours_on_patch as PC
 
-    print("@@@@@@@@@@@@ LatLims, LonLims, CM2, LonRng",LatLims, LonLims, CM2, LonRng)
-    #patch=MP.make_patch(fullmap,LatLims,LonLims,CM2,LonRng)
     np.nan_to_num(patch, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
     tx=np.linspace(vn,vx,n,endpoint=True)
 
@@ -19,9 +49,6 @@ def plot_patch(patch,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
                extent=[360-LonLims[0],360-LonLims[1],90-LatLims[1],
                        90-LatLims[0]],
                        aspect="equal")
-    #if cont:
-    #    temp=PC.plot_contours_on_patch(axis,patch,LatLims,LonLims,
-    #                       lvls=tx,frmt=frmt,clr='k')
 
     im_ratio = patch.shape[0]/patch.shape[1]
     if cbarplot:
@@ -34,8 +61,6 @@ def plot_patch(patch,LatLims,LonLims,CM2,LonRng,colorscale,axis,frmt,
         cbar.ax.yaxis.set_label_coords(-0.7, 0.5)
         if cbar_reverse:
             cbar.ax.invert_yaxis()
-    #if colorscale=="Greys":
-    #    cbar.set_label('Cloud Top Pressure (mb)',fontsize=7)
 
     return patch,vn,vx,tx
 

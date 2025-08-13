@@ -294,7 +294,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
                                      180,180)
     fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(fNH3_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
                                      180,180,ctbls[0],
-                                     axs1[0],'%3.2f',cont=cont,n=6,
+                                     axs1[0],'%3.2f',n=6,
                                      vn=fNH3low,
                                      vx=fNH3high,
                                      cbar_title="")
@@ -316,7 +316,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
                                      180,180)
     PCld_patch_mb,vn,vx,tx_PCld=PP.plot_patch(PCld_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
                                      180,180,ctbls[1],
-                                     axs1[1],'%3.2f',cont=cont,n=5,
+                                     axs1[1],'%3.2f',n=5,
                                      vn=PCldlow,
                                      vx=PCldhigh,
                                      cbar_title="",cbar_reverse=True)
@@ -359,7 +359,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
 
         fracfNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(fracfNH3_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
                                          180,180,"jet",
-                                         axs2[0],'%3.2f',cont=False,n=6,vn=0,vx=0.5,
+                                         axs2[0],'%3.2f',n=6,vn=0,vx=0.5,
                                          cbar_title="")
         print("vn,vx,tx_fNH3",vn,vx,tx_fNH3)
         axs2[0].set_title('fNH3 (fractional '+r'$\sigma$'+')',fontsize=10)
@@ -369,7 +369,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
 
         fracPCld_patch_mb,vn,vx,tx_PCld=PP.plot_patch(fracPCld_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
                                          180,180,"jet",
-                                         axs2[1],'%3.2f',cont=False,n=6,vn=0,vx=0.25,
+                                         axs2[1],'%3.2f',n=6,vn=0,vx=0.25,
                                          cbar_title="")
         axs2[1].set_title('PCloud (fractional '+r'$\sigma$'+')',fontsize=10)
 
@@ -384,7 +384,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
                                                 imagetype="Map",Level="L3",
                                                 FiveMicron=FiveMicron)                        
 
-        Five_patch=MPRGB.make_patch_RGB(Five,lats,[360-LonLims[1],360-LonLims[0]],180,180)
+        Five_patch=MP.make_patch(Five,lats,[360-LonLims[1],360-LonLims[0]],180,180)
         Five4Display=np.power(np.array(Five_patch).astype(float),1.0)
         Five4Display=Five4Display/Five4Display.max()
         show=axs1[2].imshow(Five4Display,
@@ -464,12 +464,12 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
 
         IRTF_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(np.log10(blendIRTF),lats,[360-LonLims[1],360-LonLims[0]],
                                          180,180,"gist_heat",
-                                         axs1[2],'%3.2f',cont=False,n=5,vn=1,vx=3.0)
+                                         axs1[2],'%3.2f',n=5,vn=1,vx=3.0)
         
     ###########################################################################
     # Done with IRTF branch, now, finally, do the RGB context image
     ###########################################################################
-    RGB_patch=MPRGB.make_patch_RGB(blendRGBweight,lats,[360-LonLims[1],360-LonLims[0]],180,180)
+    RGB_patch=MP.make_patch(blendRGBweight,lats,[360-LonLims[1],360-LonLims[0]],180,180)
     RGB4Display=np.power(np.array(RGB_patch).astype(float),1.0)
     show=axs1[RGBaxs].imshow(RGB4Display,
                extent=[LonLims[1],LonLims[0],90-lats[1],
@@ -699,7 +699,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
         axCH4.tick_params('y', labelleft=False)
         axCH4.tick_params('x', labelsize=8)
            
-        RGB_patch=MPRGB.make_patch_RGB(blendRGBweight,lats,[360-LonLims[1],360-LonLims[0]],180,180)
+        RGB_patch=MP.make_patch(blendRGBweight,lats,[360-LonLims[1],360-LonLims[0]],180,180)
         RGB4Display=np.power(np.array(RGB_patch).astype(float),1.0)
         #RGB4Display=RGB4Display/RGB4Display.max()
         show=axRGB.imshow(RGB4Display,
