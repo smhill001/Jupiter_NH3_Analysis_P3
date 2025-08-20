@@ -623,7 +623,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
             fb.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, timearray=blendweightTime_patch, threshold_abs=1750, mode='min')
         
         NEDF_mask, labeled_NEDF, props_NEDF= \
-            fb.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, timearray=blendweightTime_patch, threshold_abs=2000, mode='max')
+            fb.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, timearray=blendweightTime_patch, threshold_abs=1950, mode='max')
         
         fb.export_regions_to_csv(props_fNH3, pathmapplots+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" blobs"+" fNH3.csv")
         fb.export_regions_to_csv(props_Plum, pathmapplots+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" blobs"+" Plum.csv")
@@ -666,7 +666,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
     fig1.savefig(pathmapplots+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" map.png",dpi=300)
 
     if variance:
-        fig2.savefig(pathmapplots+collection+" Stdv Sys"+LonSys+" map.png",dpi=300)
+        fig2.savefig(pathmapplots+collection+" Stdv Sys"+LonSys+" "+lonstr+" "+latstr+" map.png",dpi=300)
 
     ###########################################################################
     # Create Stack Plot subplots on the axes objects passed into the procedure
@@ -676,9 +676,12 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
         #lats=[80,100]
         fNH3_patch_mb=MP.make_patch(blendweightfNH3,lats,[360-LonLims[1],360-LonLims[0]],
                                     180,180)
+        print("######### cb=",cb)
+        #plot_patch(patch,LatLims,LonLims,CM2,LonRng,colorscale,axis,
+        #               cbarplot=True,cbar_title="Test",cbar_reverse=False,vn=0.10,vx=0.20,n=6)
         fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(fNH3_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
                                          180,180,ctbls[0],
-                                         axNH3,'%3.2f',cbarplot=cb,cont=False,n=11,
+                                         axNH3,cbarplot=cb,n=11,
                                          vn=fNH3low,
                                          vx=fNH3high)
         axNH3.set_ylabel(collection.replace('-','\n'),rotation='horizontal',fontsize=6)
@@ -691,7 +694,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
                                     180,180)
         PCld_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(PCld_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
                                          180,180,ctbls[1],
-                                         axCH4,'%3.2f',cbarplot=cb,cont=False,
+                                         axCH4,cbarplot=cb,
                                          n=5,vn=PCldlow,vx=PCldhigh)
         axCH4.set_ylabel(collection,rotation='horizontal',fontsize=6)
         axCH4.set_ylabel(collection.replace('-','\n'),rotation='horizontal',fontsize=6)

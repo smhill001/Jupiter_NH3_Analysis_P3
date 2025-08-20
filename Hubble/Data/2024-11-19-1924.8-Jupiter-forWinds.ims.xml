@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WinJUPOS Version="12.3.12">
+  <ImageMeasurementSettings Version="1">
+    <FileName>C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\Hubble\Data\2024-11-19-1924.8-Jupiter-forWinds.png</FileName>
+    <Body>Jupiter</Body>
+    <JulianDateUT>2460634.30889</JulianDateUT>
+    <ObservingPlace>Earth</ObservingPlace>
+    <GeoLongDeg>-104.90000</GeoLongDeg>
+    <GeoLatDeg>39.70000</GeoLatDeg>
+    <Observer>Jupiter</Observer>
+    <ImageInfo>NR</ImageInfo>
+    <ColorChannel>Color</ColorChannel>
+    <CenterXPixel>200.0</CenterXPixel>
+    <CenterYPixel>190.0</CenterYPixel>
+    <EquatorialRadiusPixel>190.0</EquatorialRadiusPixel>
+    <RotationAngleDeg>0.000</RotationAngleDeg>
+    <DistanceRatioXToYOfSensorElements>1.000000</DistanceRatioXToYOfSensorElements>
+    <MirroredInvertedImage>False</MirroredInvertedImage>
+    <InverseLongitudes>False</InverseLongitudes>
+    <CM1Deg>251.06</CM1Deg>
+    <CM2Deg>356.01</CM2Deg>
+    <CM3Deg>135.41</CM3Deg>
+    <q>0.9351256575</q>
+    <DeclinationOfEarthOnPlanetDeg>2.89</DeclinationOfEarthOnPlanetDeg>
+  </ImageMeasurementSettings>
+</WinJUPOS>

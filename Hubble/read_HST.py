@@ -105,8 +105,8 @@ print("########",LatLims,LonLims,CM,LonRng)
 #mapHST=read_HST(obskey="2024d_f631",LonSys='1')
 mapHST=read_HST(obskey="2024d_f395n-f502n",LonSys='1')
 patch=mp.make_patch(mapHST,LatLims,LonLims,CM,LonRng,pad=True)
-    
 figH,axsH=pl.subplots(1,figsize=(8,3), dpi=150, facecolor="white")
+
 """
 axsH.grid(linewidth=0.2)
 axsH.ylim=[-5.,15.]

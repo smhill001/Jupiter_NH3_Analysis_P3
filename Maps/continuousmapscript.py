@@ -1,5 +1,6 @@
 def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,360],
-                       localmax=False,segment=False,variance=False,ctbls=['terrain_r','Blues']):
+                       localmax=False,segment=False,variance=False,ctbls=['terrain_r','Blues'],
+                       proj='maps'):
     """
     Created on Sun Aug 25 15:04:22 2024
     
@@ -60,7 +61,7 @@ def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,
 
     maps2024NEZNovDec=["20241128-20241129","20241202-20241203","20241205-20241205"]
 
-    pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/maps/"
+    pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/"+proj+"/"
     
     if int(lats[0])<90:
         latstr=str(90-lats[0])+"N"
@@ -157,11 +158,11 @@ def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,
                                   axCH4=axs23CH4[counter],
                                   axRGB=axs23RGB[counter],
                                   LimbCorrection=True,
-                                  lonhalfwidth=45,boxcar=9)
+                                  lonhalfwidth=45,boxcar=9,
+                                  proj=proj)
             #pl.show()
             counter=counter+1
             cb=False
-    
         fig23NH3.savefig(pathmapplots+collection+" NH3 Stack Sys"+LonSys+" "+lonstr+" "+latstr+" map.png",dpi=300)
         fig23CH4.savefig(pathmapplots+collection+" CH4 Stack Sys"+LonSys+" "+lonstr+" "+latstr+" map.png",dpi=300)
         fig23RGB.savefig(pathmapplots+collection+" RGB Stack Sys"+LonSys+" "+lonstr+" "+latstr+" map.png",dpi=300)
