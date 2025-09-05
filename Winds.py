@@ -296,14 +296,13 @@ def _xcorr1d_circular(s1, s2):
 
 
 def estimate_zonal_winds(
-    img1_path,
-    img2_path,
+    im1,
+    im2,
     dt_seconds,
     meters_per_pixel=None,
     deg_per_px=None,
     ref_latitude_deg=0.0,
-    out_csv_path=None
-):
+    out_csv_path=None):
     """
     Compute a single zonal (east-west) velocity at each latitude by
     performing 1D circular cross-correlation of each latitude row across all longitudes.
@@ -317,11 +316,9 @@ def estimate_zonal_winds(
     
     NOTE: THIS CODE ONLY WORKS FOR FULL LATITUDE RANGE = 90N - 90S
     """
-    from imageio import imread
     import pylab as pl
+    import numpy as np
 
-    im1 = np.ascontiguousarray(imread(img1_path, as_gray=True).astype(np.float32))
-    im2 = np.ascontiguousarray(imread(img2_path, as_gray=True).astype(np.float32))
     if im1.shape != im2.shape:
         raise ValueError("Images must have identical shape for zonal winds.")
 
@@ -362,6 +359,4 @@ def estimate_zonal_winds(
             for lat, u, s in zip(lat_deg, u_sm, snr_arr):
                 wtr.writerow([lat, u, s])
 
-    fig,axs=pl.subplots(1,figsize=(8,6), dpi=150, facecolor="white")
-    axs.plot(lat_deg,u_sm)
     return lat_deg, u_sm

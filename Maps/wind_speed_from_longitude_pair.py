@@ -33,11 +33,15 @@ def wind_speed_from_long_pair(lat_deg, lon1_deg, lon2_deg,
     """
 
     # --- Parse times
-    try:
-        t1 = datetime.strptime(t1_str, "%Y-%m-%d %H:%M:%S")
-        t2 = datetime.strptime(t2_str, "%Y-%m-%d %H:%M:%S")
-    except ValueError:
-        raise ValueError("Times must be in format 'YYYY-MM-DD hh:mm:ss'")
+    if "T" in t1_str:
+        t1 = datetime.strptime(t1_str, "%Y-%m-%dT%H:%M:%S")
+        t2 = datetime.strptime(t2_str, "%Y-%m-%dT%H:%M:%S")
+    else:
+        try:
+            t1 = datetime.strptime(t1_str, "%Y-%m-%d %H:%M:%S")
+            t2 = datetime.strptime(t2_str, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            raise ValueError("Times must be in format 'YYYY-MM-DD hh:mm:ss'")
 
     # --- Time delta in seconds
     dt = (t2 - t1).total_seconds()
@@ -81,5 +85,5 @@ def wind_speed_from_long_pair(lat_deg, lon1_deg, lon2_deg,
         raise ValueError("system must be 'I', 'II', or 'III'")
 
     speed_mps = speed_rel_system + delta_omega * R_lat
-
+    #return sys III speed in  mps and dlon/day in ORIGINAL sys long.
     return speed_mps,dlon/dt*86400

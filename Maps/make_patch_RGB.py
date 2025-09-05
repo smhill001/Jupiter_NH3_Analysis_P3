@@ -7,6 +7,7 @@ def make_patch_RGB(Map,LatLims,LonLims,CM2deg,LonRng,pad=True):
              shows the left boundary at zero, which is of course, also 360.
     """
     import numpy as np
+    
     patch=np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]:LonLims[1],:])
     if CM2deg<LonRng:
         patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]-1:360,:]),

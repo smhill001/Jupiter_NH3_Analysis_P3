@@ -1,3 +1,21 @@
+def make_lat_and_lon_str(lats,LonLims):
+    if int(lats[0])<90:
+        latstr=str(90-lats[0])+"N"
+    if int(lats[0])==90:
+        latstr=str(90-lats[0])
+    if int(lats[0])>90:
+        latstr=str(lats[0]-90)+"S"
+        
+    if int(lats[1])<90:
+        latstr=latstr+"-"+str(90-lats[1])+"N"
+    if int(lats[1])==90:
+        latstr=latstr+"-"+str(90-lats[1])
+    if int(lats[1])>90:
+        latstr=latstr+"-"+str(lats[1]-90)+"S"
+        
+    lonstr=str(LonLims[0])+"-"+str(LonLims[1])
+    return latstr,lonstr
+
 def blendstack(stackdata,stackweights):
     import numpy as np
     indzf=np.where(stackdata==0)
@@ -87,11 +105,8 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
     import make_patch as MP
     import get_map_collection as gmc
     from skimage.measure import label, regionprops
-    from skimage.io import imread, imshow
-    
-    
+    from skimage.io import imread, imshow    
 
-    
     pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/"+proj+"/"  
     if not(obskeys):
         obskeys,dummy=gmc.get_map_collection(collection)
@@ -580,21 +595,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
     ###########################################################################
     # WRITE LOCAL MAX AND MINS TO FILE
     ###########################################################################
-    if int(lats[0])<90:
-        latstr=str(90-lats[0])+"N"
-    if int(lats[0])==90:
-        latstr=str(90-lats[0])
-    if int(lats[0])>90:
-        latstr=str(lats[0]-90)+"S"
-        
-    if int(lats[1])<90:
-        latstr=latstr+"-"+str(90-lats[1])+"N"
-    if int(lats[1])==90:
-        latstr=latstr+"-"+str(90-lats[1])
-    if int(lats[1])>90:
-        latstr=latstr+"-"+str(lats[1]-90)+"S"
-        
-    lonstr=str(LonLims[0])+"-"+str(LonLims[1])
+    latstr,lonstr=make_lat_and_lon_str(lats,LonLims)
 
     if localmax:
         print("IN LOCAL MAX")
@@ -631,11 +632,11 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
         print("$$$$$$$$$$$$$$$$$$$$$$$$$",lats,LonLims)
 
         fb.plot_regions_on_axis(axs1[2], labeled_fNH3, props_fNH3,lon_lims=LonLims,lats=lats,
-                     plot_contours=False, plot_masks=True,plot_labels=True,contour_color='C0')
+                     plot_contours=False, plot_masks=True,plot_labels=False,contour_color='C0')
         fb.plot_regions_on_axis(axs1[2], labeled_Plum, props_Plum,lon_lims=LonLims,lats=lats,
-                     plot_contours=False, plot_masks=True,plot_labels=True, contour_color='white')
+                     plot_contours=False, plot_masks=True,plot_labels=False, contour_color='white')
         fb.plot_regions_on_axis(axs1[2], labeled_NEDF, props_NEDF,lon_lims=LonLims,lats=lats,
-                     plot_contours=False, plot_masks=True,plot_labels=True, contour_color='black')
+                     plot_contours=False, plot_masks=True,plot_labels=False, contour_color='black')
 
         """
         figblob,axsblob=pl.subplots(rng[-1]+1,1,figsize=(figsz[0],figsz[1]), dpi=150, facecolor="white",
@@ -725,6 +726,77 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
             fb.plot_regions_on_axis(axRGB, labeled_NEDF, props_NEDF,lon_lims=LonLims,lats=lats,
                          plot_contours=False, plot_masks=True,plot_labels=False, contour_color='black')
 
+    ###########################################################################
+    # YET ANOTHER SECTION: LONGITUDINAL CUTS!
+    #!!!! Need to make MAPS! then use profiles modules to extract this!
+    ###########################################################################
+    figlc,axslc=pl.subplots(3,1,figsize=(figsz[0],figsz[1]), dpi=150, facecolor="white",
+                          sharex=True)
+    figlc.suptitle(collection+"\n Average")
+
+    lon_array=np.arange(LonLims[0],LonLims[1],1)
+    fNH3_array0=np.mean(fNH3_patch_mb[4:7,:],axis=0)
+    Cld_array0=np.mean(PCld_patch_mb[4:7,:],axis=0)
+    fNH3_array1=np.mean(fNH3_patch_mb[5:9,:],axis=0)
+    Cld_array1=np.mean(PCld_patch_mb[5:9,:],axis=0)
+    fNH3_array2=np.mean(fNH3_patch_mb[9:12,:],axis=0)
+    Cld_array2=np.mean(PCld_patch_mb[9:12,:],axis=0)
+    #PCld_array=np.mean(PCld_patch_mb[7:9,:],axis=0)
+    #NEDF_array=np.mean(PCld_patch_mb[5:7,:],axis=0)
+
+    axslc[0].plot(lon_array,fNH3_array0,color='C2')
+    axslc0=axslc[0].twinx()
+    axslc0.plot(lon_array,Cld_array0,color='C0')
+    axslc[0].set_ylim(50.,180.)
+    axslc0.set_ylim(1500.,2200.)
+    axslc0.invert_yaxis()
+
+    axslc[1].plot(lon_array,fNH3_array1,color='C2')
+    axslc1=axslc[1].twinx()
+    axslc1.plot(lon_array,Cld_array1,color='C0')
+    axslc[1].set_ylim(50.,180.)
+    axslc1.set_ylim(1500.,2200.)
+    axslc1.invert_yaxis()
+
+    axslc[2].plot(lon_array,fNH3_array2,color='C2')
+    axslc2=axslc[2].twinx()
+    axslc2.plot(lon_array,Cld_array2,color='C0')
+    axslc[2].set_ylim(50.,180.)
+    axslc2.set_ylim(1500.,2200.)
+    axslc2.invert_yaxis()
+
+    #axslc[1].plot(lon_array,PCld_array)
+    #axslc[2].plot(lon_array,fNH3_array2)
+    
+    for i in range(0,3):
+        axslc[i].grid(linewidth=0.2)
+        #axslc[i].set_xticks(np.linspace(450.,0.,31), minor=False)
+        #xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
+        #axslc[i].set_xticklabels(xticklabels.astype(int))
+        #axslc[i].set_yticks(np.linspace(-90,90,13), minor=False)
+        #yticklabels=np.array(np.linspace(-90,90,13))
+        #axslc[i].set_yticklabels(yticklabels.astype(int))
+        axslc[i].tick_params(axis='both', which='major', labelsize=7)
+        axslc[i].set_ylabel("PG Latitude (deg)")
+        #axslc[i].set_adjustable('box')
+        axslc[i].set_xlim(15,195.)
+        
+        """
+        if i<2:
+            print("i<2")
+            axslc[i].set_ylim(1500.,2200.)
+            axslc[i].invert_yaxis()
+        elif i==2:
+            axslc[i].set_ylim(50.,180.)
+        """
+
+
+
+        #axslc[i].invert_xaxis()
+            
+            
+
+    ###########################################################################
 
     #print(aspectratio)
     #print("####### xy=",xyfnh3,xyPcldmax,xyPcldmin)
