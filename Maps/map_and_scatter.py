@@ -125,7 +125,7 @@ def map_and_scatter(patchx,patchy,mapydata,mapyhdr,LonSys,
     Testy_patch=MP.make_patch(mapydata,LatLims,LonLims,PlotCM,LonRng)
     Testy_patch,vn,vx,tx=PP.plot_patch(Testy_patch,LatLims,LonLims,
                                      PlotCM,LonRng,ct,
-                                     axs3[0],'%3.2f',cont=False,
+                                     axs3[0],'%3.2f',
                                      cbar_reverse=cbar_rev,vn=ylow,vx=yhigh,n=6,
                                      cbar_title=cbar_title)
     temp=PC.plot_contours_on_patch(axs3[0],patchx,LatLims,LonLims,

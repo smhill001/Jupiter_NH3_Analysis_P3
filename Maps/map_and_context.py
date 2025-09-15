@@ -102,7 +102,7 @@ def map_and_context(mapdata,maphdr,RGB,RGBtime,LonSys,LatLims,LonLims,LonRng,Plo
     data_patch=MP.make_patch(mapdata2,LatLims,LonLims,PlotCM,LonRng)
     data_patch,vn,vx,tx=PP.plot_patch(data_patch,LatLims,LonLims,
                                      PlotCM,LonRng,ct,axs1[0],'%3.2f',
-                                     cont=False,n=6,vn=low,vx=high,
+                                     n=6,vn=low,vx=high,
                                      cbar_title=cbar_title,cbar_reverse=cbar_rev)
     
     temp=PC.plot_contours_on_patch(axs1[0],data_patch,LatLims,LonLims,

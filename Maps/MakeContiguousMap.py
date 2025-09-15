@@ -730,11 +730,12 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
     # YET ANOTHER SECTION: LONGITUDINAL CUTS!
     #!!!! Need to make MAPS! then use profiles modules to extract this!
     ###########################################################################
+    
     figlc,axslc=pl.subplots(3,1,figsize=(figsz[0],figsz[1]), dpi=150, facecolor="white",
                           sharex=True)
-    figlc.suptitle(collection+"\n Average")
+    figlc.suptitle(collection)
 
-    lon_array=np.arange(LonLims[0],LonLims[1],1)
+    lon_array=np.arange(LonLims[1],LonLims[0],-1)
     fNH3_array0=np.mean(fNH3_patch_mb[4:7,:],axis=0)
     Cld_array0=np.mean(PCld_patch_mb[4:7,:],axis=0)
     fNH3_array1=np.mean(fNH3_patch_mb[5:9,:],axis=0)
@@ -771,31 +772,35 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
     for i in range(0,3):
         axslc[i].grid(linewidth=0.2)
         #axslc[i].set_xticks(np.linspace(450.,0.,31), minor=False)
-        #xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
-        #axslc[i].set_xticklabels(xticklabels.astype(int))
         #axslc[i].set_yticks(np.linspace(-90,90,13), minor=False)
         #yticklabels=np.array(np.linspace(-90,90,13))
         #axslc[i].set_yticklabels(yticklabels.astype(int))
         axslc[i].tick_params(axis='both', which='major', labelsize=7)
-        axslc[i].set_ylabel("PG Latitude (deg)")
+        axslc[i].set_ylabel("fNH3 (ppm)")
+        axslc0.set_ylabel("PCloud (mb)")
         #axslc[i].set_adjustable('box')
-        axslc[i].set_xlim(15,195.)
-        
-        """
-        if i<2:
-            print("i<2")
-            axslc[i].set_ylim(1500.,2200.)
-            axslc[i].invert_yaxis()
-        elif i==2:
-            axslc[i].set_ylim(50.,180.)
-        """
+        axslc[i].set_xlim(195,15.)
 
+    axslc0.set_ylabel("PCloud (mb)")
+    axslc1.set_ylabel("PCloud (mb)")
+    axslc2.set_ylabel("PCloud (mb)")
+    
+    axslc[2].set_xlabel("System 3 Longitude (deg)")
+    
+    axslc[0].set_title("8-11 deg PG Latitude - NEDFs",fontsize=10)
+    axslc[1].set_title("6-10 deg PG Latitude - Plumes",fontsize=10)
+    axslc[2].set_title("3-6 deg PG Latitude - NH3 Features",fontsize=10)
+    
+    #xticklabels=np.array(np.linspace(195,15,13))
+    #print(xticklabels)
+    #axslc[2].set_xticklabels(xticklabels.astype(int))
+    #axslc[2].invert_xaxis()
+    Rossby=np.sin((lon_array+30)*9*np.pi/180.)*20+100
+    #print(lon_array)
+    #axslc[0].plot(lon_array,Rossby,color='k')
 
-
-        #axslc[i].invert_xaxis()
-            
-            
-
+    figlc.savefig(pathmapplots+collection+" Wave.png",dpi=150)
+    
     ###########################################################################
 
     #print(aspectratio)

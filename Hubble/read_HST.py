@@ -146,7 +146,8 @@ def HST_feature_overlay(HSTkey="2024d_f395n-f502n",LonSys='1'):
                          axNH3=False,axCH4=False,axRGB=False,LimbCorrection=True,lonhalfwidth=45,boxcar=9)
     
     #mapHST=read_HST(obskey="2024d_f631",LonSys='1')
-    mapHST=read_HST(obskey="2024d_f395n-f502n",LonSys='1')
+    mapHST,dateHST=read_HST(obskey="2024d_f395n-f502n",LonSys='1')
+    print(mapHST.shape)
     patch=mp.make_patch(mapHST,LatLims,LonLims,CM,LonRng,pad=True)
     
     figH,axsH=pl.subplots(1,figsize=(10,4.5), dpi=150, facecolor="white")
@@ -165,12 +166,13 @@ def HST_feature_overlay(HSTkey="2024d_f395n-f502n",LonSys='1'):
     
     pp.plot_patch(patch,LatLims,LonLims,CM,LonRng,"gray",axsH,cbarplot=False,
                    cbar_title="Test",cbar_reverse=False,vn=100,vx=300,n=6)
-   
+    """
     fb.plot_regions_on_axis(axsH, labeled_fNH3, props_fNH3,lon_lims=np.array(LonLims)+180,lats=lats,
                  plot_contours=False, plot_masks=True,plot_labels=False,contour_color='C0')
     fb.plot_regions_on_axis(axsH, labeled_Plum, props_Plum,lon_lims=np.array(LonLims)+180,lats=lats,
                  plot_contours=False, plot_masks=True,plot_labels=False, contour_color='white')
     fb.plot_regions_on_axis(axsH, labeled_NEDF, props_NEDF,lon_lims=np.array(LonLims)+180,lats=lats,
                  plot_contours=False, plot_masks=True,plot_labels=False, contour_color='black')
+    """
     pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/NEZ/"
     figH.savefig(pathmapplots+"HST "+HSTkey+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" map.png",dpi=300)
