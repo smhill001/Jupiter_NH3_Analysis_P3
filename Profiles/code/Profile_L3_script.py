@@ -40,14 +40,14 @@ def Profile_L3_script(figxy=[6.0,6.0],LatPlotLims=[45,135],ZonePlotHalfWidth=60,
     ###########################################################################
     # COMPUTE CLOUD PRESSURE AND AMMONIA PROFILES FOR FOUR OBSERVATION SERIES
     ###########################################################################
-    CH4SCT22,CH4VLT22,CH4SCT23,CH4SCT24=PL3M.Profile_L3_multi(param="PCld",
+    CH4SCT22,CH4VLT22,CH4SCT23,CH4SCT24,CH4SCT25=PL3M.Profile_L3_multi(param="PCld",
                                                        profile="Meridional",
                                                        ProfileHalfWidth=2,
                                                        LatPlotLims=LatPlotLims,
                                                        ZonePlotHalfWidth=ZonePlotHalfWidth,
                                                        smooth=False,inset=False)
     
-    NH3SCT22,NH3VLT22,NH3SCT23,NH3SCT24=PL3M.Profile_L3_multi(param="fNH3",
+    NH3SCT22,NH3VLT22,NH3SCT23,NH3SCT24,NH3SCT25=PL3M.Profile_L3_multi(param="fNH3",
                                                        profile="Meridional",
                                                        ProfileHalfWidth=2,
                                                        LatPlotLims=LatPlotLims,
@@ -70,7 +70,7 @@ def Profile_L3_script(figxy=[6.0,6.0],LatPlotLims=[45,135],ZonePlotHalfWidth=60,
     #micronhigh=3.5
 
     axs3.tick_params(axis='both', which='major', labelsize=10)
-    axs3.set_title("Cloud-Top Pressure vs Ammonia Abundance: 2022-2024",fontsize=12)
+    axs3.set_title("Cloud-Top Pressure vs Ammonia Abundance: 2022-2025",fontsize=12)
     
     pps.plot_profile_scatter(CH4SCT22["Pro"],NH3SCT22["Pro"],CH4SCT22["Lats"],axs3,PCldlow,PCldhigh,
                      fNH3low,fNH3high,False,bands,colors,marker='o',Level="L3",
@@ -82,13 +82,19 @@ def Profile_L3_script(figxy=[6.0,6.0],LatPlotLims=[45,135],ZonePlotHalfWidth=60,
                      fNH3low,fNH3high,False,bands,colors,marker='s',Level="L3",
                      leg=False,axis_inv=True)
     
+    pps.plot_profile_scatter(CH4SCT25["Pro"],NH3SCT25["Pro"],CH4SCT25["Lats"],axs3,PCldlow,PCldhigh,
+                     fNH3low,fNH3high,False,bands,colors,marker='D',Level="L3",
+                     leg=False,axis_inv=True)
+    
     axs3.scatter(62,1410,marker='o',c='k',s=50)
     axs3.scatter(62,1440,marker='^',c='k',s=50)
     axs3.scatter(62,1470,marker='s',c='k',s=50)
+    axs3.scatter(62,1500,marker='D',c='k',s=50)
     
     axs3.annotate('2022',xy=(65,1410), xycoords='data',xytext=(64,1410),fontsize=9,verticalalignment='center_baseline')
     axs3.annotate('2023',xy=(65,1440), xycoords='data',xytext=(64,1440),fontsize=9,verticalalignment='center_baseline')
     axs3.annotate('2024',xy=(65,1470), xycoords='data',xytext=(64,1470),fontsize=9,verticalalignment='center_baseline')
+    axs3.annotate('2025',xy=(65,1500), xycoords='data',xytext=(64,1500),fontsize=9,verticalalignment='center_baseline')
     path="/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Profiles/output/"
 
     fig3.subplots_adjust(left=0.14, bottom=0.10, right=0.94, top=0.92)  

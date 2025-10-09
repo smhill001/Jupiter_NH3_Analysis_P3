@@ -78,6 +78,8 @@ def Profile_L3_multi(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     ###########################################################################
     # Compute profiles for the SCT for 2022, 2023, 2024 and for the VLT for 
     # 2022. Requires four separate calls to plot_profile_L3.
+    ###########################################################################
+    # SCT 2022
     LatsSCT22,OutProSCT22,OutStdSCT22,OutamfSCT22,NumS22=PPL3G.plot_profile_L3_granular(axsspg[0,0],axsamfspg[0,0],Batch0,ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='k',width=1.,param=param,smooth=smooth)
@@ -90,7 +92,7 @@ def Profile_L3_multi(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     
     axsamf.scatter(OutamfSCT22,OutProSCT22,s=5,label='2022 SCT (Avg. '+str(NumS22)+')')
 
-
+    # VLT 2022
     LatsVLT22,OutProVLT22,OutStdVLT22,OutamfVLT22,NumV22=PPL3G.plot_profile_L3_granular(axsspg[0,1],axsamfspg[0,1],"2022 VLTMUSE",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='k',width=0.5,param=param,smooth=smooth,
@@ -104,7 +106,7 @@ def Profile_L3_multi(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     
     axsamf.scatter(OutamfVLT22,OutProVLT22,s=5,label='2022 VLT (Avg. '+str(NumV22)+')')
 
-
+    #SCT 2023
     LatsSCT23,OutProSCT23,OutStdSCT23,OutamfSCT23,NumS23=PPL3G.plot_profile_L3_granular(axsspg[1,0],axsamfspg[1,0],Batch1,ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='C0',width=2.5,param=param,smooth=smooth)
@@ -117,7 +119,7 @@ def Profile_L3_multi(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     
     axsamf.scatter(OutamfSCT23,OutProSCT23,s=5,label='2023 SCT (Avg. '+str(NumS23)+')')
 
-
+    #SCT 2024
     LatsSCT24,OutProSCT24,OutStdSCT24,OutamfSCT24,NumS24=PPL3G.plot_profile_L3_granular(axsspg[1,1],axsamfspg[1,1],"2024 CMOS",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='C1',width=2.5,param=param,smooth=smooth)
@@ -129,6 +131,19 @@ def Profile_L3_multi(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
                     color='C1',alpha=.05)
 
     axsamf.scatter(OutamfSCT24,OutProSCT24,s=5,label='2024 SCT (Avg. '+str(NumS23)+')')
+
+    #SCT 2025
+    LatsSCT25,OutProSCT25,OutStdSCT25,OutamfSCT25,NumS25=PPL3G.plot_profile_L3_granular(axsspg[1,1],axsamfspg[1,1],"2025 CMOS",ProfileHalfWidth=ProfileHalfWidth,
+                        LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
+                        profile=profile,clr='C2',width=2.5,param=param,smooth=smooth)
+
+    axsavgprof.plot(LatsSCT25,OutProSCT25,color='C2',linewidth=2.5,linestyle='solid',
+            label='SCT 2025 (Avg. '+str(NumS25)+')')  
+
+    axsavgprof.fill_between(LatsSCT25, OutProSCT25-OutStdSCT25, OutProSCT25+OutStdSCT25,
+                    color='C1',alpha=.05)
+
+    axsamf.scatter(OutamfSCT25,OutProSCT25,s=5,label='2025 SCT (Avg. '+str(NumS23)+')')
 
     ###########################################################################
     # For the case of a meridional ammonia plot, add a zoomed inset and add
@@ -242,6 +257,12 @@ def Profile_L3_multi(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     axsresid.fill_between(LatsSCT23,proresid-stdresid,proresid+stdresid,
                           color='C1',alpha=.1)
 
+    proresid=OutProSCT25-OutProSCT24
+    axsresid.plot(LatsSCT24,proresid,label="2025 SCT minus 2024 SCT",linewidth=2.5)
+    stdresid=np.sqrt(OutStdSCT24**2+OutStdSCT25**2)
+    axsresid.fill_between(LatsSCT23,proresid-stdresid,proresid+stdresid,
+                          color='C2',alpha=.1)
+
     if profile=="Meridional":
         axsresid.set_xlim(90-LatPlotLims[1],90-LatPlotLims[0])
         axsresid.set_xlabel("Planetographic Latitude (deg)",fontsize=10)
@@ -286,7 +307,8 @@ def Profile_L3_multi(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     VLT22={'Lats':LatsVLT22,'Pro':OutProVLT22,'Std':OutStdVLT22,'Amf':OutamfVLT22}
     SCT23={'Lats':LatsSCT23,'Pro':OutProSCT23,'Std':OutStdSCT23,'Amf':OutamfSCT23}
     SCT24={'Lats':LatsSCT24,'Pro':OutProSCT24,'Std':OutStdSCT24,'Amf':OutamfSCT24}
+    SCT25={'Lats':LatsSCT25,'Pro':OutProSCT25,'Std':OutStdSCT25,'Amf':OutamfSCT25}
 
     #return(figavgprof,axsavgprof)
    
-    return(SCT22,VLT22,SCT23,SCT24)#,figavgprof,axsavgprof)
+    return(SCT22,VLT22,SCT23,SCT24,SCT25)#,figavgprof,axsavgprof)

@@ -117,7 +117,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
     # simplified if I retire the "jet" color table.
     ctbl_settings = {
                     "jet": (70, 140, 1200, 2000),
-                    "terrain_r": (60, 160, 1600, 2200)
+                    "terrain_r": (60, 160, 1400, 2200)
                 }
                 
     if ctbls[0] in ctbl_settings:
@@ -499,9 +499,10 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
         temp=PC.plot_contours_on_patch(axs1[RGBaxs],fNH3_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
                                         tx_fNH3[-2:], frmt='%3.0f', clr='k')
         temp=PC.plot_contours_on_patch(axs1[RGBaxs],PCld_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
-                                        tx_PCld[:2], frmt='%3.0f', clr='r')
+                                        tx_PCld[:5], frmt='%3.0f', clr='r')
     
     axs1[RGBaxs].set_title('RGB Context',fontsize=10)
+    fig1.text(0.99,0.01,"Dr. Steven Hill, PSI",ha='right',fontsize=10)
 
     if bare_maps:
         temp=make_bare_map(blendweightfNH3,ctbls[0],fNH3low,fNH3high,pathmapplots,collection,LonSys)
@@ -730,7 +731,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
     # YET ANOTHER SECTION: LONGITUDINAL CUTS!
     #!!!! Need to make MAPS! then use profiles modules to extract this!
     ###########################################################################
-    
+    """
     figlc,axslc=pl.subplots(3,1,figsize=(figsz[0],figsz[1]), dpi=150, facecolor="white",
                           sharex=True)
     figlc.suptitle(collection)
@@ -800,7 +801,7 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
     #axslc[0].plot(lon_array,Rossby,color='k')
 
     figlc.savefig(pathmapplots+collection+" Wave.png",dpi=150)
-    
+    """
     ###########################################################################
 
     #print(aspectratio)
