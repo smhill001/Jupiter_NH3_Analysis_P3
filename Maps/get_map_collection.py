@@ -1258,6 +1258,48 @@ def get_map_collection(collection):
         lonlims={'20241129UTg':[292,352],
                  '20241129UTk':[292,352]}
 
+    elif collection=="20251001-20251001": #Modest ammonia gradient on many observations
+        dataset={'20251001UTa',
+                 '20251001UTb',
+                 '20251001UTc',
+                 '20251001UTd',
+                 '20251001UTe',
+                 '20251001UTf',
+                 '20251001UTg',
+                 '20251001UTh',
+                 #'20251001UTi',# BAD Gradient, tried unsuccessfully to correct
+                 '20251001UTj'}#,
+                 #'20251001UTk'}  #Bad twilight
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTk':[292,352]}
+
+    elif collection=="20250930-20251001": #Modest ammonia gradient on many observations
+        dataset={'20250930UTa',
+                 '20250930UTb',
+                 '20250930UTc',
+                 '20250930UTd',
+                 '20250930UTe',
+                 '20250930UTf',
+                 '20250930UTg',
+                 '20250930UTh',
+                 '20250930UTi',
+                 '20250930UTj',
+                 '20251001UTa',
+                 '20251001UTb',
+                 '20251001UTc',
+                 '20251001UTd',
+                 '20251001UTe',
+                 '20251001UTf',
+                 '20251001UTg',
+                 '20251001UTh',
+                 #'20251001UTi',# BAD Gradient, tried unsuccessfully to correct
+                 '20251001UTj'}#,
+                 #'20251001UTk'}  #Bad twilight
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTk':[292,352]}
+
 ###############################################################################
 
     elif collection=="20241105-20241105 NEDF A":

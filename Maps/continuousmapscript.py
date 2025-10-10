@@ -1,4 +1,4 @@
-def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,360],
+def continousmapscript(collections=['2025'],LonSys='1',lats=[75,105],LonLims=[0,360],
                        localmax=False,segment=False,variance=False,ctbls=['terrain_r','Blues'],
                        proj='maps'):
     """
@@ -58,8 +58,11 @@ def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,
               "20241202-20241202","20241203-20241203","20241205-20241205",
               "20250106-20250106","20250116-20250116","20250117-20250117","20250127-20250127",
               "20250128-20250128","20250129-20250129","20250302-20250302"]
-
+    
     maps2024NEZNovDec=["20241128-20241129","20241202-20241203","20241205-20241205"]
+
+    maps2025=["20250919-20250919","20250925-20250926","20250930-20251001"]
+
 
     pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/"+proj+"/"
     
@@ -100,6 +103,8 @@ def continousmapscript(collections=['2024'],LonSys='1',lats=[75,105],LonLims=[0,
             maps=maps2024NEZG
         if collection=='2024 NEZ Nov-Dec':
             maps=maps2024NEZNovDec
+        if collection=='2025':
+            maps=maps2025
         
         xfig=6.0
         yfig=6.0
