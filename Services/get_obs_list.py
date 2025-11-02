@@ -2886,6 +2886,263 @@ def get_obs_list(planet="Jupiter",subsetkeys='all'):
                                'NH3file':'2025-10-01-1248_0-Jupiter_R656G647B632-RGB-WhtBal',
                                'RGBfile':'2025-10-01-1237_5-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'}, #Too much twilight, use prior IrGB
                   
+                  #############################################################
+                  # 20251016                                         20251016 #
+                  #############################################################
+                  
+                  '20251016UTa':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-16-0803_0-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-16-0803_0-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-16-0813_6-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251016UTb':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM', 
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-16-0824_1-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-16-0824_1-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-16-0834_7-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251016UTc':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM', #E-W navigation error offset
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-16-0845_3-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-16-0845_3-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-16-0855_9-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251016UTd':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM', #E-W navigation error offset
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-16-0906_5-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-16-0906_4-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-16-0917_0-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251016UTe':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM', #E-W navigation error offset
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-16-0927_6-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-16-0927_6-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-16-0938_2-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251016UTf':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM', #E-W navigation error offset
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-16-0949_7-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-16-0949_7-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-16-0938_2-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'}, #Bad image, using alternate - but should be revisited
+                  
+                  '20251016UTg':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM', #E-W navigation error offset
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-16-1010_8-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-16-1010_9-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-16-0938_2-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'}, #Bad image, using alternate - but should be revisited
+                  
+                  '20251016UTh':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM', #E-W navigation error offset
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-16-1032_0-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-16-1032_0-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-16-0938_2-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'}, #Bad image, using alternate - but should be revisited
+                  
+                  '20251016UTi':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM', #E-W navigation error offset
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-16-1053_2-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-16-1053_2-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-16-0938_2-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'}, #Bad image, using alternate - but should be revisited
+                  
+                  '20251016UTj':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM', #E-W navigation error offset?
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-16-1114_3-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-16-1114_3-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-16-1124_9-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251016UTk':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM', #E-W navigation error offset?
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-16-1135_5-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-16-1135_5-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-16-1146_1-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251016UTl':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM', #E-W navigation error offset?
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-16-1156_6-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-16-1156_6-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-16-1146_1-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'}, #Bad image, using alternate - but should be revisited
+                  
+                  '20251016UTm':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM', #E-W navigation error offset?
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-16-1217_8-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-16-1217_8-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-16-1228_4-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251016UTn':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM', #E-W navigation error offset?
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-16-1238_9-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-16-1239_0-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-16-1249_5-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  #############################################################
+                  # 20251017                                         20251017 #
+                  #############################################################
+                  
+                  '20251017UTa':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-17-0813_7-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-17-0813_7-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-17-0824_3-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251017UTb':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-17-0834_8-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-17-0834_8-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-17-0845_4-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251017UTc':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-17-0856_0-Jupiter_R656G620B632-RGB-WhtBal-Shift',
+                               'NH3file':'2025-10-17-0856_0-Jupiter_R656G647B632-RGB-WhtBal-Shift',
+                               'RGBfile':'2025-10-17-0906_6-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251017UTd':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-17-0917_2-Jupiter_R656G620B632-RGB-WhtBal-Shift',
+                               'NH3file':'2025-10-17-0917_2-Jupiter_R656G647B632-RGB-WhtBal-Shift',
+                               'RGBfile':'2025-10-17-0927_7-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251017UTe':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-17-0938_3-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-17-0938_0-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-17-0948_9-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251017UTf':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-17-0959_5-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-17-0959_5-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-17-1010_1-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251017UTg':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-17-1020_6-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-17-1020_6-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-17-1031_2-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251017UTh':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-17-1041_8-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-17-1041_8-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-17-1052_4-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251017UTi':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-17-1103_0-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-17-1102_9-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-17-1113_5-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251017UTj':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-17-1124_1-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-17-1124_1-Jupiter_R656G647B632-RGB-WhtBal-Shift',
+                               'RGBfile':'2025-10-17-1134_7-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251017UTk':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-17-1145_3-Jupiter_R656G620B632-RGB-WhtBal-Shift',
+                               'NH3file':'2025-10-17-1145_3-Jupiter_R656G647B632-RGB-WhtBal-Shift',
+                               'RGBfile':'2025-10-17-1155_9-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251017UTl':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-17-1206_4-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-17-1206_4-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-17-1217_0-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  #############################################################
+                  # 20251019                                         20251019 #
+                  #############################################################
+                  
+                  '20251019UTa':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-19-0801_6-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-19-0801_6-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-19-0812_2-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251019UTb':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-19-0822_8-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-19-0822_8-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-19-0833_4-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251019UTc':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-19-0844_0-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-19-0844_0-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-19-0854_6-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251019UTd':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-19-0905_1-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-19-0905_1-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-19-0915_7-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251019UTe':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-19-0929_8-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-19-0929_7-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-19-0940_3-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251019UTf':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-19-0950_9-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-19-0950_9-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-19-1001_5-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251019UTg':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-19-1012_1-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-19-1012_1-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-19-1022_7-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251019UTh':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-19-1033_2-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-19-1033_2-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-19-1043_8-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251019UTi':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-19-1054_4-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-19-1054_4-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-19-1105_0-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251019UTj':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-19-1115_6-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-19-1115_5-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-19-1126_1-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251019UTk':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-19-1136_7-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-19-1136_7-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-19-1147_3-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251019UTl':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-19-1157_9-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-19-1157_9-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-19-1208_5-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251019UTm':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-19-1219_0-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-19-1219_0-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-10-19-1229_6-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251019UTn':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-19-1240_2-Jupiter_R656G620B632-RGB-WhtBal',
+                               'NH3file':'2025-10-19-1240_2-Jupiter_R656G647B632-RGB-WhtBal-Shift', #Gradient due to HIA fixed
+                               'RGBfile':'2025-10-19-1250_8-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+                  
+                  '20251019UTo':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM', #Overall poor quality, likely due to twilight
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-10-19-1301_4-Jupiter_R656G620B632-RGB-WhtBal-Shift', #Gradient due to HIA fixed
+                               'NH3file':'2025-10-19-1301_4-Jupiter_R656G647B632-RGB-WhtBal-Shift', #Gradient due to HIA fixed
+                               'RGBfile':'2025-10-19-1311_9-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
                   
                   
                   }

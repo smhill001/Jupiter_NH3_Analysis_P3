@@ -5,8 +5,8 @@ def rename_from_registax_batch(path):
     fnlist = os.listdir(path)
     #print(fnlist)
     for fn in fnlist:
-        #if ".png" in fn:
-        if ".png" in fn and "NH3" not in fn:
+        if ".png" in fn:
+        #if ".png" in fn and "BLU" in fn:
             print(fn)
             x=fn.split("2025")
             print(x[0],x[1])

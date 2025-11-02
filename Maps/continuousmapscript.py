@@ -61,7 +61,7 @@ def continousmapscript(collections=['2025'],LonSys='1',lats=[75,105],LonLims=[0,
     
     maps2024NEZNovDec=["20241128-20241129","20241202-20241203","20241205-20241205"]
 
-    maps2025=["20250919-20250919","20250925-20250926","20250930-20251001"]
+    maps2025=["20250919-20250919","20250925-20250926","20250930-20251001","20251016-20251017"]
 
 
     pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/"+proj+"/"

@@ -117,7 +117,8 @@ def MakeContiguousMap(collection="20220904-20220905",obskeys=False,LonSys='2',
     # simplified if I retire the "jet" color table.
     ctbl_settings = {
                     "jet": (70, 140, 1200, 2000),
-                    "terrain_r": (60, 160, 1400, 2200)
+                    "terrain_r": (60, 160, 1400, 2200),
+                    "gray": (60, 160, 1400, 2200)
                 }
                 
     if ctbls[0] in ctbl_settings:

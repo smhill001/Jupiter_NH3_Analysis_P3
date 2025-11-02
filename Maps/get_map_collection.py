@@ -1300,6 +1300,96 @@ def get_map_collection(collection):
         lonlims={'20241129UTg':[292,352],
                  '20241129UTk':[292,352]}
 
+    elif collection=="20251016-20251016": #
+        dataset={'20251016UTa',
+                 '20251016UTb',
+                 '20251016UTc',
+                 '20251016UTd',
+                 '20251016UTe',
+                 '20251016UTf',#NEED TO FIX RGB CONTEXT IMAGE
+                 '20251016UTg',#NEED TO FIX RGB CONTEXT IMAGE
+                 '20251016UTh',#NEED TO FIX RGB CONTEXT IMAGE
+                 '20251016UTi',#NEED TO FIX RGB CONTEXT IMAGE
+                 '20251016UTj',
+                 '20251016UTk',
+                 '20251016UTl',
+                 '20251016UTm',
+                 '20251016UTn'}
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTk':[292,352]}
+
+    elif collection=="20251017-20251017": #
+        dataset={'20251017UTa',
+                 '20251017UTb',
+                 '20251017UTc',
+                 '20251017UTd',
+                 '20251017UTe',
+                 '20251017UTf',
+                 '20251017UTg',
+                 '20251017UTh',
+                 '20251017UTi',
+                 '20251017UTj',
+                 '20251017UTk',
+                 '20251017UTl'}
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTk':[292,352]}
+
+    elif collection=="20251016-20251017": #
+        dataset={'20251016UTa',
+                 '20251016UTb',
+                 '20251016UTc',
+                 '20251016UTd',
+                 '20251016UTe',
+                 '20251016UTf',#NEED TO FIX RGB CONTEXT IMAGE
+                 '20251016UTg',#NEED TO FIX RGB CONTEXT IMAGE
+                 '20251016UTh',#NEED TO FIX RGB CONTEXT IMAGE
+                 '20251016UTi',#NEED TO FIX RGB CONTEXT IMAGE
+                 '20251016UTj',
+                 '20251016UTk',
+                 '20251016UTl',
+                 '20251016UTm',
+                 '20251016UTn',
+                 
+                 '20251017UTa',
+                 '20251017UTb',
+                 '20251017UTc',
+                 '20251017UTd',
+                 '20251017UTe',
+                 '20251017UTf',
+                 '20251017UTg',
+                 '20251017UTh',
+                 '20251017UTi',
+                 '20251017UTj',
+                 '20251017UTk',
+                 '20251017UTl'}
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTk':[292,352]}
+        
+    elif collection=="20251019-20251019": #
+            dataset={'20251019UTa',
+                     '20251019UTb',
+                     '20251019UTc',
+                     '20251019UTd',
+                     '20251019UTe',
+                     '20251019UTf',
+                     '20251019UTg',
+                     '20251019UTh', #Gradient
+                     '20251019UTi',
+                     '20251019UTj',
+                     '20251019UTk',
+                     '20251019UTl',
+                     '20251019UTm',
+                     '20251019UTn'}#,
+                     #'20251019UTo'}#Overall poor quality likely due to twilight
+            
+            lonlims={'20241129UTg':[292,352],
+                     '20241129UTk':[292,352]}
+
+
+
 ###############################################################################
 
     elif collection=="20241105-20241105 NEDF A":

@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['Maps\\MakeContiguousMap.py', 'Services\\pipe_one_obs.py', 'Services\\get_obs_list.py', 'Maps\\get_map_collection.py', 'Profiles\\code\\Profile_L3_script.py', 'Services\\get_batch_lists.py', 'Profiles\\code\\Profile_L3_multi.py', 'Profiles\\code\\plot_profile_scatter.py']
+recent_files = ['Maps\\MakeContiguousMap.py', 'Services\\pipe_one_obs.py', 'Services\\get_obs_list.py', 'Maps\\get_map_collection.py']
 
 [main]
 version = 0.2.0
