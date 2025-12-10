@@ -109,6 +109,11 @@ def get_map_collection(collection):
         lonlims={'20220810UTa':[0,60],
                  '20220812UTa':[240,360]}
         
+    elif collection=="20220818-20220818":
+        dataset={'20220818UTa'}
+        
+        lonlims={'20220828UTa':[0,100]}
+        
     elif collection=="20220828-20220901":
         dataset={'20220828UTa',
                  '20220830UTa',
@@ -131,6 +136,12 @@ def get_map_collection(collection):
         
         lonlims={'20220912UTa':[40,170],
                  '20220913UTa':[170,290]}
+        
+    elif collection=="20220925-20220925":
+        dataset={'20220925UTa'}
+        
+        lonlims={'20220919UTa':[300,360],
+                 '20220919UTb':[0,110]}
         
     elif collection=="20220919-20220919":
         dataset={'20220919UTa',
@@ -213,6 +224,24 @@ def get_map_collection(collection):
                  '20231006UTa':[120,190],
                  '20231006UTb':[190,260]}
         
+    elif collection=="20231015-20231015":
+        dataset={'20231015UTa',
+                 '20231015UTb'}
+        
+        lonlims={'20231015UTa':[60,95],
+                 '20231015UTb':[95,150]}
+                
+    elif collection=="20231015-20231017":
+        dataset={'20231015UTa',
+                 '20231015UTb',
+                 '20231017UTa',
+                 '20231017UTb'}
+        
+        lonlims={'20231015UTa':[60,95],
+                 '20231015UTb':[95,150],
+                 '20231017UTa':[0,35],
+                 '20231017UTb':[35,60]}
+                
     elif collection=="20231015-20231019":
         dataset={'20231015UTa',
                  '20231015UTb',
@@ -357,6 +386,13 @@ def get_map_collection(collection):
                  '20240202UTa':[280,320],
                  '20240202UTb':[320,360]}
                                
+    elif collection=="20240202-20240202":
+        dataset={'20240202UTa',
+                 '20240202UTb'}
+        
+        lonlims={'20240202UTa':[280,320],
+                 '20240202UTb':[320,360]}
+                               
     elif collection=="20240229-20240301":
         dataset={'20240229UTa',
                  '20240229UTb',
@@ -368,6 +404,13 @@ def get_map_collection(collection):
                  '20240301UTa':[130,197],
                  '20240301UTb':[197,265]}
         
+    elif collection=="20240919-20240919":
+        dataset={'20240919UTb',
+                 '20240919UTc'}
+        
+        lonlims={'20241027UTd':[292,352],
+                 '20241027UTd':[292,352]}
+
     elif collection=="20240925-20240929":
         dataset={'20240925UTb',
                  '20240925UTc',
@@ -414,6 +457,17 @@ def get_map_collection(collection):
                  '20241027UTd':[292,352],
                  '20241027UTd':[292,352]}
                       
+    elif collection=="20241022-20241023":
+        dataset={'20241022UTa',
+                 '20241022UTb',
+                 '20241023UTa'}
+        
+        lonlims={'20241027UTd':[292,352],
+                 '20241027UTd':[292,352],
+                 '20241027UTd':[292,352],
+                 '20241027UTd':[292,352],
+                 '20241027UTd':[292,352]}
+
     elif collection=="20241027-20241027":
         dataset={'20241027UTa',
                  '20241027UTb',
@@ -1178,13 +1232,34 @@ def get_map_collection(collection):
                  '20250302UTe',
                  '20250302UTf',
                  '20250302UTg',
-                 '20250302UTh',# #very strong NH3 gradient
+                 '20250302UTh',#!!!! #very strong NH3 gradient - should fix this!
                  '20250302UTi'}
         
         lonlims={'20241129UTg':[292,352],
-                 '20241129UTh':[292,352],
-                 '20241129UTi':[292,352],
-                 '20241129UTj':[292,352],
+                 '20241129UTk':[292,352]}
+
+    elif collection=="20250309-20250309":
+        dataset={'20250309UTa', #Blurry with some gradient, some striping
+                 '20250309UTb', #Blurry with some gradient, some striping,
+                 '20250309UTc',
+                 '20250309UTd',
+                 '20250309UTe', #Some gradient and striping
+                 '20250309UTf', #!!!Strongish gradient - should fix this!
+                 '20250309UTg'} #Fixed NH3 gradient, but strong striping
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTk':[292,352]}
+
+    elif collection=="20250310-20250310":
+        dataset={'20250310UTa'}#, 
+                 #'20250310UTb', #Blurry with some gradient, some striping,
+                 #'20250310UTc',
+                 #'20250310UTd',
+                 #'20250310UTe', #Some gradient and striping
+                 #'20250310UTf', #!!!Strongish gradient - should fix this!
+                 #'20250310UTg'} #Fixed NH3 gradient, but strong striping
+        
+        lonlims={'20241129UTg':[292,352],
                  '20241129UTk':[292,352]}
 
     elif collection=="20250919-20250919":

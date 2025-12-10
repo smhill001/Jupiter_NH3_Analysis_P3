@@ -37,6 +37,7 @@ def make_patch(Map,LatLims,LonLims,CM,LonRng,pad=True):
     """
 
     import numpy as np
+    import copy
     
     scale=int(Map.shape[0]/180)
     lon_max=360*scale
@@ -51,7 +52,9 @@ def make_patch(Map,LatLims,LonLims,CM,LonRng,pad=True):
         patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]-1:lon_max]),
                               np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]-lon_max])),axis=1)
     if CM>lon_max-LonRng:
+        print("******************  CM2deg>LonRng")
+
         patch=np.concatenate((np.copy(Map[LatLims[0]:LatLims[1],lon_max+LonLims[0]:lon_max]),
                               np.copy(Map[LatLims[0]:LatLims[1],0:LonLims[1]])),axis=1)
-
+        print("lon_max+LonLims[0]:lon_max,0:LonLims[1]=",lon_max+LonLims[0],lon_max,0,LonLims[1])
     return patch    

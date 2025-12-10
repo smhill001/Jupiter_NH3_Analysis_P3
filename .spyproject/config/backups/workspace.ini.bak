@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['Maps\\MakeContiguousMap.py', 'Services\\pipe_one_obs.py', 'Services\\get_obs_list.py', 'Maps\\get_map_collection.py']
+recent_files = ['Services\\get_obs_list.py', 'Maps\\get_map_collection.py', 'Services\\pipe_one_obs.py', 'Services\\make_L4_cont_maps.py', 'Maps\\L4_Jup_Map_Plot.py', '5micron\\JALPO JPEGS\\5micron_jpg_maps.py']
 
 [main]
 version = 0.2.0

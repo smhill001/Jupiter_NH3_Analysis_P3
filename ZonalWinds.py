@@ -3,6 +3,7 @@ def ZonalHSTWinds(HSTkey1,HSTkey2):
     import os
     import sys
     sys.path.append('./Hubble')
+    sys.path.append('././Hubble')
 
     from Winds import estimate_zonal_winds
     from read_HST import getFilename,read_HST

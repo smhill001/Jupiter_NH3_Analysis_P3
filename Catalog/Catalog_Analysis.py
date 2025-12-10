@@ -1,4 +1,4 @@
-def Catalog_Analysis(writecsv=False,writejson=False,plothist=False):
+def Catalog_Analysis(writecsv=True,writejson=True,plothist=True):
     """
     Created on Fri Dec 15 10:50:45 2023
     
@@ -96,7 +96,7 @@ def Catalog_Analysis(writecsv=False,writejson=False,plothist=False):
         axs[0].step(bincenters, histCM1)
         axs[0].set_xlim(0,360)
         axs[0].set_xticks(np.linspace(0,360,num=13))
-        axs[0].set_ylim(0,10)
+        axs[0].set_ylim(0,20)
         axs[0].set_yticks(np.linspace(0,10,num=6))
         axs[0].set_title("System 1 Longitude")
         axs[1].step(bincenters, histCM2)

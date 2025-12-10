@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WinJUPOS Version="12.3.12">
+  <ImageMeasurementSettings Version="1">
+    <FileName>C:\Astronomy\Projects\SAS 2021 Ammonia\Jupiter_NH3_Analysis_P3\5micron\JALPO JPEGS\2024-03-05-1053_0-Jupiter_889CH4_j240305a1.jpg</FileName>
+    <Body>Jupiter</Body>
+    <JulianDateUT>2460374.95347</JulianDateUT>
+    <ObservingPlace>Earth</ObservingPlace>
+    <GeoLongDeg>15.00000</GeoLongDeg>
+    <GeoLatDeg>50.00000</GeoLatDeg>
+    <Observer>Jupiter_889CH4_j240305a1</Observer>
+    <ImageInfo>RGB-WhtBal</ImageInfo>
+    <ColorChannel>Color</ColorChannel>
+    <CenterXPixel>368.7</CenterXPixel>
+    <CenterYPixel>967.3</CenterYPixel>
+    <EquatorialRadiusPixel>234.9</EquatorialRadiusPixel>
+    <RotationAngleDeg>0.000</RotationAngleDeg>
+    <DistanceRatioXToYOfSensorElements>1.000000</DistanceRatioXToYOfSensorElements>
+    <MirroredInvertedImage>False</MirroredInvertedImage>
+    <InverseLongitudes>False</InverseLongitudes>
+    <CM1Deg>112.71</CM1Deg>
+    <CM2Deg>36.60</CM2Deg>
+    <CM3Deg>107.01</CM3Deg>
+    <q>0.9351256575</q>
+    <DeclinationOfEarthOnPlanetDeg>2.90</DeclinationOfEarthOnPlanetDeg>
+  </ImageMeasurementSettings>
+</WinJUPOS>

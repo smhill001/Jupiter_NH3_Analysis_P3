@@ -47,16 +47,21 @@ def plot_NEZ_features(feature_type='NH3',axsnp=False):
     date_form = mdates.DateFormatter("%y-%m-%d")
     
     pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/NEZ/"
-    speed_by_label = {}
+    lon_speed_by_label = {}
+    lat_speed_by_label = {}
+    area_by_label = {}
+    strength_by_label = {}
 
     avglat=[]
     avglon=[]
+    avgarea=[]
+    avgstrength=[]
     avgfNH3=[]
     avgPCld=[]
     stdfNH3=[]
     stdPCld=[]
     labels=[]
-
+    
     for pl_col in range(0,2):  #!!! I have row and column nomenclature swapped in the indices pl_col and pl_row
         for pl_row in range(0,3):
             col=columns[pl_col,pl_row]
@@ -84,6 +89,25 @@ def plot_NEZ_features(feature_type='NH3',axsnp=False):
                         labels.append(i)
                         xnp=np.array(filtered_data[:,10],dtype=float)
                         ynp=np.array(filtered_data[:,13],dtype=float)
+                        latcoefficients = np.polyfit(tjd, y, 1)
+                        p = np.poly1d(latcoefficients)
+                        axs[pl_col,pl_row].plot(t,p(tjd),linewidth=0.5)
+
+                        if len(t)>1:
+
+                            lat_speed_by_label[i] = {
+                                'label':i,
+                                'avglat': avglat[labels.index(i)],
+                                'latdrift': latcoefficients[0],
+                                'latcoef0':latcoefficients[0],
+                                'latcoef1':latcoefficients[1],
+                                'avgfNH3':np.mean(avgfNH3),
+                                'avgPCld':np.mean(avgPCld),
+                                'stdfNH3':np.std(avgfNH3),
+                                'stdPCld':np.std(avgPCld)
+
+                            }
+
                         if feature_type=='NH3': #Order is reversed in source files
                             axsnp.scatter(xnp,ynp,s=5)
                             avgfNH3.append(np.mean(xnp))
@@ -100,8 +124,8 @@ def plot_NEZ_features(feature_type='NH3',axsnp=False):
                             
                     if pl_row == 0 and pl_col==1:  #Longitude Plot
                         avglon.append(np.mean(y))
-                        coefficients = np.polyfit(tjd, y, 1)
-                        p = np.poly1d(coefficients)
+                        loncoefficients = np.polyfit(tjd, y, 1)
+                        p = np.poly1d(loncoefficients)
                         axs[pl_col,pl_row].plot(t,p(tjd),linewidth=0.5)
                         
                         if len(t)>1:
@@ -111,14 +135,14 @@ def plot_NEZ_features(feature_type='NH3',axsnp=False):
                                                                  tstr[0],
                                                                  tstr[-1],
                                                                  system='I')
-                            speed_by_label[i] = {
+                            lon_speed_by_label[i] = {
                                 'label':i,
                                 'avglat': avglat[labels.index(i)],
-                                'avglon': avglon[labels.index(i)],
+                                'avglon': avglat[labels.index(i)],
                                 'sys3speed': mps,
-                                'drift': dpd,
-                                'coef0':coefficients[0],
-                                'coef1':coefficients[1],
+                                'sys1drift': dpd,
+                                'sys1coef0':loncoefficients[0],
+                                'sys1coef1':loncoefficients[1],
                                 'avgfNH3':np.mean(avgfNH3),
                                 'avgPCld':np.mean(avgPCld),
                                 'stdfNH3':np.std(avgfNH3),
@@ -127,6 +151,49 @@ def plot_NEZ_features(feature_type='NH3',axsnp=False):
                             }
 
                             print("############## i,avglat,mps,dpd=",i,avglat[labels.index(i)], mps,dpd)
+                            
+                    if pl_row == 1 and pl_col==1:  #Area
+                        avgarea.append(np.mean(y))
+                        areacoefficients = np.polyfit(tjd, y, 1)
+                        p = np.poly1d(areacoefficients)
+                        axs[pl_col,pl_row].plot(t,p(tjd),linewidth=0.5)
+                        
+                        if len(t)>1:
+                            
+                            area_by_label[i] = {
+                                'label':i,
+                                'avglat': avglat[labels.index(i)],
+                                'avglon': avglat[labels.index(i)],
+                                'avgarea':avgarea[labels.index(i)],
+                                'areacoef0':areacoefficients[0],
+                                'areacoef1':areacoefficients[1],
+                                'avgfNH3':np.mean(avgfNH3),
+                                'avgPCld':np.mean(avgPCld),
+                                'stdfNH3':np.std(avgfNH3),
+                                'stdPCld':np.std(avgPCld)
+                            }
+                            
+                    if pl_row == 1 and pl_col==0:  #Mean Strength
+                        avgstrength.append(np.mean(y))
+                        avgstrengthcoefficients = np.polyfit(tjd, y, 1)
+                        p = np.poly1d(avgstrengthcoefficients)
+                        axs[pl_col,pl_row].plot(t,p(tjd),linewidth=0.5)
+                        
+                        if len(t)>1:
+                            
+                            strength_by_label[i] = {
+                                'label':i,
+                                'avglat': avglat[labels.index(i)],
+                                'avglon': avglat[labels.index(i)],
+                                'avgfNH3':np.mean(avgfNH3),
+                                'avgstr':avgstrength[labels.index(i)],
+                                'strcoef0':avgstrengthcoefficients[0],
+                                'strcoef1':avgstrengthcoefficients[1],
+                                'avgPCld':np.mean(avgPCld),
+                                'stdfNH3':np.std(avgfNH3),
+                                'stdPCld':np.std(avgPCld)
+
+                            }
                 
             axs[pl_col,pl_row].set_title(subtitle)
             axs[pl_col,pl_row].set_ylabel(ylabels[pl_col,pl_row],fontsize=10)
@@ -139,30 +206,93 @@ def plot_NEZ_features(feature_type='NH3',axsnp=False):
             #print(ylabels[pl_col,pl_row])
             if "mb" in ylabels[pl_col,pl_row]:
                 axs[pl_col,pl_row].invert_yaxis()
+
+    axs[0,0].legend(fontsize=8,ncols=2,loc='lower left')
+    axs[1,1].legend(fontsize=8,ncols=2,loc='upper left')
+
+
+
+    #axs[1,1].legend(bbox_to_anchor=(0.5,-0.15),loc='center',borderaxespad=0,ncols=11,fontsize=8)
     
-    axs[1,1].legend(bbox_to_anchor=(0.5,-0.15),loc='center',borderaxespad=0,ncols=11,fontsize=8)
     fig.subplots_adjust(left=0.05, bottom=0.08, right=0.98, top=0.90,
                 wspace=0.25, hspace=0.15)     
     fig.savefig(pathmapplots+"2024-25 "+feature_type+" time series.png",dpi=300)
 
-    fields = [
+    lonfields = [
         'label',
         'avglat',
         'avglon',
         'sys3speed',
-        'drift',
-        'coef0',
-        'coef1',
+        'sys1drift',
+        'sys1coef0',
+        'sys1coef1',
         'avgfNH3',
         'avgPCld',
         'stdfNH3',
         'stdPCld'
     ]
 
-    with open(pathmapplots+feature_type+"speed_by_label.csv", "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fields)
+    with open(pathmapplots+feature_type+"lon_speed_by_label.csv", "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=lonfields)
         writer.writeheader()
-        for item in speed_by_label.values():
+        for item in lon_speed_by_label.values():
+            writer.writerow(item)
+            
+    latfields = [
+        'label',
+        'avglat',
+        'latdrift',
+        'latcoef0',
+        'latcoef1',
+        'avglon',
+        'avgfNH3',
+        'avgPCld',
+        'stdfNH3',
+        'stdPCld'
+    ]
+
+    with open(pathmapplots+feature_type+"lat_speed_by_label.csv", "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=latfields)
+        writer.writeheader()
+        for item in lat_speed_by_label.values():
+            writer.writerow(item)
+            
+    areafields = [
+        'label',
+        'avglat',
+        'avglon',
+        'avgarea',
+        'areacoef0',
+        'areacoef1',
+        'avgfNH3',
+        'avgPCld',
+        'stdfNH3',
+        'stdPCld'
+    ]
+
+    with open(pathmapplots+feature_type+"area_by_label.csv", "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=areafields)
+        writer.writeheader()
+        for item in area_by_label.values():
+            writer.writerow(item)
+
+    strengthfields = [
+        'label',
+        'avglat',
+        'avglon',
+        'avgfNH3',
+        'avgstr',
+        'strcoef0',
+        'strcoef1',
+        'avgPCld',
+        'stdfNH3',
+        'stdPCld'
+    ]
+
+    with open(pathmapplots+feature_type+"strength_by_label.csv", "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=strengthfields)
+        writer.writeheader()
+        for item in strength_by_label.values():
             writer.writerow(item)
     
     return np.array([avgfNH3, avgPCld,stdfNH3,stdPCld])

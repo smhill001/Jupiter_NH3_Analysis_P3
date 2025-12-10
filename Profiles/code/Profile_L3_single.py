@@ -1,9 +1,9 @@
 def Profile_L3_single(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
                LatPlotLims=[60,120],ZonePlotHalfWidth=45,smooth=False,
-               inset=True,collection="2022 CMOS",colat=90):
+               inset=False,collection="2022 CMOS",colat=90):
     """
     PURPOSE:    To compute and plot averaged meridional and zonal profiles over
-                a single set of observing sessions
+                a single set of observing sessions for a singe environmental parameter
                 
     CALLS:      plot_profile_L3_granular
                 

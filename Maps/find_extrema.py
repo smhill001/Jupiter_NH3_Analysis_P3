@@ -216,6 +216,7 @@ def plot_extrema_on_axisa(ax, extrema_dict, data_type, extrema_type, text_color=
 
 def extrema_overplot_all(results,axes = {'axNH3': False, 'axCH4': False, 'axRGB': False}):
     # Define the plotting parameters for each (data_type, extrema_type)
+    # !!!!!!!NEED FIX FOR ADDITIONAL AXES, E.G., 5um and 889CH4
     plot_specs = {
         ('NH3', 'minima'): {'color': 'k', 's': 8, 'lw': 1.0},
         ('NH3', 'maxima'): {'color': 'w', 's': 8, 'lw': 1.0},

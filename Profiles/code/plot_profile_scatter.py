@@ -9,11 +9,14 @@ CALLED BY Profile_L2_script.py and Profile_L3_script.py
 
 def plot_profile_scatter(profile1,profile2,Lats,axscor,PCldlow,PCldhigh,
                  fNH3low,fNH3high,FiveMicron,bands,colors,
-                 marker='o',Level="L2",leg=True,axis_inv=False):
+                 Level="L2",leg=True,axis_inv=False,date='NA',
+                 counter=36,countmax=0):
     
     import pylab as pl
     import numpy as np
     import copy
+    from matplotlib.cm import get_cmap
+    from matplotlib.colors import Normalize
     
     print("profile1",profile1.shape)
     print("profile2",profile2.shape)
@@ -44,8 +47,9 @@ def plot_profile_scatter(profile1,profile2,Lats,axscor,PCldlow,PCldhigh,
     # LOOP OVER BELTS AND PLOT SCATTER IN APPROPRIATE COLOR
     ###########################################################################
     idx=0
+    print(bands)
     for key in bands:
-        #print(key,BZ[key],[90,90]-np.array(BZ[key]),LatLims)
+        print(key)#,BZ[key],[90,90]-np.array(BZ[key]))
         BZind[key][0]=(np.abs(Lats-BZ[key][0])).argmin()
         BZind[key][1]=(np.abs(Lats-BZ[key][1])).argmin()
 
@@ -67,8 +71,58 @@ def plot_profile_scatter(profile1,profile2,Lats,axscor,PCldlow,PCldhigh,
         stdv1=np.std(profile1[BZind[key][0]:BZind[key][1]])
         stdv2=np.std(profile2[BZind[key][0]:BZind[key][1]])
         print("key,mean1,mean2",key,mean1,mean2)
-        axscor.errorbar(mean2,mean1,xerr=stdv2,yerr=stdv1,marker=marker,markersize=7.0,
-                       alpha=0.8,label=key,c=colors[idx])
+        
+        cmap = get_cmap('coolwarm')          # choose colormap
+        norm = Normalize(vmin=0, vmax=countmax)
+        color = cmap(norm(counter))
+        
+        if 220601<=int(date)<=221231:
+            marker='o'
+            clr='C0'
+        if 230901<=int(date)<=240331:
+            marker='^'
+            clr='C1'
+        if 240801<=int(date)<=250430:
+            marker='s'
+            clr='C2'
+        if 250901<=int(date)<=260531:
+            marker='D'
+            clr='C3'
+            
+        """
+        marker='o'
+        if key=='SEZ':
+            fclr='w'
+        elif key=='NEZ':
+            fclr=clr
+        """
+        
+        if leg:
+            #axscor.errorbar(mean2,mean1,xerr=stdv2,yerr=stdv1,marker=marker,
+            #                markersize=7,elinewidth=0.5,ecolor=colors[idx],markeredgewidth=2,
+            #                #alpha=counter/countmax,label=key,markerfacecolor=colors[idx],markeredgecolor=color)
+            #                alpha=1,label=key,markerfacecolor=colors[idx],markeredgecolor=colors[idx])
+            #                #alpha=0.8,label=key,markerfacecolor=colors[idx],markeredgecolor=colors[idx])
+            axscor.errorbar(mean2,mean1,xerr=stdv2,yerr=stdv1,marker=marker,
+                            markersize=7,elinewidth=0.5,ecolor=colors[idx],markeredgewidth=2,
+                            #alpha=counter/countmax,label=key,markerfacecolor=colors[idx],markeredgecolor=color)
+                            alpha=0.2+0.8*counter/countmax,label=key,markerfacecolor=colors[idx],markeredgecolor=colors[idx])
+                            #alpha=0.8,label=key,markerfacecolor=colors[idx],markeredgecolor=colors[idx])
+                            ##alpha=0.8,label=key,markerfacecolor=fclr,markeredgecolor=clr)
+
+        else:
+            axscor.errorbar(mean2,mean1,xerr=stdv2,yerr=stdv1,marker=marker,
+                            markersize=7,elinewidth=0.5,ecolor=colors[idx],markeredgewidth=2,
+                            #alpha=counter/countmax,markerfacecolor=colors[idx],markeredgecolor=color)
+                            alpha=0.2+0.8*counter/countmax,markerfacecolor=colors[idx],markeredgecolor=colors[idx])
+                            #alpha=0.8,markerfacecolor=colors[idx],markeredgecolor=colors[idx])
+                            #alpha=0.8,markerfacecolor=fclr,markeredgecolor=clr)
+
+                       
+        #if date!="NA":
+        #    axscor.annotate(date,(mean2,mean1),textcoords='offset points',
+        #                    xytext=(1,-1),fontsize=6,color=colors[idx])
+        
         idx=idx+1
     axscor.grid(linewidth=0.2)
     axscor.set_ylim(PCldlow,PCldhigh)
@@ -92,6 +146,6 @@ def plot_profile_scatter(profile1,profile2,Lats,axscor,PCldlow,PCldhigh,
                     
     if leg:
         axscor.legend(fontsize=8,ncols=2)
-    
+        
     return(BZ)
   

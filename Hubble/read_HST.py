@@ -1,11 +1,8 @@
 import matplotlib.pyplot as pl
 import numpy as np
-import find_blob as fb
-import MakeContiguousMap as MCM
+#import MakeContiguousMap as MCM
 import make_patch as mp
-import make_patch_RGB as mpr
 import plot_patch as pp
-from imageio import imread
 
 
 def getFilename(files, keyword):
@@ -112,7 +109,7 @@ def read_HST(obskey="2024c_f631",LonSys='1'):
     return datar,dateobs
 
 ###############################################################################
-def HST_feature_overlay(HSTkey="2024d_f395n-f502n",LonSys='1'):
+def HST_feature_overlay(HSTkey="2024d_f395n-f502n",LonSys='1',LatLims=[75,95],CM=270,LonRng=90):
     """
     Runs MakeContinguousMap on 2024-11-18 data with the feature overlay.
     Then reads an HST OPAL TIF image (2024d) and plots the feature overlay.
@@ -128,22 +125,23 @@ def HST_feature_overlay(HSTkey="2024d_f395n-f502n",LonSys='1'):
     None.
 
     """
-    LatLims=[75,95]
-    CM=270
-    LonRng=90
+    import make_lat_lon_str as MLLS
+    #LatLims=[75,95]
+    #CM=270
+    #LonRng=90
     LatLims=np.array(LatLims)
     LonLims=np.array([360-int(CM+LonRng),360-int(CM-LonRng)])
     
     print("########",LatLims,LonLims,CM,LonRng)
-    latstr,lonstr=MCM.make_lat_and_lon_str(LatLims,LonLims)
+    latstr,lonstr=MLLS.make_lat_lon_str(LatLims,LonLims)
 
-    lats,blendweightPCloud,blendweightfNH3,blendRGBweight,labeled_fNH3, props_fNH3,labeled_Plum, props_Plum,labeled_NEDF, props_NEDF=\
-        MCM.MakeContiguousMap(collection="20241118-20241118",obskeys=False,LonSys='1',
-                         FiveMicron=False,Five_obskey='',IRTFdataset='', 
-                         lats=LatLims,LonLims=[180,360],figsz=[6.0,6.0],
-                         ROI=False, variance=False,localmax=False,segment=True,proj='NEZ',
-                         ctbls=['terrain_r','Blues'], cont=True,bare_maps=False,cb=True, 
-                         axNH3=False,axCH4=False,axRGB=False,LimbCorrection=True,lonhalfwidth=45,boxcar=9)
+    #lats,blendweightPCloud,blendweightfNH3,blendRGBweight,labeled_fNH3, props_fNH3,labeled_Plum, props_Plum,labeled_NEDF, props_NEDF=\
+    #    MCM.MakeContiguousMap(collection="20241118-20241118",obskeys=False,LonSys='1',
+    #                     FiveMicron=False,Five_obskey='',IRTFdataset='', 
+    #                     lats=LatLims,LonLims=[180,360],figsz=[6.0,6.0],
+    #                     ROI=False, variance=False,localmax=False,segment=True,proj='NEZ',
+    #                     ctbls=['terrain_r','Blues'], cont=True,bare_maps=False,cb=True, 
+    #                     axNH3=False,axCH4=False,axRGB=False,LimbCorrection=True,lonhalfwidth=45,boxcar=9)
     
     #mapHST=read_HST(obskey="2024d_f631",LonSys='1')
     mapHST,dateHST=read_HST(obskey="2024d_f395n-f502n",LonSys='1')

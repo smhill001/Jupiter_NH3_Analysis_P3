@@ -18,14 +18,11 @@ def extract_profile(pth,filename,LonCtr='CM',ProfileHalfWidth=45.,
         2) Return FITS header information from files
     """
     import numpy as np
-    from astropy.convolution import convolve, Box1DKernel
     from astropy.io import fits
     import RetrievalLibrary as RL
     import sys
     sys.path.append('./Services')
-    import read_master_calibration
-    import get_WINJupos_ephem as get_ephem
-    print("filename=",filename)
+
     hdulist=fits.open(pth+filename)
     hdulist.info()
     hdr=hdulist[0].header

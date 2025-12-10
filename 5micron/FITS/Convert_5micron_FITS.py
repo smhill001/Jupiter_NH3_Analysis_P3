@@ -1,4 +1,4 @@
-def Convert_5micron_FITS():
+def Convert_5micron_FITS(year='2025'):
     """
     Created on Mon Nov 11 08:06:50 2024
     
@@ -23,17 +23,18 @@ def Convert_5micron_FITS():
     import copy
     
     pathFITS="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/5micron/FITS/"
+    pathFITSin=pathFITS+year+" Delivery from Glenn/"
     
-    for fname in os.listdir(pathFITS):
+    for fname in os.listdir(pathFITSin):
         #name, cmap, ext = os.path.splitext(fname)
         #print("name, cmap, ext",name, cmap, ext)
         print("fname",fname)
         print("fname[:-9]",fname[-9:])
         tail=fname[-9:]
-        print("pathFITS+fname",pathFITS+fname)
+        print("pathFITS+fname",pathFITSin+fname)
         if tail=="cmap.fits":
             print("fname=",fname)
-            Sourcehdulist=fits.open(pathFITS+fname)
+            Sourcehdulist=fits.open(pathFITSin+fname)
             Sourcehdulist.info()
             Sourcehdr=Sourcehdulist[0].header
             Sourcedata=Sourcehdulist[0].data

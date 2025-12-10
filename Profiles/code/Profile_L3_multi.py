@@ -3,7 +3,7 @@ def Profile_L3_multi(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
                inset=True,Batch0="2022 CMOS",Batch1="2023 CMOS"):
     """
     PURPOSE:    To compute and plot averaged meridional and zonal profiles over
-                multiple observing periods for comparision.
+                multiple observing periods for comparision for one environmental parameter.
                 
     CALLS:      plot_profile_L3_granular
                 
@@ -82,9 +82,9 @@ def Profile_L3_multi(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     # SCT 2022
     LatsSCT22,OutProSCT22,OutStdSCT22,OutamfSCT22,NumS22=PPL3G.plot_profile_L3_granular(axsspg[0,0],axsamfspg[0,0],Batch0,ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
-                        profile=profile,clr='k',width=1.,param=param,smooth=smooth)
+                        profile=profile,clr='C7',width=2.5,param=param,smooth=smooth)
             
-    axsavgprof.plot(LatsSCT22,OutProSCT22,color='k',linewidth=1.,linestyle='solid',
+    axsavgprof.plot(LatsSCT22,OutProSCT22,color='C7',linewidth=2.5,linestyle='solid',
             label='SCT 2022 (Avg. '+str(NumS22)+')')  
 
     axsavgprof.fill_between(LatsSCT22, OutProSCT22-OutStdSCT22, OutProSCT22+OutStdSCT22,
@@ -93,19 +93,20 @@ def Profile_L3_multi(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     axsamf.scatter(OutamfSCT22,OutProSCT22,s=5,label='2022 SCT (Avg. '+str(NumS22)+')')
 
     # VLT 2022
+    
     LatsVLT22,OutProVLT22,OutStdVLT22,OutamfVLT22,NumV22=PPL3G.plot_profile_L3_granular(axsspg[0,1],axsamfspg[0,1],"2022 VLTMUSE",ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
                         profile=profile,clr='k',width=0.5,param=param,smooth=smooth,
                         style='dashed')
 
-    axsavgprof.plot(LatsVLT22,OutProVLT22,color='k',linewidth=0.5,linestyle='dashed',
-            label='VLT 2022 (Avg. '+str(NumV22)+')')  
+    #axsavgprof.plot(LatsVLT22,OutProVLT22,color='k',linewidth=0.5,linestyle='dashed',
+    #        label='VLT 2022 (Avg. '+str(NumV22)+')')  
 
-    axsavgprof.fill_between(LatsVLT22, OutProVLT22-OutStdVLT22, OutProVLT22+OutStdVLT22,
-                    color='k',alpha=.05)
+    #axsavgprof.fill_between(LatsVLT22, OutProVLT22-OutStdVLT22, OutProVLT22+OutStdVLT22,
+    #                color='k',alpha=.05)
     
-    axsamf.scatter(OutamfVLT22,OutProVLT22,s=5,label='2022 VLT (Avg. '+str(NumV22)+')')
-
+    #axsamf.scatter(OutamfVLT22,OutProVLT22,s=5,label='2022 VLT (Avg. '+str(NumV22)+')')
+    
     #SCT 2023
     LatsSCT23,OutProSCT23,OutStdSCT23,OutamfSCT23,NumS23=PPL3G.plot_profile_L3_granular(axsspg[1,0],axsamfspg[1,0],Batch1,ProfileHalfWidth=ProfileHalfWidth,
                         LatPlotLims=LatPlotLims,ZonePlotHalfWidth=ZonePlotHalfWidth,
@@ -302,7 +303,7 @@ def Profile_L3_multi(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     
     figresid.subplots_adjust(left=0.12, bottom=0.12, right=0.98, top=0.92)  
     figresid.savefig(pathout+"Residuals_"+param+"_"+profile+".png",dpi=300)
-
+    
     SCT22={'Lats':LatsSCT22,'Pro':OutProSCT22,'Std':OutStdSCT22,'Amf':OutamfSCT22}
     VLT22={'Lats':LatsVLT22,'Pro':OutProVLT22,'Std':OutStdVLT22,'Amf':OutamfVLT22}
     SCT23={'Lats':LatsSCT23,'Pro':OutProSCT23,'Std':OutStdSCT23,'Amf':OutamfSCT23}
@@ -312,3 +313,4 @@ def Profile_L3_multi(param="fNH3",profile="Meridional",ProfileHalfWidth=45,
     #return(figavgprof,axsavgprof)
    
     return(SCT22,VLT22,SCT23,SCT24,SCT25)#,figavgprof,axsavgprof)
+    
