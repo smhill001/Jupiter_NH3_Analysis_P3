@@ -12,6 +12,12 @@ def ReadContiguousMap(LonSys,collection="20220904-20220905",
         #'subobs':180
     }.get(LonSys)
     
+    ctype1_key = {
+        'Sys. 1 Longitude':'CM1',
+        'Sys. 2 Longitude':'CM2',
+        'Sys. 3 Longitude':'CM3',
+        }
+    
     ###########################################################################
     # Identify files to read
     ###########################################################################
@@ -29,7 +35,7 @@ def ReadContiguousMap(LonSys,collection="20220904-20220905",
         fNH3hdulist=fits.open(pathinp+fNH3file[0])
         fNH3hdulist.info()
         fNH3hdr=fNH3hdulist[0].header
-        roll=int(fNH3hdr['CM3']-fNH3hdr[cm_key])
+        roll=int(fNH3hdr[ctype1_key[fNH3hdr['CTYPE1']]]-fNH3hdr[cm_key])
         fNH3data=np.roll(fNH3hdulist[0].data,roll,axis=1)
         fNH3stdv=np.roll(fNH3hdulist[1].data,roll,axis=1)
         fNH3frac=np.roll(fNH3hdulist[2].data,roll,axis=1)
@@ -42,7 +48,7 @@ def ReadContiguousMap(LonSys,collection="20220904-20220905",
         PCldhdulist=fits.open(pathinp+PCldfile[0])
         PCldhdulist.info()
         PCldhdr=PCldhdulist[0].header
-        roll=int(PCldhdr['CM3']-PCldhdr[cm_key])
+        roll=int(PCldhdr[ctype1_key[PCldhdr['CTYPE1']]]-PCldhdr[cm_key])
         PClddata=np.roll(PCldhdulist[0].data,roll,axis=1)
         PCldstdv=np.roll(PCldhdulist[1].data,roll,axis=1)
         PCldfrac=np.roll(PCldhdulist[2].data,roll,axis=1)
@@ -55,7 +61,7 @@ def ReadContiguousMap(LonSys,collection="20220904-20220905",
         RGBhdulist=fits.open(pathinp+RGBfile[0])
         RGBhdulist.info()
         RGBhdr=RGBhdulist[0].header
-        roll=int(RGBhdr['CM3']-RGBhdr[cm_key])
+        roll=int(RGBhdr[ctype1_key[RGBhdr['CTYPE1']]]-RGBhdr[cm_key])
         RGBdata=np.roll(RGBhdulist[0].data,roll,axis=1)
         RGBstdv=np.roll(RGBhdulist[1].data,roll,axis=1)
         RGBfrac=np.roll(RGBhdulist[2].data,roll,axis=1)
@@ -378,7 +384,7 @@ def make_bare_map(blendweight,ctbl,low,high,pathmapplots,collection,LonSys,env_d
 def L4_Jup_Map_Plot(collection="20240129-20240202",IRTFcollection='20240205-20240205',
                     CH4889collection="20240131-20240201",LonSys='1',
                       lats=[0,180],LonLims=[0,360],figsz=[6.0,6.0],ROI=False,
-                      variance=True,localmax=False,segment=False,
+                      variance=False,localmax=False,segment=False,
                       proj='AGU2025',ctbls=['terrain_r','Blues'],
                       cont=False,bare_maps=False,cb=False,
                       axNH3=False,axCH4=False,axRGB=False,axIRTF=False,
@@ -583,14 +589,18 @@ def L4_Jup_Map_Plot(collection="20240129-20240202",IRTFcollection='20240205-2024
     # !!!!! NEED FIX FOR ADDITIONAL AXES, E.G., 5um and 889CH4
     ###########################################################################
     if segment:
+        #NH3thresh=135 #standard value
+        NH3thresh=145 #alt value
+        Cloudthresh=1750
+        NEDFthresh=1950
         fNH3_mask, labeled_fNH3, props_fNH3= \
-            FB.process_blob(fNH3_patch_mb, PCld_patch_mb, lats, LonLims, timearray=blendweightTime_patch,threshold_abs=135, mode='max')
+            FB.process_blob(fNH3_patch_mb, PCld_patch_mb, lats, LonLims, timearray=blendweightTime_patch,threshold_abs=NH3thresh, mode='max')
         
         Plum_mask, labeled_Plum, props_Plum= \
-            FB.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, timearray=blendweightTime_patch, threshold_abs=1750, mode='min')
+            FB.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, timearray=blendweightTime_patch, threshold_abs=Cloudthresh, mode='min')
         
         NEDF_mask, labeled_NEDF, props_NEDF= \
-            FB.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, timearray=blendweightTime_patch, threshold_abs=1950, mode='max')
+            FB.process_blob(PCld_patch_mb, fNH3_patch_mb, lats, LonLims, timearray=blendweightTime_patch, threshold_abs=NEDFthresh, mode='max')
         
         FB.export_regions_to_csv(props_fNH3, path+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" blobs"+" fNH3.csv")
         FB.export_regions_to_csv(props_Plum, path+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" blobs"+" Plum.csv")

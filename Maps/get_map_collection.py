@@ -1251,13 +1251,30 @@ def get_map_collection(collection):
                  '20241129UTk':[292,352]}
 
     elif collection=="20250310-20250310":
-        dataset={'20250310UTa'}#, 
-                 #'20250310UTb', #Blurry with some gradient, some striping,
-                 #'20250310UTc',
-                 #'20250310UTd',
-                 #'20250310UTe', #Some gradient and striping
-                 #'20250310UTf', #!!!Strongish gradient - should fix this!
-                 #'20250310UTg'} #Fixed NH3 gradient, but strong striping
+        dataset={'20250310UTa', 
+                 '20250310UTb', #Strong gradient, corrected in NH3, but fix didn't work well in pressure
+                 '20250310UTc',
+                 '20250310UTd', #some streaking
+                 '20250310UTe', #fNH3 gradient - corrected
+                 '20250310UTf'} # Only single 656, 632, and 620 images - no new IrGB
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTk':[292,352]}
+
+    elif collection=="20250309-20250310":
+        dataset={'20250309UTa', #Blurry with some gradient, some striping
+                 '20250309UTb', #Blurry with some gradient, some striping,
+                 '20250309UTc',
+                 '20250309UTd',
+                 '20250309UTe', #Some gradient and striping
+                 '20250309UTf', #!!!Strongish gradient - should fix this!
+                 '20250309UTg',
+                 '20250310UTa', 
+                 '20250310UTb', #Strong gradient, corrected in NH3, but fix didn't work well in pressure
+                 '20250310UTc',
+                 '20250310UTd', #some streaking
+                 '20250310UTe', #fNH3 gradient - corrected
+                 '20250310UTf'} # Only single 656, 632, and 620 images - no new IrGB
         
         lonlims={'20241129UTg':[292,352],
                  '20241129UTk':[292,352]}
@@ -1275,6 +1292,25 @@ def get_map_collection(collection):
 
     elif collection=="20250925-20250925":
         dataset={'20250925UTa',
+                 '20250925UTb',
+                 '20250925UTc',
+                 '20250925UTd',
+                 '20250925UTe',
+                 '20250925UTf',
+                 '20250925UTg'}#,
+                 #'20250925UTh'} Ammonia seems VERY depressed
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTk':[292,352]}
+
+    elif collection=="20250919-20250925":
+        dataset={'20250919UTa',
+                 '20250919UTb',
+                 '20250919UTc',
+                 '20250919UTd',
+                 '20250919UTe',
+                 '20250919UTf',
+                 '20250925UTa',
                  '20250925UTb',
                  '20250925UTc',
                  '20250925UTd',
@@ -1317,6 +1353,40 @@ def get_map_collection(collection):
         
         lonlims={'20241129UTg':[292,352],
                  '20241129UTk':[292,352]}
+        
+    elif collection=="20250919-20250926":
+        dataset={'20250919UTa',
+                 '20250919UTb',
+                 '20250919UTc',
+                 '20250919UTd',
+                 '20250919UTe',
+                 '20250919UTf',
+                 '20250925UTa',
+                 '20250925UTb',
+                 '20250925UTc',
+                 '20250925UTd',
+                 '20250925UTe',
+                 '20250925UTf',
+                 '20250925UTg',#,
+                 #'20250925UTh'} Ammonia seems VERY depressed
+                 '20250925UTa',
+                 '20250925UTb',
+                 '20250925UTc',
+                 '20250925UTd',
+                 '20250925UTe',
+                 '20250925UTf',
+                 '20250925UTg',
+                 '20250926UTa',
+                 '20250926UTb',
+                 '20250926UTc',
+                 '20250926UTd',
+                 '20250926UTe',
+                 '20250926UTf',
+                 '20250926UTg'}
+        
+        lonlims={'20241129UTg':[292,352],
+                 '20241129UTk':[292,352]}
+
 
     elif collection=="20250930-20250930": #Modest ammonia gradient on many observations
         dataset={'20250930UTa',
@@ -1459,6 +1529,56 @@ def get_map_collection(collection):
                      '20251019UTm',
                      '20251019UTn'}#,
                      #'20251019UTo'}#Overall poor quality likely due to twilight
+            
+            lonlims={'20241129UTg':[292,352],
+                     '20241129UTk':[292,352]}
+
+    elif collection=="20251116-20251116": #
+            dataset={'20251116UTa', #Gradient, corrected
+                     '20251116UTb', #Gradient PCld, uncorrected
+                     '20251116UTc', #Gradient??? Needs correction?
+                     '20251116UTd'}#,
+                     #'20251116UTe',
+                     #'20251116UTf',
+                     #'20251116UTg',
+                     #'20251116UTh', 
+                     #'20251116UTi',
+                     #'20251116UTj',
+                     #'20251116UTk',
+                     #'20251116UTl', #Gradient, corrected
+                     #'20251116UTm', #Gradient, corrected
+                     #'20251116UTn', #Gradient, corrected
+                     #'20251116UTo',
+                     #'20251116UTp',
+                     #'20251116UTq'}#,
+                     #'20251116UTr', #Gradiant, correction attempted, but insufficient
+                     #'20251116UTs', #Gradiant, correction attempted, but insufficient
+                     #'20251116UTt'} #Twilight contamination is too much
+            
+            lonlims={'20241129UTg':[292,352],
+                     '20241129UTk':[292,352]}
+
+    elif collection=="20251119-20251119": #
+            dataset={#'20251119UTa', #Strong gradient, maybe uncorrectable
+                     #'20251119UTb', #Strong gradient, maybe uncorrectable
+                     '20251119UTc',
+                     '20251119UTd',
+                     '20251119UTe',
+                     '20251119UTf',
+                     '20251119UTg',
+                     '20251119UTh', 
+                     '20251119UTi',
+                     '20251119UTj',
+                     '20251119UTk',
+                     '20251119UTl', #Gradient, corrected
+                     '20251119UTm', #Gradient, corrected
+                     '20251119UTn', #Gradient, corrected
+                     '20251119UTo',
+                     '20251119UTp',
+                     '20251119UTq'}#,
+                     #'20251119UTr', #Gradiant, correction attempted, but insufficient
+                     #'20251119UTs', #Gradiant, correction attempted, but insufficient
+                     #'20251119UTt'} #Twilight contamination is too much
             
             lonlims={'20241129UTg':[292,352],
                      '20241129UTk':[292,352]}
