@@ -1,12 +1,39 @@
 def plot_NEZ_features(feature_type='NH3',axsnp=False):
+    """
+    Plots data and trends from feature-regions (NH3, cloud plumes, or NEDFs)
+    that were identified by find_blob.py and supporting functions, usually 
+    executed as part of L4_Jup_Map_Plot.py run in a batch mode for a given
+    apparition. The inputs for this routine are read from curated
+    versions of the find_blob.py outputs that have been manually inspected
+    to tag persistent features over time as they drift in longitude.
+    
+    The current curated data sets are for the 2024-24 appariation and are
+    HARD-CODED below.
+
+    Parameters
+    ----------
+    feature_type : String, optional
+        This is a string tag indicating what type of feature is to be analyzed,
+        e.g., NH3, Plume, or NEDF
+    axsnp : TYPE, optional
+        DESCRIPTION. The default is False.
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    """
     import matplotlib.pyplot as pl
     import numpy as np
     from datetime import datetime
     import matplotlib.dates as mdates
     import wind_speed_from_longitude_pair as ws
     import csv
-
     
+    ###########################################################################
+    # Set path for data files and dictionary for curated data files
+    ###########################################################################
     pth="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/NEZ/"
     config={"NH3":{"file":"2024-2025 Mean Sys1 0-360 15N-15S blobs fNH3 Tracker.csv",
                     "title":"Enhanced Ammonia Regions Time Series",
@@ -298,20 +325,57 @@ def plot_NEZ_features(feature_type='NH3',axsnp=False):
     return np.array([avgfNH3, avgPCld,stdfNH3,stdPCld])
             
 def plot_ALL_NEZ_features():
-    
+    """
+    Plots data and trends from ALL feature-regions (NH3, cloud plumes, and NEDFs)
+    that were identified by find_blob.py and supporting functions, usually 
+    executed as part of L4_Jup_Map_Plot.py run in a batch mode for a given
+    apparition. The inputs for this routine are read from curated
+    versions of the find_blob.py outputs that have been manually inspected
+    to tag persistent features over time as they drift in longitude.
+       
+    Calls
+        plot_NEZ_features
+        ZonalWinds
+    Returns
+    -------
+    None.
+
+    """
+    import sys
     import matplotlib.pyplot as pl
-    import ZonalWinds as ZW
+    sys.path.append('../../Winds/')
+    import ZonalHSTWinds as ZHSTW
+    pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/NEZ/"  
+
+    ###########################################################################
+    # Set up plot for ammonia-pressure plane for individual feature points
+    ###########################################################################
     fignp,axsnp=pl.subplots(1,figsize=(6,6), dpi=150, facecolor="white",sharex=True)
-    fignp.suptitle("N-P Plane", fontsize=14)
+    fignp.suptitle("Ammonia - Pressure Plane", fontsize=14)
     
+    ###########################################################################
+    # Run plot_NEZ_features three times, once each for ammonia, clouds, and NEDFS
+    ###########################################################################
     avgsNH3=plot_NEZ_features(feature_type='NH3',axsnp=axsnp)
     avgsPlume=plot_NEZ_features(feature_type='Plume',axsnp=axsnp)
     avgsNEDF=plot_NEZ_features(feature_type='NEDF',axsnp=axsnp)
-    
+    axsnp.set_ylim(1500.,2200.)
+    axsnp.set_xlim(60.,180.)
+    axsnp.grid(linewidth=0.2)
+    axsnp.set_title("Individual Features 2024-25",fontsize=14)
+    axsnp.set_xlabel("Ammonia Mole Fraction (ppm)",fontsize=14)
+    axsnp.set_ylabel("Cloud Pressure (mb)",fontsize=14)
+    axsnp.legend()
     axsnp.invert_yaxis()
+    fignp.savefig(pathmapplots+"fNH3-PCld Plane Individual Obs.png",dpi=300)
 
+
+    ###########################################################################
+    # Set up and plot average values on the ammonia-pressure plane for features
+    ###########################################################################
     fignpavg,axsnpavg=pl.subplots(1,figsize=(6,6), dpi=150, facecolor="white",sharex=True)
-    #axsnpavg.set_title("NH3-PCloud Plane", fontsize=14)
+    fignp.suptitle("Ammonia - Pressure Plane", fontsize=14)
+
     axsnpavg.errorbar(avgsNH3[0,:],avgsNH3[1,:],xerr=avgsNH3[2,:],yerr=avgsNH3[3,:],
                       color='C2',label="NH3",linewidth=0.0,
                       elinewidth=1.0,marker="o",markersize=3)
@@ -322,7 +386,8 @@ def plot_ALL_NEZ_features():
                      color='r',label="NEDF",linewidth=0.0,
                      elinewidth=1.0,marker="o",markersize=3)
     
-    labels,NH3_indices,Plume_indices,NEDF_indices=ZW.NEZ_feature_quiver_plot()
+    labels,NH3_indices,Plume_indices,NEDF_indices=ZHSTW.NEZ_feature_quiver_plot()
+    
     print(labels)
     axsnpavg.set_ylim(1500.,2200.)
     axsnpavg.set_xlim(60.,180.)
@@ -331,11 +396,17 @@ def plot_ALL_NEZ_features():
     axsnpavg.scatter(avgsNEDF[0,NEDF_indices],avgsNEDF[1,NEDF_indices],s=50,color='r')
     axsnpavg.invert_yaxis() 
     axsnpavg.grid(linewidth=0.2)
+    axsnpavg.set_title("Feature Averages 2024-25",fontsize=14)
     axsnpavg.set_xlabel("Ammonia Mole Fraction (ppm)",fontsize=14)
     axsnpavg.set_ylabel("Cloud Pressure (mb)",fontsize=14)
-
     axsnpavg.legend()
 
-    pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/NEZ/"  
-    fignpavg.savefig(pathmapplots+"ThermoCycle.png",dpi=300)
+    fignpavg.savefig(pathmapplots+"fNH3-PCld Plane Average Obs.png",dpi=300)
 
+
+    figw,axsw=ZHSTW.ZonalHSTWinds("2024c_f631n","2024d_f631n")
+    ZHSTW.overplot_NEZ_feature_speeds(axsw)
+    axsw.legend()
+    pathmapplots="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/NEZ/"  
+    
+    figw.savefig(pathmapplots+"WindProfile.png",dpi=300)

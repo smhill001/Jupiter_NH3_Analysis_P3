@@ -98,8 +98,7 @@ def map_and_context(mapdata,maphdr,RGB,RGBtime,LonSys,LatLims,LonLims,LonRng,Plo
 
         axs1[ix].set_adjustable('box') 
 
-    mapdata2=mapdata*amfdata**coef
-    data_patch=MP.make_patch(mapdata2,LatLims,LonLims,PlotCM,LonRng)
+    data_patch=MP.make_patch(mapdata,LatLims,LonLims,PlotCM,LonRng)
     data_patch,vn,vx,tx=PP.plot_patch(data_patch,LatLims,LonLims,
                                      PlotCM,LonRng,ct,axs1[0],'%3.2f',
                                      n=6,vn=low,vx=high,
@@ -205,4 +204,4 @@ def map_and_context(mapdata,maphdr,RGB,RGBtime,LonSys,LatLims,LonLims,LonRng,Plo
         
     fig1.savefig(pathout+fnout,dpi=300)
     
-    return(data_patch,mapdata2,tx,fnout)
+    return(data_patch,mapdata,tx,fnout)

@@ -1,10 +1,78 @@
 def ReadContiguousMap(LonSys,collection="20220904-20220905",
                       collectionIRTF="20240205-20240205",
                       collection889CH4="20240131-20240201"):
+    """
+    Retrieve continguous maps from FITS files for plotting and analysis.
+    
+    !!!Development notes: 
+    1) Currently assumes that fNH3, PCld, and RGB 'optical' data is always
+    provided. It could be useful to make that optional like the IRTF and 889-nm
+    data in order to generalize this function.
+    2) A helper function to read the m x n FITS files and perhaps the RGB file
+    could dramatically shorten this function and make it more readable.
+    
+
+    Parameters
+    ----------
+    LonSys : String
+        Indicates desired longitude system of map plot
+    collection : String, optional
+        The map collection label for contiguous map FITS files of fNH3, PCld,
+        and visual context
+    collectionIRTF : String, optional
+        The map collection label for contiguous map FITS file of 5-micron data
+    collection889CH4 : String, optional
+        The map collection label for contiguous map FITS file of 889-nm data
+
+    Returns
+    -------
+    fNH3data : float array
+        Cylindrically mapped mean ammonia mole fraction at each lat-lon in ppm.
+    fNH3stdv : float array
+        Cylindrically mapped fNH3 standard deviation at each lat-lon in ppm.
+    fNH3frac : float array
+        Cylindrically mapped fractional uncertainty in fNH3, e.g., 
+        fNH3stdv/fNH3data
+    fNH3time : float array
+        Cylindrically mapped mean fNH3 observation time at each lat-lon in JD(?).
+    PClddata : float array
+        Cylindrically mapped mean effective cloud pressure at each lat-lon in 
+        mbar.
+    PCldstdv : float array
+        Cylindrically mapped PCld standard deviation at each lat-lon in mbar.
+    PCldfrac : float array
+        Cylindrically mapped fractional uncertainty in PCld, e.g., 
+        PCldstdv/PClddata
+    PCldtime : float array
+        Cylindrically mapped mean PCld observation time at each lat-lon in JD(?).
+    RGBdata : TYPE
+        DESCRIPTION.
+    RGBstdv : TYPE
+        DESCRIPTION.
+    RGBfrac : TYPE
+        DESCRIPTION.
+    RGBtime : TYPE
+        DESCRIPTION.
+    IRTFdata : float array
+        Cylindrically mapped mean effective cloud pressure at each lat-lon in 
+        uncalibrated units.
+    IRTFstdv : float array
+        Cylindrically mapped IRTF standard deviation at each lat-lon in mbar.
+    IRTFfrac : float array
+        Cylindrically mapped fractional uncertainty in IRTF, e.g., 
+        IRTFstdv/IRTFdata
+    IRTFtime : float array
+        Cylindrically mapped mean IRTF observation time at each lat-lon in JD(?).
+    JALPOdata : TYPE
+        DESCRIPTION.
+
+    """
     from astropy.io import fits
     import os
     import numpy as np
+    
     print("############ IN READ MAP,collectionIRTF=",collectionIRTF)
+    
     cm_key = {
         '1': 'CM1',
         '2': 'CM2',
@@ -29,6 +97,10 @@ def ReadContiguousMap(LonSys,collection="20220904-20220905",
                          if '.fits' in item ]  
     collection_in_directory = [item for item in fits_in_directory \
                          if collection in item]  
+        
+    ###########################################################################
+    # Read fNH3 data and 'roll' to desired longitude system (LonSys)
+    ###########################################################################
     fNH3file = [item for item in collection_in_directory \
                          if 'L4fNH3' in item]  
     if len(fNH3file)>0:
@@ -42,6 +114,9 @@ def ReadContiguousMap(LonSys,collection="20220904-20220905",
         fNH3time=np.roll(fNH3hdulist[3].data,roll,axis=1)
         fNH3hdulist.close()       
         
+    ###########################################################################
+    # Read PCld data and 'roll' to desired longitude system (LonSys)
+    ###########################################################################
     PCldfile = [item for item in collection_in_directory \
                          if 'L4PCld' in item]      
     if len(PCldfile)>0:
@@ -55,6 +130,9 @@ def ReadContiguousMap(LonSys,collection="20220904-20220905",
         PCldtime=np.roll(PCldhdulist[3].data,roll,axis=1)
         PCldhdulist.close()
         
+    ###########################################################################
+    # Read RGB data and 'roll' to desired longitude system (LonSys)
+    ###########################################################################
     RGBfile = [item for item in collection_in_directory \
                          if 'L4RGB' in item]      
     if len(RGBfile)>0:
@@ -68,6 +146,9 @@ def ReadContiguousMap(LonSys,collection="20220904-20220905",
         RGBtime=np.roll(RGBhdulist[3].data,roll,axis=1)
         RGBhdulist.close()
 
+    ###########################################################################
+    # Read IRTF data and 'roll' to desired longitude system (LonSys)
+    ###########################################################################
     if collectionIRTF:        
         collectionIRTF_in_directory = [item for item in fits_in_directory \
                              if collectionIRTF in item]  
@@ -95,6 +176,9 @@ def ReadContiguousMap(LonSys,collection="20220904-20220905",
         IRTFfrac=np.zeros((180,360))
         IRTFtime=np.zeros((180,360))
 
+    ###########################################################################
+    # Read 889-nm JALPO data and 'roll' to desired longitude system (LonSys)
+    ###########################################################################
     if collection889CH4:
         
         collection889CH4_in_directory = [item for item in fits_in_directory \
@@ -116,7 +200,6 @@ def ReadContiguousMap(LonSys,collection="20220904-20220905",
             JALPOdata=np.zeros((180,360))
     else:
         JALPOdata=np.zeros((180,360))
-            
     
     return fNH3data,fNH3stdv,fNH3frac,fNH3time,\
         PClddata,PCldstdv,PCldfrac,PCldtime, \
@@ -127,6 +210,74 @@ def ReadContiguousMap(LonSys,collection="20220904-20220905",
 def plot_optical_maps(LonLims,lats,collection,blendweightfNH3,
                       blendweightPCloud,blendweightTime,blendRGBweight,
                       ctbls,variance,fracfNH3,fracPCloud,RGBaxs):
+    """
+    
+
+    Parameters
+    ----------
+    LonLims : TYPE
+        DESCRIPTION.
+    lats : TYPE
+        DESCRIPTION.
+    collection : TYPE
+        DESCRIPTION.
+    blendweightfNH3 : TYPE
+        DESCRIPTION.
+    blendweightPCloud : TYPE
+        DESCRIPTION.
+    blendweightTime : TYPE
+        DESCRIPTION.
+    blendRGBweight : TYPE
+        DESCRIPTION.
+    ctbls : TYPE
+        DESCRIPTION.
+    variance : TYPE
+        DESCRIPTION.
+    fracfNH3 : TYPE
+        DESCRIPTION.
+    fracPCloud : TYPE
+        DESCRIPTION.
+    RGBaxs : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    fig1 : TYPE
+        DESCRIPTION.
+    fig2 : TYPE
+        DESCRIPTION.
+    axs1 : TYPE
+        DESCRIPTION.
+    axs2 : TYPE
+        DESCRIPTION.
+    fNH3_patch_mb : TYPE
+        DESCRIPTION.
+    PCld_patch_mb : TYPE
+        DESCRIPTION.
+    RGB_patch : TYPE
+        DESCRIPTION.
+    tx_fNH3 : TYPE
+        DESCRIPTION.
+    tx_PCld : TYPE
+        DESCRIPTION.
+    fNH3low : TYPE
+        DESCRIPTION.
+    fNH3high : TYPE
+        DESCRIPTION.
+    PCldlow : TYPE
+        DESCRIPTION.
+    PCldhigh : TYPE
+        DESCRIPTION.
+    blendweightTime_patch : TYPE
+        DESCRIPTION.
+    aspectratio : TYPE
+        DESCRIPTION.
+    RGB4Display : TYPE
+        DESCRIPTION.
+    RGBaxs : TYPE
+        DESCRIPTION.
+
+    """
     import pylab as pl
     import numpy as np
     import plot_patch as PP
@@ -390,6 +541,72 @@ def L4_Jup_Map_Plot(collection="20240129-20240202",IRTFcollection='20240205-2024
                       axNH3=False,axCH4=False,axRGB=False,axIRTF=False,
                       axCH4889=False,axNH3vCloud=False,axNH3vIRTF=False,
                       axIRTFvPCld=False,ax889vPCld=False,counter=0,countmax=0):
+    """
+    Main program for making plots of blended, contiguous maps, including
+    analysis tools and overplotting
+
+    Parameters
+    ----------
+    collection : TYPE, optional
+        DESCRIPTION. The default is "20240129-20240202".
+    IRTFcollection : TYPE, optional
+        DESCRIPTION. The default is '20240205-20240205'.
+    CH4889collection : TYPE, optional
+        DESCRIPTION. The default is "20240131-20240201".
+    LonSys : TYPE, optional
+        DESCRIPTION. The default is '1'.
+    lats : TYPE, optional
+        DESCRIPTION. The default is [0,180].
+    LonLims : TYPE, optional
+        DESCRIPTION. The default is [0,360].
+    figsz : TYPE, optional
+        DESCRIPTION. The default is [6.0,6.0].
+    ROI : TYPE, optional
+        DESCRIPTION. The default is False.
+    variance : TYPE, optional
+        DESCRIPTION. The default is False.
+    localmax : TYPE, optional
+        DESCRIPTION. The default is False.
+    segment : TYPE, optional
+        DESCRIPTION. The default is False.
+    proj : TYPE, optional
+        DESCRIPTION. The default is 'AGU2025'.
+    ctbls : TYPE, optional
+        DESCRIPTION. The default is ['terrain_r','Blues'].
+    cont : TYPE, optional
+        DESCRIPTION. The default is False.
+    bare_maps : TYPE, optional
+        DESCRIPTION. The default is False.
+    cb : TYPE, optional
+        DESCRIPTION. The default is False.
+    axNH3 : TYPE, optional
+        DESCRIPTION. The default is False.
+    axCH4 : TYPE, optional
+        DESCRIPTION. The default is False.
+    axRGB : TYPE, optional
+        DESCRIPTION. The default is False.
+    axIRTF : TYPE, optional
+        DESCRIPTION. The default is False.
+    axCH4889 : TYPE, optional
+        DESCRIPTION. The default is False.
+    axNH3vCloud : TYPE, optional
+        DESCRIPTION. The default is False.
+    axNH3vIRTF : TYPE, optional
+        DESCRIPTION. The default is False.
+    axIRTFvPCld : TYPE, optional
+        DESCRIPTION. The default is False.
+    ax889vPCld : TYPE, optional
+        DESCRIPTION. The default is False.
+    counter : TYPE, optional
+        DESCRIPTION. The default is 0.
+    countmax : TYPE, optional
+        DESCRIPTION. The default is 0.
+
+    Returns
+    -------
+    None.
+
+    """
 
     import make_patch as MP
     import numpy as np
@@ -1021,7 +1238,7 @@ def L4_Jup_Map_Plot(collection="20240129-20240202",IRTFcollection='20240205-2024
     # YET ANOTHER SECTION: LONGITUDINAL CUTS!
     #!!!! Need to make MAPS! then use profiles modules to extract this!
     ###########################################################################
-    """
+    
     figlc,axslc=pl.subplots(3,1,figsize=(figsz[0],figsz[1]), dpi=150, facecolor="white",
                           sharex=True)
     figlc.suptitle(collection)
@@ -1036,14 +1253,16 @@ def L4_Jup_Map_Plot(collection="20240129-20240202",IRTFcollection='20240205-2024
     #PCld_array=np.mean(PCld_patch_mb[7:9,:],axis=0)
     #NEDF_array=np.mean(PCld_patch_mb[5:7,:],axis=0)
 
-    axslc[0].plot(lon_array,fNH3_array0,color='C2')
+    axslc[0].plot(lon_array,fNH3_array0,color='C2',label='fNH3')
+    axslc[0].plot(lon_array,np.roll(fNH3_array0,10),color='C2',linestyle='dashed',linewidth=0.5)
     axslc0=axslc[0].twinx()
-    axslc0.plot(lon_array,Cld_array0,color='C0')
+    axslc0.plot(lon_array,Cld_array0,color='C0',label='PCld')
     axslc[0].set_ylim(50.,180.)
     axslc0.set_ylim(1500.,2200.)
     axslc0.invert_yaxis()
 
     axslc[1].plot(lon_array,fNH3_array1,color='C2')
+    axslc[1].plot(lon_array,np.roll(fNH3_array1,10),color='C2',linestyle='dashed',linewidth=0.5)
     axslc1=axslc[1].twinx()
     axslc1.plot(lon_array,Cld_array1,color='C0')
     axslc[1].set_ylim(50.,180.)
@@ -1051,6 +1270,7 @@ def L4_Jup_Map_Plot(collection="20240129-20240202",IRTFcollection='20240205-2024
     axslc1.invert_yaxis()
 
     axslc[2].plot(lon_array,fNH3_array2,color='C2')
+    axslc[2].plot(lon_array,np.roll(fNH3_array2,10),color='C2',linestyle='dashed',linewidth=0.5)
     axslc2=axslc[2].twinx()
     axslc2.plot(lon_array,Cld_array2,color='C0')
     axslc[2].set_ylim(50.,180.)
@@ -1066,15 +1286,18 @@ def L4_Jup_Map_Plot(collection="20240129-20240202",IRTFcollection='20240205-2024
         #axslc[i].set_yticks(np.linspace(-90,90,13), minor=False)
         #yticklabels=np.array(np.linspace(-90,90,13))
         #axslc[i].set_yticklabels(yticklabels.astype(int))
-        axslc[i].tick_params(axis='both', which='major', labelsize=7)
-        axslc[i].set_ylabel("fNH3 (ppm)")
-        axslc0.set_ylabel("PCloud (mb)")
+        axslc[i].tick_params(axis='both', which='major', labelsize=8)
+        axslc[i].set_ylabel("fNH3 (ppm)",color='C2')
+        #axslc0.set_ylabel("PCloud (mb)",color='C0')
         #axslc[i].set_adjustable('box')
-        axslc[i].set_xlim(195,15.)
+        axslc[i].set_xlim(360,0.)
 
-    axslc0.set_ylabel("PCloud (mb)")
-    axslc1.set_ylabel("PCloud (mb)")
-    axslc2.set_ylabel("PCloud (mb)")
+    axslc0.set_ylabel("PCloud (mb)",color='C0')
+    axslc0.tick_params(axis='both', which='major', labelsize=8)
+    axslc1.set_ylabel("PCloud (mb)",color='C0')
+    axslc1.tick_params(axis='both', which='major', labelsize=8)
+    axslc2.set_ylabel("PCloud (mb)",color='C0')
+    axslc2.tick_params(axis='both', which='major', labelsize=8)
     
     axslc[2].set_xlabel("System 3 Longitude (deg)")
     
@@ -1090,9 +1313,19 @@ def L4_Jup_Map_Plot(collection="20240129-20240202",IRTFcollection='20240205-2024
     #print(lon_array)
     #axslc[0].plot(lon_array,Rossby,color='k')
 
-    figlc.savefig(pathmapplots+collection+" Wave.png",dpi=150)
+    figlc.subplots_adjust(bottom=0.07,top=0.92,left=0.10,right=0.90)
+
+
+    
+    figlc.savefig(path+collection+" Wave.png",dpi=150)
+    #Autocorrelation (below) doesn't work well due to differing shapes
     """
-        
+    from Winds import _xcorr1d_circular
+    shift_px, peak, snr = _xcorr1d_circular(1.0/(Cld_array2/np.mean(Cld_array2)),
+                                            fNH3_array2/np.mean(fNH3_array2))
+    print("%%%%%%%%%%%%%%%%%% shift_px, peak, snr=",shift_px, peak, snr)
+    """
+    
     
     if segment:
         return(lats,blendweightPCloud,blendweightfNH3,blendRGBweight,

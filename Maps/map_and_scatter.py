@@ -3,7 +3,7 @@ def map_and_scatter(patchx,patchy,mapydata,mapyhdr,LonSys,
                     coef,txin,xlow,xhigh,ylow,yhigh,figxy,
                     ct,pathout,Ltitle,Rtitle,Level='L3',FiveMicron=False,
                     cbar_rev=False,swap_xy=False,axis_inv=False,cbar_title="Test",
-                    suptitle="Test",ROI=False,amfpatch=False):
+                    suptitle="Test",ROI=False):
     """
     PURPOSE:    Makes a pair of plots, the left one is a patch map of one data
                 set overlayed by another patch map data set. The right plot is
