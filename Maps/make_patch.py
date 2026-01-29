@@ -40,11 +40,14 @@ def make_patch(Map,LatLims,LonLims,CM,LonRng,pad=True):
     import copy
     
     scale=int(Map.shape[0]/180)
+    print("######## scale=",scale)
     lon_max=360*scale
-    LatLims=LatLims*scale
+    LatLims=np.array(LatLims)*scale
     LonRng=LonRng*scale
     CM=CM*scale
-    LonLims=LonLims*scale
+    LonLims=np.array(LonLims)*scale
+    
+    print(lon_max,LatLims,LonRng,CM,LonLims)
     
     patch=np.copy(Map[LatLims[0]:LatLims[1],LonLims[0]:LonLims[1]])
     if CM<LonRng:

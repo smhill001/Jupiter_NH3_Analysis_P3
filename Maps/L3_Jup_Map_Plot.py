@@ -42,6 +42,7 @@ def L3_Jup_Map_Plot(obskey="20250106UTf",imagetype='Map',target="Jupiter",
     import make_patch as MP
     import map_and_context as mac
     import map_and_scatter as mas
+    import map_cloudsurface as msurf
 
     if ctbls[0]=="jet":
         fNH3low=60
@@ -61,7 +62,8 @@ def L3_Jup_Map_Plot(obskey="20250106UTf",imagetype='Map',target="Jupiter",
         PCldhdr,PClddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM,RGBtime= \
                         RFM.read_fits_map_L2_L3(obskey=obskey,LonSys=LonSys,
                                                 imagetype="Map",Level="L3",
-                                                target=target,FiveMicron=FiveMicron)
+                                                target=target,FiveMicron=FiveMicron,
+                                                LimbCorrection=True)
     elif FiveMicron=="fits":
         PCldhdr,PClddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM,RGBtime,micronhdr,microndatar= \
                         RFM.read_fits_map_L2_L3(obskey=obskey,LonSys=LonSys,
@@ -119,7 +121,7 @@ def L3_Jup_Map_Plot(obskey="20250106UTf",imagetype='Map',target="Jupiter",
     ###########################################################################
     ## Just RGB and Abundance
     ###########################################################################
-    fNH3_patch_mb,TestfNH3,tx_fNH3,fnNH3=mac.map_and_context(fNH3data,fNH3hdr,
+    fNH3_patch_mb,TestfNH3,tx_fNH3,fnNH3,RGB4Display=mac.map_and_context(fNH3data,fNH3hdr,
                                                        RGB,RGBtime,
                                                        LonSys,LatLims,NH3LonLims,
                                                        LonRng,fNH3PlotCM,
@@ -134,7 +136,7 @@ def L3_Jup_Map_Plot(obskey="20250106UTf",imagetype='Map',target="Jupiter",
     ###########################################################################
     ## Just RGB and Cloud Pressure
     ###########################################################################
-    PCld_patch,TestPCld,tx_PCld,fnPCld=mac.map_and_context(PClddata,PCldhdr,
+    PCld_patch,TestPCld,tx_PCld,fnPCld,RGB4Display=mac.map_and_context(PClddata,PCldhdr,
                                                         RGB,RGBtime,
                                                         LonSys,LatLims,NH3LonLims,
                                                         LonRng,PCldPlotCM,
@@ -146,6 +148,12 @@ def L3_Jup_Map_Plot(obskey="20250106UTf",imagetype='Map',target="Jupiter",
                                                         cbar_title="Cloud Top Pressure (mb)",
                                                         ROI=ROI)
 
+    ###########################################################################
+    ## Make surface plots
+    ###########################################################################
+    msurf.map_cloudsurface(PCld_patch,fNH3_patch_mb,RGB4Display,
+                           PCldhdr,fNH3hdr,RGBtime,
+                           LonSys,LatLims,NH3LonLims,LonRng,fNH3PlotCM,pathmapplots)
     ###########################################################################
     ## Just RGB and 5 micron
     ###########################################################################
@@ -168,10 +176,10 @@ def L3_Jup_Map_Plot(obskey="20250106UTf",imagetype='Map',target="Jupiter",
         mas.map_and_scatter(fNH3_patch_mb,PCld_patch,PClddata,fNH3hdr,LonSys,
         LatLims,NH3LonLims,LonRng,PCldPlotCM,fnNH3,
         coef[0],tx_fNH3,fNH3low,fNH3high,PCldlow,PCldhigh,
-        figxy,ctbls[0],pathmapplots,"PCloud & fNH3 (contours)",
+        figxy,ctbls[1],pathmapplots,"PCloud & fNH3 (contours)",
         "PCloud vs fNH3",Level='L3',cbar_rev=True,cbar_title="Cloud-top Pressure (mb)",
-        axis_inv=True,ROI=ROI,amfpatch=amfpatch)
-    
+        axis_inv=True,ROI=ROI)#,amfpatch=amfpatch) #May need to fix this and pass it through
+        
     ###########################################################################
     ## Compute Scatter Plot (PCloud vs 5um radiance)
     ###########################################################################

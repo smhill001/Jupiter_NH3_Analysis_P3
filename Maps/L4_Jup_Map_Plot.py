@@ -1,3 +1,73 @@
+def figsize_and_aspect(lats,LonLims):
+    aspectratio=(LonLims[1]-LonLims[0])/(lats[1]-lats[0])
+    print("###############################")
+    print(LonLims[1],LonLims[0],lats[1],lats[0])
+    import time
+    time.sleep(5)
+    aspect_ratio_map = {
+                        2/3.:  [2.5, 6.0],
+                        1:     [3.0, 6.0],
+                        4/3.:  [3.5, 6.0],
+                        3/2.:  [4.0, 6.0],
+                        2:     [4.5, 6.0],
+                        3:     [6.0, 6.0], #e.g. 120x360
+                        4:     [7.05, 6.0],
+                        6:     [8.5, 5.0],
+                        9:     [10, 4.5],
+                        12:    [12.0, 4.0] #e.g. 30x360
+                        }
+    
+    #Aspect Ratio Customization
+    adjust_params = {
+    2/3.:  {'left': 0.21,  'bottom': 0.07, 'right': 0.79,  'top': 0.88,  'wspace': 0.0,  'hspace': 0.2},
+    1:     {'left': 0.21,  'bottom': 0.07, 'right': 0.79,  'top': 0.88,  'wspace': 0.0,  'hspace': 0.2},
+    4/3.:  {'left': 0.20,  'bottom': 0.07, 'right': 0.825, 'top': 0.86,  'wspace': 0.0,  'hspace': 0.2},
+    3/2.:  {'left': 0.20,  'bottom': 0.07, 'right': 0.825, 'top': 0.86,  'wspace': 0.0,  'hspace': 0.2},
+    2:     {'left': 0.20,  'bottom': 0.07, 'right': 0.825, 'top': 0.86,  'wspace': 0.0,  'hspace': 0.2},
+    3:     {'left': 0.095, 'bottom': 0.07, 'right': 0.90,  'top': 0.88,  'wspace': 0.25, 'hspace': 0.2},
+    4:     {'left': 0.035, 'bottom': 0.07, 'right': 0.94,  'top': 0.88,  'wspace': 0.25, 'hspace': 0.2},
+    6:     {'left': 0.04,  'bottom': 0.08, 'right': 0.94,  'top': 0.865, 'wspace': 0.0,  'hspace': 0.2},
+    9:     {'left': 0.04,  'bottom': 0.10, 'right': 0.94,  'top': 0.865, 'wspace': 0.0,  'hspace': 0.395},
+    12:    {'left': 0.035, 'bottom': 0.1,  'right': 0.935, 'top': 0.84,  'wspace': 0.0,  'hspace': 0.3}
+            }
+
+    figsz = aspect_ratio_map[aspectratio]
+    plot_adjust=adjust_params[aspectratio]
+    
+    return figsz,aspectratio,plot_adjust
+
+def set_up_figure(figsz,collection,LonSys,RGBaxs=2):
+    
+    import numpy as np
+    import matplotlib.pyplot as pl
+    #Set up plots to be 3x1 or 4x1 if there's a 5 micron file
+
+    rng=np.arange(0,RGBaxs+1)
+
+    fig1,axs1=pl.subplots(rng[-1]+1,1,figsize=(figsz[0],figsz[1]), dpi=150, facecolor="white",
+                          sharex=True,sharey=True)
+    fig1.suptitle(collection+"\n Average")
+    
+    #Set up plot axes etc.
+    for ix in rng:
+        axs1[ix].grid(linewidth=0.2)
+        axs1[ix].ylim=[-90.,90.]
+        axs1[ix].xlim=[0.,360.]
+        axs1[ix].set_xticks(np.linspace(450.,0.,31), minor=False)
+        xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
+        axs1[ix].set_xticklabels(xticklabels.astype(int))
+        axs1[ix].set_yticks(np.linspace(-90,90,13), minor=False)
+        axs1[ix].tick_params(axis='both', which='major', labelsize=7)
+        axs1[ix].set_ylabel("PG Latitude (deg)")
+        axs1[ix].set_adjustable('box') 
+
+    fig1.text(0.99,0.01,"Dr. Steven Hill, PSI",ha='right',fontsize=10)
+    axs1[RGBaxs].tick_params(axis='both', which='major', labelsize=7)
+    axs1[RGBaxs].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=9)
+    axs1[RGBaxs].set_ylabel("PG Latitude (deg)")
+
+    return fig1,axs1
+
 def ReadContiguousMap(LonSys,collection="20220904-20220905",
                       collectionIRTF="20240205-20240205",
                       collection889CH4="20240131-20240201"):
@@ -97,11 +167,12 @@ def ReadContiguousMap(LonSys,collection="20220904-20220905",
                          if '.fits' in item ]  
     collection_in_directory = [item for item in fits_in_directory \
                          if collection in item]  
-        
+    LonSys_in_directory = [item for item in collection_in_directory \
+                         if 'Sys'+LonSys in item]
     ###########################################################################
     # Read fNH3 data and 'roll' to desired longitude system (LonSys)
     ###########################################################################
-    fNH3file = [item for item in collection_in_directory \
+    fNH3file = [item for item in LonSys_in_directory \
                          if 'L4fNH3' in item]  
     if len(fNH3file)>0:
         fNH3hdulist=fits.open(pathinp+fNH3file[0])
@@ -117,7 +188,7 @@ def ReadContiguousMap(LonSys,collection="20220904-20220905",
     ###########################################################################
     # Read PCld data and 'roll' to desired longitude system (LonSys)
     ###########################################################################
-    PCldfile = [item for item in collection_in_directory \
+    PCldfile = [item for item in LonSys_in_directory \
                          if 'L4PCld' in item]      
     if len(PCldfile)>0:
         PCldhdulist=fits.open(pathinp+PCldfile[0])
@@ -133,7 +204,7 @@ def ReadContiguousMap(LonSys,collection="20220904-20220905",
     ###########################################################################
     # Read RGB data and 'roll' to desired longitude system (LonSys)
     ###########################################################################
-    RGBfile = [item for item in collection_in_directory \
+    RGBfile = [item for item in LonSys_in_directory \
                          if 'L4RGB' in item]      
     if len(RGBfile)>0:
         RGBhdulist=fits.open(pathinp+RGBfile[0])
@@ -209,7 +280,8 @@ def ReadContiguousMap(LonSys,collection="20220904-20220905",
 
 def plot_optical_maps(LonLims,lats,collection,blendweightfNH3,
                       blendweightPCloud,blendweightTime,blendRGBweight,
-                      ctbls,variance,fracfNH3,fracPCloud,RGBaxs):
+                      ctbls,variance,fracfNH3,fracPCloud,RGBaxs,LonSys,
+                      surfplot=False):
     """
     
 
@@ -282,23 +354,13 @@ def plot_optical_maps(LonLims,lats,collection,blendweightfNH3,
     import numpy as np
     import plot_patch as PP
     import make_patch as MP
+    import map_cloudsurface as msurf
     
     ###########################################################################
     #BEGIN PLOTTING
     ###########################################################################
     # Determine figure size (inches) based on aspect ratio of data set
-    aspectratio=(LonLims[1]-LonLims[0])/(lats[1]-lats[0])
-    aspect_ratio_map = {
-                        1:     [3.0, 6.0],
-                        4/3.:  [3.5, 6.0],
-                        2:     [4.5, 6.0],
-                        3:     [6.0, 6.0], #e.g. 120x360
-                        4:     [7.05, 6.0],
-                        6:     [8.5, 5.0],
-                        9:     [10, 4.5],
-                        12:    [12.0, 4.0] #e.g. 30x360
-                        }
-    figsz = aspect_ratio_map[aspectratio]
+    figsz,aspectratio,plot_adjust = figsize_and_aspect(lats,LonLims)
     if RGBaxs==4:
         figsz[1]=figsz[1]*1.36
         
@@ -315,30 +377,12 @@ def plot_optical_maps(LonLims,lats,collection,blendweightfNH3,
     if ctbls[0] in ctbl_settings:
         fNH3low, fNH3high, PCldlow, PCldhigh = ctbl_settings[ctbls[0]]
 
-    #Set up plots to be 3x1 or 4x1 if there's a 5 micron file
-    rng=np.arange(0,RGBaxs+1)
-
-    fig1,axs1=pl.subplots(rng[-1]+1,1,figsize=(figsz[0],figsz[1]), dpi=150, facecolor="white",
-                          sharex=True,sharey=True)
-    fig1.suptitle(collection+"\n Average")
-    
-    #Set up plot axes etc.
-    for ix in rng:
-        axs1[ix].grid(linewidth=0.2)
-        axs1[ix].ylim=[-90.,90.]
-        axs1[ix].xlim=[0.,360.]
-        axs1[ix].set_xticks(np.linspace(450.,0.,31), minor=False)
-        xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
-        axs1[ix].set_xticklabels(xticklabels.astype(int))
-        axs1[ix].set_yticks(np.linspace(-90,90,13), minor=False)
-        axs1[ix].tick_params(axis='both', which='major', labelsize=7)
-        axs1[ix].set_ylabel("PG Latitude (deg)")
-        axs1[ix].set_adjustable('box') 
-
+    fig1,axs1=set_up_figure(figsz,collection,LonSys,RGBaxs=RGBaxs)
     ###########################################################################    
-    #NH3 patch plot    
+    #NH3 patch plot
     print("###############")
     print([360-LonLims[1],360-LonLims[0]])
+    print(lats)
     fNH3_patch_mb=MP.make_patch(blendweightfNH3,lats,[360-LonLims[1],360-LonLims[0]],
                                      180,180)
     fNH3_patch_mb,vn,vx,tx_fNH3=PP.plot_patch(fNH3_patch_mb,lats,[360-LonLims[1],360-LonLims[0]],
@@ -385,32 +429,29 @@ def plot_optical_maps(LonLims,lats,collection,blendweightfNH3,
     ###########################################################################
     # Done with IRTF branch, now, finally, do the RGB context image
     ###########################################################################
-    RGB_patch=MP.make_patch(blendRGBweight,lats,[360-LonLims[1],360-LonLims[0]],180,180)
+    RGB_patch=MP.make_patch(blendRGBweight,lats,[360-LonLims[1],360-LonLims[0]],
+                            180,180)
     RGB4Display=np.power(np.array(RGB_patch).astype(float),1.0)
     show=axs1[RGBaxs].imshow(RGB4Display,
                extent=[LonLims[1],LonLims[0],90-lats[1],
                        90-lats[0]],
                        aspect="equal")
 
+    im_ratio = RGB_patch.shape[0]/RGB_patch.shape[1]
+    cbar = pl.colorbar(show, 
+               orientation='vertical',cmap='gist_heat',
+               ax=axs1[RGBaxs],fraction=0.046*im_ratio, pad=0.04)
+    #cbar.ax.set_yticklabels(np.around(tx,3))
+    cbar.ax.tick_params(labelsize=6,color="k")#if iSession >1:
+    #cbar.ax.set_ylabel(cbar_title,size=8)#,loc="top")
+    #cbar.ax.yaxis.set_label_coords(-0.7, 0.5)
+    cbar.ax.set_visible(False)
+
     ###########################################################################
     #PLOT variance of NH3 and PCld blended maps
     ###########################################################################
     if variance:
-        fig2,axs2=pl.subplots(rng[-1]+1,1,figsize=(figsz[0],figsz[1]), dpi=150, facecolor="white",
-                              sharex=True,sharey=True)
-        fig2.suptitle(collection+"\n Standard Deviation")
-        
-        for ix in rng:
-            axs2[ix].grid(linewidth=0.2)
-            axs2[ix].ylim=[-90.,90.]
-            axs2[ix].xlim=[0.,360.]
-            axs2[ix].set_xticks(np.linspace(450.,0.,31), minor=False)
-            xticklabels=np.array(np.mod(np.linspace(450,0,31),360))
-            axs2[ix].set_xticklabels(xticklabels.astype(int))
-            axs2[ix].set_yticks(np.linspace(-90,90,13), minor=False)
-            axs2[ix].tick_params(axis='both', which='major', labelsize=7)
-            axs2[ix].set_ylabel("PG Latitude (deg)")
-            axs2[ix].set_adjustable('box') 
+        fig2,axs2=set_up_figure(figsz,collection,RGBaxs=RGBaxs)
     
         print("###############")
         print([360-LonLims[1],360-LonLims[0]])
@@ -436,9 +477,19 @@ def plot_optical_maps(LonLims,lats,collection,blendweightfNH3,
     else:
         fig2,axs2=False,False
         
+    ###########################################################################
+    ## Make surface plots
+    ###########################################################################
+    path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/"
+    if surfplot:
+        msurf.map_cloudsurface(PCld_patch_mb,fNH3_patch_mb,RGB4Display,
+                               False,False,False,
+                               '3',lats,[360-LonLims[1],360-LonLims[0]],
+                               180,180,path)
+        
     return fig1,fig2,axs1,axs2,fNH3_patch_mb,PCld_patch_mb,RGB_patch,tx_fNH3,tx_PCld,\
         fNH3low,fNH3high,PCldlow,PCldhigh,blendweightTime_patch,aspectratio,\
-        RGB4Display,RGBaxs
+        RGB4Display,RGBaxs,plot_adjust
             
 def plot_5u_map(blendweightIRTF,LonLims,lats,axs1,axs2,variance,fracIRTF,IRTFaxs):
     import numpy as np
@@ -540,7 +591,8 @@ def L4_Jup_Map_Plot(collection="20240129-20240202",IRTFcollection='20240205-2024
                       cont=False,bare_maps=False,cb=False,
                       axNH3=False,axCH4=False,axRGB=False,axIRTF=False,
                       axCH4889=False,axNH3vCloud=False,axNH3vIRTF=False,
-                      axIRTFvPCld=False,ax889vPCld=False,counter=0,countmax=0):
+                      axIRTFvPCld=False,ax889vPCld=False,counter=0,countmax=0,
+                      waveplot=False,meridplot=False):
     """
     Main program for making plots of blended, contiguous maps, including
     analysis tools and overplotting
@@ -619,7 +671,6 @@ def L4_Jup_Map_Plot(collection="20240129-20240202",IRTFcollection='20240205-2024
     sys.path.append('../Profiles/code')
     import plot_profile_scatter as pps
 
-
     if IRTFcollection and CH4889collection:
         RGBaxs=4
         IRTFaxs=2
@@ -643,14 +694,14 @@ def L4_Jup_Map_Plot(collection="20240129-20240202",IRTFcollection='20240205-2024
 
     fig1,fig2,axs1,axs2,fNH3_patch_mb,PCld_patch_mb,RGB_patch,tx_fNH3,tx_PCld,\
         fNH3low,fNH3high,PCldlow,PCldhigh,blendweightTime_patch,aspectratio,\
-            RGB4Display,RGBaxs=\
+            RGB4Display,RGBaxs,plot_adjust=\
                 plot_optical_maps(LonLims,lats,
                               collection,blendweightfNH3,
                               blendweightPCloud,
                               blendweightfNH3time,
                               blendRGBweight,
                               ctbls,variance,
-                              fNH3frac,PCldfrac,RGBaxs)
+                              fNH3frac,PCldfrac,RGBaxs,LonSys)
 
     if IRTFcollection:
         plot_5u_map(blendweightIRTF,LonLims,lats,axs1,axs2,variance,IRTFfrac,IRTFaxs)
@@ -685,21 +736,7 @@ def L4_Jup_Map_Plot(collection="20240129-20240202",IRTFcollection='20240205-2024
                                             tx_PCld[:5], frmt='%3.0f', clr='r')
     
     axs1[RGBaxs].set_title('RGB Context',fontsize=10)
-    fig1.text(0.99,0.01,"Dr. Steven Hill, PSI",ha='right',fontsize=10)
     
-    ###########################################################################
-    # WRITE BARE MAPS FOR ANIMATIONS ETC
-    ###########################################################################
-    path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/"+proj+"/"
-
-    if bare_maps:
-        temp=make_bare_map(blendweightfNH3,ctbls[0],fNH3low,fNH3high,path,collection,LonSys,"fNH3")
-        temp=make_bare_map(blendweightPCloud,ctbls[1],PCldlow,PCldhigh,path,collection,LonSys,"PCld")
-        temp=make_bare_map(RGB4Display,ctbls[0],PCldlow,PCldhigh,path,collection,LonSys,"RGB")
-        if IRTFcollection:
-            temp=make_bare_map(np.log10(blendweightIRTF),'gist_heat',1.0,3.0,path,collection,LonSys,"IRTF")
-        
-
     ###########################################################################
 
     if variance:
@@ -709,34 +746,16 @@ def L4_Jup_Map_Plot(collection="20240129-20240202",IRTFcollection='20240205-2024
                            aspect="equal")
         axs2[RGBaxs].set_title('RGB Context',fontsize=10)
         
-    axs1[RGBaxs].tick_params(axis='both', which='major', labelsize=7)
-    axs1[RGBaxs].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=9)
-    axs1[RGBaxs].set_ylabel("PG Latitude (deg)")
 
-    box1 = axs1[RGBaxs].get_position()
     if variance:
         axs2[RGBaxs].tick_params(axis='both', which='major', labelsize=7)
         axs2[RGBaxs].set_xlabel("Sys. "+LonSys+" Longitude (deg)",fontsize=9)
         axs2[RGBaxs].set_ylabel("PG Latitude (deg)")
-        box2 = axs2[RGBaxs].get_position()
 
-    #Aspect Ratio Customization
-    adjust_params = {
-    1:     {'left': 0.21,  'bottom': 0.07, 'right': 0.79,  'top': 0.88,  'wspace': 0.0,  'hspace': 0.2},
-    4/3.:  {'left': 0.20,  'bottom': 0.07, 'right': 0.825, 'top': 0.86,  'wspace': 0.0,  'hspace': 0.2},
-    2:     {'left': 0.20,  'bottom': 0.07, 'right': 0.825, 'top': 0.86,  'wspace': 0.0,  'hspace': 0.2},
-    3:     {'left': 0.095, 'bottom': 0.07, 'right': 0.90,  'top': 0.88,  'wspace': 0.25, 'hspace': 0.2},
-    4:     {'left': 0.035, 'bottom': 0.07, 'right': 0.94,  'top': 0.88,  'wspace': 0.25, 'hspace': 0.2},
-    6:     {'left': 0.04,  'bottom': 0.08, 'right': 0.94,  'top': 0.865, 'wspace': 0.0,  'hspace': 0.2},
-    9:     {'left': 0.04,  'bottom': 0.10, 'right': 0.94,  'top': 0.865, 'wspace': 0.0,  'hspace': 0.395},
-    12:    {'left': 0.035, 'bottom': 0.1,  'right': 0.935, 'top': 0.84,  'wspace': 0.0,  'hspace': 0.3}
-            }
-    if aspectratio in adjust_params:
-        fig1.subplots_adjust(**adjust_params[aspectratio])     
+    fig1.subplots_adjust(**plot_adjust)     
 
     if variance:
-        if aspectratio in adjust_params:
-            fig2.subplots_adjust(**adjust_params[aspectratio])     
+        fig2.subplots_adjust(**plot_adjust)     
 
     if IRTFcollection and CH4889collection:
         
@@ -782,6 +801,7 @@ def L4_Jup_Map_Plot(collection="20240129-20240202",IRTFcollection='20240205-2024
     # WRITE LOCAL MAX AND MINS TO FILE
     ###########################################################################
     latstr,lonstr=MLLS.make_lat_lon_str(lats,LonLims)
+    path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/"+proj+"/"
 
     if localmax:
         print("IN LOCAL MAX")
@@ -838,128 +858,142 @@ def L4_Jup_Map_Plot(collection="20240129-20240202",IRTFcollection='20240205-2024
 
     ###########################################################################
     ###########################################################################
+    ###########################################################################
+    # WRITE BARE MAPS FOR ANIMATIONS ETC
+    ###########################################################################
+
+    if bare_maps:
+        temp=make_bare_map(blendweightfNH3,ctbls[0],fNH3low,fNH3high,path,collection,LonSys,"fNH3")
+        temp=make_bare_map(blendweightPCloud,ctbls[1],PCldlow,PCldhigh,path,collection,LonSys,"PCld")
+        temp=make_bare_map(RGB4Display,ctbls[0],PCldlow,PCldhigh,path,collection,LonSys,"RGB")
+        if IRTFcollection:
+            temp=make_bare_map(np.log10(blendweightIRTF),'gist_heat',1.0,3.0,path,collection,LonSys,"IRTF")
+        
+
+    ###########################################################################
     # Meridional Profiles
     ###########################################################################
     import pylab as pl
 
     ###########################################################################
-    #! Set up belt and zone boundaries (need to make this a common service!)             
-    belt={"SSTB":[-39.6,-36.2],
-          "STB":[-32.4,-27.1],
-          "SEB":[-19.7,-7.2],
-          "NEB":[6.9,17.4],
-          "NTB":[24.2,31.4],
-          "NNTB":[35.4,39.6]}
-    
-    zone={"STZ":[-36.2,-32.4],
-          "STrZ":[-27.1,-19.7],
-          "EZ":[-7.2,6.9],
-          "NTrZ":[17.4,24.2],
-          "NTZ":[31.4,35.4]}
-
-    rngprofileplots=np.arange(0,RGBaxs)
-    Coords=np.linspace(-89.5,89.5,180)
+    if meridplot:
+        #! Set up belt and zone boundaries (need to make this a common service!)             
+        belt={"SSTB":[-39.6,-36.2],
+              "STB":[-32.4,-27.1],
+              "SEB":[-19.7,-7.2],
+              "NEB":[6.9,17.4],
+              "NTB":[24.2,31.4],
+              "NNTB":[35.4,39.6]}
         
-    arrays=[blendweightfNH3,blendweightPCloud]
-    if blendweightIRTF.any():
-        arrays=[blendweightfNH3,blendweightPCloud,blendweightIRTF]
-        if blendweightCH4889.any():
-            arrays=[blendweightfNH3,blendweightPCloud,blendweightIRTF,blendweightCH4889]
-    elif blendweightCH4889.any():
-        arrays=[blendweightfNH3,blendweightPCloud,blendweightCH4889]
-
-    # 0. Convert zeros to NaNs first
-    arrays = [np.where(arr == 0, np.nan, arr) for arr in arrays]
-    # 1. Build a combined mask: True where ANY array has a NaN
-    mask_any_nan = np.any([np.isnan(arr) for arr in arrays], axis=0)
-    # 2. Apply the mask using masked arrays
-    masked_arrays = [np.ma.array(arr, mask=mask_any_nan) for arr in arrays]
-    # 3. Compute row-wise mean (axis=1), ignoring masked values
-    means = [ma.mean(axis=1) for ma in masked_arrays]
-    stdvs = [ma.std(axis=1) for ma in masked_arrays]
-
-    figmp,axsmp=pl.subplots(rngprofileplots[-1]+1,1,figsize=(6,6), dpi=150, facecolor="white",
-                          sharex=True)
-    figmp.suptitle("Multi-parameter Meridional Profiles")
-    blendweightfNH3nan=np.where(blendweightfNH3==0.0,np.nan,blendweightfNH3)
+        zone={"STZ":[-36.2,-32.4],
+              "STrZ":[-27.1,-19.7],
+              "EZ":[-7.2,6.9],
+              "NTrZ":[17.4,24.2],
+              "NTZ":[31.4,35.4]}
     
-    axsmp[0].plot(Coords,means[0][::-1],color='C0')
-    axsmp[0].fill_between(Coords, means[0][::-1]-stdvs[0][::-1], 
-                          means[0][::-1]+stdvs[0][::-1],alpha=0.1,color='C0')
-    axsmp[0].set_ylim(60,160)
-
-    blendweightPCldnan=np.where(blendweightPCloud==0.0,np.nan,blendweightPCloud)
-    axsmp[1].plot(Coords,means[1][::-1],color='C0')
-    axsmp[1].fill_between(Coords, means[1][::-1]-stdvs[1][::-1], 
-                          means[1][::-1]+stdvs[1][::-1],alpha=0.1,color='C0')
-    axsmp[1].set_ylim(1400,2000)
+        rngprofileplots=np.arange(0,RGBaxs)
+        Coords=np.linspace(-89.5,89.5,180)
+            
+        arrays=[blendweightfNH3,blendweightPCloud]
+        if blendweightIRTF.any():
+            arrays=[blendweightfNH3,blendweightPCloud,blendweightIRTF]
+            if blendweightCH4889.any():
+                arrays=[blendweightfNH3,blendweightPCloud,blendweightIRTF,blendweightCH4889]
+        elif blendweightCH4889.any():
+            arrays=[blendweightfNH3,blendweightPCloud,blendweightCH4889]
     
-    if blendweightIRTF.any() and IRTFcollection:
-        print("&&&&&&&&& IRTFcollection,blendweightIRTF.any()=",IRTFcollection,blendweightIRTF.any())
-        axs5um=axsmp[1].twinx()
-        axs5um.plot(Coords,np.log10(means[2][::-1]),color='C1')
-        axs5um.fill_between(Coords, np.log10(np.maximum(means[2][::-1]-stdvs[2][::-1],0.001)), 
-                              np.log10(means[2][::-1]+stdvs[2][::-1]),alpha=0.1,color='C1')
+        # 0. Convert zeros to NaNs first
+        arrays = [np.where(arr == 0, np.nan, arr) for arr in arrays]
+        # 1. Build a combined mask: True where ANY array has a NaN
+        mask_any_nan = np.any([np.isnan(arr) for arr in arrays], axis=0)
+        # 2. Apply the mask using masked arrays
+        masked_arrays = [np.ma.array(arr, mask=mask_any_nan) for arr in arrays]
+        # 3. Compute row-wise mean (axis=1), ignoring masked values
+        means = [ma.mean(axis=1) for ma in masked_arrays]
+        stdvs = [ma.std(axis=1) for ma in masked_arrays]
     
-        axs5um.set_ylim(1,3)
-        axs5um.tick_params(axis='y',labelsize=8)
-        axs5um.set_ylabel("5-um Radiance (Log10)",fontsize=8)
-    
-
-        blendweightIRTFnan=np.where(blendweightIRTF==0.0,np.nan,blendweightIRTF)
-        #axsmp[2].plot(np.nanmean(np.log10(blendweightIRTFnan),axis=1))
-        axsmp[2].plot(Coords,np.log10(means[2][::-1]),color='C1')
-        axsmp[2].fill_between(Coords, np.log10(np.maximum(means[2][::-1]-stdvs[2][::-1],0.001)), 
-                              np.log10(means[2][::-1]+stdvs[2][::-1]),alpha=0.1,color='C1')
-        axsmp[2].set_ylim(1,3)
-
-    if blendweightCH4889.any() and CH4889collection: 
-        blendweightCH4889nan=np.where(blendweightCH4889==0.0,np.nan,blendweightCH4889)
-        #axsmp[3].plot(np.nanmean(blendweightCH4889nan,axis=1))
+        figmp,axsmp=pl.subplots(rngprofileplots[-1]+1,1,figsize=(6,6), dpi=150, facecolor="white",
+                              sharex=True)
+        figmp.suptitle("Multi-parameter Meridional Profiles")
+        blendweightfNH3nan=np.where(blendweightfNH3==0.0,np.nan,blendweightfNH3)
         
-        #!!!!Need to fix indexing of means when IRTF is missing (s/b 2 instead of 3
-        axsmp[3].plot(Coords,means[3][::-1],color='C0')
-        axsmp[3].fill_between(Coords, means[3][::-1]-stdvs[3][::-1], 
-                              means[3][::-1]+stdvs[3][::-1],alpha=0.1,color='C0')
+        axsmp[0].plot(Coords,means[0][::-1],color='C0')
+        axsmp[0].fill_between(Coords, means[0][::-1]-stdvs[0][::-1], 
+                              means[0][::-1]+stdvs[0][::-1],alpha=0.1,color='C0')
+        axsmp[0].set_ylim(60,160)
     
-        axsmp[3].set_ylim(50,200)
-        #axsmp[3].set_ylim(-90,90)
-    axsmp[RGBaxs-1].set_xlim(-30,30)
+        blendweightPCldnan=np.where(blendweightPCloud==0.0,np.nan,blendweightPCloud)
+        axsmp[1].plot(Coords,means[1][::-1],color='C0')
+        axsmp[1].fill_between(Coords, means[1][::-1]-stdvs[1][::-1], 
+                              means[1][::-1]+stdvs[1][::-1],alpha=0.1,color='C0')
+        axsmp[1].set_ylim(1400,2000)
+        
+        if blendweightIRTF.any() and IRTFcollection:
+            print("&&&&&&&&& IRTFcollection,blendweightIRTF.any()=",IRTFcollection,blendweightIRTF.any())
+            axs5um=axsmp[1].twinx()
+            axs5um.plot(Coords,np.log10(means[2][::-1]),color='C1')
+            axs5um.fill_between(Coords, np.log10(np.maximum(means[2][::-1]-stdvs[2][::-1],0.001)), 
+                                  np.log10(means[2][::-1]+stdvs[2][::-1]),alpha=0.1,color='C1')
+        
+            axs5um.set_ylim(1,3)
+            axs5um.tick_params(axis='y',labelsize=8)
+            axs5um.set_ylabel("5-um Radiance (Log10)",fontsize=8)
+        
     
-    plot_titles=["Ammonia Abundance "+collection,"Cloud Pressure "+collection,
-                 "5-um Radiance "+str(IRTFcollection),"Methane CH4 Radiance "+str(CH4889collection)]
-    ylabels=["fNH3 (ppm)","Cloud Pressure (mbar)","5-um Radiance (log10)","889nm CH4 Radiance"]
-    count=0
-    for a in axsmp:
-        a.tick_params(axis='x',labelsize=8)
-        a.tick_params(axis='y',labelsize=8)
-        a.set_ylabel(ylabels[count],fontsize=8)
-        a.yaxis.set_label_coords(-0.08,0.5)
-        a.set_title(plot_titles[count],fontsize=10,y=0.95)
-
+            blendweightIRTFnan=np.where(blendweightIRTF==0.0,np.nan,blendweightIRTF)
+            #axsmp[2].plot(np.nanmean(np.log10(blendweightIRTFnan),axis=1))
+            axsmp[2].plot(Coords,np.log10(means[2][::-1]),color='C1')
+            axsmp[2].fill_between(Coords, np.log10(np.maximum(means[2][::-1]-stdvs[2][::-1],0.001)), 
+                                  np.log10(means[2][::-1]+stdvs[2][::-1]),alpha=0.1,color='C1')
+            axsmp[2].set_ylim(1,3)
+    
+        if blendweightCH4889.any() and CH4889collection: 
+            blendweightCH4889nan=np.where(blendweightCH4889==0.0,np.nan,blendweightCH4889)
+            #axsmp[3].plot(np.nanmean(blendweightCH4889nan,axis=1))
+            
+            #!!!!Need to fix indexing of means when IRTF is missing (s/b 2 instead of 3
+            axsmp[3].plot(Coords,means[3][::-1],color='C0')
+            axsmp[3].fill_between(Coords, means[3][::-1]-stdvs[3][::-1], 
+                                  means[3][::-1]+stdvs[3][::-1],alpha=0.1,color='C0')
+        
+            axsmp[3].set_ylim(50,200)
+            #axsmp[3].set_ylim(-90,90)
+        axsmp[RGBaxs-1].set_xlim(-30,30)
+        
+        plot_titles=["Ammonia Abundance "+collection,"Cloud Pressure "+collection,
+                     "5-um Radiance "+str(IRTFcollection),"Methane CH4 Radiance "+str(CH4889collection)]
+        ylabels=["fNH3 (ppm)","Cloud Pressure (mbar)","5-um Radiance (log10)","889nm CH4 Radiance"]
+        count=0
+        for a in axsmp:
+            a.tick_params(axis='x',labelsize=8)
+            a.tick_params(axis='y',labelsize=8)
+            a.set_ylabel(ylabels[count],fontsize=8)
+            a.yaxis.set_label_coords(-0.08,0.5)
+            a.set_title(plot_titles[count],fontsize=10,y=0.95)
+    
+            for zb in belt:
+                print(zb,belt[zb])
+                a.fill_between([belt[zb][0],belt[zb][1]],np.array([0.,0.]),
+                                        np.array([5000.,5000.]),color="0.5",alpha=0.2)
+    
+            count=count+1
+    
+        axsmp[RGBaxs-1].set_xlabel("PG Latitude")
+        
+        yb=51
+        yz=51
         for zb in belt:
-            print(zb,belt[zb])
-            a.fill_between([belt[zb][0],belt[zb][1]],np.array([0.,0.]),
-                                    np.array([5000.,5000.]),color="0.5",alpha=0.2)
-
-        count=count+1
-
-    axsmp[RGBaxs-1].set_xlabel("PG Latitude")
-    
-    yb=51
-    yz=51
-    for zb in belt:
-        axsmp[RGBaxs-1].annotate(zb,xy=[np.mean(belt[zb]),yb],ha="center")
-    for zb in zone:
-        axsmp[RGBaxs-1].annotate(zb,xy=[np.mean(zone[zb]),yz],ha="center")  
+            axsmp[RGBaxs-1].annotate(zb,xy=[np.mean(belt[zb]),yb],ha="center")
+        for zb in zone:
+            axsmp[RGBaxs-1].annotate(zb,xy=[np.mean(zone[zb]),yz],ha="center")  
+        
+        
+        figmp.subplots_adjust(bottom=0.07,top=0.92,left=0.10,right=0.92)
+        
+        figmp.savefig(path+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" Meridional Profile.png",dpi=300)
     
     
-    figmp.subplots_adjust(bottom=0.07,top=0.92,left=0.10,right=0.92)
-    
-    figmp.savefig(path+collection+" Mean Sys"+LonSys+" "+lonstr+" "+latstr+" Meridional Profile.png",dpi=300)
-
-
-    print("###############",means[0].shape)
+        print("###############",means[0].shape)
 
     ###########################################################################
     ###########################################################################
@@ -1238,94 +1272,92 @@ def L4_Jup_Map_Plot(collection="20240129-20240202",IRTFcollection='20240205-2024
     # YET ANOTHER SECTION: LONGITUDINAL CUTS!
     #!!!! Need to make MAPS! then use profiles modules to extract this!
     ###########################################################################
+    if waveplot:
     
-    figlc,axslc=pl.subplots(3,1,figsize=(figsz[0],figsz[1]), dpi=150, facecolor="white",
-                          sharex=True)
-    figlc.suptitle(collection)
-
-    lon_array=np.arange(LonLims[1],LonLims[0],-1)
-    fNH3_array0=np.mean(fNH3_patch_mb[4:7,:],axis=0)
-    Cld_array0=np.mean(PCld_patch_mb[4:7,:],axis=0)
-    fNH3_array1=np.mean(fNH3_patch_mb[5:9,:],axis=0)
-    Cld_array1=np.mean(PCld_patch_mb[5:9,:],axis=0)
-    fNH3_array2=np.mean(fNH3_patch_mb[9:12,:],axis=0)
-    Cld_array2=np.mean(PCld_patch_mb[9:12,:],axis=0)
-    #PCld_array=np.mean(PCld_patch_mb[7:9,:],axis=0)
-    #NEDF_array=np.mean(PCld_patch_mb[5:7,:],axis=0)
-
-    axslc[0].plot(lon_array,fNH3_array0,color='C2',label='fNH3')
-    axslc[0].plot(lon_array,np.roll(fNH3_array0,10),color='C2',linestyle='dashed',linewidth=0.5)
-    axslc0=axslc[0].twinx()
-    axslc0.plot(lon_array,Cld_array0,color='C0',label='PCld')
-    axslc[0].set_ylim(50.,180.)
-    axslc0.set_ylim(1500.,2200.)
-    axslc0.invert_yaxis()
-
-    axslc[1].plot(lon_array,fNH3_array1,color='C2')
-    axslc[1].plot(lon_array,np.roll(fNH3_array1,10),color='C2',linestyle='dashed',linewidth=0.5)
-    axslc1=axslc[1].twinx()
-    axslc1.plot(lon_array,Cld_array1,color='C0')
-    axslc[1].set_ylim(50.,180.)
-    axslc1.set_ylim(1500.,2200.)
-    axslc1.invert_yaxis()
-
-    axslc[2].plot(lon_array,fNH3_array2,color='C2')
-    axslc[2].plot(lon_array,np.roll(fNH3_array2,10),color='C2',linestyle='dashed',linewidth=0.5)
-    axslc2=axslc[2].twinx()
-    axslc2.plot(lon_array,Cld_array2,color='C0')
-    axslc[2].set_ylim(50.,180.)
-    axslc2.set_ylim(1500.,2200.)
-    axslc2.invert_yaxis()
-
-    #axslc[1].plot(lon_array,PCld_array)
-    #axslc[2].plot(lon_array,fNH3_array2)
+        figlc,axslc=pl.subplots(3,1,figsize=(figsz[0],figsz[1]), dpi=150, facecolor="white",
+                              sharex=True)
+        figlc.suptitle(collection)
     
-    for i in range(0,3):
-        axslc[i].grid(linewidth=0.2)
-        #axslc[i].set_xticks(np.linspace(450.,0.,31), minor=False)
-        #axslc[i].set_yticks(np.linspace(-90,90,13), minor=False)
-        #yticklabels=np.array(np.linspace(-90,90,13))
-        #axslc[i].set_yticklabels(yticklabels.astype(int))
-        axslc[i].tick_params(axis='both', which='major', labelsize=8)
-        axslc[i].set_ylabel("fNH3 (ppm)",color='C2')
-        #axslc0.set_ylabel("PCloud (mb)",color='C0')
-        #axslc[i].set_adjustable('box')
-        axslc[i].set_xlim(360,0.)
-
-    axslc0.set_ylabel("PCloud (mb)",color='C0')
-    axslc0.tick_params(axis='both', which='major', labelsize=8)
-    axslc1.set_ylabel("PCloud (mb)",color='C0')
-    axslc1.tick_params(axis='both', which='major', labelsize=8)
-    axslc2.set_ylabel("PCloud (mb)",color='C0')
-    axslc2.tick_params(axis='both', which='major', labelsize=8)
+        lon_array=np.arange(LonLims[1],LonLims[0],-1)
+        fNH3_array0=np.mean(fNH3_patch_mb[4:7,:],axis=0)
+        Cld_array0=np.mean(PCld_patch_mb[4:7,:],axis=0)
+        fNH3_array1=np.mean(fNH3_patch_mb[5:9,:],axis=0)
+        Cld_array1=np.mean(PCld_patch_mb[5:9,:],axis=0)
+        fNH3_array2=np.mean(fNH3_patch_mb[9:12,:],axis=0)
+        Cld_array2=np.mean(PCld_patch_mb[9:12,:],axis=0)
+        #PCld_array=np.mean(PCld_patch_mb[7:9,:],axis=0)
+        #NEDF_array=np.mean(PCld_patch_mb[5:7,:],axis=0)
     
-    axslc[2].set_xlabel("System 3 Longitude (deg)")
+        axslc[0].plot(lon_array,fNH3_array0,color='C2',label='fNH3')
+        axslc[0].plot(lon_array,np.roll(fNH3_array0,10),color='C2',linestyle='dashed',linewidth=0.5)
+        axslc0=axslc[0].twinx()
+        axslc0.plot(lon_array,Cld_array0,color='C0',label='PCld')
+        axslc[0].set_ylim(50.,180.)
+        axslc0.set_ylim(1500.,2200.)
+        axslc0.invert_yaxis()
     
-    axslc[0].set_title("8-11 deg PG Latitude - NEDFs",fontsize=10)
-    axslc[1].set_title("6-10 deg PG Latitude - Plumes",fontsize=10)
-    axslc[2].set_title("3-6 deg PG Latitude - NH3 Features",fontsize=10)
+        axslc[1].plot(lon_array,fNH3_array1,color='C2')
+        axslc[1].plot(lon_array,np.roll(fNH3_array1,10),color='C2',linestyle='dashed',linewidth=0.5)
+        axslc1=axslc[1].twinx()
+        axslc1.plot(lon_array,Cld_array1,color='C0')
+        axslc[1].set_ylim(50.,180.)
+        axslc1.set_ylim(1500.,2200.)
+        axslc1.invert_yaxis()
     
-    #xticklabels=np.array(np.linspace(195,15,13))
-    #print(xticklabels)
-    #axslc[2].set_xticklabels(xticklabels.astype(int))
-    #axslc[2].invert_xaxis()
-    Rossby=np.sin((lon_array+30)*9*np.pi/180.)*20+100
-    #print(lon_array)
-    #axslc[0].plot(lon_array,Rossby,color='k')
-
-    figlc.subplots_adjust(bottom=0.07,top=0.92,left=0.10,right=0.90)
-
-
+        axslc[2].plot(lon_array,fNH3_array2,color='C2')
+        axslc[2].plot(lon_array,np.roll(fNH3_array2,10),color='C2',linestyle='dashed',linewidth=0.5)
+        axslc2=axslc[2].twinx()
+        axslc2.plot(lon_array,Cld_array2,color='C0')
+        axslc[2].set_ylim(50.,180.)
+        axslc2.set_ylim(1500.,2200.)
+        axslc2.invert_yaxis()
     
-    figlc.savefig(path+collection+" Wave.png",dpi=150)
-    #Autocorrelation (below) doesn't work well due to differing shapes
+        #axslc[1].plot(lon_array,PCld_array)
+        #axslc[2].plot(lon_array,fNH3_array2)
+        
+        for i in range(0,3):
+            axslc[i].grid(linewidth=0.2)
+            #axslc[i].set_xticks(np.linspace(450.,0.,31), minor=False)
+            #axslc[i].set_yticks(np.linspace(-90,90,13), minor=False)
+            #yticklabels=np.array(np.linspace(-90,90,13))
+            #axslc[i].set_yticklabels(yticklabels.astype(int))
+            axslc[i].tick_params(axis='both', which='major', labelsize=8)
+            axslc[i].set_ylabel("fNH3 (ppm)",color='C2')
+            #axslc0.set_ylabel("PCloud (mb)",color='C0')
+            #axslc[i].set_adjustable('box')
+            axslc[i].set_xlim(360,0.)
+    
+        axslc0.set_ylabel("PCloud (mb)",color='C0')
+        axslc0.tick_params(axis='both', which='major', labelsize=8)
+        axslc1.set_ylabel("PCloud (mb)",color='C0')
+        axslc1.tick_params(axis='both', which='major', labelsize=8)
+        axslc2.set_ylabel("PCloud (mb)",color='C0')
+        axslc2.tick_params(axis='both', which='major', labelsize=8)
+        
+        axslc[2].set_xlabel("System 3 Longitude (deg)")
+        
+        axslc[0].set_title("8-11 deg PG Latitude - NEDFs",fontsize=10)
+        axslc[1].set_title("6-10 deg PG Latitude - Plumes",fontsize=10)
+        axslc[2].set_title("3-6 deg PG Latitude - NH3 Features",fontsize=10)
+        
+        #xticklabels=np.array(np.linspace(195,15,13))
+        #print(xticklabels)
+        #axslc[2].set_xticklabels(xticklabels.astype(int))
+        #axslc[2].invert_xaxis()
+        Rossby=np.sin((lon_array+30)*9*np.pi/180.)*20+100
+        #print(lon_array)
+        #axslc[0].plot(lon_array,Rossby,color='k')
+    
+        figlc.subplots_adjust(bottom=0.07,top=0.92,left=0.10,right=0.90)
+       
+        figlc.savefig(path+collection+" Wave.png",dpi=150)
+        #Autocorrelation (below) doesn't work well due to differing shapes
     """
     from Winds import _xcorr1d_circular
     shift_px, peak, snr = _xcorr1d_circular(1.0/(Cld_array2/np.mean(Cld_array2)),
                                             fNH3_array2/np.mean(fNH3_array2))
     print("%%%%%%%%%%%%%%%%%% shift_px, peak, snr=",shift_px, peak, snr)
     """
-    
     
     if segment:
         return(lats,blendweightPCloud,blendweightfNH3,blendRGBweight,

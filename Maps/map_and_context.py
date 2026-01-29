@@ -204,4 +204,4 @@ def map_and_context(mapdata,maphdr,RGB,RGBtime,LonSys,LatLims,LonLims,LonRng,Plo
         
     fig1.savefig(pathout+fnout,dpi=300)
     
-    return(data_patch,mapdata,tx,fnout)
+    return(data_patch,mapdata,tx,fnout,RGB4Display)

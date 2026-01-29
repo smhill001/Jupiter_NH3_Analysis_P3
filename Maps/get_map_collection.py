@@ -1537,10 +1537,10 @@ def get_map_collection(collection):
             dataset={'20251116UTa', #Gradient, corrected
                      '20251116UTb', #Gradient PCld, uncorrected
                      '20251116UTc', #Gradient??? Needs correction?
-                     '20251116UTd'}#,
-                     #'20251116UTe',
-                     #'20251116UTf',
-                     #'20251116UTg',
+                     '20251116UTd',
+                     '20251116UTe',
+                     '20251116UTf',
+                     '20251116UTg'}#,
                      #'20251116UTh', 
                      #'20251116UTi',
                      #'20251116UTj',

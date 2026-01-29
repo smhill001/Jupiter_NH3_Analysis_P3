@@ -3260,6 +3260,30 @@ def get_obs_list(planet="Jupiter",subsetkeys='all'):
                                'NH3file':'2025-11-16-0654_7-Jupiter_R656G647B632-RGB-WhtBal',
                                'RGBfile':'2025-11-16-0706_1-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
 
+                  '20251116UTd':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-11-16-0654_6-Jupiter_R656G620B632-RGB-WhtBal', #Gradient, uncorrected
+                               'NH3file':'2025-11-16-0654_7-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-11-16-0706_1-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+
+                  '20251116UTe':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-11-16-0715_9-Jupiter_R656G620B632-RGB-WhtBal', 
+                               'NH3file':'2025-11-16-0715_9-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-11-16-0727_3-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+
+                  '20251116UTf':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-11-16-0737_1-Jupiter_R656G620B632-RGB-WhtBal', 
+                               'NH3file':'2025-11-16-0737_1-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-11-16-0748_5-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+
+                  '20251116UTg':{'Telescope':'C11','FL':'5600mm','Camera':'ASI120MM',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2025-11-16-0758_3-Jupiter_R656G620B632-RGB-WhtBal', 
+                               'NH3file':'2025-11-16-0758_3-Jupiter_R656G647B632-RGB-WhtBal',
+                               'RGBfile':'2025-11-16-0809_7-Jupiter_R685G550B450-RGB-ClrSmth-WhtBal-WV'},
+
 
                   #############################################################
                   # 20251019                                         20251019 #
