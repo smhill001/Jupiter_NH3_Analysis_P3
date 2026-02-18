@@ -1,7 +1,10 @@
-# -*- coding: utf-8 -*-
+import sys
+sys.path.append('C:/Astronomy/Projects/SAS 2021 Ammonia/Visualization-and-Analysis')
+from config_VA import config_VA
+
 def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
-                        target="Jupiter",LonSys='3',Smoothing=False,
-                        FiveMicron=False,LimbCorrection=False):
+                        target="Jupiter",LonSys='3',FiveMicron=False,
+                        LimbCorrection=False,pathin=config_VA['path_in_Legacy']):
     """
     Created on Mon Nov 20 08:42:28 2023
     Called by: Map_Jup_Atm_2022_P3, currently only for L3 data to plot
@@ -23,7 +26,6 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
     sys.path.append('./Services')
     import get_obs_list as getlist
 
-    #import get_WINJupos_ephem as WJ_ephem
     import get_spice_ephem as sp_ephem
     import numpy as np
 
@@ -31,9 +33,6 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
     sourcefiles=getlist.get_obs_list(planet=target)
     pathRGB='c:/Astronomy/Projects/Planets/'+target+'/Imaging Data/'+obskey[0:10]+'/'
     pathmicron="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/5micron/FITS/output/"
-    print("####")
-    print("sourcefiles[sourcedata]['RGBfile']=",sourcefiles[sourcedata]['RGBfile'])
-    print("####")
     
     if FiveMicron=="png":
         RGBfn="5umfile"
@@ -54,7 +53,6 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
         RGBsec=str(int(str(RGBfile[16:17]))*6)
         RGBtime=(RGBfile[0:10]+"_"+RGBfile[11:13]+":"+RGBfile[13:15]+":"+RGBsec.zfill(2))
         eph=sp_ephem.get_spice_ephem(RGBtime,planet=target)
-        #time.sleep(5)
         RGB_CM1=float(eph[0].strip())
         RGB_CM2=float(eph[1].strip())
         RGB_CM3=float(eph[2].strip())
@@ -67,7 +65,7 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
     elif Level=="L3":
         CH4suffix="-"+target+"_"+imagetype+"_L3PCld_S0"
         NH3suffix="-"+target+"_"+imagetype+"_L3fNH3_S0"
-        pathFITS='C:/Astronomy/Projects/SAS 2021 Ammonia/Data/L3 FITS/'
+        pathFITS=config_VA['path_in_Legacy']
     #!!! I think this may be where the option for reading a 5um FITS files should be
 
     # try-except logic for when variation files existed. Hasn't been run 
@@ -88,7 +86,7 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
         fNH3file=sourcefiles[sourcedata]['NH3file'][0:17]+NH3suffix+".fits"
         variation=""
     
-    #Read 
+    #Read the files!!!
     PCloudhdulist=fits.open(pathFITS+PCloudfile)
     PCloudhdulist.info()
     PCloudhdr=PCloudhdulist[0].header
@@ -201,7 +199,6 @@ def read_fits_map_L2_L3(obskey="20231026UTa",imagetype="Map",Level="L3",
         amfdata=(1.0/fNH3szar+1.0/fNH3ezar)/2.0
         fNH3datar=fNH3datar*(amfdata**0.55)
         PClouddatar=PClouddatar*amfdata**0.25
-
     
     if FiveMicron==False or FiveMicron=="png":
         print(PClouddatar.shape)

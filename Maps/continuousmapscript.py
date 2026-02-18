@@ -9,7 +9,7 @@ def continousmapscript(collections=['AGU2025'],LonSys='1',lats=[75,105],LonLims=
     import pylab as pl
     import time
     import get_map_collection as gmc
-    import L4_Jup_Map_Plot as L4MP
+    import L4_Jup_Map_Plot_V2 as L4MP
     import make_L4_cont_maps as M4CM
 
 
@@ -256,14 +256,14 @@ def continousmapscript(collections=['AGU2025'],LonSys='1',lats=[75,105],LonLims=
             #    obslist,dummy=gmc.get_map_collection(mp)
             obslist,dummy=gmc.get_map_collection(mp)
 
-            M4CM.make_L4_cont_maps(collection=mp,obskeys=False,
+            M4CM.make_L4_cont_maps(collection=mp,obskeys=False,LonSys=LonSys,
                                   FiveMicron=False,Five_obskey='',IRTFcollection=False,
                                   lats=[0,180],LonLims=[0,360],variance=True,proj='../../Data/L4 FITS (cont maps)/',
                                   bare_maps=False,cb=False,LimbCorrection=True,
                                   lonhalfwidth=45,boxcar=9)
 
             print("------------ collection,mp=",collection,mp)
-            L4MP.L4_Jup_Map_Plot(collection=mp,IRTFcollection=mapsIRTF[mp],
+            L4MP.L4_Jup_Map_Plot_V2(collection=mp,IRTFcollection=mapsIRTF[mp],
                                 CH4889collection=mapsCH4889[mp],LonSys=LonSys,
                                   lats=lats,LonLims=LonLims,figsz=[6.0,6.0],ROI=False,
                                   variance=False,localmax=False,segment=False,
@@ -278,7 +278,8 @@ def continousmapscript(collections=['AGU2025'],LonSys='1',lats=[75,105],LonLims=
                                   axNH3vIRTF=axNH3vIRTF,
                                   axIRTFvPCld=axIRTFvPCld,
                                   ax889vPCld=ax889vPCld,
-                                  counter=counter,countmax=countmax)
+                                  counter=counter,countmax=countmax,
+                                  meridplot=True)
             #pl.show()
                 
             counter=counter+1

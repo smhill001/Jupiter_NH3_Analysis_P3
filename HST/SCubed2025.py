@@ -12,7 +12,7 @@ def SCubed2025(obskeyHST):
     ###############################################################################
     # 20251015UTa HST
     ###############################################################################
-    if obskeyHST=='20251016UTa':
+    if obskeyHST=='20251015UTa':
         #Sys 3
         L4MP.L4_Jup_Map_Plot(collection="20251016-20251016",IRTFcollection=False, 
                         CH4889collection=False,LonSys='3',lats=[45,135],

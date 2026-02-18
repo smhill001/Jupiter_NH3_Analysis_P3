@@ -250,9 +250,10 @@ def write_fits_contiguous_map(data,variance,fract,env_data_type,mean_time,
     hdul[0].header['TIME']=strftime("%Y-%m-%d %H:%M:%S", gmtime())
     
     hdul[0].header['TELESCOP']=first_fits_hdr['TELESCOP']
-    hdul[0].header['INSTRUME']=first_fits_hdr['INSTRUME']
-    hdul[0].header['SEEING']=first_fits_hdr['SEEING']
-    hdul[0].header['TRANSPAR']=first_fits_hdr['TRANSPAR']
+    #!!! Should fix these four items for V1 and V2, and for other instruments
+    #hdul[0].header['INSTRUME']=first_fits_hdr['INSTRUME']
+    #hdul[0].header['SEEING']=first_fits_hdr['SEEING']
+    #hdul[0].header['TRANSPAR']=first_fits_hdr['TRANSPAR']
     #hdul[0].header['VERSION']=('1.2','Lat. Dep. Gravity; eta=2 (not 4)')
     hdul[0].header['CTYPE1']=('Sys. '+LonSys+' Longitude','deg')
     hdul[0].header['CTYPE2']=('PG Latitude','deg')
@@ -275,10 +276,10 @@ def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
                       FiveMicron='fits',Five_obskey='',IRTFcollection='20240205-20240205',
                       lats=[0,180],LonLims=[0,360],variance=True,proj='../../Data/L4 FITS (cont maps)/',
                       bare_maps=False,cb=False,LimbCorrection=True,
-                      lonhalfwidth=45,boxcar=9):
+                      lonhalfwidth=45,boxcar=9,dataversion=1):
     """
     Rewriten Nov 2025 to only produce global, cylindrical FITS files in
-        system 3 longitude and pg latitude. All other functions of the original
+        system 1,2, or 3 longitude and pg latitude. All other functions of the original
         routine - plotting/subplotting, extrema, etc, have been removed and
         decoupled.
     """
@@ -293,12 +294,15 @@ def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
     import scipy.ndimage as ndi
     sys.path.append('./Maps')
     from astropy.time import Time
-
-    import read_fits_map_L2_L3 as RFM
+    import os
+    import read_fits_Tiktin as RFT
     import get_map_collection as gmc
+    from config_VA import config_VA
     
-    if not(obskeys):
+    if dataversion==1:
         obskeys,dummy=gmc.get_map_collection(collection)
+    elif dataversion==2:
+        obskeys=os.listdir(config_VA[dataversion]+'/'+obskeys)
         print("################################",obskeys)
 
     ###########################################################################
@@ -313,12 +317,23 @@ def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
     print("obskeys=",obskeys)
     First=True
     for obskey in obskeys:
-        print("*******obsdate in MakeContiguousMap=",obskey)
-        PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM2,RGBtime= \
-                        RFM.read_fits_map_L2_L3(obskey=obskey,LonSys=LonSys,
-                                                imagetype="Map",Level="L3",
-                                                LimbCorrection=LimbCorrection)
-                        
+        print()
+        print("*******obsdate in MakeContiguousMap=",obskey,dataversion)
+        print()
+        if dataversion==1:
+            PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM2,RGBtime= \
+                            RFT.read_fits_map_L3_V1(obskey=obskey,LonSys=LonSys,
+                                                    imagetype="Map",Level="L3",
+                                                    LimbCorrection=LimbCorrection,
+                                                    pathin=config_VA[dataversion])
+        elif dataversion==2:
+            PCloudhdr,PClouddata,fNH3hdr,fNH3data,RGB,RGB_CM2,RGBtime= \
+                            RFT.read_fits_map_L3_V2(obskey=obskey,LonSys=LonSys,
+                                                    imagetype="Map",Level="L3",
+                                                    LimbCorrection=LimbCorrection,
+                                                    pathin=config_VA[dataversion])
+        print("DDDDDDDD")
+        print(fNH3hdr)
         #Set longitude limits for data (ll_x) and weights (wl_x)
         ll_0,ll_1,wl_0,wl_1=make_map_frame_lims(fNH3hdr,lonhalfwidth,boxcar,LonSys)
         

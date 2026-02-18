@@ -1,3 +1,7 @@
+import sys
+sys.path.append('C:/Astronomy/Projects/SAS 2021 Ammonia/Visualization-and-Analysis/')
+sys.path.append('C:/Astronomy/Projects/SAS 2021 Ammonia/Data-Management-and-Access/processes/')
+
 import matplotlib.pyplot as pl
 import numpy as np
 #import MakeContiguousMap as MCM
@@ -10,9 +14,8 @@ import make_patch as mp
 import plot_patch as pp
 from scipy.ndimage import gaussian_filter
 from matplotlib import cm, colors
-import sys
 from scipy.ndimage import zoom
-sys.path.append('C:/Astronomy/Projects/SAS 2021 Ammonia/Data-Management-and-Access/processes/')
+import L4_Jup_Map_Plot_V2 as L4MP
 
 #set constants and set gravity as a function of latitude (Jupiter is so oblate that gravity
 #  varies significantly from the equator to the poles. 
@@ -364,9 +367,13 @@ def plot_HSTGO_abs_patches(obskeyHST,LatLims,LonLims,CH4abs,NH3abs,axsCH4abspatc
 
     NH3patchflat=NH3patch/linfitnorm
     
+    
+    cbttl="Mean="+str(np.mean(CH4abspatchflat))[:4]+" $\pm$ "+str(np.std(CH4abspatchflat))[:3]
     pp.plot_patch(CH4abspatchflat,LatLims,LonLims,180,180,ctbls[0],axsCH4abspatch,
-                   cbarplot=True,cbar_title="",cbar_reverse=cbar_reverse1,
+                   cbarplot=True,cbar_title=cbttl,cbar_reverse=cbar_reverse1,
                    vn=minmax1[0],vx=minmax1[1])
+    
+
     axsCH4abspatch.set_title(titles[1],fontsize=10)
     
     #figNH3patch,axsNH3patch=pl.subplots(1,figsize=(8,6), dpi=150, facecolor="white")
@@ -378,8 +385,9 @@ def plot_HSTGO_abs_patches(obskeyHST,LatLims,LonLims,CH4abs,NH3abs,axsCH4abspatc
     #print("coefs ",coefs)
     #linfit_reshaped = linfit.reshape(len(y), 1)
     
+    cbttl="Mean="+str(np.mean(NH3patchflat))[:3]+" $\pm$ "+str(np.std(NH3patchflat))[:2]
     pp.plot_patch(NH3patchflat,LatLims,LonLims,180,180,ctbls[1],axsNH3patch,
-                   cbarplot=True,cbar_title="",cbar_reverse=cbar_reverse2,
+                   cbarplot=True,cbar_title=cbttl,cbar_reverse=cbar_reverse2,
                    vn=minmax2[0],vx=minmax2[1])
     axsNH3patch.set_title(titles[0],fontsize=10)
     
@@ -454,10 +462,17 @@ def plot_HSTGO_abs_3dpatches(obskeyHST,LatLims,LonLims,CH4abspatchflat,NH3patchf
     ax3dboth.set_ylabel('PG Latitude (deg)')
 
 
-def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3'):
+def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
+                           cont=False,waveplot=False):
     
     import os
-    from L4_Jup_Map_Plot import figsize_and_aspect,set_up_figure
+    import sys
+    from scipy.ndimage import gaussian_filter
+    sys.path.append('C:/Astronomy/Projects/SAS 2021 Ammonia/Visualization-and-Analysis/')
+
+    import L4_Jup_Map_Plot_V2 as L4MP 
+    #import figsize_and_aspect,set_up_figure
+    from astropy.io import fits
 
     pathout="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/SCubed 2025/"+obskeyHST
     if not os.path.exists(pathout):
@@ -486,8 +501,8 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3'):
     #print("$$$$$$$$$$$$$$$$$$$$$$$")
     #print(LonLims)
 
-    figsz,aspect,plot_adjust=figsize_and_aspect(LatLims,LonLims)
-    fig1,axs1=set_up_figure(figsz,obskeyHST,LonSys,RGBaxs=2)
+    figsz,aspect,plot_adjust=L4MP.figsize_and_aspect(LatLims,LonLims)
+    fig1,axs1=L4MP.set_up_figure(figsz,obskeyHST,LonSys,RGBaxs=2)
     CH4abspatchflat,NH3patchflat=plot_HSTGO_abs_patches(obskeyHST,LatLims,
                                                         LonLims,CH4abs,
                                                         NH3abs,axs1[1],axs1[0],
@@ -504,7 +519,7 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3'):
     
     titles=['Color Index (CI)','Altitude Opacity Index (AOI)']
     RGBtitle="'Methane' RGB (673/727/889)"
-    fig2,axs2=set_up_figure(figsz,obskeyHST,LonSys,RGBaxs=2)
+    fig2,axs2=L4MP.set_up_figure(figsz,obskeyHST,LonSys,RGBaxs=2)
     AOIpatchflat,CIpatchflat=plot_HSTGO_abs_patches(obskeyHST,LatLims,
                                                         LonLims,AOI,
                                                         CI,axs2[1],axs2[0],
@@ -516,9 +531,71 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3'):
     plot_HSTGO_RGB_patches(obskeyHST,LatLims,LonLims,RGBMeth,axs2[2],title=RGBtitle)
     fig2.subplots_adjust(**plot_adjust)     
 
+    if cont:
+        tx_fNH3=[100,150,200,250]
+        tx_PCld=[1600,2000,2400,2800]
+        smoothed_fNH3 = gaussian_filter(NH3patchflat, sigma=5)
+        smoothed_PCld = gaussian_filter(CH4abspatchflat, sigma=5)
+        L4MP.ApplyContours(axs1,2,smoothed_fNH3,tx_fNH3,smoothed_PCld,tx_PCld,
+                          LatLims,LonLims,IRTFcollection=False,IRTFaxs='',
+                          CH4889collection=False,CH4889plot=False,CH4889axs='',
+                          HST=True)
+        L4MP.ApplyContours(axs2,2,smoothed_fNH3,tx_fNH3,smoothed_PCld,tx_PCld,
+                          LatLims,LonLims,IRTFcollection=False,IRTFaxs='',
+                          CH4889collection=False,CH4889plot=False,CH4889axs='',
+                          HST=True)
+
+    path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/"
+    if waveplot:
+        L4MP.RossbyWavePlot(obskeyHST,LonLims,NH3patchflat,CH4abspatchflat,
+                       [figsz[0],figsz[1]],path,LonSys,HST=True)
+
+
+
+
     print(pathout)
     fig1.savefig(pathout+'/'+obskeyHST+' HST Sys'+ LonSys +' fNH3+PCld.png',dpi=150)
     fig2.savefig(pathout+'/'+obskeyHST+' HST Sys'+ LonSys +' CI+AOI.png',dpi=150)
+
+    hdudatafNH3 = fits.PrimaryHDU(NH3patchflat)
+    hdulfNH3 = fits.HDUList([hdudatafNH3])
+    fnout=pathout+'/'+obskeyHST+' HST Sys'+ LonSys +' fNH3.fits'
+    try:
+        os.remove(fnout)
+    except: 
+        print("file doesn't exist")
+    hdulfNH3.writeto(fnout)
+    hdulfNH3.close()
+
+    hdudataPCld = fits.PrimaryHDU(CH4abspatchflat)
+    hdulPCld = fits.HDUList([hdudataPCld])
+    fnout=pathout+'/'+obskeyHST+' HST Sys'+ LonSys +' PCld.fits'
+    try:
+        os.remove(fnout)
+    except: 
+        print("file doesn't exist")
+    hdulPCld.writeto(fnout)
+    hdulPCld.close()
+
+    hdudataAOI = fits.PrimaryHDU(AOIpatchflat)
+    hdulAOI = fits.HDUList([hdudataAOI])
+    fnout=pathout+'/'+obskeyHST+' HST Sys'+ LonSys +' AOI.fits'
+    try:
+        os.remove(fnout)
+    except: 
+        print("file doesn't exist")
+    hdulAOI.writeto(fnout)
+    hdulAOI.close()
+
+    hdudataCI = fits.PrimaryHDU(CIpatchflat)
+    hdulCI = fits.HDUList([hdudataCI])
+    fnout=pathout+'/'+obskeyHST+' HST Sys'+ LonSys +' CI.fits'
+    try:
+        os.remove(fnout)
+    except: 
+        print("file doesn't exist")
+    hdulCI.writeto(fnout)
+    hdulCI.close()
 
 #Good run of a couple of NEDFs and interesting bow clouds
 #L4_Jup_Map_Plot(collection="20251016-20251016",IRTFcollection=False, \
