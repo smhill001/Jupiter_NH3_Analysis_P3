@@ -14,11 +14,13 @@ def pipe_one_obs(obskeys,target="Jupiter",close=False):
     sys.path.append(drive+'/Astronomy/Python Play/Util_P3')
     sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Spectroscopy')
     sys.path.append('./Services')
+    sys.path.append('C:/Astronomy/Projects/SAS 2021 Ammonia/Visualization-and-Analysis')
+
 
     import make_L2_abs_data as ML2
     import make_L3_env_data as ML3
     import image_array_new as IAN
-    import L3_Jup_Map_Plot as L3P
+    import L3_Jup_Map_Plot_V2 as L3P
     import pylab as pl
 
     
@@ -37,11 +39,11 @@ def pipe_one_obs(obskeys,target="Jupiter",close=False):
         IAN.image_array_new(obsdate=obskey,target=target,imagetype='Img',
                             contour=False)
         
-        L3P.L3_Jup_Map_Plot(obskey=obskey,imagetype='Map',target=target,
-                        Smoothing=False,LatLims=[45,135],LonRng=45,CMpref='subobs',
+        L3P.L3_Jup_Map_Plot_V2(obskey=obskey,imagetype='Map',target=target,
+                        LatLims=[45,135],LonRng=45,CMpref='subobs',
                         LonSys='2',showbands=False,coef=[0.,0.],subproj='',
                         figxy=[8.0,4.0],FiveMicron=False,ROI=False,
-                        ctbls=["terrain_r","Blues"])
+                        ctbls=["terrain_r","Blues"],dataversion=1)
         if close:
             pl.close('all')
         

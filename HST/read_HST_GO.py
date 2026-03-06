@@ -6,12 +6,10 @@ import matplotlib.pyplot as pl
 import numpy as np
 #import MakeContiguousMap as MCM
 import make_patch as mp
-import make_patch_RGB as mpRGB
 import plot_patch as pp
+import flatten_patch as fp
 #from matplotlib.pyplot import imread
 from astropy.io import fits
-import make_patch as mp
-import plot_patch as pp
 from scipy.ndimage import gaussian_filter
 from matplotlib import cm, colors
 from scipy.ndimage import zoom
@@ -250,8 +248,6 @@ def make_L2_HSTGO_abs_data(pathHST,fn619,fn631,fn645,LonSys,plot=True):
     PCld=computeCloudPressure(CH4abs)
     fNH3=computeAmmoniaMoleFraction(CH4abs, NH3abs)
 
-    
-    #return CH4abs,NH3abs,NH3
     return PCld,fNH3
 
 def make_L2_HSTGO_AOI_CI(pathHST,fn275,fn889,fn395,fn631,LonSys,plot=True):
@@ -268,30 +264,13 @@ def make_L2_HSTGO_AOI_CI(pathHST,fn275,fn889,fn395,fn631,LonSys,plot=True):
 
 def normalizeBrightness(radianceArr, emissionArr):
     #From Leah Tiktin L1Y helpers code
-    rows = radianceArr.shape[0]
-    cols = radianceArr.shape[1]
-    radianceSum = 0
-    radianceCount = 0
-    radianceMax = 0.0
    
     mask = emissionArr < 60
     radianceMax = radianceArr[mask].max()
     radianceMean=radianceArr[mask].mean()
-    """
-    for r in range(rows):
-        for c in range(cols):
-            #if emissionArr.data[r][c] < 85:
-            if emissionArr[r][c] < 80.:
-                #radianceSum += radianceArr[r][c]
-                #radianceCount += 1
-                #print(radianceMax,float(radianceArr[r][c]))
-                radianceMax=np.maximum(radianceMax,radianceArr[r][c])
-    #avgRadiance = radianceSum / radianceCount
-    """
     #normRadiance = radianceArr / radianceMax
     normRadiance = radianceArr / radianceMean
   
-    #return np.array(radianceArr.data / avgRadiance)
     return np.array(normRadiance)
 
 def make_L2_HSTGO_RGB_data(pathHST,fnR,fnG,fnB,LonSys,plot=True):
@@ -302,11 +281,6 @@ def make_L2_HSTGO_RGB_data(pathHST,fnR,fnG,fnB,LonSys,plot=True):
                                  read_HSTGO_fits(pathHST,fnG,LonSys,dataunit=1,plot=False))
     HSTBnorm=normalizeBrightness(read_HSTGO_fits(pathHST,fnB,LonSys,plot=False),
                                  read_HSTGO_fits(pathHST,fnB,LonSys,dataunit=1,plot=False))
-    """
-    HSTRnorm=read_HSTGO_fits(pathHST,fnR,LonSys,plot=False)
-    HSTGnorm=read_HSTGO_fits(pathHST,fnG,LonSys,plot=False)
-    HSTBnorm=read_HSTGO_fits(pathHST,fnB,LonSys,plot=False)
-    """
     RGB=np.stack((HSTRnorm,HSTGnorm,HSTBnorm),axis=2)
     if plot:
         fig,ax=pl.subplots(1,figsize=(8,6), dpi=150, facecolor="white")
@@ -330,70 +304,33 @@ def plot_HSTGO_abs_patches(obskeyHST,LatLims,LonLims,CH4abs,NH3abs,axsCH4abspatc
                            cbar_reverse1=True,cbar_reverse2=False,
                            titles=['fNH3 (ppm)','PCloud (mbar)'],
                            ctbls=['Blues','terrain_r']):
-    #####LonLims=[90,130] #special for case 1
-    
-    #####LatLims=[70,100]
-    #LonLims=[40,140]
-    #LonLims=[280,360]
-    #LonLims=[220,300]
-    
-    #figNH3abspatch,axsNH3abspatch=pl.subplots(1,figsize=(8,6), dpi=150, facecolor="white")
-    #NH3abspatch=mp.make_patch(NH3abs,LatLims,LonLims,180,180,pad=True)
-    #pp.plot_patch(NH3abspatch,LatLims,LonLims,180,180,'Blues_r',axsNH3abspatch,
-    #               cbarplot=True,cbar_title="Test",cbar_reverse=False,vn=0.95,vx=1.85)
-    #axsNH3abspatch.set_title("NH3 Absorption")
-    
-    #figCH4abspatch,axsCH4abspatch=pl.subplots(1,figsize=(8,6), dpi=150, facecolor="white")
-    CH4abspatch=mp.make_patch(CH4abs,LatLims,LonLims,180,180,pad=True)
-    x=np.arange(0,CH4abspatch.shape[1],1)
-    y=np.mean(CH4abspatch,axis=0)
-    
-    coefs=np.polyfit(x,y,2)
-    linfit=coefs[2]+coefs[1]*x+coefs[0]*x**2
-    
-    linfitnorm=linfit/np.mean(linfit)
-    
-    CH4abspatchflat=CH4abspatch/linfitnorm
-    
+
+    ###########################################################################
+    # MAKE PATCH
+    ###########################################################################
+    CH4patch=mp.make_patch(CH4abs,LatLims,LonLims,180,180,pad=True)
+    CH4patchflat=fp.flatten_patch(CH4patch)
     NH3patch=mp.make_patch(NH3abs,LatLims,LonLims,180,180,pad=True)
-    
-    x=np.arange(0,NH3patch.shape[1],1)
-    y=np.mean(NH3patch,axis=0)
-    
-    coefs=np.polyfit(x,y,2)
-    linfit=coefs[2]+coefs[1]*x+coefs[0]*x**2
-    
-    linfitnorm=linfit/np.mean(linfit)
+    NH3patchflat=fp.flatten_patch(NH3patch)
 
-    NH3patchflat=NH3patch/linfitnorm
-    
-    
-    cbttl="Mean="+str(np.mean(CH4abspatchflat))[:4]+" $\pm$ "+str(np.std(CH4abspatchflat))[:3]
-    pp.plot_patch(CH4abspatchflat,LatLims,LonLims,180,180,ctbls[0],axsCH4abspatch,
+    ###########################################################################
+    # PLOT SECTION
+    ###########################################################################   
+    cbttl="Mean="+str(np.mean(CH4patchflat))[:4]+" $\pm$ "+str(np.std(CH4patchflat))[:3]
+    pp.plot_patch(CH4patchflat,LatLims,LonLims,180,180,ctbls[0],axsCH4abspatch,
                    cbarplot=True,cbar_title=cbttl,cbar_reverse=cbar_reverse1,
-                   vn=minmax1[0],vx=minmax1[1])
-    
-
+                   vn=minmax1[0],vx=minmax1[1])  
     axsCH4abspatch.set_title(titles[1],fontsize=10)
-    
-    #figNH3patch,axsNH3patch=pl.subplots(1,figsize=(8,6), dpi=150, facecolor="white")
-    #figfit,axsfit=pl.subplots(1,figsize=(8,6), dpi=150, facecolor="white")
-    
-    #axsfit.plot(x,y)
-    #axsfit.plot(x,linfit)
-    #print("lin linfit=",len(linfit))
-    #print("coefs ",coefs)
-    #linfit_reshaped = linfit.reshape(len(y), 1)
-    
+        
     cbttl="Mean="+str(np.mean(NH3patchflat))[:3]+" $\pm$ "+str(np.std(NH3patchflat))[:2]
     pp.plot_patch(NH3patchflat,LatLims,LonLims,180,180,ctbls[1],axsNH3patch,
                    cbarplot=True,cbar_title=cbttl,cbar_reverse=cbar_reverse2,
                    vn=minmax2[0],vx=minmax2[1])
     axsNH3patch.set_title(titles[0],fontsize=10)
     
-    return CH4abspatchflat,NH3patchflat
+    return CH4patchflat,NH3patchflat
     
-def plot_HSTGO_RGB_patches(obskeyHST,LatLims,LonLims,RGB,axsRGBpatch,
+def plot_HSTGO_RGB_patches(obskeyHST,LatLims,LonLims,RGBpatch,axsRGBpatch,
                            title='RGB (673/502/395)'):
     #LonLims=[90,130] #special for case 1
     
@@ -402,7 +339,7 @@ def plot_HSTGO_RGB_patches(obskeyHST,LatLims,LonLims,RGB,axsRGBpatch,
     #LonLims=[280,360]
     #LonLims=[220,300]
     #figRGBpatch,axsRGBpatch=pl.subplots(1,figsize=(8,6), dpi=150, facecolor="white")
-    RGBpatch=mp.make_patch(RGB,LatLims,LonLims,180,180)
+    #RGBpatch=mp.make_patch(RGB,LatLims,LonLims,180,180)
     RGB4Display=np.power(np.array(RGBpatch).astype(float),1.3)
     RGB4Display=RGB4Display/RGB4Display.max()
     show=axsRGBpatch.imshow(RGB4Display,
@@ -420,6 +357,7 @@ def plot_HSTGO_RGB_patches(obskeyHST,LatLims,LonLims,RGB,axsRGBpatch,
     cbar.ax.set_visible(False)
 
     axsRGBpatch.set_title(title,fontsize=10)
+    
     
     
 def plot_HSTGO_abs_3dpatches(obskeyHST,LatLims,LonLims,CH4abspatchflat,NH3patchflat):
@@ -461,7 +399,63 @@ def plot_HSTGO_abs_3dpatches(obskeyHST,LatLims,LonLims,CH4abspatchflat,NH3patchf
     ax3dboth.set_xlabel(' Longitude deg')
     ax3dboth.set_ylabel('PG Latitude (deg)')
 
+def write_HST_fits_patch(obskeyHST,LonSys,patchflat,pathout,patchtype,
+                         LatLims=False,LonLims=False,dmin=0.0,dmax=1.0):
+    """
+    If LatLims and LonLims are provided, then the full map array is saved,
+    but only the patch area has data. This is done as a 16 bit int.
+    Otherwise, the FITS file is of the patch only and is a 64-bit float.
 
+    Parameters
+    ----------
+    obskeyHST : TYPE
+        DESCRIPTION.
+    LonSys : TYPE
+        DESCRIPTION.
+    patchflat : TYPE
+        DESCRIPTION.
+    pathout : TYPE
+        DESCRIPTION.
+    patchtype : TYPE
+        DESCRIPTION.
+    LatLims : TYPE, optional
+        DESCRIPTION. The default is False.
+    LonLims : TYPE, optional
+        DESCRIPTION. The default is False.
+    dmin : TYPE, optional
+        DESCRIPTION. The default is 0.0.
+    dmax : TYPE, optional
+        DESCRIPTION. The default is 1.0.
+
+    Returns
+    -------
+    None.
+
+    """
+    import os
+    
+    if LatLims and LonLims:
+        fullmap=np.zeros((3600,7200))
+        ylims=np.array(LatLims)*20
+        xlims=np.array(LonLims)*20
+        fullmap[ylims[0]:ylims[1],xlims[0]:xlims[1]]=patchflat
+        hdudata = fits.PrimaryHDU(fullmap)
+        bscale = (dmax - dmin) / 65535.0
+        bzero  = dmin + 32768 * bscale   
+        hdudata.scale('int16', bscale=bscale, bzero=bzero)
+    else:
+        hdudata = fits.PrimaryHDU(patchflat)
+      
+    hdul = fits.HDUList([hdudata])
+    fnout=pathout+'/'+obskeyHST+' HST Sys'+ LonSys +' '+patchtype+'.fits'
+    try:
+        os.remove(fnout)
+    except: 
+        print("file doesn't exist")
+    hdul.writeto(fnout)
+    hdul.close()
+
+###############################################################################
 def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
                            cont=False,waveplot=False):
     
@@ -473,10 +467,6 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
     import L4_Jup_Map_Plot_V2 as L4MP 
     #import figsize_and_aspect,set_up_figure
     from astropy.io import fits
-
-    pathout="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/SCubed 2025/"+obskeyHST
-    if not os.path.exists(pathout):
-        os.makedirs(pathout)
     
     LonLims=[(360-LonLimsInput[1])%360,(360-LonLimsInput[0])%360]
     if LonLimsInput[0]==0:
@@ -489,53 +479,99 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
     # Compute PCld and fNH3
     CH4abs,NH3abs=make_L2_HSTGO_abs_data(pathHST,fn619,fn631,fn645,LonSys,plot=False)
     #plot_HST_global_maps(CH4abs,NH3abs)
+    CH4patch=mp.make_patch(CH4abs,LatLims,LonLims,180,180,pad=True)
+    CH4patchflat=fp.flatten_patch(CH4patch)
+    NH3patch=mp.make_patch(NH3abs,LatLims,LonLims,180,180,pad=True)
+    NH3patchflat=fp.flatten_patch(NH3patch)
+
     # Compute AOI and CI
     AOI,CI=make_L2_HSTGO_AOI_CI(pathHST,fn275,fn889,fn395,fn631,LonSys,plot=False)
+    AOIpatch=mp.make_patch(AOI,LatLims,LonLims,180,180,pad=True)
+    AOIpatchflat=fp.flatten_patch(AOIpatch)
+    CIpatch=mp.make_patch(CI,LatLims,LonLims,180,180,pad=True)
+    CIpatchflat=fp.flatten_patch(CIpatch)
+
     # Make standard RGB and false color 'methane' RGB
     RGB=make_L2_HSTGO_RGB_data(pathHST,fn673,fn502,fn395,LonSys,plot=False)
-    RGBMeth=make_L2_HSTGO_RGB_data(pathHST,fn673,fn727,fn889,LonSys,plot=False)
+    RGBpatch=mp.make_patch(RGB,LatLims,LonLims,180,180)
 
-    # Plot first figure
+    RGBMeth=make_L2_HSTGO_RGB_data(pathHST,fn673,fn727,fn889,LonSys,plot=False)
+    RGBMethpatch=mp.make_patch(RGBMeth,LatLims,LonLims,180,180)
+
+    ###########################################################################
+    # Write FITS Patches
+    ########################################################################### 
+    pathout="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/SCubed 2025/"+obskeyHST[:-1]+"/"+obskeyHST
+    if not os.path.exists(pathout+"/L1"):
+        os.makedirs(pathout+"/L1")
+    if not os.path.exists(pathout+"/L3"):
+        os.makedirs(pathout+"/L3")
+
+
+    write_HST_fits_patch(obskeyHST,LonSys,NH3patchflat,pathout+"/L3",'fNH3',
+                         LatLims=LatLims, LonLims=LonLims,dmin=-100.0,dmax=600.0)
+    write_HST_fits_patch(obskeyHST,LonSys,CH4patchflat,pathout+"/L3",'PCld',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=4000.0)
+    write_HST_fits_patch(obskeyHST,LonSys,CIpatchflat,pathout+"/L3",'CI',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=1.0)
+    write_HST_fits_patch(obskeyHST,LonSys,AOIpatchflat,pathout+"/L3",'AOI',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=1.0)
+
+    wv=['673','502','395']
+    for i in range(0,3):
+        write_HST_fits_patch(obskeyHST,LonSys,RGBpatch[:,:,i],pathout+"/L1",wv[i],
+                             LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    ###########################################################################
+    # PLOT SECTION - this is like an L4 plot format
+    ###########################################################################   
+    figsz,aspect,plot_adjust=L4MP.figsize_and_aspect(LatLims,LonLims)
+    # SETUP FIRST FIGURE
     titles=['fNH3 (ppm)','PCloud (mbar)']
     RGBtitle='RGB (673/502/395)'
-    #print("$$$$$$$$$$$$$$$$$$$$$$$")
-    #print(LonLims)
-
-    figsz,aspect,plot_adjust=L4MP.figsize_and_aspect(LatLims,LonLims)
     fig1,axs1=L4MP.set_up_figure(figsz,obskeyHST,LonSys,RGBaxs=2)
-    CH4abspatchflat,NH3patchflat=plot_HSTGO_abs_patches(obskeyHST,LatLims,
-                                                        LonLims,CH4abs,
-                                                        NH3abs,axs1[1],axs1[0],
-                                                        minmax1=[1000.,3000.],
-                                                        minmax2=[0.,300.],
-                                                        titles=titles,
-                                                        ctbls=['Blues','terrain_r'])
+    # PLOT fNH3
+    cbttlNH3="Mean="+str(np.mean(NH3patchflat))[:4]+" $\pm$ "+str(np.std(NH3patchflat))[:3]
+    pp.plot_patch(NH3patchflat,LatLims,LonLims,180,180,'terrain_r',axs1[0],
+                   cbarplot=True,cbar_title=cbttlNH3,cbar_reverse=False,
+                   vn=0,vx=300)  
+    axs1[1].set_title('fNH3 (ppm)',fontsize=10)
+    # PLOT PCld    
+    cbttlCH4="Mean="+str(np.mean(CH4patchflat))[:4]+" $\pm$ "+str(np.std(CH4patchflat))[:3]
+    pp.plot_patch(CH4patchflat,LatLims,LonLims,180,180,'Blues',axs1[1],
+                   cbarplot=True,cbar_title=cbttlCH4,cbar_reverse=True,
+                   vn=1000,vx=3000)  
+    axs1[1].set_title('PCloud (mbar)',fontsize=10)
+    # PLOT RGB
     print("################",RGB.shape)
-    #RGB[:,:,2]=RGB[:,:,2]*0.8
-    plot_HSTGO_RGB_patches(obskeyHST,LatLims,LonLims,RGB,axs1[2],title=RGBtitle)
-    fig1.subplots_adjust(**plot_adjust)     
-
-    # Plot second figure
+    plot_HSTGO_RGB_patches(obskeyHST,LatLims,LonLims,RGBpatch,axs1[2],title=RGBtitle)
+    fig1.subplots_adjust(**plot_adjust)    
     
+    # SETUP SECOND FIGURE
     titles=['Color Index (CI)','Altitude Opacity Index (AOI)']
     RGBtitle="'Methane' RGB (673/727/889)"
     fig2,axs2=L4MP.set_up_figure(figsz,obskeyHST,LonSys,RGBaxs=2)
-    AOIpatchflat,CIpatchflat=plot_HSTGO_abs_patches(obskeyHST,LatLims,
-                                                        LonLims,AOI,
-                                                        CI,axs2[1],axs2[0],
-                                                        minmax1=[0.1,0.4],
-                                                        minmax2=[0.35,0.75],
-                                                        cbar_reverse1=False,
-                                                        titles=titles,
-                                                        ctbls=['Greys_r','Spectral',])
-    plot_HSTGO_RGB_patches(obskeyHST,LatLims,LonLims,RGBMeth,axs2[2],title=RGBtitle)
+    # PLOT CI    
+    cbttlCI="Mean="+str(np.mean(CIpatchflat))[:4]+" $\pm$ "+str(np.std(CIpatchflat))[:3]
+    pp.plot_patch(CIpatchflat,LatLims,LonLims,180,180,'Spectral',axs2[0],
+                   cbarplot=True,cbar_title=cbttlCI,cbar_reverse=False,
+                   vn=0.35,vx=0.75)  
+    axs2[0].set_title('Color Index (CI)',fontsize=10)    
+    # PLOT AOI
+    cbttlAOI="Mean="+str(np.mean(AOIpatchflat))[:4]+" $\pm$ "+str(np.std(AOIpatchflat))[:3]
+    pp.plot_patch(AOIpatchflat,LatLims,LonLims,180,180,'Greys_r',axs2[1],
+                   cbarplot=True,cbar_title=cbttlAOI,cbar_reverse=False,
+                   vn=0.1,vx=0.4)  
+    axs2[1].set_title('Altitude Opacity Index (AOI)',fontsize=10)
+    # PLOT METHANE RGB
+    plot_HSTGO_RGB_patches(obskeyHST,LatLims,LonLims,RGBMethpatch,axs2[2],title=RGBtitle)
     fig2.subplots_adjust(**plot_adjust)     
 
     if cont:
         tx_fNH3=[100,150,200,250]
         tx_PCld=[1600,2000,2400,2800]
         smoothed_fNH3 = gaussian_filter(NH3patchflat, sigma=5)
-        smoothed_PCld = gaussian_filter(CH4abspatchflat, sigma=5)
+        smoothed_PCld = gaussian_filter(CH4patchflat, sigma=5)
         L4MP.ApplyContours(axs1,2,smoothed_fNH3,tx_fNH3,smoothed_PCld,tx_PCld,
                           LatLims,LonLims,IRTFcollection=False,IRTFaxs='',
                           CH4889collection=False,CH4889plot=False,CH4889axs='',
@@ -547,91 +583,12 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
 
     path="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/"
     if waveplot:
-        L4MP.RossbyWavePlot(obskeyHST,LonLims,NH3patchflat,CH4abspatchflat,
+        L4MP.RossbyWavePlot(obskeyHST,LonLims,NH3patchflat,CH4patchflat,
                        [figsz[0],figsz[1]],path,LonSys,HST=True)
-
-
 
 
     print(pathout)
     fig1.savefig(pathout+'/'+obskeyHST+' HST Sys'+ LonSys +' fNH3+PCld.png',dpi=150)
     fig2.savefig(pathout+'/'+obskeyHST+' HST Sys'+ LonSys +' CI+AOI.png',dpi=150)
-
-    hdudatafNH3 = fits.PrimaryHDU(NH3patchflat)
-    hdulfNH3 = fits.HDUList([hdudatafNH3])
-    fnout=pathout+'/'+obskeyHST+' HST Sys'+ LonSys +' fNH3.fits'
-    try:
-        os.remove(fnout)
-    except: 
-        print("file doesn't exist")
-    hdulfNH3.writeto(fnout)
-    hdulfNH3.close()
-
-    hdudataPCld = fits.PrimaryHDU(CH4abspatchflat)
-    hdulPCld = fits.HDUList([hdudataPCld])
-    fnout=pathout+'/'+obskeyHST+' HST Sys'+ LonSys +' PCld.fits'
-    try:
-        os.remove(fnout)
-    except: 
-        print("file doesn't exist")
-    hdulPCld.writeto(fnout)
-    hdulPCld.close()
-
-    hdudataAOI = fits.PrimaryHDU(AOIpatchflat)
-    hdulAOI = fits.HDUList([hdudataAOI])
-    fnout=pathout+'/'+obskeyHST+' HST Sys'+ LonSys +' AOI.fits'
-    try:
-        os.remove(fnout)
-    except: 
-        print("file doesn't exist")
-    hdulAOI.writeto(fnout)
-    hdulAOI.close()
-
-    hdudataCI = fits.PrimaryHDU(CIpatchflat)
-    hdulCI = fits.HDUList([hdudataCI])
-    fnout=pathout+'/'+obskeyHST+' HST Sys'+ LonSys +' CI.fits'
-    try:
-        os.remove(fnout)
-    except: 
-        print("file doesn't exist")
-    hdulCI.writeto(fnout)
-    hdulCI.close()
-
-#Good run of a couple of NEDFs and interesting bow clouds
-#L4_Jup_Map_Plot(collection="20251016-20251016",IRTFcollection=False, \
-#                CH4889collection=False,LonSys='1',lats=[75,105],LonLims=[235,325])
-#HSTGO_process_and_plot("20251015UTa",[75,105],[235,325],LonSys='1')
-
-#Great run for SED!
-#L4_Jup_Map_Plot(collection="20251016-20251017",IRTFcollection=False, \
-#    CH4889collection=False,LonSys='1',lats=[75,105],LonLims=[0,90])
-#HSTGO_process_and_plot("20251016UTb",[75,105],[0,90],LonSys='1')
-
-#Good for a couple of NEDFs, some weirdness in my data at the equator showing
-#  high fNH3. This is a couple days after HST, so I wonder if real. No moons.
-#L4_Jup_Map_Plot(collection="20251017-20251017",IRTFcollection=False, \
-#    CH4889collection=False,LonSys='1',lats=[75,105],LonLims=[75,165])
-#HSTGO_process_and_plot("20251016UTe",[75,105],[75,165],LonSys='1')
-
-
-#L4_Jup_Map_Plot(collection="20251116-20251116",IRTFcollection=False, \
-#    CH4889collection=False,LonSys='1',lats=[75,105],LonLims=[30,90])
-#HSTGO_process_and_plot("20251120UTa",[75,105],[30,90],LonSys='1')
-
-
-#Sys 3. GRS in data
-#HSTGO_process_and_plot("20251120UTb",[45,135],[270,330],LonSys='3')
-#L4_Jup_Map_Plot(collection="20251119-20251119",IRTFcollection=False, \
-#    CH4889collection=False,LonSys='3',lats=[45,135],LonLims=[270,330])
-
-#
-#L4_Jup_Map_Plot(collection="20251119-20251119",IRTFcollection=False, \
-#    CH4889collection=False,LonSys='1',lats=[75,105],LonLims=[200,260])
-#HSTGO_process_and_plot("20251120UTb",[75,105],[200,260],LonSys='1')
-
-#L4_Jup_Map_Plot(collection="20251119-20251119",IRTFcollection=False, \
-#    CH4889collection=False,LonSys='1',lats=[75,105],LonLims=[330,360])
-#HSTGO_process_and_plot("20251120UTc",[75,105],[330,360],LonSys='1')
-
 
 

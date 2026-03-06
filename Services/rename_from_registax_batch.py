@@ -8,10 +8,10 @@ def rename_from_registax_batch(path):
         if ".png" in fn:
         #if ".png" in fn and "BLU" in fn:
             print(fn)
-            x=fn.split("2025")
+            x=fn.split("2026")
             print(x[0],x[1])
             y=x[1].split(".")
-            fnout="2025"+y[0]+"-"+x[0][0:-1]+".png"
+            fnout="2026"+y[0]+"-"+x[0][0:-1]+".png"
             #fnout="2024"+y[0]+x[0][0:-1]+".png"
             print("fnout",fnout)
             os.rename(path+fn,path+fnout)

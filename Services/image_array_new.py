@@ -37,7 +37,7 @@ def image_array_new(obsdate="20240925UTa",target="Jupiter",
     import make_sza_eza_planes as za
     import pylab as pl
     sys.path.append('./Maps')
-    import read_fits_map_L2_L3 as RFM
+    import read_fits_V2 as RFT
 
     ###########################################################################
     #  DATA FILES AND METADATA DICTIONARY
@@ -128,7 +128,7 @@ def image_array_new(obsdate="20240925UTa",target="Jupiter",
     NH3hdulist.close()
     
     PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM,RGBtime= \
-                    RFM.read_fits_map_L2_L3(obskey=obsdate,target=target,
+                    RFT.read_fits_map_L3_V1(obskey=obsdate,target=target,
                                             imagetype="Img",Level="L3")
                     
     tx=np.linspace(0,65500.,5,endpoint=True)

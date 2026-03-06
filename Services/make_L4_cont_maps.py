@@ -288,6 +288,7 @@ def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
     sys.path.append(drive+'/Astronomy/Python Play')
     sys.path.append(drive+'/Astronomy/Python Play/Util_P3')
     sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Spectroscopy')
+    sys.path.append("C:/Astronomy/Projects/SAS 2021 Ammonia/Visualization-and-Analysis")
     sys.path.append('./Services')
 
     import numpy as np
@@ -295,7 +296,7 @@ def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
     sys.path.append('./Maps')
     from astropy.time import Time
     import os
-    import read_fits_Tiktin as RFT
+    import read_fits_V2 as RF2
     import get_map_collection as gmc
     from config_VA import config_VA
     
@@ -322,13 +323,13 @@ def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
         print()
         if dataversion==1:
             PCloudhdr,PClouddata,fNH3hdr,fNH3data,sza,eza,RGB,RGB_CM2,RGBtime= \
-                            RFT.read_fits_map_L3_V1(obskey=obskey,LonSys=LonSys,
+                            RF2.read_fits_map_L3_V1(obskey=obskey,LonSys=LonSys,
                                                     imagetype="Map",Level="L3",
                                                     LimbCorrection=LimbCorrection,
                                                     pathin=config_VA[dataversion])
         elif dataversion==2:
             PCloudhdr,PClouddata,fNH3hdr,fNH3data,RGB,RGB_CM2,RGBtime= \
-                            RFT.read_fits_map_L3_V2(obskey=obskey,LonSys=LonSys,
+                            RF2.read_fits_map_L3_V2(obskey=obskey,LonSys=LonSys,
                                                     imagetype="Map",Level="L3",
                                                     LimbCorrection=LimbCorrection,
                                                     pathin=config_VA[dataversion])
