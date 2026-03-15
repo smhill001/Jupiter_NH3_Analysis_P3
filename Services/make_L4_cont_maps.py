@@ -332,7 +332,7 @@ def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
                             RF2.read_fits_map_L3_V2(obskey=obskey,LonSys=LonSys,
                                                     imagetype="Map",Level="L3",
                                                     LimbCorrection=LimbCorrection,
-                                                    pathin=config_VA[dataversion])
+                                                    dataversion=dataversion)
         print("DDDDDDDD")
         print(fNH3hdr)
         #Set longitude limits for data (ll_x) and weights (wl_x)

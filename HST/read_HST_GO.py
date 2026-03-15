@@ -94,9 +94,9 @@ def computeAmmoniaMoleFraction(CH4data, NH3data):
     return fNH3
 def get_HSTGO_filenames(obskeyHST):
     
-    pathHST='C:/Astronomy/Projects/SAS 2021 Ammonia/Data/HST GO 18055/'+obskeyHST+'/'
+    pathHST='C:/Astronomy/Projects/SAS 2021 Ammonia/Data/HST GO 18055/'+obskeyHST[:-1]+'/'+obskeyHST+'/unprocessed_L1/'
 
-    if obskeyHST=='20251015UTa':
+    if obskeyHST=='20251016UTa':
         fn619={'fn':'251015_619_2347_reg.fits','offset':[0,0]} #-9,0
         fn631={'fn':'251015_631_2352_reg.fits','offset':[0,0]}
         fn645={'fn':'251015_645_2354_reg.fits','offset':[0,0]} #-14,0
@@ -106,7 +106,7 @@ def get_HSTGO_filenames(obskeyHST):
         fn673={'fn':'251015_673_2359_reg.fits','offset':[0,0]} #-13,0
         fn727={'fn':'251016_727_0010_reg.fits','offset':[0,0]} #7,0
         fn889={'fn':'251015_889_2339_reg.fits','offset':[0,0]}
-    if obskeyHST=='20251016UTb':
+    if obskeyHST=='20251016UTc':
         fn619={'fn':'251016_619_0256_reg.fits','offset':[0,0]}
         fn631={'fn':'251016_631_0300_reg.fits','offset':[0,0]}
         fn645={'fn':'251016_645_0302_reg.fits','offset':[0,0]}
@@ -233,29 +233,65 @@ def read_HSTGO_fits(path,filename,LonSys,plot=True,dataunit=0):
         ax.imshow(HSTx_rolled,cmap='gray')
         ax.set_title(filename['fn'][-24:])
     
-    return HSTx_rolled
+    return HSTx_rolled,hdr
 
 def make_L2_HSTGO_abs_data(pathHST,fn619,fn631,fn645,LonSys,plot=True):
 
-    HST619=read_HSTGO_fits(pathHST,fn619,LonSys,plot=plot)
-    HST631=read_HSTGO_fits(pathHST,fn631,LonSys,plot=plot)
-    HST645=read_HSTGO_fits(pathHST,fn645,LonSys,plot=plot)
+    import copy
+    import process_L1Y_helpers as hp
+    HST619,hdr619=read_HSTGO_fits(pathHST,fn619,LonSys,plot=plot)
+    HST631,hdr631=read_HSTGO_fits(pathHST,fn631,LonSys,plot=plot)
+    HST645,hdr645=read_HSTGO_fits(pathHST,fn645,LonSys,plot=plot)
     
     CH4abs=HST619/HST631
     NH3abs=HST645/HST631
     #NH3=CH4abs/NH3abs
     
     PCld=computeCloudPressure(CH4abs)
-    fNH3=computeAmmoniaMoleFraction(CH4abs, NH3abs)
+    PCldhdr = copy.deepcopy(hdr619)
+    print("@@@@@@@@@@@@@@@@")
+    print(hdr619["DATE-OBS"]+'T'+hdr619["TIME-OBS"])
+    print(hdr631["DATE-OBS"]+'T'+hdr631["TIME-OBS"])
+    PCldhdr["DATE-OBS"] = hp.averageDates(hdr619["DATE-OBS"]+'T'+hdr619["TIME-OBS"],
+                                          hdr631["DATE-OBS"]+'T'+hdr631["TIME-OBS"], "%Y-%m-%dT%H:%M:%S.%f")
+    print(PCldhdr["DATE-OBS"])
+    hp.averageHdrNum(PCldhdr, hdr619, hdr631, "TRG_LAT")
+    hp.averageHdrNum(PCldhdr, hdr619, hdr631, "TRG_LON")
+    hp.averageHdrNum(PCldhdr, hdr619, hdr631, "SUN_LAT")
+    hp.averageHdrNum(PCldhdr, hdr619, hdr631, "SUN_LON")
+    #hp.averageHdrNum(PCldhdr, hdr619, hdr631, "HIERARCH PLANMAP LIGHT-TIME")
+    hp.averageHdrNum(PCldhdr, hdr619, hdr631, "TRG_D")
+    PCldhdr["BUNIT"]='Cloud-top Press'
+    del PCldhdr["MISSVAL"]
 
-    return PCld,fNH3
+    fNH3=computeAmmoniaMoleFraction(CH4abs, NH3abs)
+    fNH3hdr = copy.deepcopy(hdr645)
+    fNH3hdr["DATE-OBS"] = hp.averageDates(hdr645["DATE-OBS"]+'T'+hdr645["TIME-OBS"],
+                                          hdr631["DATE-OBS"]+'T'+hdr631["TIME-OBS"], "%Y-%m-%dT%H:%M:%S.%f")
+    hp.averageHdrNum(fNH3hdr, hdr645, hdr631, "TRG_LAT")
+    hp.averageHdrNum(fNH3hdr, hdr645, hdr631, "TRG_LON")
+    hp.averageHdrNum(fNH3hdr, hdr645, hdr631, "SUN_LAT")
+    hp.averageHdrNum(fNH3hdr, hdr645, hdr631, "SUN_LON")
+    #hp.averageHdrNum(fNH3hdr, hdr619, hdr631, "HIERARCH PLANMAP LIGHT-TIME")
+    hp.averageHdrNum(fNH3hdr, hdr645, hdr631, "TRG_D")
+    fNH3hdr["BUNIT"]='Mole Fraction'
+    del fNH3hdr["MISSVAL"]
+
+    ###########################################################################
+    #!!!! Need to return two headers here based on the input header pairs for
+    #!!!! each PCld and fNH3. Maybe leverage some of Leah's code? Need to
+    #!!!! minimally include: DATE-OBS, TELESCOP, BUNIT, CM1, CM2, CM3
+    ###########################################################################
+
+
+    return PCld,fNH3,PCldhdr,fNH3hdr
 
 def make_L2_HSTGO_AOI_CI(pathHST,fn275,fn889,fn395,fn631,LonSys,plot=True):
 
-    HST275=read_HSTGO_fits(pathHST,fn275,LonSys,plot=plot)
-    HST889=read_HSTGO_fits(pathHST,fn889,LonSys,plot=plot)
-    HST395=read_HSTGO_fits(pathHST,fn395,LonSys,plot=plot)
-    HST631=read_HSTGO_fits(pathHST,fn631,LonSys,plot=plot)
+    HST275,hdr275=read_HSTGO_fits(pathHST,fn275,LonSys,plot=plot)
+    HST889,hdr889=read_HSTGO_fits(pathHST,fn889,LonSys,plot=plot)
+    HST395,hdr395=read_HSTGO_fits(pathHST,fn395,LonSys,plot=plot)
+    HST631,hdr631=read_HSTGO_fits(pathHST,fn631,LonSys,plot=plot)
     
     AOI=HST889/HST275
     CI=HST395/HST631
@@ -275,12 +311,12 @@ def normalizeBrightness(radianceArr, emissionArr):
 
 def make_L2_HSTGO_RGB_data(pathHST,fnR,fnG,fnB,LonSys,plot=True):
     
-    HSTRnorm=normalizeBrightness(read_HSTGO_fits(pathHST,fnR,LonSys,plot=False),
-                                 read_HSTGO_fits(pathHST,fnR,LonSys,dataunit=1,plot=False))
-    HSTGnorm=normalizeBrightness(read_HSTGO_fits(pathHST,fnG,LonSys,plot=False),
-                                 read_HSTGO_fits(pathHST,fnG,LonSys,dataunit=1,plot=False))
-    HSTBnorm=normalizeBrightness(read_HSTGO_fits(pathHST,fnB,LonSys,plot=False),
-                                 read_HSTGO_fits(pathHST,fnB,LonSys,dataunit=1,plot=False))
+    HSTRnorm=normalizeBrightness(read_HSTGO_fits(pathHST,fnR,LonSys,plot=False)[0],
+                                 read_HSTGO_fits(pathHST,fnR,LonSys,dataunit=1,plot=False)[0])
+    HSTGnorm=normalizeBrightness(read_HSTGO_fits(pathHST,fnG,LonSys,plot=False)[0],
+                                 read_HSTGO_fits(pathHST,fnG,LonSys,dataunit=1,plot=False)[0])
+    HSTBnorm=normalizeBrightness(read_HSTGO_fits(pathHST,fnB,LonSys,plot=False)[0],
+                                 read_HSTGO_fits(pathHST,fnB,LonSys,dataunit=1,plot=False)[0])
     RGB=np.stack((HSTRnorm,HSTGnorm,HSTBnorm),axis=2)
     if plot:
         fig,ax=pl.subplots(1,figsize=(8,6), dpi=150, facecolor="white")
@@ -399,7 +435,7 @@ def plot_HSTGO_abs_3dpatches(obskeyHST,LatLims,LonLims,CH4abspatchflat,NH3patchf
     ax3dboth.set_xlabel(' Longitude deg')
     ax3dboth.set_ylabel('PG Latitude (deg)')
 
-def write_HST_fits_patch(obskeyHST,LonSys,patchflat,pathout,patchtype,
+def write_HST_fits_patch(obskeyHST,LonSys,patchflat,hdr,pathout,patchtype,
                          LatLims=False,LonLims=False,dmin=0.0,dmax=1.0):
     """
     If LatLims and LonLims are provided, then the full map array is saved,
@@ -439,7 +475,7 @@ def write_HST_fits_patch(obskeyHST,LonSys,patchflat,pathout,patchtype,
         ylims=np.array(LatLims)*20
         xlims=np.array(LonLims)*20
         fullmap[ylims[0]:ylims[1],xlims[0]:xlims[1]]=patchflat
-        hdudata = fits.PrimaryHDU(fullmap)
+        hdudata = fits.PrimaryHDU(data=fullmap,header=hdr)
         bscale = (dmax - dmin) / 65535.0
         bzero  = dmin + 32768 * bscale   
         hdudata.scale('int16', bscale=bscale, bzero=bzero)
@@ -447,6 +483,8 @@ def write_HST_fits_patch(obskeyHST,LonSys,patchflat,pathout,patchtype,
         hdudata = fits.PrimaryHDU(patchflat)
       
     hdul = fits.HDUList([hdudata])
+    print(hdr)
+
     fnout=pathout+'/'+obskeyHST+' HST Sys'+ LonSys +' '+patchtype+'.fits'
     try:
         os.remove(fnout)
@@ -477,7 +515,7 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
     pathHST,fn619,fn631,fn645,fn275,fn395,fn502,fn673,fn727,fn889=\
         get_HSTGO_filenames(obskeyHST)
     # Compute PCld and fNH3
-    CH4abs,NH3abs=make_L2_HSTGO_abs_data(pathHST,fn619,fn631,fn645,LonSys,plot=False)
+    CH4abs,NH3abs,PCldhdr,fNH3hdr=make_L2_HSTGO_abs_data(pathHST,fn619,fn631,fn645,LonSys,plot=False)
     #plot_HST_global_maps(CH4abs,NH3abs)
     CH4patch=mp.make_patch(CH4abs,LatLims,LonLims,180,180,pad=True)
     CH4patchflat=fp.flatten_patch(CH4patch)
@@ -501,25 +539,25 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
     ###########################################################################
     # Write FITS Patches
     ########################################################################### 
-    pathout="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/SCubed 2025/"+obskeyHST[:-1]+"/"+obskeyHST
+    pathout="C:/Astronomy/Projects/SAS 2021 Ammonia/Data/HST GO 18055/"+obskeyHST[:-1]+"/"+obskeyHST
     if not os.path.exists(pathout+"/L1"):
         os.makedirs(pathout+"/L1")
     if not os.path.exists(pathout+"/L3"):
         os.makedirs(pathout+"/L3")
 
 
-    write_HST_fits_patch(obskeyHST,LonSys,NH3patchflat,pathout+"/L3",'fNH3',
-                         LatLims=LatLims, LonLims=LonLims,dmin=-100.0,dmax=600.0)
-    write_HST_fits_patch(obskeyHST,LonSys,CH4patchflat,pathout+"/L3",'PCld',
+    write_HST_fits_patch(obskeyHST,LonSys,CH4patchflat,PCldhdr,pathout+"/L3",'PCld',
                          LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=4000.0)
-    write_HST_fits_patch(obskeyHST,LonSys,CIpatchflat,pathout+"/L3",'CI',
+    write_HST_fits_patch(obskeyHST,LonSys,NH3patchflat,fNH3hdr,pathout+"/L3",'fNH3',
+                         LatLims=LatLims, LonLims=LonLims,dmin=-100.0,dmax=600.0)
+    write_HST_fits_patch(obskeyHST,LonSys,CIpatchflat,fNH3hdr,pathout+"/L3",'CI',
                          LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=1.0)
-    write_HST_fits_patch(obskeyHST,LonSys,AOIpatchflat,pathout+"/L3",'AOI',
+    write_HST_fits_patch(obskeyHST,LonSys,AOIpatchflat,fNH3hdr,pathout+"/L3",'AOI',
                          LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=1.0)
 
     wv=['673','502','395']
     for i in range(0,3):
-        write_HST_fits_patch(obskeyHST,LonSys,RGBpatch[:,:,i],pathout+"/L1",wv[i],
+        write_HST_fits_patch(obskeyHST,LonSys,RGBpatch[:,:,i],fNH3hdr,pathout+"/L1",wv[i],
                              LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
 
     ###########################################################################

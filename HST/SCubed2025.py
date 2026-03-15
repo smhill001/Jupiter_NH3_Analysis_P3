@@ -16,14 +16,14 @@ def SCubed2025(obskeyHST):
         #Sys 3
         L4MP.L4_Jup_Map_Plot(collection="20251016-20251016",IRTFcollection=False, 
                         CH4889collection=False,LonSys='3',lats=[45,135],
-                        LonLims=[210,300],proj='SCubed 2025/20251015UTa')
-        HGO.HSTGO_process_and_plot("20251015UTa",[45,135],[210,300],LonSys='3')
+                        LonLims=[210,300],proj='SCubed 2025/20251016UTa')
+        HGO.HSTGO_process_and_plot("20251016UTa",[45,135],[210,300],LonSys='3')
         
         #Sys 1
         L4MP.L4_Jup_Map_Plot(collection="20251016-20251016",IRTFcollection=False, 
                         CH4889collection=False,LonSys='1',lats=[75,105],
-                        LonLims=[235,325],proj='SCubed 2025/20251015UTa')
-        HGO.HSTGO_process_and_plot("20251015UTa",[75,105],[235,325],LonSys='1')
+                        LonLims=[235,325],proj='SCubed 2025/20251016UTa')
+        HGO.HSTGO_process_and_plot("20251016UTa",[75,105],[235,325],LonSys='1')
     
     ###############################################################################
     # 20251016UTb HST
