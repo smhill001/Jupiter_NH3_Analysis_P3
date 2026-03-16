@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['HST\\read_HST_GO.py', 'Maps\\PlanetMapper_Test.py', '..\\Visualization-and-Analysis\\config_VA.py', '..\\Visualization-and-Analysis\\L4_Jup_Map_Plot_V2.py', '..\\Visualization-and-Analysis\\L3_Jup_Map_Plot_V2.py', '..\\Visualization-and-Analysis\\map_and_context.py', '..\\Visualization-and-Analysis\\map_and_scatter.py', 'HST\\SCubed2025.py']
+recent_files = ['HST\\read_HST_GO.py', 'Maps\\PlanetMapper_Test.py', '..\\Visualization-and-Analysis\\config_VA.py', '..\\Visualization-and-Analysis\\L4_Jup_Map_Plot_V2.py', '..\\Visualization-and-Analysis\\L3_Jup_Map_Plot_V2.py', '..\\Visualization-and-Analysis\\map_and_context.py', '..\\Visualization-and-Analysis\\map_and_scatter.py', '..\\Visualization-and-Analysis\\plot_map_scatter.py', 'HST\\SCubed2025.py']
 
 [main]
 version = 0.2.0

@@ -3423,6 +3423,26 @@ def get_obs_list(planet="Jupiter",subsetkeys='all'):
                                'NH3file':'2026-02-14-1504_4-Jupiter_R656G647B632-RGB-WhtBal', 
                                'RGBfile':'2026-02-15-1102_1-Jupiter-j260215q2'},
                   
+                  #############################################################
+                  # 20260222 CHU-WING-SO HONG KONG                   20260222 #
+                  #############################################################
+                  
+                  '20260222UTa':{'Telescope':'C11','FL':'6000mm','Camera':'SBIG',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2026-02-22-1345_5-Jupiter_R656G620B632-RGB-WhtBal', 
+                               'NH3file':'2026-02-22-1345_6-Jupiter_R656G647B632-RGB-WhtBal', 
+                               'RGBfile':'2026-02-22-0347_8-Jupiter-RGB-j260222j2-WhtBal'},
+                  
+                  #############################################################
+                  # 20260312 CHU-WING-SO HONG KONG                   20260312 #
+                  #############################################################
+                  
+                  '20260312UTa':{'Telescope':'C11','FL':'6000mm','Camera':'SBIG',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2026-03-12-1230_2-Jupiter_R656G620B632-RGB-WhtBal', 
+                               'NH3file':'2026-03-12-1230_2-Jupiter_R656G647B632-RGB-Shift-WhtBal', 
+                               'RGBfile':'2026-03-12-2225_3-Jupiter-j260312k1-WhtBal'},
+                  
                   }
     
     ###########################################################################
