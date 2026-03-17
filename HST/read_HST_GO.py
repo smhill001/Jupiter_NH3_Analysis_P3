@@ -116,7 +116,7 @@ def get_HSTGO_filenames(obskeyHST):
         fn673={'fn':'251016_673_0307_reg.fits','offset':[0,0]} #4,0
         fn727={'fn':'251016_727_0318_reg.fits','offset':[0,0]} #5,0
         fn889={'fn':'251016_889_0251_reg.fits','offset':[0,0]} #0,-5
-    if obskeyHST=='20251016UTe':
+    if obskeyHST=='20251016UTf':
         fn619={'fn':'251016_619_0458_reg.fits','offset':[0,0]}
         fn631={'fn':'251016_631_0502_reg.fits','offset':[0,0]}
         fn645={'fn':'251016_645_0504_reg.fits','offset':[0,0]} ##8,0
