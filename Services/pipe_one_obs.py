@@ -39,11 +39,11 @@ def pipe_one_obs(obskeys,target="Jupiter",close=False):
         IAN.image_array_new(obsdate=obskey,target=target,imagetype='Img',
                             contour=False)
         
-        L3P.L3_Jup_Map_Plot_V2(obskey=obskey,imagetype='Map',target=target,
-                        LatLims=[45,135],LonRng=45,CMpref='subobs',
+        L3P.L3_Jup_Map_Plot_V2(obskey=obskey,target=target,
+                        CoLatLims=[45,135],LonRng=45,CMpref='subobs',
                         LonSys='2',showbands=False,coef=[0.,0.],subproj='',
                         figxy=[8.0,4.0],FiveMicron=False,ROI=False,
-                        ctbls=["terrain_r","Blues"],dataversion=1)
+                        dataversion=1)
         if close:
             pl.close('all')
         

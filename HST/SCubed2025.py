@@ -1,17 +1,23 @@
 def SCubed2025(obskeyHST,LonSys,makefits=False,HST=True,SCT=False):
     
-    import L3_Jup_Map_Plot_V2 as L3MP
     import sys
     sys.path.append('C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/HST/')
+    sys.path.append('C:/Astronomy/Projects/SAS 2021 Ammonia/Visualization-and-Analysis/')
+    import L3_Jup_Map_Plot_V2 as L3MP
     import read_HST_GO as HGO
 
     #!!!! ROI is custom to SCubed proprosal and 20251016UTc
-    #ROI={"Hot Spot":[82,84,15.0,3.0],
-    #     "Gyre":[85,87,15.0,3.0],
-    #     "Cloud Plume":[82,84,5.0,3.0],
-    #     "NEB Reference":[76,78,15,4.0]}
+    ROI={"Hot Spot":[82,84,15.0,3.0],
+         "Gyre":[85,87,15.0,3.0],
+         "Cloud Plume":[82,84,5.0,3.0],
+         "NEB Reference":[76,78,15,4.0]}
     
-    ROI=False
+    #ROI={"Hot Spot":[98,100,61.0,2.0],
+    #     "Gyre":[95,97,63.0,4.0],
+    #     "Cloud Plume":[96,98,53.0,2.0],
+    #     "SEB Reference":[104,105,60,8.0]}
+    
+    #ROI=False
 
     ###############################################################################
     ###############################################################################
@@ -53,6 +59,10 @@ def SCubed2025(obskeyHST,LonSys,makefits=False,HST=True,SCT=False):
             CoLatLims=[75,90]
             LonRng=15
             CMpref=15
+            #FOR SCUBED SED PLOT:
+            #CoLatLims=[90,105]
+            #LonRng=15
+            #CMpref=60
     if obskeyHST=='20251016UTf':
         collection="20251016-20251017"
         if LonSys=='3':        

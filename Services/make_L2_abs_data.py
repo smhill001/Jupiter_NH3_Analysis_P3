@@ -42,7 +42,6 @@ def make_l2_abs_data(obsdate="20240925UTa",target="Jupiter",imagetype='Img',
     ###########################################################################
     sourcedata=obsdate#+"_"+imagetype
     sourcefiles=getlist.get_obs_list(planet=target)
-    
     if sourcefiles[sourcedata]["Telescope"]=="C11":
         CalModel="SCT-Obs-Final"
     elif sourcefiles[sourcedata]["Telescope"]=="VLT":
