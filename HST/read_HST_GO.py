@@ -514,6 +514,46 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
     # Get file names and navigation adjustments
     pathHST,fn619,fn631,fn645,fn275,fn395,fn502,fn673,fn727,fn889=\
         get_HSTGO_filenames(obskeyHST)
+
+    # Make raw data patches
+    data275,hdr275=read_HSTGO_fits(pathHST,fn275,LonSys,plot=False,dataunit=0)
+    data275patch=mp.make_patch(data275,LatLims,LonLims,180,180,pad=True)
+    data275patchflat=fp.flatten_patch(data275patch)
+    del hdr275["MISSVAL"]
+    data395,hdr395=read_HSTGO_fits(pathHST,fn395,LonSys,plot=False,dataunit=0)
+    data395patch=mp.make_patch(data395,LatLims,LonLims,180,180,pad=True)
+    data395patchflat=fp.flatten_patch(data395patch)
+    del hdr395["MISSVAL"]
+    data502,hdr502=read_HSTGO_fits(pathHST,fn502,LonSys,plot=False,dataunit=0)
+    data502patch=mp.make_patch(data502,LatLims,LonLims,180,180,pad=True)
+    data502patchflat=fp.flatten_patch(data502patch)
+    del hdr502["MISSVAL"]
+    data619,hdr619=read_HSTGO_fits(pathHST,fn619,LonSys,plot=False,dataunit=0)
+    data619patch=mp.make_patch(data619,LatLims,LonLims,180,180,pad=True)
+    data619patchflat=fp.flatten_patch(data619patch)
+    del hdr619["MISSVAL"]
+    data631,hdr631=read_HSTGO_fits(pathHST,fn631,LonSys,plot=False,dataunit=0)
+    data631patch=mp.make_patch(data631,LatLims,LonLims,180,180,pad=True)
+    data631patchflat=fp.flatten_patch(data631patch)
+    del hdr631["MISSVAL"]
+    data645,hdr645=read_HSTGO_fits(pathHST,fn645,LonSys,plot=False,dataunit=0)
+    data645patch=mp.make_patch(data645,LatLims,LonLims,180,180,pad=True)
+    data645patchflat=fp.flatten_patch(data645patch)
+    del hdr645["MISSVAL"]
+    data673,hdr673=read_HSTGO_fits(pathHST,fn673,LonSys,plot=False,dataunit=0)
+    data673patch=mp.make_patch(data673,LatLims,LonLims,180,180,pad=True)
+    data673patchflat=fp.flatten_patch(data673patch)
+    del hdr673["MISSVAL"]
+    data727,hdr727=read_HSTGO_fits(pathHST,fn727,LonSys,plot=False,dataunit=0)
+    data727patch=mp.make_patch(data727,LatLims,LonLims,180,180,pad=True)
+    data727patchflat=fp.flatten_patch(data727patch)
+    del hdr727["MISSVAL"]
+    data889,hdr889=read_HSTGO_fits(pathHST,fn889,LonSys,plot=False,dataunit=0)
+    data889patch=mp.make_patch(data889,LatLims,LonLims,180,180,pad=True)
+    data889patchflat=fp.flatten_patch(data889patch)
+    del hdr889["MISSVAL"]
+
+
     # Compute PCld and fNH3
     CH4abs,NH3abs,PCldhdr,fNH3hdr=make_L2_HSTGO_abs_data(pathHST,fn619,fn631,fn645,LonSys,plot=False)
     #plot_HST_global_maps(CH4abs,NH3abs)
@@ -545,7 +585,7 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
     if not os.path.exists(pathout+"/L3"):
         os.makedirs(pathout+"/L3")
 
-
+    # Environmental parameters and indices
     write_HST_fits_patch(obskeyHST,LonSys,CH4patchflat,PCldhdr,pathout+"/L3",'PCld',
                          LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=4000.0)
     write_HST_fits_patch(obskeyHST,LonSys,NH3patchflat,fNH3hdr,pathout+"/L3",'fNH3',
@@ -555,10 +595,70 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
     write_HST_fits_patch(obskeyHST,LonSys,AOIpatchflat,fNH3hdr,pathout+"/L3",'AOI',
                          LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=1.0)
 
+    # RGB files - Normalized, unflatteded, reflectances
     wv=['673','502','395']
-    for i in range(0,3):
-        write_HST_fits_patch(obskeyHST,LonSys,RGBpatch[:,:,i],fNH3hdr,pathout+"/L1",wv[i],
+    for i in range(0,3): 
+        write_HST_fits_patch(obskeyHST,LonSys,RGBpatch[:,:,i],fNH3hdr,pathout+"/L1",wv[i]+" Norm",
                              LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+    #wv=['673','727','889']
+    for i in range(0,3):
+        write_HST_fits_patch(obskeyHST,LonSys,RGBMethpatch[:,:,i],fNH3hdr,pathout+"/L1",wv[i]+" Norm",
+                             LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    # Band-Approximation input reflectances and flattened reflectances (619,631,645)
+    write_HST_fits_patch(obskeyHST,LonSys,data275patchflat,hdr275,pathout+"/L1",'275 Flat',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data395patchflat,hdr395,pathout+"/L1",'395 Flat',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data502patchflat,hdr502,pathout+"/L1",'502 Flat',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data619patchflat,hdr619,pathout+"/L1",'619 Flat',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data631patchflat,hdr631,pathout+"/L1",'631 Flat',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data645patchflat,hdr645,pathout+"/L1",'645 Flat',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data673patchflat,hdr673,pathout+"/L1",'673 Flat',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data727patchflat,hdr727,pathout+"/L1",'727 Flat',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data889patchflat,hdr889,pathout+"/L1",'889 Flat',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data275patch,hdr275,pathout+"/L1",'275 Refl',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data395patch,hdr395,pathout+"/L1",'395 Refl',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data502patch,hdr502,pathout+"/L1",'502 Refl',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data619patch,hdr619,pathout+"/L1",'619 Refl',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data631patch,hdr631,pathout+"/L1",'631 Refl',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data645patch,hdr645,pathout+"/L1",'645 Refl',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data673patch,hdr673,pathout+"/L1",'673 Refl',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data727patch,hdr727,pathout+"/L1",'727 Refl',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
+
+    write_HST_fits_patch(obskeyHST,LonSys,data889patch,hdr889,pathout+"/L1",'889 Refl',
+                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
 
     ###########################################################################
     # PLOT SECTION - this is like an L4 plot format

@@ -289,6 +289,7 @@ def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
     sys.path.append(drive+'/Astronomy/Python Play/Util_P3')
     sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Spectroscopy')
     sys.path.append("C:/Astronomy/Projects/SAS 2021 Ammonia/Visualization-and-Analysis")
+    sys.path.append("C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Maps")
     sys.path.append('./Services')
 
     import numpy as np
@@ -327,7 +328,8 @@ def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
                                                     imagetype="Map",Level="L3",
                                                     LimbCorrection=LimbCorrection,
                                                     pathin=config_VA[dataversion])
-        elif dataversion==2:
+        elif dataversion==2 and len(obskey)==11:
+            print("$$obskey= ",obskey)
             PCloudhdr,PClouddata,fNH3hdr,fNH3data,RGB,RGB_CM2,RGBtime= \
                             RF2.read_fits_map_L3_V2(obskey=obskey,LonSys=LonSys,
                                                     imagetype="Map",Level="L3",

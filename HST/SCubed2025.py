@@ -7,17 +7,18 @@ def SCubed2025(obskeyHST,LonSys,makefits=False,HST=True,SCT=False):
     import read_HST_GO as HGO
 
     #!!!! ROI is custom to SCubed proprosal and 20251016UTc
-    ROI={"Hot Spot":[82,84,15.0,3.0],
-         "Gyre":[85,87,15.0,3.0],
-         "Cloud Plume":[82,84,5.0,3.0],
-         "NEB Reference":[76,78,15,4.0]}
-    
+    #!!!! NEZ Hot Spot
+    #ROI={"Hot Spot":[82,84,15.0,3.0],
+    #     "Gyre":[85,87,15.0,3.0],
+    #     "Cloud Plume":[82,84,5.0,3.0],
+    #     "NEB Reference":[76,78,15,4.0]}
+    #!!!! SEZ South Equatorial Disturbance
     #ROI={"Hot Spot":[98,100,61.0,2.0],
     #     "Gyre":[95,97,63.0,4.0],
     #     "Cloud Plume":[96,98,53.0,2.0],
     #     "SEB Reference":[104,105,60,8.0]}
     
-    #ROI=False
+    ROI=False
 
     ###############################################################################
     ###############################################################################
@@ -37,7 +38,8 @@ def SCubed2025(obskeyHST,LonSys,makefits=False,HST=True,SCT=False):
             CMpref=255
             #HGO.HSTGO_process_and_plot("20251016UTa",[45,135],[210,300],LonSys='3')
         if LonSys=='1':        
-            plotoptions=["contours","scatter","wave","resid","correl"]
+            #plotoptions=["contours","scatter","wave","resid","correl"]
+            plotoptions=["scatter","wave","resid","correl"]
             CoLatLims=[75,105]
             LonRng=45
             CMpref=280
@@ -52,13 +54,15 @@ def SCubed2025(obskeyHST,LonSys,makefits=False,HST=True,SCT=False):
             #HGO.HSTGO_process_and_plot("20251016UTc",[45,135],[0,60],LonSys='3')
         if LonSys=='1':        
             plotoptions=["scatter","wave","resid","correl"]
-            #CoLatLims=[75,105]
-            #LonRng=45
-            #CMpref=45
+            CoLatLims=[75,105]
+            LonRng=45
+            CMpref=45
+            
             #FOR SCUBED HOT-SPOT PLOT:
-            CoLatLims=[75,90]
-            LonRng=15
-            CMpref=15
+            #CoLatLims=[75,90]
+            #LonRng=15
+            #CMpref=15
+            
             #FOR SCUBED SED PLOT:
             #CoLatLims=[90,105]
             #LonRng=15
@@ -76,7 +80,7 @@ def SCubed2025(obskeyHST,LonSys,makefits=False,HST=True,SCT=False):
             CoLatLims=[75,105]
             LonRng=45
             CMpref=105
-            
+    ###########################################################################        
     if obskeyHST=='20251120UTa':
         collection="20251116-20251116"
         if LonSys=='3':        
@@ -122,7 +126,7 @@ def SCubed2025(obskeyHST,LonSys,makefits=False,HST=True,SCT=False):
 
     if makefits:
         LonLimsWest=[CMpref-LonRng,CMpref+LonRng]
-        HGO.HSTGO_process_and_plot(obskeyHST,CoLatLims,LonLimsWest,LonSys='1')
+        HGO.HSTGO_process_and_plot(obskeyHST,CoLatLims,LonLimsWest,LonSys=LonSys)
         
     if HST:
         L3MP.L3_Jup_Map_Plot_V2(obskey=obskeyHST, 
