@@ -1,0 +1,2 @@
+label,jd_time,fits_time,area,eccentricity,centroid_lat,centroid_lon,weighted_centroid_lat_seg,weighted_centroid_lon_seg,seg_intensity_mean,seg_intensity_min,seg_intensity_max,intensity_mean,intensity_min,intensity_max,threshold
+1,2460736.6771944445,2025-03-02T04:15:09.600,46.0,0.9680338782046213,-9.717391304347824,123.41304347826087,-9.717935984569195,123.4161092772723,2041.534262189248,2030.125493830254,2067.5750517517517,113.73110211125852,108.3583087048246,120.47198611882888,2030

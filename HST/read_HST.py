@@ -1,6 +1,8 @@
 import matplotlib.pyplot as pl
 import numpy as np
 #import MakeContiguousMap as MCM
+import sys
+sys.path.append('C:/Astronomy/Projects/SAS 2021 Ammonia/Visualization-and-Analysis/')
 import make_patch as mp
 import plot_patch as pp
 

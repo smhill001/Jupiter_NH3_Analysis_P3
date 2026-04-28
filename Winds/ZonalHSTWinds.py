@@ -2,7 +2,7 @@ def ZonalHSTWinds(HSTkey1,HSTkey2):
     
     import os
     import sys
-    sys.path.append('../HST/')
+    sys.path.append('C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/HST/')
     from Winds_1D_Zonal import estimate_zonal_winds
     from read_HST import getFilename,read_HST
     from matplotlib import pyplot as pl

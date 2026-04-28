@@ -301,6 +301,7 @@ def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
     import get_map_collection as gmc
     from config_VA import config_VA
     
+    print("11111111111")
     if dataversion==1:
         obskeys,dummy=gmc.get_map_collection(collection)
     elif dataversion==2:
@@ -327,7 +328,7 @@ def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
                             RF2.read_fits_map_L3_V1(obskey=obskey,LonSys=LonSys,
                                                     imagetype="Map",Level="L3",
                                                     LimbCorrection=LimbCorrection,
-                                                    pathin=config_VA[dataversion])
+                                                    dataversion=dataversion)
         elif dataversion==2 and len(obskey)==11:
             print("$$obskey= ",obskey)
             PCloudhdr,PClouddata,fNH3hdr,fNH3data,RGB,RGB_CM2,RGBtime= \
