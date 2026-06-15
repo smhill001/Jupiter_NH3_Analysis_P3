@@ -4,6 +4,11 @@ Created on Sun Dec 05 08:48:16 2021
 
 @author: Steven Hill
 """
+import socket
+hostname = socket.gethostname()
+from config_VA import Host_path, Fletcher_Profile,Plot_TEXES_code
+
+
 
 def plot_TEXES_Groups(ax,clr="C2",prs=0.43798,mult=1.0):
     """
@@ -18,12 +23,12 @@ def plot_TEXES_Groups(ax,clr="C2",prs=0.43798,mult=1.0):
     import numpy as np
     import matplotlib.pyplot as pl
     sys.path.append('./Photometry/code')
-    sys.path.append('c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Photometry/code/')
+    sys.path.append(Plot_TEXES_code[hostname]+'/')
 
     import ComputeNetRateJupiter_P3 as CNRJ
 
     #print('***************** mult=',mult)
-    pth="c:/Astronomy/Projects/SAS 2021 Ammonia/GeminiTEXES2017/ZonalResults/"
+    pth=Fletcher_Profile[hostname]+'/'
     pressure = scipy.fromfile(file=pth+"zmean_g1_retnh3_pressure.txt", dtype=float, count=-1, sep=" ")
     data=np.zeros((7,181))
     #print("data=",data.shape)
