@@ -15,6 +15,7 @@ def pipe_one_obs(obskeys,target="Jupiter",close=False):
     sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Spectroscopy')
     sys.path.append('./Services')
     sys.path.append('C:/Astronomy/Projects/SAS 2021 Ammonia/Visualization-and-Analysis')
+    sys.path.append('C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Services')
 
 
     import make_L2_abs_data as ML2

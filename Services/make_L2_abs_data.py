@@ -24,6 +24,7 @@ def make_l2_abs_data(obsdate="20240925UTa",target="Jupiter",imagetype='Img',
     sys.path.append(drive+'/Astronomy/Python Play/Util_P3')
     sys.path.append(drive+'/Astronomy/Python Play/SpectroPhotometry/Spectroscopy')
     sys.path.append('./Services')
+    sys.path.append('C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Maps')
 
     import os
     import numpy as np

@@ -38,7 +38,7 @@ def plot_TEXES_Groups(ax,clr="C2",prs=0.43798,mult=1.0):
         latc = scipy.fromfile(file=pth+"zmean_g"+str(i)+"_retnh3_lat.txt", dtype=float, count=-1, sep=" ")
         latg=Centric_to_Graphic(latc)
         latsize=len(latg)
-        #print("latsize=========",latsize)
+        print("latsize=========",latsize)
         Start=latsize*PL
         End=latsize*(PL+1)
         """if i==4:
@@ -51,12 +51,12 @@ def plot_TEXES_Groups(ax,clr="C2",prs=0.43798,mult=1.0):
             End=61*(PL+1)
             latc = scipy.fromfile(file=pth+"zmean_g1_retnh3_lat.txt", dtype=float, count=-1, sep=" ")
             latg=Centric_to_Graphic(latc)"""
-        #print("Start,End=",Start,End)
-        #print(i)
-        tmp = scipy.fromfile(file=pth+"zmean_g"+str(i)+"_retnh3_data.txt", dtype=float, count=-1, sep=" ")
+        print("Start,End=",Start,End)
+        print(i)
+        tmp = np.fromfile(file=pth+"zmean_g"+str(i)+"_retnh3_data.txt", dtype=float, count=-1, sep=" ")
         dat=tmp[Start:End]
         latgrid,tmpsig=CNRJ.uniform_lat_grid(latg,dat,Fine=True)
-
+        #return
         #print("dat=",tmpsig.shape, tmpsig)
         data[i-1,:]=tmpsig
     #print(Start,End,pressure[PL])
