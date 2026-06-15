@@ -20,11 +20,7 @@ def Profile_Vertical_Fletcher(plot=True):
     import plot_TEXES_Groups_P3 as PTG
     import matplotlib.ticker as ticker
     from config_VA import Fletcher_Profile, Plot_TEXES_code
-
-    pth="c:/Astronomy/Projects/SAS 2021 Ammonia/GeminiTEXES2017/ZonalResults/"
-    
-    import socket
-    hostname = socket.gethostname()
+   
     pth=Fletcher_Profile[hostname]+'/'
 
     pressure = np.fromfile(file=pth+"zmean_g1_retnh3_pressure.txt", dtype=float, count=-1, sep=" ")
@@ -79,7 +75,10 @@ def Profile_Vertical_Fletcher(plot=True):
         axsvertprof.set_xlabel('Abundance (ppm)')
         axsvertprof.set_ylabel('Pressure (bar)')
         axsvertprof.legend()
-        path="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/Profiles/"
+        #path="c:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Analysis Data/Profiles/"
+        #path="/mnt/data/"
+        from config_VA import Fletcher_Profile_Out
+        path=Fletcher_Profile_Out[hostname]+'/'
         
         figvertprof.savefig(path+"Profile Vertical Fletcher.png",dpi=300)
 
