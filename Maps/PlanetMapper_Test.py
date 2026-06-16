@@ -10,6 +10,8 @@ import spiceypy as spice
 import matplotlib.pyplot as pl
 
 import sys
+sys.path.append('../../Visualization-and-Analysis/') #!!!!!! New change
+
 import socket
 hostname = socket.gethostname()
 from config_VA import spice_path
