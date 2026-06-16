@@ -29,7 +29,7 @@ def plot_TEXES_Groups(ax,clr="C2",prs=0.43798,mult=1.0):
 
     #print('***************** mult=',mult)
     pth=Fletcher_Profile[hostname]+'/'
-    pressure = scipy.fromfile(file=pth+"zmean_g1_retnh3_pressure.txt", dtype=float, count=-1, sep=" ")
+    pressure = np.fromfile(file=pth+"zmean_g1_retnh3_pressure.txt", dtype=float, count=-1, sep=" ")
     data=np.zeros((7,181))
     #print("data=",data.shape)
 
@@ -40,7 +40,7 @@ def plot_TEXES_Groups(ax,clr="C2",prs=0.43798,mult=1.0):
     
     PL=np.ndarray.flatten(np.array(ind))[0]
     for i in range(1,8):
-        latc = scipy.fromfile(file=pth+"zmean_g"+str(i)+"_retnh3_lat.txt", dtype=float, count=-1, sep=" ")
+        latc = np.fromfile(file=pth+"zmean_g"+str(i)+"_retnh3_lat.txt", dtype=float, count=-1, sep=" ")
         latg=Centric_to_Graphic(latc)
         latsize=len(latg)
         print("latsize=========",latsize)

@@ -10,6 +10,10 @@ import spiceypy as spice
 import matplotlib.pyplot as pl
 
 import sys
+import socket
+hostname = socket.gethostname()
+from config_VA import spice_path
+
 drive='c:'
 sys.path.append(drive+'/Astronomy/Python Play')
 #sys.path.append("C:/Users/smhil/spice_kernels/")
@@ -21,16 +25,16 @@ sys.path.append(drive+'/Astronomy/Python Play')
 #jtest=pm.observation(path+fn)
 
 pm.base.prevent_kernel_loading()
-spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/lsk/naif0012.tls.pc")
-spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/pck/earth_200101_990825_predict.bpc")
-spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/pck/pck00011.tpc")
-spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/pck/pck00010.tpc")
-spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/pck/gm_de440.tpc")
-spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/pck/gm_de431.tpc")
+spice.furnsh(spice_path[hostname]+"/naif/generic_kernels/lsk/naif0012.tls.pc")
+#spice.furnsh(spice_path[hostname]+"/naif/generic_kernels/pck/earth_200101_990825_predict.bpc")
+spice.furnsh(spice_path[hostname]+"/naif/generic_kernels/pck/pck00011.tpc")
+spice.furnsh(spice_path[hostname]+"/naif/generic_kernels/pck/pck00010.tpc")
+spice.furnsh(spice_path[hostname]+"/naif/generic_kernels/pck/gm_de440.tpc")
+spice.furnsh(spice_path[hostname]+"/naif/generic_kernels/pck/gm_de431.tpc")
 
-spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/spk/planets/de430.bsp")
-spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/spk/satellites/jup365.bsp")
-spice.furnsh("C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/spk/satellites/sat453.bsp")
+spice.furnsh(spice_path[hostname]+"naif/generic_kernels/spk/planets/de430.bsp")
+spice.furnsh(spice_path[hostname]+"/naif/generic_kernels/spk/satellites/jup365.bsp")
+spice.furnsh(spice_path[hostname]+"/naif/generic_kernels/spk/satellites/sat459.bsp")
 
 
 body = pm.BodyXY('Jupiter', '2025-03-02 04:59:00', sz=500)
