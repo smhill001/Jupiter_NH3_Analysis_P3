@@ -1,4 +1,6 @@
 import spiceypy as sp
+import socket
+hostname = socket.gethostname()
 
 def convert_system3_to_I_II_spice(datetime_str: str, system3_lon: float):
     """
@@ -14,7 +16,8 @@ def convert_system3_to_I_II_spice(datetime_str: str, system3_lon: float):
     system3_lon_rev=360.-system3_lon
     print(system3_lon_rev)
     # Load SPICE kernels (you can customize this)
-    sp.furnsh('C:/Astronomy/Python Play/spice_kernels/naif/generic_kernels/pck/pck00010.tpc')
+    from config_VA import spice_path
+    sp.furnsh(spice_path[hostname]+'/naif/generic_kernels/pck/pck00010.tpc')
 
     # Convert UTC to Ephemeris Time (seconds past J2000)
     et = sp.utc2et(datetime_str)

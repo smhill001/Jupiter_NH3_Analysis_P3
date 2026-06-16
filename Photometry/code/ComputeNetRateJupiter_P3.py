@@ -104,7 +104,8 @@ def uniform_lat_grid(Latitude,Signal,Fine=False):
     #print Wavelength.size,Signal.size    
     Interp=interpolate.interp1d(Latitude,Signal,kind='linear', 
                                 copy=True,bounds_error=False, 
-                                fill_value=np.NaN,axis=0)  
+                                #fill_value=np.NaN,axis=0)
+                                axis=0)  
     SignalonGrid=Interp(LatGrid)
 
     return LatGrid,SignalonGrid
