@@ -10,7 +10,7 @@ def SCubed2025(obskeyHST,LonSys,ROI_ID=False,makefits=False,HST=True,SCT=False):
     #sys.path.append('C:/Astronomy/Projects/SAS 2021 Ammonia/Visualization-and-Analysis/')
     #sys.path.append()
     import L3_Jup_Map_Plot_V2 as L3MP
-    import read_HST_GO as HGO
+    #import read_HST_GO as HGO
 
     ROI=False
     segment=False
@@ -94,8 +94,8 @@ def SCubed2025(obskeyHST,LonSys,ROI_ID=False,makefits=False,HST=True,SCT=False):
                 CoLatLims=[75,90]
                 LonRng=15
                 CMpref=15
-                segment=True
-                compare=True
+                segment=False
+                compare=False
             if ROI_ID=="NEZ Hot Spot West":
                 ROI={"Hot Spot":[83,84,53.0,2.0],
                      "Gyre":[84,85,53.0,3.0],
