@@ -157,11 +157,42 @@ def get_HSTGO_filenames(obskeyHST):
         fn673={'fn':'251120_673_1707_reg.fits','offset':[0,0]} #4,0
         fn727={'fn':'251120_727_1703_reg.fits','offset':[0,0]} #5,0
         fn889={'fn':'251120_889_1719_reg.fits','offset':[0,0]} #0,-5
+    if obskeyHST=='20251221UTa':
+        fn619={'fn':'251221_619_1850_reg.fits','offset':[0,0]}
+        fn631={'fn':'251221_631_1905_reg.fits','offset':[0,0]}
+        fn645={'fn':'251221_645_1909_reg.fits','offset':[0,0]} ##8,0
+        fn275={'fn':'251221_275_1902_reg.fits','offset':[0,0]}#
+        fn395={'fn':'251221_395_1838_reg.fits','offset':[0,0]}
+        fn502={'fn':'251221_502_1842_reg.fits','offset':[0,0]}
+        fn673={'fn':'251221_673_1834_reg.fits','offset':[0,0]} #4,0
+        fn727={'fn':'251221_727_1830_reg.fits','offset':[0,0]} #5,0
+        fn889={'fn':'251221_889_1846_reg.fits','offset':[0,0]} #0,-5
+    if obskeyHST=='20251221UTb':
+        fn619={'fn':'251222_619_1518_reg.fits','offset':[0,0]}
+        fn631={'fn':'251222_631_1534_reg.fits','offset':[0,0]}
+        fn645={'fn':'251222_645_1537_reg.fits','offset':[0,0]} ##8,0
+        fn275={'fn':'251222_275_1530_reg.fits','offset':[0,0]}#
+        fn395={'fn':'251222_395_1506_reg.fits','offset':[0,0]}
+        fn502={'fn':'251222_502_1510_reg.fits','offset':[0,0]}
+        fn673={'fn':'251222_673_1503_reg.fits','offset':[0,0]} #4,0
+        fn727={'fn':'251222_727_1458_reg.fits','offset':[0,0]} #5,0
+        fn889={'fn':'251222_889_1514_reg.fits','offset':[0,0]} #0,-5
+    if obskeyHST=='20251221UTc':
+        fn619={'fn':'251223_619_1622_reg.fits','offset':[0,0]}
+        fn631={'fn':'251223_631_1638_reg.fits','offset':[0,0]}
+        fn645={'fn':'251223_645_1641_reg.fits','offset':[0,0]} ##8,0
+        fn275={'fn':'251223_275_1634_reg.fits','offset':[0,0]}#
+        fn395={'fn':'251223_395_1610_reg.fits','offset':[0,0]}
+        fn502={'fn':'251223_502_1614_reg.fits','offset':[0,0]}
+        fn673={'fn':'251223_673_1607_reg.fits','offset':[0,0]} #4,0
+        fn727={'fn':'251223_727_1602_reg.fits','offset':[0,0]} #5,0
+        fn889={'fn':'251223_889_1618_reg.fits','offset':[0,0]} #0,-5
         
     return pathHST,fn619,fn631,fn645,fn275,fn395,fn502,fn673,fn727,fn889
         
 def read_HSTGO_fits(path,filename,LonSys,plot=True,dataunit=0):
-
+    import sys
+    sys.path.append('..\Maps')
     import convert_system3_to_I_II_spice as clong
     
     hdulist=fits.open(path+filename['fn'])
