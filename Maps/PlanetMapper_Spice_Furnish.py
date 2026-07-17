@@ -38,13 +38,36 @@ spice.furnsh(spice_path[hostname]+"naif/generic_kernels/spk/planets/de430.bsp")
 spice.furnsh(spice_path[hostname]+"/naif/generic_kernels/spk/satellites/jup365.bsp")
 spice.furnsh(spice_path[hostname]+"/naif/generic_kernels/spk/satellites/sat459.bsp")
 
+spice.furnsh(spice_path[hostname]+"/naif/JUNO/kernels/spk/spk_ref_251119_281001_260129.bsp")
+spice.furnsh(spice_path[hostname]+"/naif/JUNO/kernels/spk/spk_ref_250724_281001_250724.bsp")
+spice.furnsh(spice_path[hostname]+"/naif/JUNO/kernels/spk/spk_ref_250526_281001_250505.bsp")
+spice.furnsh(spice_path[hostname]+"/naif/JUNO/kernels/spk/spk_ref_231110_251016_231110.bsp")
 
-body = pm.BodyXY('Jupiter', '2025-03-02 04:59:00', sz=500)
+body = pm.BodyXY('Jupiter', '2026-03-02 04:59:00', sz=500,observer='EARTH')
 y=body.set_disc_params(x0=250, y0=250, r0=200)
 x=body.get_backplane_map('INCIDENCE')
 
 print("body.subpoint_lon=",body.subpoint_lon)
 print("body.subpoint_lat=",body.subpoint_lat)
+print("body.subpoint_distance=",body.subpoint_distance)
+
+import numpy as np
+times = np.arange(
+    np.datetime64('2025-10-17T14:30:00'),
+    np.datetime64('2025-10-17T14:50:00'),
+    np.timedelta64(1, 'm')
+)
+time_strings = np.datetime_as_string(times)
+for time in time_strings:
+    bodyJUNO = pm.BodyXY('Jupiter', time, sz=500,observer='JUNO')
+    print("body.subpoint_lon=",bodyJUNO.subpoint_lon)
+    print("body.subpoint_lat=",bodyJUNO.subpoint_lat)
+    print("body.subpoint_distance=",bodyJUNO.subpoint_distance)
+bodyJUNO = pm.BodyXY('Jupiter', ['2025-10-17T14:40:00'][0], sz=500,observer='JUNO')
+print("body.subpoint_lon=",bodyJUNO.subpoint_lon)
+print("body.subpoint_lat=",bodyJUNO.subpoint_lat)
+print("body.subpoint_distance=",bodyJUNO.subpoint_distance)
+
 
 #fig,axs=pl.subplots(figsize=(8.0,4.0), dpi=150, facecolor="white")
 #axs.imshow(x)
