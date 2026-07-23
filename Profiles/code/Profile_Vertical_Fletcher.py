@@ -5,6 +5,25 @@ sys.path.append('C:/Astronomy/Projects/SAS 2021 Ammonia/Visualization-and-Analys
 
 from config_VA import Fletcher_Profile,Plot_TEXES_code,Fletcher_Profile_Out
 
+def Juno_MWR():
+    import numpy as np
+    # Load data with headers
+    fn="MWRNH3A2016240070004_R00548_V01.csv"
+    path="C:/Astronomy/Projects/SAS 2021 Ammonia/Visualization-and-Analysis/"
+
+    structured_data = np.genfromtxt(path+fn, delimiter=',', names=True,deletechars="")
+
+    # Extract column names as a tuple of strings
+    header_names = structured_data.dtype.names
+
+    # Convert back to a clean, 2D float array (N, num_cols)
+    numeric_data = structured_data.view((np.float64, len(header_names)))
+    
+    x = numeric_data[:, 0]
+    y = numeric_data[:, 1:]
+    
+    return(header_names,x,y)
+
 def Giles2017(dataset='4b'):
     import numpy as np
     fn="Giles2000 Figure "+dataset+".csv"
