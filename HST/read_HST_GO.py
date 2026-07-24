@@ -211,7 +211,15 @@ def read_HSTGO_fits(path,filename,LonSys,plot=True,dataunit=0):
     emi=hdulist[1].data
     inc=hdulist[1].data
     hdulist.close()
-    k=1.0
+    if '_275_' in filename['fn']:
+        #k=0.65
+        k=1.0
+    else:
+        k=1.0
+    print("##################################################################")
+    print("filename=",filename)
+    print("k= ",k)
+    print("##################################################################")
     minnaert=(np.cos(np.deg2rad(inc))**k)*(np.cos(np.deg2rad(emi))**(k-1.0))
     data=data/minnaert
     #import matplotlib.pyplot as pl
@@ -453,6 +461,7 @@ def make_L2_HSTGO_AOI_CI(pathHST,hdr275,HST275,hdr889,HST889,
     #!!!! Need to update headers here including adding input headers to call
     AOI=HST889/HST275
     AOIhdr = copy.deepcopy(hdr889)
+    
     AOIhdr["DATE-OBS"] = hp.averageDates(hdr889["DATE-OBS"]+'T'+hdr889["TIME-OBS"],
                                           hdr275["DATE-OBS"]+'T'+hdr275["TIME-OBS"], 
                                           "%Y-%m-%dT%H:%M:%S.%f")
@@ -478,7 +487,10 @@ def make_L2_HSTGO_AOI_CI(pathHST,hdr275,HST275,hdr889,HST889,
     hp.averageHdrNum(CIhdr, hdr631, hdr395, "TRG_D")
     AOIhdr["BUNIT"]='Color Index'
     #del CH4abshdr["MISSVAL"]
-    
+    if plot:
+        fig,ax=pl.subplots(1,figsize=(8,6), dpi=150, facecolor="white")
+        ax.imshow(AOI)
+
     return AOI,CI
 
 def normalizeBrightness(radianceArr, emissionArr):
@@ -761,7 +773,7 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
     # correction applied.
     AOIpatch,CIpatch=make_L2_HSTGO_AOI_CI(pathHST,hdr275,data275patch,hdr889,data889patch,
                                           hdr395,data395patch,hdr631,data631patch,
-                                          LonSys,plot=False)
+                                          LonSys,plot=True)
     AOIpatchflat=fp.flatten_patch(AOIpatch)
     CIpatchflat=fp.flatten_patch(CIpatch)
 
@@ -795,52 +807,7 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
     write_HST_fits_patch(obskeyHST,LonSys,AOIpatchflat,fNH3hdr,pathout+"/L3",'AOI',
                          LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=1.0)
 
-    # RGB files - Normalized, unflatteded, reflectances
-    """
-    wv=['673','502','395']
-    for i in range(0,3): 
-        write_HST_fits_patch(obskeyHST,LonSys,RGBpatch[:,:,i],fNH3hdr,pathout+"/L1",wv[i]+" Flat",
-                             LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
-    wv=['673','727','889']
-    for i in range(0,3):
-        write_HST_fits_patch(obskeyHST,LonSys,RGBMethpatch[:,:,i],fNH3hdr,pathout+"/L1",wv[i]+" Flat",
-                             LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
-    """
-    # Band-Approximation input reflectances and flattened reflectances (619,631,645)
-    #write_HST_fits_patch(obskeyHST,LonSys,data275patchflat,hdr275,pathout+"/L1",'275 Flat',
-    """
-    write_HST_fits_patch(obskeyHST,LonSys,data275patch,hdr275,pathout+"/L1",'275 Flat',
-                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
 
-    #write_HST_fits_patch(obskeyHST,LonSys,data395patchflat,hdr395,pathout+"/L1",'395 Flat',
-    write_HST_fits_patch(obskeyHST,LonSys,data395patch,hdr395,pathout+"/L1",'395 Flat',
-                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
-
-    #write_HST_fits_patch(obskeyHST,LonSys,data502patchflat,hdr502,pathout+"/L1",'502 Flat',
-    write_HST_fits_patch(obskeyHST,LonSys,data502patch,hdr502,pathout+"/L1",'502 Flat',
-                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
-
-    write_HST_fits_patch(obskeyHST,LonSys,data619patchflat,hdr619,pathout+"/L1",'619 Flat',
-                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
-
-    write_HST_fits_patch(obskeyHST,LonSys,data631patchflat,hdr631,pathout+"/L1",'631 Flat',
-                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
-
-    write_HST_fits_patch(obskeyHST,LonSys,data645patchflat,hdr645,pathout+"/L1",'645 Flat',
-                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
-
-    #write_HST_fits_patch(obskeyHST,LonSys,data673patchflat,hdr673,pathout+"/L1",'673 Flat',
-    write_HST_fits_patch(obskeyHST,LonSys,data673patch,hdr673,pathout+"/L1",'673 Flat',
-                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
-
-    #write_HST_fits_patch(obskeyHST,LonSys,data727patchflat,hdr727,pathout+"/L1",'727 Flat',
-    write_HST_fits_patch(obskeyHST,LonSys,data727patch,hdr727,pathout+"/L1",'727 Flat',
-                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
-
-    #write_HST_fits_patch(obskeyHST,LonSys,data889patchflat,hdr889,pathout+"/L1",'889 Flat',
-    write_HST_fits_patch(obskeyHST,LonSys,data889patch,hdr889,pathout+"/L1",'889 Flat',
-                         LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
-    """
     #Write L1 Minnaert-corrected reflectances
     write_HST_fits_patch(obskeyHST,LonSys,data275patch,hdr275,pathout+"/L1",'275 Refl',
                          LatLims=LatLims, LonLims=LonLims,dmin=0.0,dmax=10.0)
