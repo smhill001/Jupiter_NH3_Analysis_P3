@@ -98,9 +98,12 @@ def computeAmmoniaMoleFraction(CH4data, NH3data):
     fNH3=fCH4*(NH3_Ncol/CH4_Ncol)*1.0e6
     
     return fNH3
+
 def get_HSTGO_filenames(obskeyHST):
-    
-    pathHST='C:/Astronomy/Projects/SAS 2021 Ammonia/Data/HST GO 18055/'+obskeyHST[:-1]+'/'+obskeyHST+'/unprocessed_L1/'
+    import socket
+    hostname = socket.gethostname()
+    from config_VA import Host_path
+    pathHST=Host_path[hostname]+'/HST GO 18055/'+obskeyHST[:-1]+'/'+obskeyHST+'/unprocessed_L1/'
 
     if obskeyHST=='20251016UTa':
         fn619={'fn':'251015_619_2347_reg.fits','offset':[0,0]} #-9,0
@@ -110,6 +113,16 @@ def get_HSTGO_filenames(obskeyHST):
         fn395={'fn':'251016_395_0000_reg.fits','offset':[0,0]}
         fn502={'fn':'251016_502_0003_reg.fits','offset':[0,0]}
         fn673={'fn':'251015_673_2359_reg.fits','offset':[0,0]} #-13,0
+        fn727={'fn':'251016_727_0010_reg.fits','offset':[0,0]} #7,0
+        fn889={'fn':'251015_889_2339_reg.fits','offset':[0,0]}
+    if obskeyHST=='20251016UTb':
+        fn619={'fn':'251016_619_0015_reg.fits','offset':[0,0]} #-9,0
+        fn631={'fn':'251016_631_0019_reg.fits','offset':[0,0]}
+        fn645={'fn':'251016_645_0021_reg.fits','offset':[0,0]} #-14,0
+        fn275={'fn':'251016_275_0005_reg.fits','offset':[0,0]} #14,0
+        fn395={'fn':'251016_395_0000_reg.fits','offset':[0,0]}
+        fn502={'fn':'251016_502_0003_reg.fits','offset':[0,0]}
+        fn673={'fn':'251016_673_0007_reg.fits','offset':[0,0]} #-13,0
         fn727={'fn':'251016_727_0010_reg.fits','offset':[0,0]} #7,0
         fn889={'fn':'251015_889_2339_reg.fits','offset':[0,0]}
     if obskeyHST=='20251016UTc':
@@ -122,6 +135,26 @@ def get_HSTGO_filenames(obskeyHST):
         fn673={'fn':'251016_673_0307_reg.fits','offset':[0,0]} #4,0
         fn727={'fn':'251016_727_0318_reg.fits','offset':[0,0]} #5,0
         fn889={'fn':'251016_889_0251_reg.fits','offset':[0,0]} #0,-5
+    if obskeyHST=='20251016UTd':
+        fn619={'fn':'251016_619_0323_reg.fits','offset':[0,0]}
+        fn631={'fn':'251016_631_0328_reg.fits','offset':[0,0]}
+        fn645={'fn':'251016_645_0330_reg.fits','offset':[0,0]}
+        fn275={'fn':'251016_275_0313_reg.fits','offset':[0,0]}#
+        fn395={'fn':'251016_395_0309_reg.fits','offset':[0,0]}
+        fn502={'fn':'251016_502_0311_reg.fits','offset':[0,0]}
+        fn673={'fn':'251016_673_0316_reg.fits','offset':[0,0]} #4,0
+        fn727={'fn':'251016_727_0318_reg.fits','offset':[0,0]} #5,0
+        fn889={'fn':'251016_889_0251_reg.fits','offset':[0,0]} #0,-5
+    if obskeyHST=='20251016UTe':
+        fn619={'fn':'251016_619_0430_reg.fits','offset':[0,0]}
+        fn631={'fn':'251016_631_0435_reg.fits','offset':[0,0]}
+        fn645={'fn':'251016_645_0437_reg.fits','offset':[0,0]} ##8,0
+        fn275={'fn':'251016_275_0439_reg.fits','offset':[0,0]}#
+        fn395={'fn':'251016_395_0444_reg.fits','offset':[0,0]}
+        fn502={'fn':'251016_502_0446_reg.fits','offset':[0,0]}
+        fn673={'fn':'251016_673_0442_reg.fits','offset':[0,0]} #4,0
+        fn727={'fn':'251016_727_0453_reg.fits','offset':[0,0]} #5,0
+        fn889={'fn':'251016_889_0426_reg.fits','offset':[0,0]} #0,-5
     if obskeyHST=='20251016UTf':
         fn619={'fn':'251016_619_0458_reg.fits','offset':[0,0]}
         fn631={'fn':'251016_631_0502_reg.fits','offset':[0,0]}
@@ -712,16 +745,18 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
     emi275patch=mp.make_patch(emi275,LatLims,LonLims,180,180,pad=True)
     #data275patchflat=fp.flatten_patch(data275patch)
     del hdr275["MISSVAL"]
-    data395,hdr395,inc395,emi395=read_HSTGO_fits(pathHST,fn395,LonSys,plot=False,dataunit=0)
-    data395patch=mp.make_patch(data395,LatLims,LonLims,180,180,pad=True)
-    emi395patch=mp.make_patch(emi395,LatLims,LonLims,180,180,pad=True)
-    #data395patchflat=fp.flatten_patch(data395patch)
-    del hdr395["MISSVAL"]
-    data502,hdr502,inc502,emi502=read_HSTGO_fits(pathHST,fn502,LonSys,plot=False,dataunit=0)
-    data502patch=mp.make_patch(data502,LatLims,LonLims,180,180,pad=True)
-    emi502patch=mp.make_patch(emi502,LatLims,LonLims,180,180,pad=True)
-    #data502patchflat=fp.flatten_patch(data502patch)
-    del hdr502["MISSVAL"]
+    if fn395 !=' ':
+        data395,hdr395,inc395,emi395=read_HSTGO_fits(pathHST,fn395,LonSys,plot=False,dataunit=0)
+        data395patch=mp.make_patch(data395,LatLims,LonLims,180,180,pad=True)
+        emi395patch=mp.make_patch(emi395,LatLims,LonLims,180,180,pad=True)
+        #data395patchflat=fp.flatten_patch(data395patch)
+        del hdr395["MISSVAL"]
+    if fn502!=' ':
+        data502,hdr502,inc502,emi502=read_HSTGO_fits(pathHST,fn502,LonSys,plot=False,dataunit=0)
+        data502patch=mp.make_patch(data502,LatLims,LonLims,180,180,pad=True)
+        emi502patch=mp.make_patch(emi502,LatLims,LonLims,180,180,pad=True)
+        #data502patchflat=fp.flatten_patch(data502patch)
+        del hdr502["MISSVAL"]
     data619,hdr619,inc619,emi619=read_HSTGO_fits(pathHST,fn619,LonSys,plot=False,dataunit=0)
     data619patch=mp.make_patch(data619,LatLims,LonLims,180,180,pad=True)
     emi619patch=mp.make_patch(emi619,LatLims,LonLims,180,180,pad=True)
@@ -742,17 +777,19 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
     emi673patch=mp.make_patch(emi673,LatLims,LonLims,180,180,pad=True)
     #data673patchflat=fp.flatten_patch(data673patch)
     del hdr673["MISSVAL"]
-    data727,hdr727,inc727,emi727=read_HSTGO_fits(pathHST,fn727,LonSys,plot=False,dataunit=0)
-    data727patch=mp.make_patch(data727,LatLims,LonLims,180,180,pad=True)
-    emi727patch=mp.make_patch(emi727,LatLims,LonLims,180,180,pad=True)
-    #data727patchflat=fp.flatten_patch(data727patch)
-    del hdr727["MISSVAL"]
-    data889,hdr889,inc889,emi889=read_HSTGO_fits(pathHST,fn889,LonSys,plot=False,dataunit=0)
-    data889patch=mp.make_patch(data889,LatLims,LonLims,180,180,pad=True)
-    emi889patch=mp.make_patch(emi889,LatLims,LonLims,180,180,pad=True)
-    #data889patchflat=fp.flatten_patch(data889patch)
-    del hdr889["MISSVAL"]
-
+    if fn727!=' ':
+        data727,hdr727,inc727,emi727=read_HSTGO_fits(pathHST,fn727,LonSys,plot=False,dataunit=0)
+        data727patch=mp.make_patch(data727,LatLims,LonLims,180,180,pad=True)
+        emi727patch=mp.make_patch(emi727,LatLims,LonLims,180,180,pad=True)
+        #data727patchflat=fp.flatten_patch(data727patch)
+        del hdr727["MISSVAL"]
+    if fn889!=' ':
+        data889,hdr889,inc889,emi889=read_HSTGO_fits(pathHST,fn889,LonSys,plot=False,dataunit=0)
+        data889patch=mp.make_patch(data889,LatLims,LonLims,180,180,pad=True)
+        emi889patch=mp.make_patch(emi889,LatLims,LonLims,180,180,pad=True)
+        #data889patchflat=fp.flatten_patch(data889patch)
+        del hdr889["MISSVAL"]
+    
     ###########################################################################
     # Compute PCld and fNH3 from Mike Wongs radiance data with a Minnaert 
     # correction applied.
@@ -773,7 +810,7 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
     # correction applied.
     AOIpatch,CIpatch=make_L2_HSTGO_AOI_CI(pathHST,hdr275,data275patch,hdr889,data889patch,
                                           hdr395,data395patch,hdr631,data631patch,
-                                          LonSys,plot=True)
+                                          LonSys,plot=False)
     AOIpatchflat=fp.flatten_patch(AOIpatch)
     CIpatchflat=fp.flatten_patch(CIpatch)
 
@@ -791,7 +828,12 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
     ###########################################################################
     # Write FITS Patches
     ########################################################################### 
-    pathout="C:/Astronomy/Projects/SAS 2021 Ammonia/Data/HST GO 18055/"+obskeyHST[:-1]+"/"+obskeyHST
+    import socket
+    hostname = socket.gethostname()
+    from config_VA import Host_path
+    #pathout="C:/Astronomy/Projects/SAS 2021 Ammonia/Data/HST GO 18055/"+obskeyHST[:-1]+"/"+obskeyHST
+    pathout=Host_path[hostname]+'/HST GO 18055/'+obskeyHST[:-1]+'/'+obskeyHST
+
     if not os.path.exists(pathout+"/L1"):
         os.makedirs(pathout+"/L1")
     if not os.path.exists(pathout+"/L3"):

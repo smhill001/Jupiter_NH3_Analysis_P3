@@ -3463,6 +3463,16 @@ def get_obs_list(planet="Jupiter",subsetkeys='all'):
                                'NH3file':'2026-05-07-1221_8-Jupiter_R656G647B632-RGB-WhtBal-RGB-Shift', 
                                'RGBfile':'2026-05-07-1221_8-Jupiter_R656G620B632-RGB-WhtBal-WV'},
                   
+                  #############################################################
+                  # 20260528 CHU-WING-SO HONG KONG                   20260507 #
+                  #############################################################
+                    
+                  '20260528UTa':{'Telescope':'C11','FL':'6000mm','Camera':'SBIG',
+                                     'Seeing':'9/10','Transparency':'8/10', 
+                               'CH4file':'2026-05-28-1235_6-Jupiter_R656G620B632-RGB-WhtBal', 
+                               'NH3file':'2026-05-28-1235_6-Jupiter_R656G647B632-RGB-WhtBal-RGB-shift', 
+                               'RGBfile':'2026-05-28-1235_6-Jupiter_R656G620B632-RGB-WhtBal-WV'}
+                  
                   }
     
     ###########################################################################

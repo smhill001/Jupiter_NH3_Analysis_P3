@@ -7,9 +7,12 @@ from config_VA import Fletcher_Profile,Plot_TEXES_code,Fletcher_Profile_Out
 
 def Juno_MWR():
     import numpy as np
+    from config_VA import Compare_data_path
+    import socket
+    hostname = socket.gethostname()
     # Load data with headers
+    path=Compare_data_path[hostname]
     fn="MWRNH3A2016240070004_R00548_V01.csv"
-    path="C:/Astronomy/Projects/SAS 2021 Ammonia/Visualization-and-Analysis/"
 
     structured_data = np.genfromtxt(path+fn, delimiter=',', names=True,deletechars="")
 
@@ -26,8 +29,12 @@ def Juno_MWR():
 
 def Giles2017(dataset='4b'):
     import numpy as np
+    from config_VA import Compare_data_path
+    import socket
+    hostname = socket.gethostname()
+    # Load data with headers
+    path=Compare_data_path[hostname]
     fn="Giles2000 Figure "+dataset+".csv"
-    path="C:/Astronomy/Projects/SAS 2021 Ammonia/Visualization-and-Analysis/"
     tmp = np.loadtxt(path+fn, delimiter=',')
     return(tmp)
 
