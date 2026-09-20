@@ -15,7 +15,10 @@ def get_obs_list(planet="Jupiter",subsetkeys='all'):
 
     """
     import json
-    
+    import socket
+    hostname = socket.gethostname()
+    from config_VA import Host_path
+    path=Host_path[hostname]+'/../git_repos/Jupiter_NH3_Analysis_P3/'
     ###########################################################################
     #                                                                         #
     #    JUPITER                                                              #
@@ -3512,7 +3515,8 @@ def get_obs_list(planet="Jupiter",subsetkeys='all'):
         sourcefiles=Jupiterfiles
     if planet=="Saturn":
         sourcefiles=Saturnfiles
-    filename="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/L1PNG.json"
+    #filename="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/L1PNG.json"
+    filename=path+"L1PNG.json"
     with open(filename, "w") as fp:
         json.dump(sourcefiles , fp) 
 

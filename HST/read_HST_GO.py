@@ -888,7 +888,8 @@ def HSTGO_process_and_plot(obskeyHST,LatLims,LonLimsInput,LonSys='3',
     fig1,axs1=L4MP.set_up_figure(figsz,obskeyHST,LonSys,RGBaxs=2)
     # PLOT fNH3
     cbttlNH3="Mean="+str(np.mean(fNH3patchflat))[:4]+" $\pm$ "+str(np.std(fNH3patchflat))[:3]
-    pp.plot_patch(fNH3patchflat,LatLims,LonLims,180,180,'terrain_r',axs1[0],
+    fNH3factor=1.5
+    pp.plot_patch(fNH3patchflat*fNH3factor,LatLims,LonLims,180,180,'terrain_r',axs1[0],
                    cbarplot=True,cbar_title=cbttlNH3,cbar_reverse=False,
                    vn=0,vx=300)  
     axs1[1].set_title('fNH3 (ppm)',fontsize=10)

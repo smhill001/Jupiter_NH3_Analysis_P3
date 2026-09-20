@@ -27,6 +27,28 @@ def Juno_MWR():
     
     return(header_names,x,y)
 
+def Gapp2024():
+    import numpy as np
+    from config_VA import Compare_data_path
+    import socket
+    hostname = socket.gethostname()
+    # Load data with headers
+    path=Compare_data_path[hostname]
+    fn="Gapp2024 figure 17 Gapp2024.csv"
+    tmp = np.loadtxt(path+fn, delimiter=',')
+    return(tmp)
+
+def Fouchet2000():
+    import numpy as np
+    from config_VA import Compare_data_path
+    import socket
+    hostname = socket.gethostname()
+    # Load data with headers
+    path=Compare_data_path[hostname]
+    fn="Gapp2024 figure 17 Fouchet 2000.csv"
+    tmp = np.loadtxt(path+fn, delimiter=',')
+    return(tmp)
+
 def Giles2017(dataset='4b'):
     import numpy as np
     from config_VA import Compare_data_path

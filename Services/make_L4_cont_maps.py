@@ -293,7 +293,7 @@ def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
     sys.path.append('./Services')
 
     import numpy as np
-    import scipy.ndimage as ndi
+    #import scipy.ndimage as ndi
     sys.path.append('./Maps')
     from astropy.time import Time
     import os
@@ -305,6 +305,7 @@ def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
     if dataversion==1:
         obskeys,dummy=gmc.get_map_collection(collection)
     elif dataversion==2:
+        print("############ dataversion,config_VA[dataversion]=",dataversion,config_VA[dataversion])
         obskeys=os.listdir(config_VA[dataversion]+'/'+obskeys)
         print("################################",obskeys)
 

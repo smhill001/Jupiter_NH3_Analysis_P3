@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['Dummy_Start.py', 'HST/make_HST_fits_script.py', '../Visualization-and-Analysis/flatten_patch.py', '../Visualization-and-Analysis/HST_Study_Maps.py', 'HST/read_HST_GO.py']
+recent_files = ['Dummy_Start.py', 'HST/make_HST_fits_script.py', '../Visualization-and-Analysis/flatten_patch.py', '../Visualization-and-Analysis/HST_Study_Maps.py', 'HST/read_HST_GO.py', 'Services/make_L4_cont_maps.py', '../Visualization-and-Analysis/get_map_collection.py', 'Services/get_obs_list.py', '../Visualization-and-Analysis/config_VA.py']
 
 [main]
 version = 0.2.0
