@@ -10,7 +10,6 @@ import plot_patch as pp
 import flatten_patch as fp
 #from matplotlib.pyplot import imread
 from astropy.io import fits
-from scipy.ndimage import gaussian_filter
 from matplotlib import cm, colors
 from scipy.ndimage import zoom
 import L4_Jup_Map_Plot_V2 as L4MP
@@ -103,7 +102,7 @@ def get_HSTGO_filenames(obskeyHST):
     import socket
     hostname = socket.gethostname()
     from config_VA import Host_path
-    pathHST=Host_path[hostname]+'/HST GO 18055/'+obskeyHST[:-1]+'/'+obskeyHST+'/unprocessed_L1/'
+    pathHST=Host_path[hostname]+'/HST GO 18055/'+obskeyHST[0:10]+'/'+obskeyHST+'/unprocessed_L1/'
 
     if obskeyHST=='20251016UTa':
         fn619={'fn':'251015_619_2347_reg.fits','offset':[0,0]} #-9,0
@@ -125,6 +124,16 @@ def get_HSTGO_filenames(obskeyHST):
         fn673={'fn':'251016_673_0007_reg.fits','offset':[0,0]} #-13,0
         fn727={'fn':'251016_727_0010_reg.fits','offset':[0,0]} #7,0
         fn889={'fn':'251015_889_2339_reg.fits','offset':[0,0]}
+    if obskeyHST=='20251016UTc0':
+        fn619={'fn':'251016_619_0256_reg.fits','offset':[0,0]}
+        fn631={'fn':'251016_631_0300_reg.fits','offset':[0,0]}
+        fn645={'fn':'251016_645_0302_reg.fits','offset':[0,0]}
+        fn275={'fn':'251016_275_0305_reg.fits','offset':[0,0]}#
+        fn395={'fn':'251016_395_0309_reg.fits','offset':[0,0]}
+        fn502={'fn':'251016_502_0311_reg.fits','offset':[0,0]}
+        fn673={'fn':'251016_673_0307_reg.fits','offset':[0,0]} #4,0
+        fn727={'fn':'251016_727_0318_reg.fits','offset':[0,0]} #5,0
+        fn889={'fn':'251016_889_0251_reg.fits','offset':[0,0]} #0,-5
     if obskeyHST=='20251016UTc':
         fn619={'fn':'251016_619_0256_reg.fits','offset':[0,0]}
         fn631={'fn':'251016_631_0300_reg.fits','offset':[0,0]}

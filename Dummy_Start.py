@@ -19,7 +19,8 @@ sys.path.append("/mnt/data/git_repos/Data-Management-and-Access/processes/")
 import get_spice_ephem
 import convert_system3_to_I_II_spice
 import PlanetMapper_Spice_Furnish
-import read_HST_GO
+#import read_HST_GO
 import make_HST_fits_script
-import scipy.ndimage as ndi
+#import scipy.ndimage
+import make_L4_cont_maps
 

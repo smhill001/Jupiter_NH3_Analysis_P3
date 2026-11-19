@@ -4,7 +4,7 @@ Created on Wed Jul 19 15:34:15 2023
 
 @author: smhil
 """
-def get_karkoschka_data(Type='Jupiter'):
+def get_karkoschka_data(projpath='',Type='Jupiter'):
     import sys
     sys.path.append('c:/Astronomy/Python Play')
     sys.path.append('c:/Astronomy/Python Play/Util_P3')
@@ -12,7 +12,7 @@ def get_karkoschka_data(Type='Jupiter'):
     sys.path.append('c:/Astronomy/Python Play/SpectroPhotometry/Spectroscopy_P3')
     import numpy as np
     import GeneralSpecUtils_P3 as GSU
-    projpath="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
+    #projpath="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/"
     
     ###############################################################################
     # LOAD JOVIAN DISK-INTEGRATEDALBEDO DATA FROM KARKOSCHKA, 1994 (DATA FROM 1993)

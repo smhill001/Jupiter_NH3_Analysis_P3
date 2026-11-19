@@ -1,3 +1,5 @@
+import scipy.ndimage
+
 def blendstack(stackdata,stackweights):
     """
     Blend individual map patches into a larger map using using weights based
@@ -28,10 +30,15 @@ def blendstack(stackdata,stackweights):
     stackdatamasked = np.ma.MaskedArray(stackdata, mask=np.isnan(stackdata))
     print("$$$$$$$$")
     print(stackdatamasked.shape,stackweights.shape)
-    blendweightdata=np.ma.average(stackdatamasked, axis=2, weights=stackweights) 
+    blendweightdata=np.ma.average(stackdatamasked, axis=2, weights=stackweights)
     
     stdvdata=np.nanstd(stackdata,axis=2)
     fracdata=stdvdata/blenddata
+    #!!!! Experiment to return arrays without masking for writing to FITS files
+    #blendweightdata = np.asarray(blendweightdata)
+    #stdvdata = np.asarray(stdvdata)
+    #fracdata = np.asarray(fracdata)
+    
     
     return(blendweightdata,stdvdata,fracdata)
 
@@ -109,19 +116,23 @@ def make_5u_cont_map(IRTFcollection,LonSys,boxcar,lats):
     import sys
     drive='c:'
     sys.path.append(drive+'/Astronomy/Python Play')
-    sys.path.append('C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/5micron')
+    sys.path.append('./5micron')
 
     import numpy as np
     from astropy.io import fits
-    import scipy.ndimage as ndi
+    #import scipy.ndimage
     from astropy.time import Time
     import get_5um_collection as g5u
-    
+    from config_VA import Pipeline_path
+    import socket
+    hostname = socket.gethostname()
+
 
     ###########################################################################
     # Loop over 5um FITS files to create maps
     ###########################################################################
-    pathIRTF_FITS="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/5micron/FITS/output/"
+    #pathIRTF_FITS="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/5micron/FITS/output/"
+    pathIRTF_FITS=Pipeline_path[hostname]+"5micron/FITS/output/"
     stackIRTF,stackweightsIRTF,stackTimeIRTF=\
         [np.zeros((180, 360)) for _ in range(3)]
 
@@ -171,7 +182,7 @@ def make_5u_cont_map(IRTFcollection,LonSys,boxcar,lats):
             outputmask[lats[0]:lats[1],0:wl_0]= 1.0
             print("$$$$$$$$$$-------- wl_1:360,0:np.mod(wl_0,360)=",wl_1,360,0,np.mod(wl_0,360))
 
-        outputweightsIRTF=ndi.uniform_filter1d(outputmask,boxcar,1)
+        outputweightsIRTF=scipy.ndimage.uniform_filter1d(outputmask,boxcar,1)
         datamask[outputweightsIRTF>0.0]=1.0
 
         if FirstIRTF:
@@ -206,7 +217,10 @@ def createL4FileName(mean_time, env_data_type,LonSys,lats,LonLims,collection):
     import numpy as np
     import make_lat_lon_str as MLLS
     
-    mean_epoch_jd=Time(np.mean(mean_time),format='jd',scale='utc')
+    #mean_epoch_jd=Time(np.mean(mean_time),format='jd',scale='utc')
+    mean_epoch_jd=Time(np.mean(mean_time[mean_time != 0]),format='jd',scale='utc')
+    #arr[arr != 0]
+    print(mean_epoch_jd,np.min(mean_time),np.mean(mean_time),np.max(mean_time))
     dt_object = mean_epoch_jd.to_datetime()
     dt_string = dt_object.strftime('%Y%m%dT%H%M%S')
     dt_string_fits = dt_object.strftime('%Y-%m-%dT%H:%M:%S')
@@ -219,16 +233,20 @@ def createL4FileName(mean_time, env_data_type,LonSys,lats,LonLims,collection):
 
 def write_fits_contiguous_map(data,variance,fract,env_data_type,mean_time,
                               LonSys,lats,LonLims,collection,
-                              first_fits_hdr,proj='../../Data/L4 FITS (cont maps)/',
+                              first_fits_hdr,proj='',
                               target="Jupiter"):
     
-    import numpy as np
+    #import numpy as np
     from astropy.io import fits
     from time import gmtime, strftime
     import os
     import get_spice_ephem as sp_ephem
+    from config_VA import Host_path
+    import socket
+    hostname = socket.gethostname()
 
     pathout="C:/Astronomy/Projects/SAS 2021 Ammonia/Jupiter_NH3_Analysis_P3/Studies/"
+    pathout=Host_path[hostname]+'/L4 FITS (cont maps)'
     hdudata = fits.PrimaryHDU(data)
     variancedata=fits.ImageHDU(variance)
     fractdata=fits.ImageHDU(fract)
@@ -272,7 +290,7 @@ def write_fits_contiguous_map(data,variance,fract,env_data_type,mean_time,
         
     return
 
-def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
+def make_L4_cont_maps(collection="20251016-20251017",datekeys=False,LonSys='3',
                       FiveMicron='fits',Five_obskey='',IRTFcollection='20240205-20240205',
                       lats=[0,180],LonLims=[0,360],variance=True,proj='../../Data/L4 FITS (cont maps)/',
                       bare_maps=False,cb=False,LimbCorrection=True,
@@ -299,16 +317,24 @@ def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
     import os
     import read_fits_V2 as RF2
     import get_map_collection as gmc
-    from config_VA import config_VA
-    
+    from config_VA import config_VA, Host_path
+    import socket
+    hostname = socket.gethostname()
+
     print("11111111111")
     if dataversion==1:
         obskeys,dummy=gmc.get_map_collection(collection)
     elif dataversion==2:
         print("############ dataversion,config_VA[dataversion]=",dataversion,config_VA[dataversion])
-        obskeys=os.listdir(config_VA[dataversion]+'/'+obskeys)
+        #obskeys=os.listdir(config_VA[dataversion]+'/'+obskeys)
+        print(datekeys)
+        obskeys=[]
+        for datekey in datekeys:
+            print(datekey)
+            print(Host_path[hostname]+config_VA[dataversion]+datekey)
+            obskeys.extend(os.listdir(Host_path[hostname]+config_VA[dataversion]+datekey))
         print("################################",obskeys)
-
+    #return
     ###########################################################################
     # Establish empty arrays for stacked contiguous maps
     ###########################################################################
@@ -365,7 +391,7 @@ def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
             outputmask[lats[0]:lats[1],0:wl_0]= 1.0
             print("$$$$$$$$$$-------- wl_1:360,0:np.mod(wl_0,360)=",wl_1,360,0,np.mod(wl_0,360))
 
-        outputweights=ndi.uniform_filter1d(outputmask,boxcar,1)
+        outputweights=scipy.ndimage.uniform_filter1d(outputmask,boxcar,1)
         datamask[outputweights>0.0]=1.0
         
         if First:
@@ -429,22 +455,22 @@ def make_L4_cont_maps(collection="20251016-20251017",obskeys=False,LonSys='3',
 
     ###########################################################################
 
-    write_fits_contiguous_map(blendweightfNH3,stdvfNH3,fracfNH3,'fNH3',blendweightTime,
+    write_fits_contiguous_map(blendweightfNH3.data,stdvfNH3.data,fracfNH3.data,'fNH3',blendweightTime.data,
                                   LonSys,lats,LonLims,collection,
                                   fNH3hdr,proj=proj)
     
-    write_fits_contiguous_map(blendweightPCloud,stdvPCloud,fracPCloud,'PCld',blendweightTime,
+    write_fits_contiguous_map(blendweightPCloud.data,stdvPCloud.data,fracPCloud.data,'PCld',blendweightTime.data,
                                   LonSys,lats,LonLims,collection,
                                   fNH3hdr,proj=proj)
     
-    write_fits_contiguous_map(blendRGBweight,blendRGBweight,blendRGBweight,'RGB',blendweightTime,
+    write_fits_contiguous_map(blendRGBweight.data,blendRGBweight.data,blendRGBweight.data,'RGB',blendweightTime.data,
                                   LonSys,lats,LonLims,collection,
                                   fNH3hdr,proj=proj)
     
     if FiveMicron=='fits':
         blendweightIRTF,stdvIRTF,fracIRTF,blendweightTimeIRTF,stdvTimeIRTF,fracTimeIRTF=\
             make_5u_cont_map(IRTFcollection,LonSys,boxcar,lats)
-        write_fits_contiguous_map(blendweightIRTF,stdvIRTF,fracIRTF,'IRTF',blendweightTimeIRTF,
+        write_fits_contiguous_map(blendweightIRTF.data,stdvIRTF.data,fracIRTF.data,'IRTF',blendweightTimeIRTF.data,
                                       LonSys,lats,LonLims,IRTFcollection,
                                       fNH3hdr,proj=proj)
 
